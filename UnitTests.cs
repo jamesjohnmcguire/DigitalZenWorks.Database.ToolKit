@@ -196,6 +196,23 @@ namespace Zenware.DatabaseLibrary
 			VerifyRowExists(NewRowId, false);
 		}
 
+
+		/////////////////////////////////////////////////////////////////////////
+		/// Method <c>Delete</c>
+		/// <summary>
+		/// Delete Test
+		/// </summary>
+		/////////////////////////////////////////////////////////////////////////
+		[Test]
+		public void ExportToCsv()
+		{
+			StorageContainers DatabaseHelper = new StorageContainers();
+
+			DatabaseHelper.ExportToCsv(@"c:\data\admin\contacts\ContactsX.mdb", @"c:\data\admin\contacts\backups");
+
+			Assert.IsTrue((File.Exists(@"c:\data\admin\contacts\backups\contacts.csv")));
+		}
+
 		private void VerifyRowExists(
 			uint ExistingRowId,
 			bool ShouldExist)
