@@ -20,21 +20,26 @@ namespace Zenware.DatabaseLibrary
 	/////////////////////////////////////////////////////////////////////////
 	public class CoreDatabase
 	{
+		/////////////////////////////////////////////////////////////////////
 		/// <summary>
 		/// DB_OLEDB
 		/// </summary>
-		private const uint	DB_OLEDB		= 1;
+		/////////////////////////////////////////////////////////////////////
+		private const uint DB_OLEDB = 1;
 
+		/////////////////////////////////////////////////////////////////////
 		/// <summary>
 		/// DB_SQLSERVER
 		/// </summary>
+		/////////////////////////////////////////////////////////////////////
+		private const uint DB_SQLSERVER = 2;
 
-		private const uint	DB_SQLSERVER	= 2;
-
+		/////////////////////////////////////////////////////////////////////
 		/// <summary>
 		/// DB_ORACLE
 		/// </summary>
-		private const uint	DB_ORACLE		= 3;
+		/////////////////////////////////////////////////////////////////////
+		private const uint DB_ORACLE = 3;
 
 		/// <summary>
 		/// DB_MYSQL
@@ -44,7 +49,7 @@ namespace Zenware.DatabaseLibrary
 		/// <summary>
 		/// m_DatabaseType
 		/// </summary>
-		private uint		m_DatabaseType	= 0;
+		private uint m_DatabaseType = 0;
 
 		/// <summary>
 		/// The actual connection string used to connect to the database.
@@ -80,7 +85,7 @@ namespace Zenware.DatabaseLibrary
 		private Diagnostics m_Diagnostics = null;
 
 		/// <summary>
-		/// Default constructor
+		/// CoreDatabase - Default constructor
 		/// </summary>
 		public CoreDatabase()
 		{
@@ -97,7 +102,7 @@ namespace Zenware.DatabaseLibrary
 		}
 
 		/// <summary>
-		/// CoreDatabase constructor
+		/// CoreDatabase - Constructor
 		/// </summary>
 		/// <param name="Provider"></param>
 		/// <param name="DataSource"></param>
@@ -111,7 +116,7 @@ namespace Zenware.DatabaseLibrary
 		}
 
 		/// <summary>
-		/// 
+		/// CoreDatabase - Constructor
 		/// </summary>
 		/// <param name="ClientName"></param>
 		/// <param name="Provider"></param>
@@ -127,7 +132,7 @@ namespace Zenware.DatabaseLibrary
 		}
 
 		/// <summary>
-		/// 
+		/// CoreDatabase - Constructor
 		/// </summary>
 		/// <param name="DatabaseType"></param>
 		/// <param name="DataSource"></param>
@@ -143,11 +148,10 @@ namespace Zenware.DatabaseLibrary
 		}
 
 		/// <summary>
-		/// 
+		/// CoreDatabase - Constructor
 		/// </summary>
 		/// <param name="DatabaseType"></param>
-		/// <param name="DataSource"></param>
-		/// <param name="Catalog"></param>
+		/// <param name="ConnectionString"></param>
 		public CoreDatabase(
 			uint DatabaseType,
 			string ConnectionString)
@@ -176,27 +180,27 @@ namespace Zenware.DatabaseLibrary
 				switch (m_DatabaseType)
 				{
 					case DB_OLEDB:
-					{
-						m_OleDbConnection = new OleDbConnection(m_ConnectionString);
-						m_Connection = m_OleDbConnection;
-						break;
-					}
+						{
+							m_OleDbConnection = new OleDbConnection(m_ConnectionString);
+							m_Connection = m_OleDbConnection;
+							break;
+						}
 					case DB_SQLSERVER:
-					{
-						m_Connection = new SqlConnection(m_ConnectionString);
-						break;
-					}
+						{
+							m_Connection = new SqlConnection(m_ConnectionString);
+							break;
+						}
 					case DB_ORACLE:
-					{
-						m_Connection = new OracleConnection(m_ConnectionString);
-						break;
-					}
+						{
+							m_Connection = new OracleConnection(m_ConnectionString);
+							break;
+						}
 					case DB_MYSQL:
-					{
-						m_MySqlConnection = new MySqlConnection(m_ConnectionString);
-						m_Connection = m_MySqlConnection;
-						break;
-					}
+						{
+							m_MySqlConnection = new MySqlConnection(m_ConnectionString);
+							m_Connection = m_MySqlConnection;
+							break;
+						}
 				}
 
 				ReturnValue = true;
@@ -226,7 +230,7 @@ namespace Zenware.DatabaseLibrary
 			{
 				ConnectionString = "Provider=" + Provider;
 			}
-			
+
 			if (null != DataSource)
 			{
 				ConnectionString += "; Data Source=" + DataSource;
@@ -288,6 +292,8 @@ namespace Zenware.DatabaseLibrary
 		/// </summary>
 		public void BeginTransaction()
 		{
+			EstablishConnection();
+
 			if (null != m_Connection)
 			{
 				if (m_Connection.State != ConnectionState.Open)
@@ -370,9 +376,9 @@ namespace Zenware.DatabaseLibrary
 				}
 
 				ThisCommand.Transaction = m_DatabaseTransaction;
-				ThisCommand.Connection	= m_Connection;
+				ThisCommand.Connection = m_Connection;
 				ThisCommand.CommandText = SqlQuery;
-				ThisCommand.CommandTimeout	= 30;
+				ThisCommand.CommandTimeout = 30;
 
 			}
 			catch (Exception ex)
@@ -401,9 +407,9 @@ namespace Zenware.DatabaseLibrary
 			string SqlQuery,
 			out DataSet OutDataSet)
 		{
-			int	RowCount	= -1;
+			int RowCount = -1;
 
-			OutDataSet		= new DataSet();
+			OutDataSet = new DataSet();
 
 			try
 			{
@@ -438,11 +444,11 @@ namespace Zenware.DatabaseLibrary
 
 				RowCount = ThisDataAdapter.Fill(OutDataSet);
 
-				m_Diagnostics.SetEvent( "OK - getDataSet - Query: " + SqlQuery);
+				m_Diagnostics.SetEvent("OK - getDataSet - Query: " + SqlQuery);
 			}
 			catch (Exception ex)
 			{
-				m_Diagnostics.SetEvent( "getDataSet - DB connect problem. Exception: " +
+				m_Diagnostics.SetEvent("getDataSet - DB connect problem. Exception: " +
 					ex.Message +
 					" - Query: " + SqlQuery,
 					Diagnostics.ALERT_ERROR);
@@ -478,15 +484,15 @@ namespace Zenware.DatabaseLibrary
 					ReturnCode = true;
 				}
 			}
-			catch(Exception exNonQuery)
+			catch (Exception exNonQuery)
 			{
-				SetExceptionError(	
-					exNonQuery, 
+				SetExceptionError(
+					exNonQuery,
 					"ExecuteNonQuery - An exception was encountered while attempting to execute the command. Exception: ",
 					SqlQueryCommand);
 				throw exNonQuery;
 			}
-			finally 
+			finally
 			{
 				if (null == m_DatabaseTransaction)
 				{
@@ -566,16 +572,16 @@ namespace Zenware.DatabaseLibrary
 		/////////////////////////////////////////////////////////////////////////
 		public bool SetDiagnostics(string sApplicationName)
 		{
-			bool	bInit	= false;
+			bool bInit = false;
 			try
 			{
-				m_Diagnostics	= new Diagnostics( sApplicationName, "DBLib" );
+				m_Diagnostics = new Diagnostics(sApplicationName, "DBLib");
 
-				bInit	= true;
+				bInit = true;
 			}
 			catch
 			{
-				bInit	= false;
+				bInit = false;
 			}
 
 			return bInit;
@@ -589,10 +595,10 @@ namespace Zenware.DatabaseLibrary
 		/// <param name="sCommand"></param>
 		public void SetExceptionError(Exception ex, string sIntroMsg, string sCommand)
 		{
-			m_Diagnostics.SetEvent( 
-				sIntroMsg + 
+			m_Diagnostics.SetEvent(
+				sIntroMsg +
 				ex.Message +
-				" - Command: " + 
+				" - Command: " +
 				sCommand,
 				Diagnostics.ALERT_ERROR);
 		}
@@ -747,11 +753,23 @@ namespace Zenware.DatabaseLibrary
 		/////////////////////////////////////////////////////////////////////////
 		public uint InsertCommand(string SqlQueryCommand)
 		{
+			bool FinishTransaction = false;
+			if (null == m_DatabaseTransaction)
+			{
+				BeginTransaction();
+				FinishTransaction = true;
+			}
+
 			// execute non query
 			ExecuteNonQuery(SqlQueryCommand);
 
 			// get id of effected row
 			uint ReturnCode = ExecuteScalar("SELECT @@IDENTITY");
+
+			if (true == FinishTransaction)
+			{
+				CommitTransaction();
+			}
 
 			return ReturnCode;
 		}
