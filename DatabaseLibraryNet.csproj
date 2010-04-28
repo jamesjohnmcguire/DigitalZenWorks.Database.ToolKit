@@ -132,7 +132,7 @@
       <Project>{606019EB-1B8A-4F07-9C52-2CF84BB56736}</Project>
       <Name>DiagnosticsLibraryNet</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\..\Common\Src\UtilsNET\UtilsNet.csproj">
+    <ProjectReference Include="..\UtilsNET\UtilsNet.csproj">
       <Project>{3663DA63-BB91-4B03-B4F7-23DD8EEF9D61}</Project>
       <Name>UtilsNet</Name>
     </ProjectReference>
