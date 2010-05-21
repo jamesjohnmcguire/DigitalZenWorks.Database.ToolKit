@@ -119,7 +119,7 @@
     <Compile Include="UnitTests.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="ClassDiagram1.cd" />
+    <None Include="ClassDiagram.cd" />
     <None Include="DatabaseLibraryNet.snk" />
   </ItemGroup>
   <ItemGroup>
@@ -128,7 +128,7 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\Common\Src\DiagnosticsLibraryNET\DiagnosticsLibraryNet.csproj">
+    <ProjectReference Include="..\DiagnosticsLibraryNET\DiagnosticsLibraryNet.csproj">
       <Project>{606019EB-1B8A-4F07-9C52-2CF84BB56736}</Project>
       <Name>DiagnosticsLibraryNet</Name>
     </ProjectReference>
