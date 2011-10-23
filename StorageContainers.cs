@@ -19,7 +19,7 @@ namespace Zenware.DatabaseLibrary
 	/////////////////////////////////////////////////////////////////////////
 	public class StorageContainers
 	{
-		enum ColumnTypes
+		private enum ColumnTypes
 		{
 			Autonumber,
 			Currency,
@@ -30,13 +30,14 @@ namespace Zenware.DatabaseLibrary
 			String,
 			YesNo
 		}
+
 		/////////////////////////////////////////////////////////////////////
 		/// Method <c>CreateMdbFile</c>
 		/// <summary>
 		/// Creates an empty MDB (MS Jet / Access databse) file.
 		/// </summary>
 		/////////////////////////////////////////////////////////////////////
-		void CreateMdbFile(
+		private void CreateMdbFile(
 			string NewFilePath)
 		{
 			Stream TemplateObjectStream = null;
@@ -60,7 +61,7 @@ namespace Zenware.DatabaseLibrary
 			}
 		}
 
-		void ImportSchema(
+		private void ImportSchema(
 			string SchemaFile,
 			string MdbFile)
 		{
@@ -68,8 +69,7 @@ namespace Zenware.DatabaseLibrary
 			{
 				if (File.Exists(SchemaFile))
 				{
-					Utils UtilsObject = new Utils();
-					string FileContents = UtilsObject.GetFileContents(SchemaFile);
+					string FileContents = Utils.GetFileContents(SchemaFile);
 
 					string[] StringSeparators = new string[] { "\r\n\r\n" };
 					string[] Queries = FileContents.Split(StringSeparators,
@@ -172,7 +172,7 @@ namespace Zenware.DatabaseLibrary
 				"\r\n\t\t/////////////////////////////////////////////////////////////////////" +
 				"\r\n\t\tpublic bool " + TableName + "(";
 
-				return FunctionHeader;
+			return FunctionHeader;
 		}
 
 		private string GetTestFileHeader()
@@ -301,7 +301,7 @@ namespace Zenware.DatabaseLibrary
 		/////////////////////////////////////////////////////////////////////
 		/// Method <c>CreateUpdateStatments</c>
 		/// <summary>
-		/// Crates files that have the  update functions and the test 
+		/// Crates files that have the  update functions and the test
 		/// functions for the given schema file.
 		/// </summary>
 		/////////////////////////////////////////////////////////////////////
@@ -314,14 +314,13 @@ namespace Zenware.DatabaseLibrary
 			{
 				if (File.Exists(SchemaFile))
 				{
-					Utils UtilsObject = new Utils();
-					string FileContents = UtilsObject.GetFileContents(SchemaFile);
+					string FileContents = Utils.GetFileContents(SchemaFile);
 
 					string[] Queries = GetTableDefinitions(FileContents);
 
 					//set up a streamwriter for adding text
 					StreamWriter StreamWriterObject = new StreamWriter(UpdateFile, false, Encoding.Default);
-					string NewFileContents = GetFileHeader();;
+					string NewFileContents = GetFileHeader(); ;
 
 					//set up a streamwriter for adding text
 					StreamWriter TestFileStreamWriter = new StreamWriter(TestFile, false, Encoding.Default);
@@ -351,7 +350,7 @@ namespace Zenware.DatabaseLibrary
 						//uint Index = 0;
 						string PrimaryKey = null;
 
-						for (uint Index = 1; Index < TableColumnParts.Length; Index++) 
+						for (uint Index = 1; Index < TableColumnParts.Length; Index++)
 						//foreach (string Column in TableColumnParts)
 						{
 							string Column = TableColumnParts[Index];
@@ -564,8 +563,8 @@ namespace Zenware.DatabaseLibrary
 			string PrivledgedConnectString = MakePrivledgedConnectString(MdbFile);
 
 			System.Collections.Hashtable tables = new System.Collections.Hashtable();
-		
-			System.Collections.ArrayList relationships = new System.Collections.ArrayList(); 
+
+			System.Collections.ArrayList relationships = new System.Collections.ArrayList();
 
 			//DataTable t = GetTableNames();
 
@@ -638,6 +637,5 @@ namespace Zenware.DatabaseLibrary
 
 			return true;
 		}
-
 	} // End class
 } // End Namespace

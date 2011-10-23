@@ -3,7 +3,6 @@ using System.Configuration;
 using System.Data;
 using System.Data.Common;
 using System.Data.OleDb;
-using System.Data.OracleClient;
 using System.Data.SqlClient;
 using MySql.Data.MySqlClient;
 
@@ -14,7 +13,7 @@ namespace Zenware.DatabaseLibrary
 	/////////////////////////////////////////////////////////////////////////
 	/// Class <c>CoreDatabase</c>
 	/// <summary>
-	/// Class for Generic database access independent of the underlying 
+	/// Class for Generic database access independent of the underlying
 	/// transport
 	/// </summary>
 	/////////////////////////////////////////////////////////////////////////
@@ -75,7 +74,7 @@ namespace Zenware.DatabaseLibrary
 
 		// transactions
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		private DbTransaction m_DatabaseTransaction;
 
@@ -190,11 +189,11 @@ namespace Zenware.DatabaseLibrary
 							m_Connection = new SqlConnection(m_ConnectionString);
 							break;
 						}
-					case DB_ORACLE:
-						{
-							m_Connection = new OracleConnection(m_ConnectionString);
-							break;
-						}
+					//case DB_ORACLE:
+					//    {
+					//        m_Connection = new OracleConnection(m_ConnectionString);
+					//        break;
+					//    }
 					case DB_MYSQL:
 						{
 							m_MySqlConnection = new MySqlConnection(m_ConnectionString);
@@ -358,11 +357,11 @@ namespace Zenware.DatabaseLibrary
 							ThisCommand = new SqlCommand();
 							break;
 						}
-					case DB_ORACLE:
-						{
-							ThisCommand = new OracleCommand();
-							break;
-						}
+					//case DB_ORACLE:
+					//    {
+					//        ThisCommand = new OracleCommand();
+					//        break;
+					//    }
 					case DB_MYSQL:
 						{
 							ThisCommand = new MySqlCommand();
@@ -379,7 +378,6 @@ namespace Zenware.DatabaseLibrary
 				ThisCommand.Connection = m_Connection;
 				ThisCommand.CommandText = SqlQuery;
 				ThisCommand.CommandTimeout = 30;
-
 			}
 			catch (Exception ex)
 			{
@@ -428,11 +426,11 @@ namespace Zenware.DatabaseLibrary
 							ThisDataAdapter = new SqlDataAdapter();
 							break;
 						}
-					case DB_ORACLE:
-						{
-							ThisDataAdapter = new OracleDataAdapter();
-							break;
-						}
+					//case DB_ORACLE:
+					//    {
+					//        ThisDataAdapter = new OracleDataAdapter();
+					//        break;
+					//    }
 					case DB_MYSQL:
 						{
 							ThisDataAdapter = new MySqlDataAdapter();
@@ -865,6 +863,5 @@ namespace Zenware.DatabaseLibrary
 
 			return Tables;
 		}
-
 	}	// end class
 }	// end namespace
