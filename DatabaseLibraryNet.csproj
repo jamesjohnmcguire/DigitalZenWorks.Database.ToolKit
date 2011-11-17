@@ -103,6 +103,12 @@
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Common.Logging">
+      <HintPath>..\..\Lib\Common.Logging.dll</HintPath>
+    </Reference>
+    <Reference Include="Common.Logging.Log4Net">
+      <HintPath>..\..\Lib\Common.Logging.Log4Net.dll</HintPath>
+    </Reference>
     <Reference Include="MySql.Data">
       <HintPath>..\..\..\..\..\..\..\..\..\..\Program Files (x86)\MySQL\MySQL Connector Net 6.3.6\Assemblies\v4.0\MySql.Data.dll</HintPath>
     </Reference>
@@ -149,10 +155,6 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\DiagnosticsLibraryNET\DiagnosticsLibraryNet.csproj">
-      <Project>{606019EB-1B8A-4F07-9C52-2CF84BB56736}</Project>
-      <Name>DiagnosticsLibraryNet</Name>
-    </ProjectReference>
     <ProjectReference Include="..\UtilsNET\UtilsNet.csproj">
       <Project>{3663DA63-BB91-4B03-B4F7-23DD8EEF9D61}</Project>
       <Name>UtilsNet</Name>

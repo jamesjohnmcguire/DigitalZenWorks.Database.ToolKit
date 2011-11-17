@@ -5,8 +5,7 @@ using System.Data.Common;
 using System.Data.OleDb;
 using System.Data.SqlClient;
 using MySql.Data.MySqlClient;
-
-using Zenware.DiagnosticsLibrary;
+using Common.Logging;
 
 namespace Zenware.DatabaseLibrary
 {
@@ -81,7 +80,7 @@ namespace Zenware.DatabaseLibrary
 		/// <summary>
 		/// Diagnostics object
 		/// </summary>
-		private Diagnostics m_Diagnostics = null;
+		private ILog log = null;
 
 		/// <summary>
 		/// CoreDatabase - Default constructor
@@ -168,8 +167,7 @@ namespace Zenware.DatabaseLibrary
 			bool ReturnValue = false;
 			try
 			{
-				SetDiagnostics(m_ClientName);
-				m_Diagnostics.SetAlertLevel(Diagnostics.ALERT_ERROR | Diagnostics.ALERT_LOGFILE);
+				log = LogManager.GetLogger(this.GetType());
 
 				if (null != m_Connection)
 				{
@@ -206,9 +204,7 @@ namespace Zenware.DatabaseLibrary
 			}
 			catch (Exception ex)
 			{
-				m_Diagnostics.SetEvent("Initialize: DB connect problem. Exception: " +
-					ex.Message,
-					Diagnostics.ALERT_ERROR);
+				log.Debug(m => m("Initialization Error: {0}", ex.Message));
 				throw (ex);
 			}
 			finally
@@ -381,10 +377,7 @@ namespace Zenware.DatabaseLibrary
 			}
 			catch (Exception ex)
 			{
-				m_Diagnostics.SetEvent("GetCommandObject: Exception: " +
-					ex.Message +
-					" - Query: " + SqlQuery,
-					Diagnostics.ALERT_ERROR);
+				log.Debug(m => m("Initialization Error: {0}", ex.Message));
 			}
 			finally
 			{
@@ -442,14 +435,11 @@ namespace Zenware.DatabaseLibrary
 
 				RowCount = ThisDataAdapter.Fill(OutDataSet);
 
-				m_Diagnostics.SetEvent("OK - getDataSet - Query: " + SqlQuery);
+				log.Debug(m => m("OK - getDataSet - Query: {0}", SqlQuery));
 			}
 			catch (Exception ex)
 			{
-				m_Diagnostics.SetEvent("getDataSet - DB connect problem. Exception: " +
-					ex.Message +
-					" - Query: " + SqlQuery,
-					Diagnostics.ALERT_ERROR);
+				log.Debug(m => m("Initialization Error: {0}", ex.Message));
 			}
 			finally
 			{
@@ -561,30 +551,6 @@ namespace Zenware.DatabaseLibrary
 			return ReturnCode;
 		}
 
-		/////////////////////////////////////////////////////////////////////////
-		/// <summary>
-		/// Sets the level for diagnostics notification.
-		/// </summary>
-		/// <param name="sApplicationName"></param>
-		/// <returns></returns>
-		/////////////////////////////////////////////////////////////////////////
-		public bool SetDiagnostics(string sApplicationName)
-		{
-			bool bInit = false;
-			try
-			{
-				m_Diagnostics = new Diagnostics(sApplicationName, "DBLib");
-
-				bInit = true;
-			}
-			catch
-			{
-				bInit = false;
-			}
-
-			return bInit;
-		}
-
 		/// <summary>
 		/// Sets an error message of an exception type to the diagnostics object.
 		/// </summary>
@@ -593,12 +559,7 @@ namespace Zenware.DatabaseLibrary
 		/// <param name="sCommand"></param>
 		public void SetExceptionError(Exception ex, string sIntroMsg, string sCommand)
 		{
-			m_Diagnostics.SetEvent(
-				sIntroMsg +
-				ex.Message +
-				" - Command: " +
-				sCommand,
-				Diagnostics.ALERT_ERROR);
+			log.Debug(m => m("Initialization Error: {0}", ex.Message));
 		}
 
 		/////////////////////////////////////////////////////////////////////////
