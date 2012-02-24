@@ -4,8 +4,9 @@ using System.Data;
 using System.Data.Common;
 using System.Data.OleDb;
 using System.Data.SqlClient;
-using MySql.Data.MySqlClient;
+using System.Globalization;
 using Common.Logging;
+using MySql.Data.MySqlClient;
 
 namespace Zenware.DatabaseLibrary
 {
@@ -204,7 +205,7 @@ namespace Zenware.DatabaseLibrary
 			}
 			catch (Exception ex)
 			{
-				log.Debug(m => m("Initialization Error: {0}", ex.Message));
+				log.Debug(CultureInfo.InvariantCulture,  m => m("Initialization Error: {0}", ex.Message));
 				throw (ex);
 			}
 			finally
@@ -377,7 +378,7 @@ namespace Zenware.DatabaseLibrary
 			}
 			catch (Exception ex)
 			{
-				log.Debug(m => m("Initialization Error: {0}", ex.Message));
+				log.Debug(CultureInfo.InvariantCulture,  m => m("Initialization Error: {0}", ex.Message));
 			}
 			finally
 			{
@@ -435,11 +436,11 @@ namespace Zenware.DatabaseLibrary
 
 				RowCount = ThisDataAdapter.Fill(OutDataSet);
 
-				log.Debug(m => m("OK - getDataSet - Query: {0}", SqlQuery));
+				log.Debug(CultureInfo.InvariantCulture,  m => m("OK - getDataSet - Query: {0}", SqlQuery));
 			}
 			catch (Exception ex)
 			{
-				log.Debug(m => m("Initialization Error: {0}", ex.Message));
+				log.Debug(CultureInfo.InvariantCulture,  m => m("Initialization Error: {0}", ex.Message));
 			}
 			finally
 			{
@@ -559,7 +560,7 @@ namespace Zenware.DatabaseLibrary
 		/// <param name="sCommand"></param>
 		public void SetExceptionError(Exception ex, string sIntroMsg, string sCommand)
 		{
-			log.Debug(m => m("Initialization Error: {0}", ex.Message));
+			log.Debug(CultureInfo.InvariantCulture,  m => m("Initialization Error: {0}", ex.Message));
 		}
 
 		/////////////////////////////////////////////////////////////////////////
