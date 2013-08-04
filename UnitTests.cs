@@ -60,7 +60,7 @@ namespace Zenware.DatabaseLibrary
 			m_DataLib = new CoreDatabase(
 					"TestDb",
 					"Microsoft.Jet.OLEDB.4.0",
-					@"C:\data\tech\Projects\Zenware\Dev\Common\Src\DatabaseLibraryNet\TestDb.mdb");
+					@"C:\Users\jamesmc\data\tech\Projects\Zenware\Dev\Contacts\Src\Product\DatabaseLibraryNET\TestDb.mdb");
 
 			m_DataLib.Initialize();
 			m_DataLib.BeginTransaction();

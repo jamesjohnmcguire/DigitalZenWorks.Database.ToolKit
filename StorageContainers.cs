@@ -136,7 +136,7 @@ namespace Zenware.DatabaseLibrary
 				"\r\nusing System.Data;" +
 				"\r\n\r\nusing Zenware.DatabaseLibrary;" +
 				"\r\nusing Zenware.DiagnosticsLibrary;" +
-				"\r\n\r\nnamespace Zenware.Contacts.ModelLib" +
+				"\r\n\r\nnamespace Zenware.Contacts.BusinessLogicLayer" +
 				"\r\n{" +
 				"\r\n\tpublic class ContactsUpdate" +
 				"\r\n\t{" +
@@ -181,7 +181,7 @@ namespace Zenware.DatabaseLibrary
 										"\r\nusing System.Data;" +
 										"\r\nusing NUnit.Framework;" +
 										"\r\nusing Zenware.DatabaseLibrary;" +
-										"\r\n\r\nnamespace Zenware.Contacts.ModelLib.UnitTests" +
+										"\r\n\r\nnamespace Zenware.Contacts.BusinessLogicLayer.UnitTests" +
 										"\r\n{" +
 										"\r\n\t/////////////////////////////////////////////////////////////////////////" +
 										"\r\n\t/// Class <c>UpdateTests</c>" +
