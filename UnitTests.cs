@@ -47,6 +47,18 @@ namespace Zenware.DatabaseLibrary
 		/// m_DataLibObject
 		/// </summary>
 		protected CoreDatabase m_DataLib = null;
+		private string dataSource =
+			Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) +
+			@"\data\Projects\Zenware\Dev\Contacts\Src\Product\DatabaseLibraryNET\TestDb.mdb";
+		private string dataSourceContacts =
+			Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) +
+			@"\data\admin\Contacts\ContactsX.mdb";
+		private string dataSourceBackups =
+			Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) +
+			@"\data\admin\Contacts\backups";
+		private string dataSourceBackupsCsv =
+			Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) +
+			@"\data\admin\Contacts\backups\contacts.csv";
 
 		/////////////////////////////////////////////////////////////////////////
 		/// Method <c>SetUp</c>
@@ -60,7 +72,7 @@ namespace Zenware.DatabaseLibrary
 			m_DataLib = new CoreDatabase(
 					"TestDb",
 					"Microsoft.Jet.OLEDB.4.0",
-					@"C:\Users\jamesmc\data\tech\Projects\Zenware\Dev\Contacts\Src\Product\DatabaseLibraryNET\TestDb.mdb");
+					dataSource);
 
 			m_DataLib.Initialize();
 			m_DataLib.BeginTransaction();
@@ -104,7 +116,7 @@ namespace Zenware.DatabaseLibrary
 		[Test]
 		public void VerifyTestSourceExists()
 		{
-			Assert.IsTrue(File.Exists(@"C:\data\tech\Projects\Zenware\Dev\Common\Src\DatabaseLibraryNet\TestDb.mdb"));
+			Assert.IsTrue(File.Exists(dataSource));
 		}
 
 		/////////////////////////////////////////////////////////////////////////
@@ -116,12 +128,10 @@ namespace Zenware.DatabaseLibrary
 		[Test]
 		public void CanQueryTest()
 		{
-			bool AlwaysTrue = true;
-
-			m_DataLib.CanQuery();
+			bool canQuery = m_DataLib.CanQuery();
 
 			// No exceptions found
-			Assert.IsTrue(AlwaysTrue);
+			Assert.IsTrue(canQuery);
 		}
 
 		/////////////////////////////////////////////////////////////////////////
@@ -141,8 +151,7 @@ namespace Zenware.DatabaseLibrary
 			m_oDBLib = new CoreDatabase(
 				"TimeTracker",
 				"Microsoft.Jet.OLEDB.4.0",
-				//@"C:\data\tech\projects\Zenware\projects\TimeTracker\TimeTracker.mdb");
-				@"C:\data\tech\Projects\Zenware\Common\src\DBLib\TestDb.mdb");
+				dataSource);
 
 			m_oDBLib.GetDataSet(SqlQueryCommand, out TempDataSet);
 
@@ -208,9 +217,9 @@ namespace Zenware.DatabaseLibrary
 		{
 			StorageContainers DatabaseHelper = new StorageContainers();
 
-			DatabaseHelper.ExportToCsv(@"c:\data\admin\contacts\ContactsX.mdb", @"c:\data\admin\contacts\backups");
+			DatabaseHelper.ExportToCsv(dataSourceContacts, dataSourceBackups);
 
-			Assert.IsTrue((File.Exists(@"c:\data\admin\contacts\backups\contacts.csv")));
+			Assert.IsTrue((File.Exists(dataSourceBackupsCsv)));
 		}
 
 		private void VerifyRowExists(

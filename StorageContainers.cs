@@ -177,6 +177,7 @@ namespace Zenware.DatabaseLibrary
 
 		private string GetTestFileHeader()
 		{
+			string userDataFolder = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
 			string TestFileContents = "using System;" +
 										"\r\nusing System.Data;" +
 										"\r\nusing NUnit.Framework;" +
@@ -217,7 +218,7 @@ namespace Zenware.DatabaseLibrary
 										"\r\n\t\t\tm_Database = new CoreDatabase(" +
 										"\r\n\t\t\t\t\"ContactsPlus\"," +
 										"\r\n\t\t\t\t\"Microsoft.Jet.OLEDB.4.0\"," +
-										"\r\n\t\t\t\t@\"C:\\data\\admin\\Contacts\\ContactsX.mdb\");" +
+										"\r\n\t\t\t\t@\"" + userDataFolder + "\\data\\admin\\Contacts\\ContactsX.mdb\");" +
 										"\r\n" +
 										"\r\n\t\t\tm_Database.Initialize();" +
 										"\r\n\t\t\tm_Database.BeginTransaction();" +

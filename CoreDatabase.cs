@@ -599,6 +599,12 @@ namespace Zenware.DatabaseLibrary
 			int RecordsReturned = -1;
 
 			string SqlQueryCommand = "SELECT @@VERSION";
+
+			if (m_DatabaseType == DB_OLEDB)
+			{
+				SqlQueryCommand = "SELECT VERSION";
+			}
+
 			RecordsReturned = GetDataSet(SqlQueryCommand, out TestDataSet);
 
 			if (RecordsReturned > 0)
