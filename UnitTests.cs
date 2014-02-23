@@ -58,7 +58,7 @@ namespace Zenware.DatabaseLibrary
 			@"\data\admin\Contacts\backups";
 		private string dataSourceBackupsCsv =
 			Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) +
-			@"\data\admin\Contacts\backups\contacts.csv";
+			@"\data\admin\Contacts\backups\UnitTests.csv";
 
 		/////////////////////////////////////////////////////////////////////////
 		/// Method <c>SetUp</c>
@@ -69,9 +69,15 @@ namespace Zenware.DatabaseLibrary
 		[SetUp]
 		public void SetUp()
 		{
+			string provider = "Microsoft.Jet.OLEDB.4.0";
+			if (Environment.Is64BitOperatingSystem)
+			{
+				provider = "Microsoft.ACE.OLEDB.12.0";
+			}
+
 			m_DataLib = new CoreDatabase(
 					"TestDb",
-					"Microsoft.Jet.OLEDB.4.0",
+					provider,
 					dataSource);
 
 			m_DataLib.Initialize();
