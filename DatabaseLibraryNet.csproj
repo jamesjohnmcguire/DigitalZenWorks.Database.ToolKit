@@ -104,7 +104,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
     <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\x86\Debug\</OutputPath>
+    <OutputPath>..\..\bin\Debug\x86</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <BaseAddress>285212672</BaseAddress>
     <DocumentationFile>bin\Debug\Zenware.Common.DatabaseLibrary.xml</DocumentationFile>
@@ -115,7 +115,7 @@
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
-    <OutputPath>bin\x86\Release\</OutputPath>
+    <OutputPath>..\..\bin\Release\x86</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <BaseAddress>285212672</BaseAddress>
     <Optimize>true</Optimize>
@@ -177,9 +177,13 @@
     <Reference Include="System.Xml">
       <Name>System.XML</Name>
     </Reference>
-    <Reference Include="Zenware.Common.Utils, Version=1.0.0.0, Culture=neutral, PublicKeyToken=4d499e85b92e4818, processorArchitecture=x86">
+    <Reference Include="Zenware.Common.Utils, Version=1.0.0.0, Culture=neutral, PublicKeyToken=4d499e85b92e4818, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\bin\Debug\Zenware.Common.Utils.dll</HintPath>
+    </Reference>
+    <Reference Include="Zenware.Common.Utils, Version=1.0.0.0, Culture=neutral, PublicKeyToken=4d499e85b92e4818, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\bin\Debug\x86\Zenware.Common.Utils.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -194,7 +198,9 @@
     <Compile Include="UnitTests.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
+    <None Include="App.config">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="ClassDiagram.cd" />
     <None Include="DatabaseLibraryNet.snk" />
   </ItemGroup>
