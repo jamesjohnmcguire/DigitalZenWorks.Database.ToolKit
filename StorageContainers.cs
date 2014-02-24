@@ -32,6 +32,26 @@ namespace Zenware.DatabaseLibrary
 		}
 
 		/////////////////////////////////////////////////////////////////////
+		/// <summary>
+		/// Represents a provider type for a connection string
+		/// </summary>
+		/////////////////////////////////////////////////////////////////////
+		private string provider = "Microsoft.Jet.OLEDB.4.0";
+
+		/////////////////////////////////////////////////////////////////////
+		/// <summary>
+		/// Default Constructor
+		/// </summary>
+		/////////////////////////////////////////////////////////////////////
+		public StorageContainers()
+		{
+			if (Environment.Is64BitOperatingSystem)
+			{
+				provider = "Microsoft.ACE.OLEDB.12.0";
+			}
+		}
+
+		/////////////////////////////////////////////////////////////////////
 		/// Method <c>CreateMdbFile</c>
 		/// <summary>
 		/// Creates an empty MDB (MS Jet / Access databse) file.
@@ -77,7 +97,7 @@ namespace Zenware.DatabaseLibrary
 															StringSplitOptions.RemoveEmptyEntries);
 
 					CoreDatabase Database = new CoreDatabase("DatabaseLibaryNET",
-															"Microsoft.Jet.OLEDB.4.0",
+															provider,
 															MdbFile);
 
 					bool ReturnCode = Database.Initialize();
@@ -217,7 +237,7 @@ namespace Zenware.DatabaseLibrary
 										"\r\n\t\t{" +
 										"\r\n\t\t\tm_Database = new CoreDatabase(" +
 										"\r\n\t\t\t\t\"ContactsPlus\"," +
-										"\r\n\t\t\t\t\"Microsoft.Jet.OLEDB.4.0\"," +
+										"\r\n\t\t\t\t\"" + provider + "\"," +
 										"\r\n\t\t\t\t@\"" + userDataFolder + "\\data\\admin\\Contacts\\ContactsX.mdb\");" +
 										"\r\n" +
 										"\r\n\t\t\tm_Database.Initialize();" +
@@ -505,7 +525,7 @@ namespace Zenware.DatabaseLibrary
 
 			// Open the database
 			CoreDatabase Database = new CoreDatabase("DatabaseLibaryNET",
-													"Microsoft.Jet.OLEDB.4.0",
+													provider,
 													DatebaseFile);
 
 			ReturnCode = Database.Initialize();
@@ -543,7 +563,7 @@ namespace Zenware.DatabaseLibrary
 		private string MakePrivledgedConnectString(
 			string MdbFile)
 		{
-			return @"Provider=Microsoft.Jet.OLEDB.4.0;Password="""";User ID=Admin;"
+			return @"Provider=" + provider + @";Password="""";User ID=Admin;"
 					+ "Data Source=" + MdbFile + @";Mode=Share Deny None;Extended Properties="""";Jet OLEDB:System database="""";"
 					+ @"Jet OLEDB:Registry Path="""";Jet OLEDB:Database Password="""";Jet OLEDB:Engine Type=5;"
 					+ @"Jet OLEDB:Database Locking Mode=1;Jet OLEDB:Global Partial Bulk Ops=2;Jet OLEDB:Global Bulk Transactions=1;"

@@ -1,3 +1,9 @@
+/////////////////////////////////////////////////////////////////////////////
+// $Id: Program.cs 68 2014-02-23 13:57:54Z JamesMc $
+//
+// Copyright (c) 2006-2014 by James John McGuire
+// All rights reserved.
+/////////////////////////////////////////////////////////////////////////////
 using System;
 using System.Configuration;
 using System.Data;
@@ -46,37 +52,37 @@ namespace Zenware.DatabaseLibrary
 		public const uint DB_MYSQL = 4;
 
 		/// <summary>
-		/// m_DatabaseType
+		/// databaseType
 		/// </summary>
-		private uint m_DatabaseType = 0;
+		private uint databaseType = 0;
 
 		/// <summary>
 		/// The actual connection string used to connect to the database.
 		/// </summary>
-		private string m_ConnectionString = string.Empty;
+		private string connectionString = string.Empty;
 
 		/// <summary>
 		/// The name of the client that is using the database.
 		/// </summary>
-		private string m_ClientName = string.Empty;
+		private string clientName = string.Empty;
 
 		/// <summary>
 		/// Database Connection Object
 		/// </summary>
-		private DbConnection m_Connection = null;
+		private DbConnection connection = null;
 
 		/// <summary>
 		/// Ole Database Connection Object
 		/// </summary>
-		private OleDbConnection m_OleDbConnection = null;
+		private OleDbConnection oleDbConnection = null;
 
-		private MySqlConnection m_MySqlConnection = null;
+		private MySqlConnection mySqlConnection = null;
 
 		// transactions
 		/// <summary>
-		///
+		/// transaction object
 		/// </summary>
-		private DbTransaction m_DatabaseTransaction;
+		private DbTransaction databaseTransaction;
 
 		/// <summary>
 		/// Diagnostics object
@@ -91,11 +97,11 @@ namespace Zenware.DatabaseLibrary
 			if ((ConfigurationManager.ConnectionStrings != null) &&
 				(ConfigurationManager.ConnectionStrings.Count > 0))
 			{
-				m_ConnectionString = ConfigurationManager.ConnectionStrings[0].ConnectionString;
+				connectionString = ConfigurationManager.ConnectionStrings[0].ConnectionString;
 
 				// OleDbConnection is default
-				m_DatabaseType = DB_OLEDB;
-				m_ClientName = "DatabaseLib";
+				databaseType = DB_OLEDB;
+				clientName = "DatabaseLib";
 				//Initialize(DB_OLEDB, "DatabaseLib");
 			}
 		}
@@ -109,9 +115,9 @@ namespace Zenware.DatabaseLibrary
 			string Provider,
 			string DataSource)
 		{
-			m_ConnectionString = CreateConnectionString(Provider, DataSource, null);
-			m_DatabaseType = DB_OLEDB;
-			m_ClientName = "DatabaseLib";
+			connectionString = CreateConnectionString(Provider, DataSource, null);
+			databaseType = DB_OLEDB;
+			clientName = "DatabaseLib";
 		}
 
 		/// <summary>
@@ -125,9 +131,9 @@ namespace Zenware.DatabaseLibrary
 			string Provider,
 			string DataSource)
 		{
-			m_ConnectionString = CreateConnectionString(Provider, DataSource, null);
-			m_DatabaseType = DB_OLEDB;
-			m_ClientName = ClientName;
+			connectionString = CreateConnectionString(Provider, DataSource, null);
+			databaseType = DB_OLEDB;
+			clientName = ClientName;
 		}
 
 		/// <summary>
@@ -141,9 +147,9 @@ namespace Zenware.DatabaseLibrary
 			string DataSource,
 			string Catalog)
 		{
-			m_ConnectionString = CreateConnectionString(null, DataSource, Catalog);
-			m_DatabaseType = DatabaseType;
-			m_ClientName = "DatabaseLib";
+			connectionString = CreateConnectionString(null, DataSource, Catalog);
+			databaseType = DatabaseType;
+			clientName = "DatabaseLib";
 		}
 
 		/// <summary>
@@ -155,9 +161,9 @@ namespace Zenware.DatabaseLibrary
 			uint DatabaseType,
 			string ConnectionString)
 		{
-			m_ConnectionString = ConnectionString;
-			m_DatabaseType = DatabaseType;
-			m_ClientName = "DatabaseLib";
+			connectionString = ConnectionString;
+			databaseType = DatabaseType;
+			clientName = "DatabaseLib";
 		}
 
 		/// <summary>
@@ -170,33 +176,33 @@ namespace Zenware.DatabaseLibrary
 			{
 				log = LogManager.GetLogger(this.GetType());
 
-				if (null != m_Connection)
+				if (null != connection)
 				{
-					m_Connection.Close();
+					connection.Close();
 				}
 
-				switch (m_DatabaseType)
+				switch (databaseType)
 				{
 					case DB_OLEDB:
 						{
-							m_OleDbConnection = new OleDbConnection(m_ConnectionString);
-							m_Connection = m_OleDbConnection;
+							oleDbConnection = new OleDbConnection(connectionString);
+							connection = oleDbConnection;
 							break;
 						}
 					case DB_SQLSERVER:
 						{
-							m_Connection = new SqlConnection(m_ConnectionString);
+							connection = new SqlConnection(connectionString);
 							break;
 						}
 					//case DB_ORACLE:
 					//    {
-					//        m_Connection = new OracleConnection(m_ConnectionString);
+					//        connection = new OracleConnection(connectionString);
 					//        break;
 					//    }
 					case DB_MYSQL:
 						{
-							m_MySqlConnection = new MySqlConnection(m_ConnectionString);
-							m_Connection = m_MySqlConnection;
+							mySqlConnection = new MySqlConnection(connectionString);
+							connection = mySqlConnection;
 							break;
 						}
 				}
@@ -245,7 +251,7 @@ namespace Zenware.DatabaseLibrary
 		/// </summary>
 		public void EstablishConnection()
 		{
-			if (null == m_Connection)
+			if (null == connection)
 			{
 				Initialize();
 			}
@@ -256,10 +262,10 @@ namespace Zenware.DatabaseLibrary
 		/// </summary>
 		public void Close()
 		{
-			if (m_Connection != null)
+			if (connection != null)
 			{
-				if (m_Connection.State != ConnectionState.Closed)
-					m_Connection.Close();
+				if (connection.State != ConnectionState.Closed)
+					connection.Close();
 			}
 
 			System.GC.Collect();
@@ -274,10 +280,10 @@ namespace Zenware.DatabaseLibrary
 		{
 			Close();
 
-			if (null != m_Connection)
+			if (null != connection)
 			{
-				m_Connection.Dispose();
-				m_Connection = null;
+				connection.Dispose();
+				connection = null;
 			}
 
 			System.GC.Collect();
@@ -288,15 +294,23 @@ namespace Zenware.DatabaseLibrary
 		/// </summary>
 		public void BeginTransaction()
 		{
-			EstablishConnection();
-
-			if (null != m_Connection)
+			try
 			{
-				if (m_Connection.State != ConnectionState.Open)
+				EstablishConnection();
+
+				if (null != connection)
 				{
-					m_Connection.Open();
+					if (connection.State != ConnectionState.Open)
+					{
+						connection.Open();
+					}
+					databaseTransaction = connection.BeginTransaction();
 				}
-				m_DatabaseTransaction = m_Connection.BeginTransaction();
+			}
+			catch (Exception ex)
+			{
+				log.Error(CultureInfo.InvariantCulture,
+					m => m("BeginTransaction Error: {0}", ex.Message));
 			}
 		}
 
@@ -305,9 +319,9 @@ namespace Zenware.DatabaseLibrary
 		/// </summary>
 		private void CloseTransaction()
 		{
-			if (null != m_DatabaseTransaction)
+			if (null != databaseTransaction)
 			{
-				m_DatabaseTransaction.Connection.Close();
+				databaseTransaction.Connection.Close();
 			}
 		}
 
@@ -316,9 +330,9 @@ namespace Zenware.DatabaseLibrary
 		/// </summary>
 		public void CommitTransaction()
 		{
-			if (null != m_DatabaseTransaction)
+			if (null != databaseTransaction)
 			{
-				m_DatabaseTransaction.Commit();
+				databaseTransaction.Commit();
 			}
 		}
 
@@ -327,9 +341,9 @@ namespace Zenware.DatabaseLibrary
 		/// </summary>
 		public void RollBackTransaction()
 		{
-			if (null != m_DatabaseTransaction)
+			if (null != databaseTransaction)
 			{
-				m_DatabaseTransaction.Rollback();
+				databaseTransaction.Rollback();
 			}
 		}
 
@@ -342,7 +356,7 @@ namespace Zenware.DatabaseLibrary
 			{
 				EstablishConnection();
 
-				switch (m_DatabaseType)
+				switch (databaseType)
 				{
 					case DB_OLEDB:
 						{
@@ -366,13 +380,13 @@ namespace Zenware.DatabaseLibrary
 						}
 				}
 
-				if (m_Connection.State != ConnectionState.Open)
+				if (connection.State != ConnectionState.Open)
 				{
-					m_Connection.Open();
+					connection.Open();
 				}
 
-				ThisCommand.Transaction = m_DatabaseTransaction;
-				ThisCommand.Connection = m_Connection;
+				ThisCommand.Transaction = databaseTransaction;
+				ThisCommand.Connection = connection;
 				ThisCommand.CommandText = SqlQuery;
 				ThisCommand.CommandTimeout = 30;
 			}
@@ -408,7 +422,7 @@ namespace Zenware.DatabaseLibrary
 				DbCommand ThisCommand = GetCommandObject(SqlQuery);
 
 				DbDataAdapter ThisDataAdapter = null;
-				switch (m_DatabaseType)
+				switch (databaseType)
 				{
 					case DB_OLEDB:
 						{
@@ -436,7 +450,7 @@ namespace Zenware.DatabaseLibrary
 
 				RowCount = ThisDataAdapter.Fill(OutDataSet);
 
-				log.Info(CultureInfo.InvariantCulture,  m => m("OK - getDataSet - Query: {0}", SqlQuery));
+				log.Info(CultureInfo.InvariantCulture, m => m("OK - getDataSet - Query: {0}", SqlQuery));
 			}
 			catch (Exception ex)
 			{
@@ -444,7 +458,7 @@ namespace Zenware.DatabaseLibrary
 			}
 			finally
 			{
-				if (null == m_DatabaseTransaction)
+				if (null == databaseTransaction)
 				{
 					Close();
 				}
@@ -483,7 +497,7 @@ namespace Zenware.DatabaseLibrary
 			}
 			finally
 			{
-				if (null == m_DatabaseTransaction)
+				if (null == databaseTransaction)
 				{
 					Close();
 				}
@@ -508,11 +522,11 @@ namespace Zenware.DatabaseLibrary
 
 			try
 			{
-				if (null != m_Connection)
+				if (null != connection)
 				{
-					if (m_Connection.State != ConnectionState.Open)
+					if (connection.State != ConnectionState.Open)
 					{
-						m_Connection.Open();
+						connection.Open();
 					}
 				}
 				ThisCommand = GetCommandObject(SqlQueryCommand);
@@ -539,7 +553,7 @@ namespace Zenware.DatabaseLibrary
 			}
 			finally
 			{
-				if (null == m_DatabaseTransaction)
+				if (null == databaseTransaction)
 				{
 					Close();
 				}
@@ -575,7 +589,7 @@ namespace Zenware.DatabaseLibrary
 		{
 			bool Connected = false;
 
-			if (m_Connection.State == ConnectionState.Open)
+			if (connection.State == ConnectionState.Open)
 			{
 				Connected = true;
 			}
@@ -600,7 +614,7 @@ namespace Zenware.DatabaseLibrary
 
 			string SqlQueryCommand = "SELECT @@VERSION";
 
-			if (m_DatabaseType == DB_OLEDB)
+			if (databaseType == DB_OLEDB)
 			{
 				SqlQueryCommand = "SELECT VERSION";
 			}
@@ -720,7 +734,7 @@ namespace Zenware.DatabaseLibrary
 		public uint InsertCommand(string SqlQueryCommand)
 		{
 			bool FinishTransaction = false;
-			if (null == m_DatabaseTransaction)
+			if (null == databaseTransaction)
 			{
 				BeginTransaction();
 				FinishTransaction = true;
@@ -766,7 +780,7 @@ namespace Zenware.DatabaseLibrary
 
 			try
 			{
-				OleDbConnection ThisOleDbConnection = new OleDbConnection(m_ConnectionString);
+				OleDbConnection ThisOleDbConnection = new OleDbConnection(connectionString);
 
 				string SqlQuery = "INSERT INTO Contacts (Notes) VALUES ('testing')";
 				string SqlQuery2 = "SELECT @@IDENTITY";
@@ -810,23 +824,23 @@ namespace Zenware.DatabaseLibrary
 		{
 			DataTable Tables = null;
 
-			if (null != m_Connection)
+			if (null != connection)
 			{
-				if (m_Connection.State != ConnectionState.Open)
+				if (connection.State != ConnectionState.Open)
 				{
-					m_Connection.Open();
+					connection.Open();
 				}
 			}
 
-			if (DB_OLEDB == m_DatabaseType)
+			if (DB_OLEDB == databaseType)
 			{
-				Tables = m_OleDbConnection.GetOleDbSchemaTable(System.Data.OleDb.OleDbSchemaGuid.Tables,
+				Tables = oleDbConnection.GetOleDbSchemaTable(System.Data.OleDb.OleDbSchemaGuid.Tables,
 															new Object[] { null, null, null, "TABLE" });
 			}
 			else
 			{
-				//Tables = m_Connection.GetSchema("TABLE");
-				Tables = m_Connection.GetSchema();
+				//Tables = connection.GetSchema("TABLE");
+				Tables = connection.GetSchema();
 			}
 
 			return Tables;
