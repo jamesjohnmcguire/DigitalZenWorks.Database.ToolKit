@@ -89,6 +89,8 @@ namespace Zenware.DatabaseLibrary
 		/// </summary>
 		private ILog log = null;
 
+		private string provider = string.Empty;
+
 		/// <summary>
 		/// CoreDatabase - Default constructor
 		/// </summary>
@@ -109,13 +111,14 @@ namespace Zenware.DatabaseLibrary
 		/// <summary>
 		/// CoreDatabase - Constructor
 		/// </summary>
-		/// <param name="Provider"></param>
+		/// <param name="provider"></param>
 		/// <param name="DataSource"></param>
 		public CoreDatabase(
-			string Provider,
+			string provider,
 			string DataSource)
 		{
-			connectionString = CreateConnectionString(Provider, DataSource, null);
+			this.provider = provider;
+			connectionString = CreateConnectionString(provider, DataSource, null);
 			databaseType = DB_OLEDB;
 			clientName = "DatabaseLib";
 		}
@@ -124,14 +127,15 @@ namespace Zenware.DatabaseLibrary
 		/// CoreDatabase - Constructor
 		/// </summary>
 		/// <param name="ClientName"></param>
-		/// <param name="Provider"></param>
+		/// <param name="provider"></param>
 		/// <param name="DataSource"></param>
 		public CoreDatabase(
 			string ClientName,
-			string Provider,
+			string provider,
 			string DataSource)
 		{
-			connectionString = CreateConnectionString(Provider, DataSource, null);
+			this.provider = provider;
+			connectionString = CreateConnectionString(provider, DataSource, null);
 			databaseType = DB_OLEDB;
 			clientName = ClientName;
 		}

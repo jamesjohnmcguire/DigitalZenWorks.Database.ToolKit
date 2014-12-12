@@ -155,6 +155,12 @@ namespace Zenware.DatabaseLibrary
 		//[Test]
 		public void SelectTest()
 		{
+			string provider = "Microsoft.Jet.OLEDB.4.0";
+			if (Environment.Is64BitOperatingSystem)
+			{
+				provider = "Microsoft.ACE.OLEDB.12.0";
+			}
+
 			bool AlwaysTrue = true;
 			DataSet TempDataSet = null;
 			string SqlQueryCommand = "SELECT * FROM TestTable";
@@ -162,7 +168,7 @@ namespace Zenware.DatabaseLibrary
 			CoreDatabase m_oDBLib = null;
 			m_oDBLib = new CoreDatabase(
 				"TimeTracker",
-				"Microsoft.Jet.OLEDB.4.0",
+				provider,
 				dataSource);
 
 			m_oDBLib.GetDataSet(SqlQueryCommand, out TempDataSet);
