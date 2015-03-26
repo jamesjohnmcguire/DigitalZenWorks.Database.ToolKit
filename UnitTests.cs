@@ -86,7 +86,6 @@ namespace Zenware.DatabaseLibrary
 					provider,
 					dataSource);
 
-			m_DataLib.Initialize();
 			m_DataLib.BeginTransaction();
 			//m_sConnectionString = "Initial Catalog=" + p_sCatalog + "; Data Source=" + p_sDataSource + "; user id=" + p_sUserID + "; password=" + p_sPassword;
 
@@ -192,7 +191,7 @@ namespace Zenware.DatabaseLibrary
 							@"(Description) VALUES " +
 							@"('" + Description + "')";
 
-			uint NewRowId	= m_DataLib.InsertCommand(SqlQueryCommand);
+			uint NewRowId	= m_DataLib.Insert(SqlQueryCommand);
 
 			VerifyRowExists(NewRowId, true);
 		}
@@ -211,12 +210,12 @@ namespace Zenware.DatabaseLibrary
 							@"(Description) VALUES " +
 							@"('" + Description + "')";
 
-			uint NewRowId = m_DataLib.InsertCommand(SqlQueryCommand);
+			uint NewRowId = m_DataLib.Insert(SqlQueryCommand);
 
 			SqlQueryCommand = "DELETE FROM TestTable " +
 				"WHERE id=" + NewRowId.ToString();
 
-			bool Result = m_DataLib.DeleteCommand(SqlQueryCommand);
+			bool Result = m_DataLib.Delete(SqlQueryCommand);
 
 			Assert.IsTrue(Result);
 

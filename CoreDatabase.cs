@@ -4,6 +4,8 @@
 // Copyright (c) 2006-2015 by James John McGuire
 // All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
+using Common.Logging;
+using MySql.Data.MySqlClient;
 using System;
 using System.Configuration;
 using System.Data;
@@ -11,8 +13,6 @@ using System.Data.Common;
 using System.Data.OleDb;
 using System.Data.SqlClient;
 using System.Globalization;
-using Common.Logging;
-using MySql.Data.MySqlClient;
 
 namespace Zenware.DatabaseLibrary
 {
@@ -25,36 +25,11 @@ namespace Zenware.DatabaseLibrary
 	/////////////////////////////////////////////////////////////////////////
 	public class CoreDatabase
 	{
-		/////////////////////////////////////////////////////////////////////
-		/// <summary>
-		/// DB_OLEDB
-		/// </summary>
-		/////////////////////////////////////////////////////////////////////
-		private const uint DB_OLEDB = 1;
-
-		/////////////////////////////////////////////////////////////////////
-		/// <summary>
-		/// DB_SQLSERVER
-		/// </summary>
-		/////////////////////////////////////////////////////////////////////
-		private const uint DB_SQLSERVER = 2;
-
-		/////////////////////////////////////////////////////////////////////
-		/// <summary>
-		/// DB_ORACLE
-		/// </summary>
-		/////////////////////////////////////////////////////////////////////
-		private const uint DB_ORACLE = 3;
-
-		/// <summary>
-		/// DB_MYSQL
-		/// </summary>
-		public const uint DB_MYSQL = 4;
-
+		#region private variables
 		/// <summary>
 		/// databaseType
 		/// </summary>
-		private uint databaseType = 0;
+		private DatabaseTypes databaseType;
 
 		/// <summary>
 		/// The actual connection string used to connect to the database.
@@ -87,10 +62,13 @@ namespace Zenware.DatabaseLibrary
 		/// <summary>
 		/// Diagnostics object
 		/// </summary>
-		private ILog log = null;
+		private static readonly ILog log = LogManager.GetLogger
+			(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
 		private string provider = string.Empty;
+		#endregion private variables
 
+		#region constructors
 		/// <summary>
 		/// CoreDatabase - Default constructor
 		/// </summary>
@@ -99,12 +77,13 @@ namespace Zenware.DatabaseLibrary
 			if ((ConfigurationManager.ConnectionStrings != null) &&
 				(ConfigurationManager.ConnectionStrings.Count > 0))
 			{
-				connectionString = ConfigurationManager.ConnectionStrings[0].ConnectionString;
+				connectionString =
+					ConfigurationManager.ConnectionStrings[0].ConnectionString;
 
 				// OleDbConnection is default
-				databaseType = DB_OLEDB;
-				clientName = "DatabaseLib";
-				//Initialize(DB_OLEDB, "DatabaseLib");
+				databaseType = DatabaseTypes.OleDb;
+
+				clientName = "DatabaseLibrary";
 			}
 		}
 
@@ -112,202 +91,98 @@ namespace Zenware.DatabaseLibrary
 		/// CoreDatabase - Constructor
 		/// </summary>
 		/// <param name="provider"></param>
-		/// <param name="DataSource"></param>
-		public CoreDatabase(
-			string provider,
-			string DataSource)
+		/// <param name="dataSource"></param>
+		public CoreDatabase(string provider, string dataSource)
 		{
 			this.provider = provider;
-			connectionString = CreateConnectionString(provider, DataSource, null);
-			databaseType = DB_OLEDB;
+			connectionString = CreateConnectionString(provider, dataSource,
+				null);
+			databaseType = DatabaseTypes.OleDb;
 			clientName = "DatabaseLib";
 		}
 
 		/// <summary>
 		/// CoreDatabase - Constructor
 		/// </summary>
-		/// <param name="ClientName"></param>
+		/// <param name="clientName"></param>
 		/// <param name="provider"></param>
-		/// <param name="DataSource"></param>
-		public CoreDatabase(
-			string ClientName,
-			string provider,
-			string DataSource)
+		/// <param name="dataSource"></param>
+		public CoreDatabase(string clientName, string provider,
+			string dataSource)
 		{
 			this.provider = provider;
-			connectionString = CreateConnectionString(provider, DataSource, null);
-			databaseType = DB_OLEDB;
-			clientName = ClientName;
+			connectionString = CreateConnectionString(provider, dataSource,
+				null);
+			databaseType = DatabaseTypes.OleDb;
+			this.clientName = clientName;
 		}
 
 		/// <summary>
 		/// CoreDatabase - Constructor
 		/// </summary>
-		/// <param name="DatabaseType"></param>
-		/// <param name="DataSource"></param>
-		/// <param name="Catalog"></param>
-		public CoreDatabase(
-			uint DatabaseType,
-			string DataSource,
-			string Catalog)
+		/// <param name="databaseType"></param>
+		/// <param name="dataSource"></param>
+		/// <param name="catalog"></param>
+		public CoreDatabase(DatabaseTypes databaseType, string dataSource,
+			string catalog)
 		{
-			connectionString = CreateConnectionString(null, DataSource, Catalog);
-			databaseType = DatabaseType;
+			connectionString = CreateConnectionString(null, dataSource,
+				catalog);
+			this.databaseType = databaseType;
 			clientName = "DatabaseLib";
 		}
 
 		/// <summary>
 		/// CoreDatabase - Constructor
 		/// </summary>
-		/// <param name="DatabaseType"></param>
+		/// <param name="databaseType"></param>
 		/// <param name="ConnectionString"></param>
-		public CoreDatabase(
-			uint DatabaseType,
-			string ConnectionString)
+		public CoreDatabase(DatabaseTypes databaseType, string ConnectionString)
 		{
 			connectionString = ConnectionString;
-			databaseType = DatabaseType;
+			this.databaseType = databaseType;
 			clientName = "DatabaseLib";
 		}
+		#endregion constructors
 
-		/// <summary>
-		/// Prepares all necessary class variables by various constructors
-		/// </summary>
-		public bool Initialize()
-		{
-			bool ReturnValue = false;
-			try
-			{
-				log = LogManager.GetLogger(this.GetType());
-
-				if (null != connection)
-				{
-					connection.Close();
-				}
-
-				switch (databaseType)
-				{
-					case DB_OLEDB:
-						{
-							oleDbConnection = new OleDbConnection(connectionString);
-							connection = oleDbConnection;
-							break;
-						}
-					case DB_SQLSERVER:
-						{
-							connection = new SqlConnection(connectionString);
-							break;
-						}
-					//case DB_ORACLE:
-					//    {
-					//        connection = new OracleConnection(connectionString);
-					//        break;
-					//    }
-					case DB_MYSQL:
-						{
-							mySqlConnection = new MySqlConnection(connectionString);
-							connection = mySqlConnection;
-							break;
-						}
-				}
-
-				ReturnValue = true;
-			}
-			catch (Exception ex)
-			{
-				log.Error(CultureInfo.InvariantCulture, m => m("Initialization Error: {0}", ex.Message));
-				throw (ex);
-			}
-			finally
-			{
-			}
-
-			return ReturnValue;
-		}
-
-		private string CreateConnectionString(
-			string Provider,
-			string DataSource,
-			string Catalog)
-		{
-			string ConnectionString = null;
-
-			if (null != Provider)
-			{
-				ConnectionString = "Provider=" + Provider;
-			}
-
-			if (null != DataSource)
-			{
-				ConnectionString += "; Data Source=" + DataSource;
-			}
-
-			if (null != Catalog)
-			{
-				ConnectionString += "; Integrated Security=SSPI; Initial Catalog=" + Catalog;
-			}
-
-			return ConnectionString;
-		}
-
-		/// <summary>
-		/// Establishes connection with the database.
-		/// </summary>
-		public void EstablishConnection()
-		{
-			if (null == connection)
-			{
-				Initialize();
-			}
-		}
-
+		#region startup and shutdown
 		/// <summary>
 		/// Closes the database connection and object
 		/// </summary>
 		public void Close()
 		{
-			if (connection != null)
-			{
-				if (connection.State != ConnectionState.Closed)
-					connection.Close();
-			}
-
-			System.GC.Collect();
-		}
-
-		/////////////////////////////////////////////////////////////////////////
-		/// <summary>
-		/// Shut down the database.
-		/// </summary>
-		/////////////////////////////////////////////////////////////////////////
-		public void ShutDown()
-		{
-			Close();
-
 			if (null != connection)
 			{
 				connection.Dispose();
 				connection = null;
 			}
+		}
+
+		/////////////////////////////////////////////////////////////////////
+		/// <summary>
+		/// Shut down the database.
+		/// </summary>
+		/////////////////////////////////////////////////////////////////////
+		public void ShutDown()
+		{
+			Close();
 
 			System.GC.Collect();
 		}
+		#endregion startup and shutdown
 
+		#region transactions
 		/// <summary>
-		/// This opens a connection and begin's the transaction.
+		/// This opens a connection and begins the transaction.
 		/// </summary>
 		public void BeginTransaction()
 		{
 			try
 			{
-				EstablishConnection();
+				bool returnCode = Initialize();
 
-				if (null != connection)
+				if (true == returnCode)
 				{
-					if (connection.State != ConnectionState.Open)
-					{
-						connection.Open();
-					}
 					databaseTransaction = connection.BeginTransaction();
 				}
 			}
@@ -321,7 +196,7 @@ namespace Zenware.DatabaseLibrary
 		/// <summary>
 		/// This closes the transaction.
 		/// </summary>
-		private void CloseTransaction()
+		public void CloseTransaction()
 		{
 			if (null != databaseTransaction)
 			{
@@ -341,7 +216,7 @@ namespace Zenware.DatabaseLibrary
 		}
 
 		/// <summary>
-		/// This rollsback the transaction.
+		/// This rolls back the transaction.
 		/// </summary>
 		public void RollBackTransaction()
 		{
@@ -350,153 +225,85 @@ namespace Zenware.DatabaseLibrary
 				databaseTransaction.Rollback();
 			}
 		}
+		#endregion transactions
 
-		private DbCommand GetCommandObject(
-			string SqlQuery)
-		{
-			DbCommand ThisCommand = null;
-
-			try
-			{
-				EstablishConnection();
-
-				switch (databaseType)
-				{
-					case DB_OLEDB:
-						{
-							ThisCommand = new OleDbCommand();
-							break;
-						}
-					case DB_SQLSERVER:
-						{
-							ThisCommand = new SqlCommand();
-							break;
-						}
-					//case DB_ORACLE:
-					//    {
-					//        ThisCommand = new OracleCommand();
-					//        break;
-					//    }
-					case DB_MYSQL:
-						{
-							ThisCommand = new MySqlCommand();
-							break;
-						}
-				}
-
-				if (connection.State != ConnectionState.Open)
-				{
-					connection.Open();
-				}
-
-				ThisCommand.Transaction = databaseTransaction;
-				ThisCommand.Connection = connection;
-				ThisCommand.CommandText = SqlQuery;
-				ThisCommand.CommandTimeout = 30;
-			}
-			catch (Exception ex)
-			{
-				log.Error(CultureInfo.InvariantCulture, m => m("Initialization Error: {0}", ex.Message));
-			}
-			finally
-			{
-			}
-
-			return ThisCommand;
-		}
-
-		/////////////////////////////////////////////////////////////////////////
+		#region methods
+		/////////////////////////////////////////////////////////////////////
+		/// Method <c>CanQuery</c>
 		/// <summary>
-		/// Gets a DataSet based on the given query.
+		/// Checks to see if the database can return a valid query. Helper
+		/// function for unit tests.
 		/// </summary>
-		/// <param name="SqlQuery"></param>
-		/// <param name="OutDataSet"></param>
-		/// <returns>number of records retrieved</returns>
-		/////////////////////////////////////////////////////////////////////////
-		public int GetDataSet(
-			string SqlQuery,
-			out DataSet OutDataSet)
+		/// <returns>true if connection is open, false otherwise</returns>
+		/////////////////////////////////////////////////////////////////////
+		public bool CanQuery()
 		{
-			int RowCount = -1;
+			bool canQuery = false;
 
-			OutDataSet = new DataSet();
+			DataSet testDataSet = null;
+			int recordsReturned = -1;
 
-			try
+			string sql = "SELECT @@VERSION";
+
+			if (databaseType == DatabaseTypes.OleDb)
 			{
-				DbCommand ThisCommand = GetCommandObject(SqlQuery);
-
-				DbDataAdapter ThisDataAdapter = null;
-				switch (databaseType)
-				{
-					case DB_OLEDB:
-						{
-							ThisDataAdapter = new OleDbDataAdapter();
-							break;
-						}
-					case DB_SQLSERVER:
-						{
-							ThisDataAdapter = new SqlDataAdapter();
-							break;
-						}
-					//case DB_ORACLE:
-					//    {
-					//        ThisDataAdapter = new OracleDataAdapter();
-					//        break;
-					//    }
-					case DB_MYSQL:
-						{
-							ThisDataAdapter = new MySqlDataAdapter();
-							break;
-						}
-				}
-
-				ThisDataAdapter.SelectCommand = ThisCommand;
-
-				RowCount = ThisDataAdapter.Fill(OutDataSet);
-
-				log.Info(CultureInfo.InvariantCulture, m => m("OK - getDataSet - Query: {0}", SqlQuery));
-			}
-			catch (Exception ex)
-			{
-				log.Error(CultureInfo.InvariantCulture, m => m("Initialization Error: {0}", ex.Message));
-			}
-			finally
-			{
-				if (null == databaseTransaction)
-				{
-					Close();
-				}
+				sql = "SELECT VERSION";
 			}
 
-			return RowCount;
+			recordsReturned = GetDataSet(sql, out testDataSet);
+
+			if (recordsReturned > 0)
+			{
+				canQuery = true;
+			}
+
+			return canQuery;
 		}
 
-		/////////////////////////////////////////////////////////////////////////
+		/////////////////////////////////////////////////////////////////////
+		/// Method <c>Delete</c>
+		/// <summary>
+		/// Performs an Sql DELETE command
+		/// </summary>
+		/// <param name="sql"></param>
+		/// <returns>Success / Failure</returns>
+		/////////////////////////////////////////////////////////////////////
+		public bool Delete(string sql)
+		{
+			bool returnCode = ExecuteNonQuery(sql);
+
+			return returnCode;
+		}
+
+		/////////////////////////////////////////////////////////////////////
 		/// <summary>
 		/// Prepares and executes a Non-Query DB Command
 		/// </summary>
-		/////////////////////////////////////////////////////////////////////////
-		public bool ExecuteNonQuery(string SqlQueryCommand)
+		/////////////////////////////////////////////////////////////////////
+		public bool ExecuteNonQuery(string sql)
 		{
-			bool ReturnCode = false;
-			DbCommand ThisCommand = null;
+			bool returnCode = false;
+			DbCommand command = null;
 
 			try
 			{
-				ThisCommand = GetCommandObject(SqlQueryCommand);
-				int RowsEffected = ThisCommand.ExecuteNonQuery();
+				command = GetCommandObject(sql);
 
-				if (RowsEffected > 0)
+				if (null != command)
 				{
-					ReturnCode = true;
+					int rowsEffected = command.ExecuteNonQuery();
+
+					if (rowsEffected > 0)
+					{
+						returnCode = true;
+					}
 				}
 			}
 			catch (Exception exNonQuery)
 			{
-				SetExceptionError(
-					exNonQuery,
-					"ExecuteNonQuery - An exception was encountered while attempting to execute the command. Exception: ",
-					SqlQueryCommand);
+				SetExceptionError(exNonQuery, "ExecuteNonQuery - " +
+					"An exception was encountered while attempting to " +
+					"execute the command. Exception: ", sql);
 				throw exNonQuery;
 			}
 			finally
@@ -506,54 +313,119 @@ namespace Zenware.DatabaseLibrary
 					Close();
 				}
 
-				if (null != ThisCommand)
+				if (null != command)
 				{
-					ThisCommand.Dispose();
+					command.Dispose();
 				}
 			}
-			return ReturnCode;
+			return returnCode;
 		}
 
-		/////////////////////////////////////////////////////////////////////////
+		/////////////////////////////////////////////////////////////////////
+		/// Method <c>GetDataField</c>
 		/// <summary>
-		/// Prepares and executes a Non-Query DB Command
+		/// Gets a single field from a row of data
 		/// </summary>
-		/////////////////////////////////////////////////////////////////////////
-		private uint ExecuteScalar(string SqlQueryCommand)
+		/// <param name="sql"></param>
+		/// <returns>the field object</returns>
+		/////////////////////////////////////////////////////////////////////
+		public object GetDataField(string sql)
 		{
-			uint ReturnCode = 0;
-			DbCommand ThisCommand = null;
+			object datafield = null;
+			int recordsReturned = -1;
+			DataTable TempDataTable = null;
+
+			recordsReturned = GetDataTable(sql, out TempDataTable);
+
+			if (recordsReturned > 0)
+			{
+				DataRow DataRowOut = TempDataTable.Rows[0];
+				datafield = DataRowOut.ItemArray[0];
+			}
+
+			return datafield;
+		}
+
+		/////////////////////////////////////////////////////////////////////
+		/// Method <c>GetDataRow</c>
+		/// <summary>
+		/// Gets a single row of data
+		/// </summary>
+		/// <param name="sql"></param>
+		/// <param name="dataRowOut"> (for returning data)</param>
+		/// <returns>Success / Failure</returns>
+		/////////////////////////////////////////////////////////////////////
+		public bool GetDataRow(string sql, out DataRow dataRowOut)
+		{
+			bool hasData = false;
+			int recordsReturned = -1;
+			DataTable dataTable = null;
+
+			dataRowOut = null;
+
+			recordsReturned = GetDataTable(sql, out dataTable);
+
+			if (recordsReturned > 0)
+			{
+				dataRowOut = dataTable.Rows[0];
+				hasData = true;
+			}
+
+			return hasData;
+		}
+
+		/////////////////////////////////////////////////////////////////////
+		/// <summary>
+		/// Gets a DataSet based on the given query.
+		/// </summary>
+		/// <param name="sql"></param>
+		/// <param name="dataset"></param>
+		/// <returns>number of records retrieved</returns>
+		/////////////////////////////////////////////////////////////////////
+		public int GetDataSet(string sql, out DataSet dataset)
+		{
+			int rowCount = -1;
+
+			dataset = new DataSet();
 
 			try
 			{
-				if (null != connection)
-				{
-					if (connection.State != ConnectionState.Open)
-					{
-						connection.Open();
-					}
-				}
-				ThisCommand = GetCommandObject(SqlQueryCommand);
-				Object Result = ThisCommand.ExecuteScalar();
+				DbCommand command = GetCommandObject(sql);
 
-				if (null != Result)
+				if (null != command)
 				{
-					ReturnCode = Convert.ToUInt32(Result);
+					DbDataAdapter dataAdapter = null;
+					switch (databaseType)
+					{
+						case DatabaseTypes.OleDb:
+						{
+							dataAdapter = new OleDbDataAdapter();
+							break;
+						}
+						case DatabaseTypes.SqlServer:
+						{
+							dataAdapter = new SqlDataAdapter();
+							break;
+						}
+						case DatabaseTypes.MySql:
+						{
+							dataAdapter = new MySqlDataAdapter();
+							break;
+						}
+					}
+
+					dataAdapter.SelectCommand = command;
+
+					rowCount = dataAdapter.Fill(dataset);
+
+					log.Info(CultureInfo.InvariantCulture,
+						m => m("OK - getDataSet - Query: {0}", sql));
 				}
 			}
-			catch (OleDbException Exception)
+			catch (Exception ex)
 			{
-				SetExceptionError(
-					Exception,
-					"ExecuteNonQuery - An exception was encountered while attempting to execute the command. Exception: ",
-					SqlQueryCommand);
-			}
-			catch (Exception exNonQuery)
-			{
-				SetExceptionError(
-					exNonQuery,
-					"ExecuteNonQuery - An exception was encountered while attempting to execute the command. Exception: ",
-					SqlQueryCommand);
+				log.Error(CultureInfo.InvariantCulture,
+					m => m("Initialization Error: {0}", ex.Message));
 			}
 			finally
 			{
@@ -561,249 +433,137 @@ namespace Zenware.DatabaseLibrary
 				{
 					Close();
 				}
-
-				if (null != ThisCommand)
-				{
-					ThisCommand.Dispose();
-				}
 			}
-			return ReturnCode;
+
+			return rowCount;
 		}
 
+		/////////////////////////////////////////////////////////////////////
 		/// <summary>
-		/// Sets an error message of an exception type to the diagnostics object.
+		/// GetDataTable
 		/// </summary>
-		/// <param name="ex"></param>
-		/// <param name="sIntroMsg"></param>
-		/// <param name="sCommand"></param>
-		public void SetExceptionError(Exception ex, string sIntroMsg, string sCommand)
+		/// <param name="sql"></param>
+		/// <param name="dataTable"> (for returning data)</param>
+		/// <returns>number of records retrieved</returns>
+		/////////////////////////////////////////////////////////////////////
+		public int GetDataTable(string sql, out DataTable dataTable)
 		{
-			log.Error(CultureInfo.InvariantCulture, m => m("Initialization Error: {0}", ex.Message));
+			int recordsReturned = -1;
+			DataSet dataSet = null;
+
+			dataTable = new DataTable();
+
+			recordsReturned = GetDataSet(sql, out dataSet);
+			if (dataSet.Tables.Count > 0)
+			{
+				dataTable = dataSet.Tables[0];
+			}
+
+			return recordsReturned;
 		}
 
-		/////////////////////////////////////////////////////////////////////////
+		/////////////////////////////////////////////////////////////////////
+		/// Method <c>Insert</c>
+		/// <summary>
+		/// Performs an Sql UPDATE command
+		/// </summary>
+		/// <param name="sql"></param>
+		/// <returns>object item</returns>
+		/////////////////////////////////////////////////////////////////////
+		public uint Insert(string sql)
+		{
+			bool finishTransaction = false;
+			if (null == databaseTransaction)
+			{
+				BeginTransaction();
+				finishTransaction = true;
+			}
+
+			// execute non query
+			ExecuteNonQuery(sql);
+
+			// get id of effected row
+			uint returnCode = ExecuteScalar("SELECT @@IDENTITY");
+
+			if (true == finishTransaction)
+			{
+				CommitTransaction();
+			}
+
+			return returnCode;
+		}
+
+		/////////////////////////////////////////////////////////////////////
 		/// Method <c>IsConnected</c>
 		/// <summary>
 		/// Checks to see if the database is open and connected. Helper function
 		/// for unit tests.
 		/// </summary>
 		/// <returns>true if connection is open, false otherwise</returns>
-		/////////////////////////////////////////////////////////////////////////
+		/////////////////////////////////////////////////////////////////////
 		public bool IsConnected()
 		{
-			bool Connected = false;
+			bool connected = false;
 
-			if (connection.State == ConnectionState.Open)
+			if ((null != connection) &&
+				(connection.State == ConnectionState.Open))
 			{
-				Connected = true;
+				connected = true;
 			}
 
-			return Connected;
+			return connected;
 		}
 
-		/////////////////////////////////////////////////////////////////////////
-		/// Method <c>CanQuery</c>
-		/// <summary>
-		/// Checks to see if the database can return a valid query. Helper
-		/// function for unit tests.
-		/// </summary>
-		/// <returns>true if connection is open, false otherwise</returns>
-		/////////////////////////////////////////////////////////////////////////
-		public bool CanQuery()
-		{
-			bool CanQuery = false;
-
-			DataSet TestDataSet = null;
-			int RecordsReturned = -1;
-
-			string SqlQueryCommand = "SELECT @@VERSION";
-
-			if (databaseType == DB_OLEDB)
-			{
-				SqlQueryCommand = "SELECT VERSION";
-			}
-
-			RecordsReturned = GetDataSet(SqlQueryCommand, out TestDataSet);
-
-			if (RecordsReturned > 0)
-			{
-				CanQuery = true;
-			}
-
-			return CanQuery;
-		}
-
-		/////////////////////////////////////////////////////////////////////////
-		/// <summary>
-		/// GetDataTable
-		/// </summary>
-		/// <param name="SqlQueryCommand"></param>
-		/// <param name="ReturnedDataTable"> (for returning data)</param>
-		/// <returns>number of records retrieved</returns>
-		/////////////////////////////////////////////////////////////////////////
-		public int GetDataTable(string SqlQueryCommand, out DataTable ReturnedDataTable)
-		{
-			int RecordsReturned = -1;
-			DataSet dtTempSet = null;
-
-			ReturnedDataTable = new DataTable();
-
-			RecordsReturned = GetDataSet(SqlQueryCommand, out dtTempSet);
-			if (dtTempSet.Tables.Count > 0)
-			{
-				ReturnedDataTable = dtTempSet.Tables[0];
-			}
-
-			return RecordsReturned;
-		}
-
-		/////////////////////////////////////////////////////////////////////////
-		/// Method <c>GetDataRow</c>
-		/// <summary>
-		/// Gets a single row of data
-		/// </summary>
-		/// <param name="SqlCommandQuery"></param>
-		/// <param name="DataRowOut"> (for returning data)</param>
-		/// <returns>Success / Failure</returns>
-		/////////////////////////////////////////////////////////////////////////
-		public bool GetDataRow(string SqlCommandQuery, out DataRow DataRowOut)
-		{
-			bool HasData = false;
-			int RecordsReturned = -1;
-			DataTable TempDataTable = null;
-
-			DataRowOut = null;
-
-			RecordsReturned = GetDataTable(SqlCommandQuery, out TempDataTable);
-
-			if (RecordsReturned > 0)
-			{
-				DataRowOut = TempDataTable.Rows[0];
-				HasData = true;
-			}
-
-			return HasData;
-		}
-
-		/////////////////////////////////////////////////////////////////////////
-		/// Method <c>GetDataField</c>
-		/// <summary>
-		/// Gets a single field from a row of data
-		/// </summary>
-		/// <param name="SqlCommandQuery"></param>
-		/// <returns>the field object</returns>
-		/////////////////////////////////////////////////////////////////////////
-		public object GetDataField(
-			string SqlCommandQuery)
-		{
-			object DataField = null;
-			int RecordsReturned = -1;
-			DataTable TempDataTable = null;
-
-			RecordsReturned = GetDataTable(SqlCommandQuery, out TempDataTable);
-
-			if (RecordsReturned > 0)
-			{
-				DataRow DataRowOut = TempDataTable.Rows[0];
-				DataField = DataRowOut.ItemArray[0];
-			}
-
-			return DataField;
-		}
-
-		/////////////////////////////////////////////////////////////////////////
-		/// Method <c>UpdateCommand</c>
+		/////////////////////////////////////////////////////////////////////
+		/// Method <c>Update</c>
 		/// <summary>
 		/// Performs an Sql UPDATE command
 		/// </summary>
-		/// <param name="SqlQueryCommand"></param>
+		/// <param name="sql"></param>
 		/// <returns>Success / Failure</returns>
-		/////////////////////////////////////////////////////////////////////////
-		public bool UpdateCommand(
-			string SqlQueryCommand)
+		/////////////////////////////////////////////////////////////////////
+		public bool Update(string sql)
 		{
-			bool ReturnCode = ExecuteNonQuery(SqlQueryCommand);
+			bool returnCode = ExecuteNonQuery(sql);
 
-			return ReturnCode;
+			return returnCode;
 		}
 
-		/////////////////////////////////////////////////////////////////////////
-		/// Method <c>InsertCommand</c>
-		/// <summary>
-		/// Performs an Sql UPDATE command
-		/// </summary>
-		/// <param name="SqlQueryCommand"></param>
-		/// <returns>object item</returns>
-		/////////////////////////////////////////////////////////////////////////
-		public uint InsertCommand(string SqlQueryCommand)
-		{
-			bool FinishTransaction = false;
-			if (null == databaseTransaction)
-			{
-				BeginTransaction();
-				FinishTransaction = true;
-			}
-
-			// execute non query
-			ExecuteNonQuery(SqlQueryCommand);
-
-			// get id of effected row
-			uint ReturnCode = ExecuteScalar("SELECT @@IDENTITY");
-
-			if (true == FinishTransaction)
-			{
-				CommitTransaction();
-			}
-
-			return ReturnCode;
-		}
-
-		/////////////////////////////////////////////////////////////////////////
-		/// Method <c>DeleteCommand</c>
-		/// <summary>
-		/// Performs an Sql DELETE command
-		/// </summary>
-		/// <param name="SqlQueryCommand"></param>
-		/// <returns>Success / Failure</returns>
-		/////////////////////////////////////////////////////////////////////////
-		public bool DeleteCommand(string SqlQueryCommand)
-		{
-			bool ReturnCode = ExecuteNonQuery(SqlQueryCommand);
-
-			return ReturnCode;
-		}
-
+		/////////////////////////////////////////////////////////////////////
 		/// <summary>
 		/// Temp test method
 		/// </summary>
+		/////////////////////////////////////////////////////////////////////
 		public void Test()
 		{
-			int ReturnCode = -1;
-			OleDbCommand CommandObject = null;
-			OleDbCommand commandObject = null;
+			int returnCode = -1;
+			OleDbCommand commandObject1 = null;
+			OleDbCommand commandObject2 = null;
 
 			try
 			{
-				OleDbConnection ThisOleDbConnection = new OleDbConnection(connectionString);
+				OleDbConnection connection =
+					new OleDbConnection(connectionString);
 
-				string SqlQuery = "INSERT INTO Contacts (Notes) VALUES ('testing')";
-				string SqlQuery2 = "SELECT @@IDENTITY";
+				string sql =
+					"INSERT INTO Contacts (Notes) VALUES ('testing')";
+				string Sql2 = "SELECT @@IDENTITY";
 
-				CommandObject = new OleDbCommand(SqlQuery2, ThisOleDbConnection);
-				commandObject = new OleDbCommand(SqlQuery, ThisOleDbConnection);
+				commandObject1 = new OleDbCommand(sql, connection);
+				commandObject2 = new OleDbCommand(Sql2, connection);
 
-				ThisOleDbConnection.Open();
+				connection.Open();
 
 				//CommandObject.CommandTimeout = 30;
 
-				Object Result = commandObject.ExecuteScalar();
+				Object result = commandObject1.ExecuteScalar();
 
-				if (null != Result)
+				if (null != result)
 				{
-					ReturnCode = (int)Result;
+					returnCode = (int)result;
 				}
-				ReturnCode = (int)CommandObject.ExecuteScalar();
-				ThisOleDbConnection.Close();
+
+				returnCode = (int)commandObject2.ExecuteScalar();
 			}
 			catch (Exception ex)
 			{
@@ -811,10 +571,20 @@ namespace Zenware.DatabaseLibrary
 			}
 			finally
 			{
-				if (CommandObject != null)
+				Close();
+
+				if (commandObject1 != null)
 				{
-					CommandObject.Dispose();
+					commandObject1.Dispose();
+					commandObject1 = null;
 				}
+
+				if (commandObject2 != null)
+				{
+					commandObject2.Dispose();
+					commandObject2 = null;
+				}
+
 			}
 		}
 
@@ -826,28 +596,233 @@ namespace Zenware.DatabaseLibrary
 		/////////////////////////////////////////////////////////////////////
 		public DataTable GetSchemaTable()
 		{
-			DataTable Tables = null;
+			DataTable tables = null;
 
-			if (null != connection)
+			bool returnCode = Initialize();
+
+			if (true == returnCode)
 			{
-				if (connection.State != ConnectionState.Open)
+				if (DatabaseTypes.OleDb == databaseType)
 				{
-					connection.Open();
+					tables = oleDbConnection.GetOleDbSchemaTable(
+						System.Data.OleDb.OleDbSchemaGuid.Tables,
+						new Object[] { null, null, null, "TABLE" });
+				}
+				else
+				{
+					//tables = connection.GetSchema("TABLE");
+					tables = connection.GetSchema();
 				}
 			}
 
-			if (DB_OLEDB == databaseType)
+			return tables;
+		}
+		#endregion methods
+
+		private string CreateConnectionString(string provider, 
+			string dataSource, string catalog)
+		{
+			string connectionString = null;
+
+			if (null != provider)
 			{
-				Tables = oleDbConnection.GetOleDbSchemaTable(System.Data.OleDb.OleDbSchemaGuid.Tables,
-															new Object[] { null, null, null, "TABLE" });
-			}
-			else
-			{
-				//Tables = connection.GetSchema("TABLE");
-				Tables = connection.GetSchema();
+				connectionString = "provider=" + provider;
 			}
 
-			return Tables;
+			if (null != dataSource)
+			{
+				connectionString += "; Data Source=" + dataSource;
+			}
+
+			if (null != catalog)
+			{
+				connectionString +=
+					"; Integrated Security=SSPI; Initial catalog=" + catalog;
+			}
+
+			return connectionString;
+		}
+
+		/////////////////////////////////////////////////////////////////////
+		/// <summary>
+		/// The first column of the first row in the result set,
+		/// or a null reference if the result set is empt
+		/// </summary>
+		/////////////////////////////////////////////////////////////////////
+		private uint ExecuteScalar(string sql)
+		{
+			uint returnCode = 0;
+			DbCommand command = null;
+
+			try
+			{
+				command = GetCommandObject(sql);
+
+				if (null != command)
+				{
+					Object Result = command.ExecuteScalar();
+
+					if (null != Result)
+					{
+						returnCode = Convert.ToUInt32(Result);
+					}
+				}
+			}
+			catch (OleDbException exception)
+			{
+				SetExceptionError(exception, "ExecuteNonQuery - An exception " +
+					"was encountered while attempting to execute the " +
+					"command. Exception: ", sql);
+			}
+			catch (InvalidOperationException exception)
+			{
+				SetExceptionError(exception, "ExecuteNonQuery - An exception " +
+					"was encountered while attempting to execute the " +
+					"command. Exception: ", sql);
+			}
+			catch (Exception exception)
+			{
+				SetExceptionError(exception,"ExecuteNonQuery - An exception " +
+					"was encountered while attempting to execute the " +
+					"command. Exception: ", sql);
+			}
+			finally
+			{
+				if (null == databaseTransaction)
+				{
+					Close();
+				}
+
+				if (null != command)
+				{
+					command.Dispose();
+				}
+			}
+			return returnCode;
+		}
+
+		private DbCommand GetCommandObject(string sql)
+		{
+			DbCommand command = null;
+
+			try
+			{
+				bool returnCode = Initialize();
+
+				if (true == returnCode)
+				{
+					switch (databaseType)
+					{
+						case DatabaseTypes.OleDb:
+						{
+							command = new OleDbCommand();
+							break;
+						}
+						case DatabaseTypes.SqlServer:
+						{
+							command = new SqlCommand();
+							break;
+						}
+						case DatabaseTypes.MySql:
+						{
+							command = new MySqlCommand();
+							break;
+						}
+					}
+
+					command.Transaction = databaseTransaction;
+					command.Connection = connection;
+					command.CommandText = sql;
+					command.CommandTimeout = 30;
+				}
+			}
+			catch (Exception ex)
+			{
+				log.Error(CultureInfo.InvariantCulture,
+					m => m("Initialization Error: {0}", ex.Message));
+			}
+			finally
+			{
+			}
+
+			return command;
+		}
+
+		/// <summary>
+		/// Prepares all necessary class variables by various constructors
+		/// </summary>
+		private bool Initialize(bool forceReset = false)
+		{
+			bool returnValue = false;
+
+			try
+			{
+				if (true == forceReset)
+				{
+					if ((null != connection) &&
+						(connection.State == ConnectionState.Open))
+					{
+						connection.Dispose();
+						connection = null;
+					}
+				}
+
+				switch (databaseType)
+				{
+					case DatabaseTypes.OleDb:
+					{
+						// Two statements help in debugging problems
+						oleDbConnection = new OleDbConnection(connectionString);
+						connection = oleDbConnection;
+						break;
+					}
+					case DatabaseTypes.SqlServer:
+					{
+						connection = new SqlConnection(connectionString);
+						break;
+					}
+					case DatabaseTypes.MySql:
+					{
+						mySqlConnection = new MySqlConnection(connectionString);
+						connection = mySqlConnection;
+						break;
+					}
+				}
+
+				if ((null != connection) &&
+					(connection.State != ConnectionState.Open))
+				{
+					connection.Open();
+				}
+
+				returnValue = true;
+			}
+			catch (Exception ex)
+			{
+				log.Error(CultureInfo.InvariantCulture,
+					m => m("Initialization Error: {0}", ex.Message));
+				throw (ex);
+			}
+			finally
+			{
+			}
+
+			return returnValue;
+		}
+
+		/// <summary>
+		/// Sets an error message of an exception type for the log object.
+		/// </summary>
+		/// <param name="ex"></param>
+		/// <param name="message"></param>
+		/// <param name="command"></param>
+		private void SetExceptionError(Exception ex, string message,
+			string command)
+		{
+			log.Error(CultureInfo.InvariantCulture,
+				m => m("Error: {0} Command: {1}", message, command));
+			log.Error(CultureInfo.InvariantCulture,
+				m => m("Initialization Error: {0}", ex.Message));
 		}
 	}	// end class
 }	// end namespace

@@ -102,18 +102,12 @@ namespace Zenware.DatabaseLibrary
 					CoreDatabase Database = new CoreDatabase("DatabaseLibaryNET",
 															provider,
 															MdbFile);
-
-					bool ReturnCode = Database.Initialize();
-
-					if (true == ReturnCode)
+					foreach (string SqlQuery in Queries)
 					{
-						foreach (string SqlQuery in Queries)
-						{
-							Database.ExecuteNonQuery(SqlQuery);
-						}
-
-						Database.ShutDown();
+						Database.ExecuteNonQuery(SqlQuery);
 					}
+
+					Database.ShutDown();
 				}
 			}
 			catch (Exception Ex)
@@ -531,34 +525,29 @@ namespace Zenware.DatabaseLibrary
 													provider,
 													DatebaseFile);
 
-			ReturnCode = Database.Initialize();
+			// Get all the table names
+			DataTable TableNames = GetTableNames(Database);
 
-			if (true == ReturnCode)
+			// for each table, select all the data
+			foreach (DataRow Table in TableNames.Rows)
 			{
-				// Get all the table names
-				DataTable TableNames = GetTableNames(Database);
+				string TableName = Table["TABLE_NAME"].ToString();
+				string CsvFile = CsvPath + "\\" + TableName + ".csv";
 
-				// for each table, select all the data
-				foreach (DataRow Table in TableNames.Rows)
-				{
-					string TableName = Table["TABLE_NAME"].ToString();
-					string CsvFile = CsvPath + "\\" + TableName + ".csv";
+				// Create the CSV file to which data will be exported.
+				StreamWriter ExportFile = new StreamWriter(CsvFile, false);
 
-					// Create the CSV file to which data will be exported.
-					StreamWriter ExportFile = new StreamWriter(CsvFile, false);
+				// export the table
+				string SqlQuery = "SELECT * FROM " + Table["TABLE_NAME"].ToString();
+				DataTable TableData = null;
+				int RowCount = Database.GetDataTable(SqlQuery, out TableData);
 
-					// export the table
-					string SqlQuery = "SELECT * FROM " + Table["TABLE_NAME"].ToString();
-					DataTable TableData = null;
-					int RowCount = Database.GetDataTable(SqlQuery, out TableData);
+				ExportDataTableToCsv(TableData, ExportFile);
 
-					ExportDataTableToCsv(TableData, ExportFile);
-
-					ExportFile.Close();
-				}
-
-				Database.ShutDown();
+				ExportFile.Close();
 			}
+
+			Database.ShutDown();
 
 			return ReturnCode;
 		}
