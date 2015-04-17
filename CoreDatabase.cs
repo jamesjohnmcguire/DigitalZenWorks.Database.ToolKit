@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-// $Id: Program.cs 68 2014-02-23 13:57:54Z JamesMc $
+// $Id: $
 //
 // Copyright (c) 2006-2015 by James John McGuire
 // All rights reserved.
@@ -240,19 +240,9 @@ namespace Zenware.DatabaseLibrary
 		{
 			bool canQuery = false;
 
-			DataSet testDataSet = null;
-			int recordsReturned = -1;
+			DataTable Tables = GetSchemaTable();
 
-			string sql = "SELECT @@VERSION";
-
-			if (databaseType == DatabaseTypes.OleDb)
-			{
-				sql = "SELECT VERSION";
-			}
-
-			recordsReturned = GetDataSet(sql, out testDataSet);
-
-			if (recordsReturned > 0)
+			if (Tables.Rows.Count > 0)
 			{
 				canQuery = true;
 			}
@@ -767,25 +757,28 @@ namespace Zenware.DatabaseLibrary
 					}
 				}
 
-				switch (databaseType)
+				if (null == connection)
 				{
-					case DatabaseTypes.OleDb:
+					switch (databaseType)
 					{
-						// Two statements help in debugging problems
-						oleDbConnection = new OleDbConnection(connectionString);
-						connection = oleDbConnection;
-						break;
-					}
-					case DatabaseTypes.SqlServer:
-					{
-						connection = new SqlConnection(connectionString);
-						break;
-					}
-					case DatabaseTypes.MySql:
-					{
-						mySqlConnection = new MySqlConnection(connectionString);
-						connection = mySqlConnection;
-						break;
+						case DatabaseTypes.OleDb:
+						{
+							// Two statements help in debugging problems
+							oleDbConnection = new OleDbConnection(connectionString);
+							connection = oleDbConnection;
+							break;
+						}
+						case DatabaseTypes.SqlServer:
+						{
+							connection = new SqlConnection(connectionString);
+							break;
+						}
+						case DatabaseTypes.MySql:
+						{
+							mySqlConnection = new MySqlConnection(connectionString);
+							connection = mySqlConnection;
+							break;
+						}
 					}
 				}
 

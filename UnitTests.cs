@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-// $Id: Program.cs 68 2014-02-23 13:57:54Z JamesMc $
+// $Id: $
 //
 // Copyright (c) 2006-2015 by James John McGuire
 // All rights reserved.
@@ -55,7 +55,8 @@ namespace Zenware.DatabaseLibrary
 		protected CoreDatabase m_DataLib = null;
 		private string dataSource =
 			Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) +
-			@"\data\Projects\Zenware\Dev\Contacts\Src\Product\DatabaseLibraryNET\TestDb.mdb";
+			@"\data\Projects\Zenware\Dev\Contacts\Src\Product\" +
+			@"DatabaseLibraryNET\TestDb.mdb";
 		private string dataSourceContacts =
 			Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) +
 			@"\data\admin\Contacts\ContactsX.mdb";
@@ -64,7 +65,7 @@ namespace Zenware.DatabaseLibrary
 			@"\data\admin\Contacts\backups";
 		private string dataSourceBackupsCsv =
 			Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) +
-			@"\data\admin\Contacts\backups\UnitTests.csv";
+			@"\data\admin\Contacts\backups\Contacts.csv";
 
 		/////////////////////////////////////////////////////////////////////////
 		/// Method <c>SetUp</c>
@@ -76,19 +77,14 @@ namespace Zenware.DatabaseLibrary
 		public void SetUp()
 		{
 			string provider = "Microsoft.Jet.OLEDB.4.0";
-			if (Environment.Is64BitOperatingSystem)
+			if (Environment.Is64BitProcess)
 			{
 				provider = "Microsoft.ACE.OLEDB.12.0";
 			}
 
-			m_DataLib = new CoreDatabase(
-					"TestDb",
-					provider,
-					dataSource);
+			m_DataLib = new CoreDatabase("TestDb", provider, dataSource);
 
 			m_DataLib.BeginTransaction();
-			//m_sConnectionString = "Initial Catalog=" + p_sCatalog + "; Data Source=" + p_sDataSource + "; user id=" + p_sUserID + "; password=" + p_sPassword;
-
 		}
 
 		/////////////////////////////////////////////////////////////////////
@@ -121,7 +117,7 @@ namespace Zenware.DatabaseLibrary
 		/////////////////////////////////////////////////////////////////////////
 		/// Method <c>VerifyTestSourceExists</c>
 		/// <summary>
-		/// Test to see if test db exisits
+		/// Test to see if test db exists
 		/// </summary>
 		/////////////////////////////////////////////////////////////////////////
 		[Test]
@@ -151,7 +147,7 @@ namespace Zenware.DatabaseLibrary
 		/// Test to see if Unit Testing is working
 		/// </summary>
 		/////////////////////////////////////////////////////////////////////////
-		//[Test]
+		[Test]
 		public void SelectTest()
 		{
 			string provider = "Microsoft.Jet.OLEDB.4.0";

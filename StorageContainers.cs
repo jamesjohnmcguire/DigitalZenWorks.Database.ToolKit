@@ -566,7 +566,7 @@ namespace Zenware.DatabaseLibrary
 		/////////////////////////////////////////////////////////////////////
 		/// Method <c>ExportSchema</c>
 		/// <summary>
-		/// Export all tables to similiarly named csv files
+		/// Export all tables to similarly named csv files
 		/// </summary>
 		/////////////////////////////////////////////////////////////////////
 		public bool ExportSchema(
