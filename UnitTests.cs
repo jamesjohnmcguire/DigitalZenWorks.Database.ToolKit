@@ -13,32 +13,6 @@ using NUnit.Framework;
 
 namespace Zenware.DatabaseLibrary
 {
-	///////////////////////////////////////////////////////////////////////////
-	///// Class <c>DatabaseFixture</c>
-	///// <summary>
-	///// Base Class for Database Unit Testing
-	///// </summary>
-	///////////////////////////////////////////////////////////////////////////
-	//[TestFixture]
-	//[Transaction(TransactionOption.Required)]
-	//public class DatabaseFixture : ServicedComponent
-	//{
-	//    /////////////////////////////////////////////////////////////////////////
-	//    /// Method <c>TransactionTearDown</c>
-	//    /// <summary>
-	//    /// Basic Support for Unit Testing
-	//    /// </summary>
-	//    /////////////////////////////////////////////////////////////////////////
-	//    [TearDown]
-	//    public void TransactionTearDown()
-	//    {
-	//        if (ContextUtil.IsInTransaction)
-	//        {
-	//            ContextUtil.SetAbort();
-	//        }
-	//    }
-	//}
-
 	/////////////////////////////////////////////////////////////////////////
 	/// Class <c>UnitTests</c>
 	/// <summary>
@@ -46,26 +20,17 @@ namespace Zenware.DatabaseLibrary
 	/// </summary>
 	/////////////////////////////////////////////////////////////////////////
 	[TestFixture]
+	[Transaction(TransactionOption.Required)]
 	public class TransactionUnitTests
-	//public class TransactionUnitTests : DatabaseFixture
 	{
 		/// <summary>
 		/// m_DataLibObject
 		/// </summary>
 		protected CoreDatabase m_DataLib = null;
-		private string dataSource =
-			Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) +
-			@"\data\Projects\Zenware\Dev\Contacts\Src\Product\" +
-			@"DatabaseLibraryNET\TestDb.mdb";
-		private string dataSourceContacts =
-			Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) +
-			@"\data\admin\Contacts\ContactsX.mdb";
-		private string dataSourceBackups =
-			Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) +
-			@"\data\admin\Contacts\backups";
-		private string dataSourceBackupsCsv =
-			Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) +
-			@"\data\admin\Contacts\backups\Contacts.csv";
+		private string dataSource = AppDomain.CurrentDomain.BaseDirectory +
+			"TestDb.mdb";
+		private string dataSourceBackupsCsv = 
+			AppDomain.CurrentDomain.BaseDirectory + @"\TestDb.csv";
 
 		/////////////////////////////////////////////////////////////////////////
 		/// Method <c>SetUp</c>
@@ -96,6 +61,11 @@ namespace Zenware.DatabaseLibrary
 		[TearDown]
 		public void TearDown()
 		{
+			if (ContextUtil.IsInTransaction)
+			{
+				ContextUtil.SetAbort();
+			}
+
 			m_DataLib.CommitTransaction();
 			m_DataLib.ShutDown();
 		}
@@ -220,7 +190,7 @@ namespace Zenware.DatabaseLibrary
 
 
 		/////////////////////////////////////////////////////////////////////////
-		/// Method <c>Delete</c>
+		/// Method <c>ExportToCsv</c>
 		/// <summary>
 		/// Delete Test
 		/// </summary>
@@ -230,7 +200,8 @@ namespace Zenware.DatabaseLibrary
 		{
 			StorageContainers DatabaseHelper = new StorageContainers();
 
-			DatabaseHelper.ExportToCsv(dataSourceContacts, dataSourceBackups);
+			DatabaseHelper.ExportToCsv(dataSource,
+				AppDomain.CurrentDomain.BaseDirectory);
 
 			Assert.IsTrue((File.Exists(dataSourceBackupsCsv)));
 		}
