@@ -226,7 +226,6 @@
     </Compile>
     <Compile Include="DatabaseTypes.cs" />
     <Compile Include="StorageContainers.cs" />
-    <Compile Include="TestFixture.cs" />
     <Compile Include="UnitTests.cs" />
   </ItemGroup>
   <ItemGroup>

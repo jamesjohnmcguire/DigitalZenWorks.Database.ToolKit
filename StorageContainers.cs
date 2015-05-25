@@ -17,7 +17,7 @@ namespace Zenware.DatabaseLibrary
 	/////////////////////////////////////////////////////////////////////////
 	/// Class <c>StorageContainers</c>
 	/// <summary>
-	/// Class for support on operations on complete data storage containters
+	/// Class for support on operations on complete data storage containers
 	/// </summary>
 	/////////////////////////////////////////////////////////////////////////
 	public class StorageContainers
@@ -92,10 +92,10 @@ namespace Zenware.DatabaseLibrary
 			{
 				if (File.Exists(SchemaFile))
 				{
-					string FileContents = Utils.GetFileContents(SchemaFile);
+					string fileContents = FileUtils.GetFileContents(SchemaFile);
 
 					string[] StringSeparators = new string[] { "\r\n\r\n" };
-					string[] Queries = FileContents.Split(StringSeparators,
+					string[] Queries = fileContents.Split(StringSeparators,
 															32000,
 															StringSplitOptions.RemoveEmptyEntries);
 
@@ -332,12 +332,12 @@ namespace Zenware.DatabaseLibrary
 			{
 				if (File.Exists(SchemaFile))
 				{
-					string FileContents = Utils.GetFileContents(SchemaFile);
+					string fileContents = FileUtils.GetFileContents(SchemaFile);
 
-					string[] Queries = GetTableDefinitions(FileContents);
+					string[] Queries = GetTableDefinitions(fileContents);
 
 					//set up a streamwriter for adding text
-					StreamWriter StreamWriterObject = new StreamWriter(UpdateFile, false, Encoding.Default);
+					StreamWriter streamWriter = new StreamWriter(UpdateFile, false, Encoding.Default);
 					string NewFileContents = GetFileHeader(); ;
 
 					//set up a streamwriter for adding text
@@ -438,9 +438,9 @@ namespace Zenware.DatabaseLibrary
 
 					NewFileContents += "\r\n\t}\r\n}\r\n";
 
-					StreamWriterObject.Write(NewFileContents);
+					streamWriter.Write(NewFileContents);
 
-					StreamWriterObject.Close();
+					streamWriter.Close();
 
 					TestFileContents += "\r\n\t}\r\n}\r\n";
 

@@ -30,7 +30,7 @@ namespace Zenware.DatabaseLibrary
 		private string dataSource = AppDomain.CurrentDomain.BaseDirectory +
 			"TestDb.mdb";
 		private string dataSourceBackupsCsv = 
-			AppDomain.CurrentDomain.BaseDirectory + @"\TestDb.csv";
+			AppDomain.CurrentDomain.BaseDirectory + @"\TestTable.csv";
 
 		/////////////////////////////////////////////////////////////////////////
 		/// Method <c>SetUp</c>
