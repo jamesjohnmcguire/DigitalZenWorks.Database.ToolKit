@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-// $Id: $
+// $Id$
 //
 // Copyright (c) 2006-2015 by James John McGuire
 // All rights reserved.
@@ -195,9 +195,7 @@ namespace Zenware.DatabaseLibrary
 		[Test]
 		public void ExportToCsv()
 		{
-			StorageContainers DatabaseHelper = new StorageContainers();
-
-			DatabaseHelper.ExportToCsv(dataSource,
+			StorageContainers.ExportToCsv(dataSource,
 				AppDomain.CurrentDomain.BaseDirectory);
 
 			Assert.IsTrue((File.Exists(dataSourceBackupsCsv)));

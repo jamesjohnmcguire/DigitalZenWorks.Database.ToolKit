@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-// $Id: TestForm.cs 26 2015-03-25 12:59:31Z JamesMc $
+// $Id$
 //
 // Copyright (c) 2006-2015 by James John McGuire
 // All rights reserved.
@@ -22,18 +22,6 @@ namespace Zenware.DatabaseLibrary
 	/////////////////////////////////////////////////////////////////////////
 	public class StorageContainers
 	{
-		private enum ColumnTypes
-		{
-			Autonumber,
-			Currency,
-			DateTime,
-			Memo,
-			Number,
-			Ole,
-			String,
-			YesNo
-		}
-
 		/////////////////////////////////////////////////////////////////////
 		/// <summary>
 		/// Represents a provider type for a connection string
@@ -54,409 +42,13 @@ namespace Zenware.DatabaseLibrary
 			}
 		}
 
-		/////////////////////////////////////////////////////////////////////
-		/// Method <c>CreateMdbFile</c>
 		/// <summary>
-		/// Creates an empty MDB (MS Jet / Access database) file.
+		/// Export the data table to csv file.
 		/// </summary>
-		/////////////////////////////////////////////////////////////////////
-		private void CreateMdbFile(
-			string NewFilePath)
-		{
-			Stream TemplateObjectStream = null;
-			FileStream NewFileStream = null;
-
-			try
-			{
-				byte[] EmbeddedResource;
-				Assembly ThisAssembly = Assembly.GetExecutingAssembly();
-
-				TemplateObjectStream = ThisAssembly.GetManifestResourceStream(
-					"DatabaseLibaryNet.template.mdb");
-				EmbeddedResource = new Byte[TemplateObjectStream.Length];
-				TemplateObjectStream.Read(EmbeddedResource, 0,
-					(int)TemplateObjectStream.Length);
-				NewFileStream = new FileStream(NewFilePath, FileMode.Create);
-				NewFileStream.Write(EmbeddedResource, 0,
-					(int)TemplateObjectStream.Length);
-				NewFileStream.Close();
-			}
-			catch (Exception Ex)
-			{
-				Console.WriteLine("Exception: " + Ex.ToString());
-			}
-		}
-
-		private void ImportSchema(
-			string schemaFile,
-			string MdbFile)
-		{
-			try
-			{
-				if (File.Exists(schemaFile))
-				{
-					string fileContents = FileUtils.GetFileContents(schemaFile);
-
-					string[] StringSeparators = new string[] { "\r\n\r\n" };
-					string[] Queries = fileContents.Split(StringSeparators,
-						32000, StringSplitOptions.RemoveEmptyEntries);
-
-					CoreDatabase Database = new CoreDatabase(provider,
-						MdbFile);
-					foreach (string SqlQuery in Queries)
-					{
-						Database.ExecuteNonQuery(SqlQuery);
-					}
-
-					Database.Shutdown();
-				}
-			}
-			catch (Exception Ex)
-			{
-				Console.WriteLine("Exception: " + Ex.ToString());
-			}
-		}
-
-		private string[] GetTableDefinitions(
-			string TableDefinitionsFile)
-		{
-			string[] StringSeparators = new string[] { "\r\n\r\n" };
-			string[] Queries = TableDefinitionsFile.Split(StringSeparators,
-													32000,
-													StringSplitOptions.RemoveEmptyEntries);
-
-			return Queries;
-		}
-
-		private string GetTableNameFromTableDefinitions(
-			string DdlStatement)
-		{
-			string[] TableParts = DdlStatement.Split(new char[] { '(' });
-
-			string[] TableNameParts = TableParts[0].Split(new char[] { '[', ']' });
-
-			string TableName = TableNameParts[1];
-
-			return TableName;
-		}
-
-		private string GetColumnsInfo(
-			string DdlStatement)
-		{
-			int SplitIndex = DdlStatement.IndexOf("(") + 1;
-			string ColumnsInfo = DdlStatement.Substring(SplitIndex);
-			return ColumnsInfo;
-		}
-
-		private string GetFileHeader()
-		{
-			string FileHeader = "using System;" +
-				"\r\nusing System.Data;" +
-				"\r\n\r\nusing Zenware.DatabaseLibrary;" +
-				"\r\nusing Zenware.DiagnosticsLibrary;" +
-				"\r\n\r\nnamespace Zenware.Contacts.BusinessLogicLayer" +
-				"\r\n{" +
-				"\r\n\tpublic class ContactsUpdate" +
-				"\r\n\t{" +
-				"\r\n\t\t/////////////////////////////////////////////////////////////////////" +
-				"\r\n\t\t/// <summary>" +
-				"\r\n\t\t/// The core database object" +
-				"\r\n\t\t/// </summary>" +
-				"\r\n\t\t/////////////////////////////////////////////////////////////////////" +
-				"\r\n\t\tprivate CoreDatabase database = null;" +
-				"\r\n\r\n\t\t/////////////////////////////////////////////////////////////////////" +
-				"\r\n\t\t/// Method <c>ContactsUpdate</c>" +
-				"\r\n\t\t/// <summary>" +
-				"\r\n\t\t/// Default constructor" +
-				"\r\n\t\t/// </summary>" +
-				"\r\n\t\t/////////////////////////////////////////////////////////////////////" +
-				"\r\n\t\tpublic ContactsUpdate(" +
-				"\r\n\t\t\tCoreDatabase DatabaseObject)" +
-				"\r\n\t\t{" +
-				"\r\n\t\t\tdatabase = DatabaseObject;" +
-				"\r\n\t\t}";
-
-			return FileHeader;
-		}
-
-		private string GetFunctionHeader(
-			string TableName)
-		{
-			string FunctionHeader = "\r\n\r\n\t\t/////////////////////////////////////////////////////////////////////" +
-				"\r\n\t\t/// Method <c>" + TableName + "</c>" +
-				"\r\n\t\t/// <summary>" +
-				"\r\n\t\t/// Updates a " + TableName + " record" +
-				"\r\n\t\t/// </summary>" +
-				"\r\n\t\t/////////////////////////////////////////////////////////////////////" +
-				"\r\n\t\tpublic bool " + TableName + "(";
-
-			return FunctionHeader;
-		}
-
-		private string GetTestFileHeader()
-		{
-			string userDataFolder = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-			string TestFileContents = "using System;" +
-										"\r\nusing System.Data;" +
-										"\r\nusing NUnit.Framework;" +
-										"\r\nusing Zenware.DatabaseLibrary;" +
-										"\r\n\r\nnamespace Zenware.Contacts.BusinessLogicLayer.UnitTests" +
-										"\r\n{" +
-										"\r\n\t/////////////////////////////////////////////////////////////////////////" +
-										"\r\n\t/// Class <c>UpdateTests</c>" +
-										"\r\n\t/// <summary>" +
-										"\r\n\t/// Database UpdateTests Unit Testing Class" +
-										"\r\n\t/// </summary>" +
-										"\r\n\t/////////////////////////////////////////////////////////////////////////" +
-										"\r\n\t[TestFixture]" +
-										"\r\n\tpublic class UpdateTests" +
-										"\r\n\t{" +
-										"\r\n\t\t/////////////////////////////////////////////////////////////////////" +
-										"\r\n\t\t/// <summary>" +
-										"\r\n\t\t/// The core database object" +
-										"\r\n\t\t/// </summary>" +
-										"\r\n\t\t/////////////////////////////////////////////////////////////////////" +
-										"\r\n\t\tprivate CoreDatabase database = null;" +
-										"\r\n\r\n\t\t/////////////////////////////////////////////////////////////////////" +
-										"\r\n\t\t/// <summary>" +
-										"\r\n\t\t/// " +
-										"\r\n\t\t/// </summary>" +
-										"\r\n\t\t/////////////////////////////////////////////////////////////////////" +
-										"\r\n\t\tprivate ContactsUpdate contactsUpdate = null;" +
-										"\r\n" +
-										"\r\n\t\t/////////////////////////////////////////////////////////////////////" +
-										"\r\n\t\t/// Method <c>SetUp</c>" +
-										"\r\n\t\t/// <summary>" +
-										"\r\n\t\t/// function that is called just before each test method is called." +
-										"\r\n\t\t/// </summary>" +
-										"\r\n\t\t/////////////////////////////////////////////////////////////////////" +
-										"\r\n\t\t[SetUp]" +
-										"\r\n\t\tpublic void SetUp()" +
-										"\r\n\t\t{" +
-										"\r\n\t\t\tdatabase = new CoreDatabase(" +
-										"\r\n\t\t\t\t\"ContactsPlus\"," +
-										"\r\n\t\t\t\t\"" + provider + "\"," +
-										"\r\n\t\t\t\t@\"" + userDataFolder + "\\data\\admin\\Contacts\\ContactsX.mdb\");" +
-										"\r\n" +
-										"\r\n\t\t\tdatabase.Initialize();" +
-										"\r\n\t\t\tdatabase.BeginTransaction();" +
-										"\r\n\t\t\tcontactsUpdate = new ContactsUpdate(database);" +
-										"\r\n\t\t}" +
-										"\r\n" +
-										"\r\n\t\t/////////////////////////////////////////////////////////////////////" +
-										"\r\n\t\t/// Method <cTearDownSetUp</c>" +
-										"\r\n\t\t/// <summary>" +
-										"\r\n\t\t/// function that is called just after each test method is called." +
-										"\r\n\t\t/// </summary>" +
-										"\r\n\t\t/////////////////////////////////////////////////////////////////////" +
-										"\r\n\t\t[TearDown]" +
-										"\r\n\t\tpublic void TearDown()" +
-										"\r\n\t\t{" +
-										"\r\n\t\t\tdatabase.CommitTransaction();" +
-										"\r\n\t\t\tdatabase.ShutDown();" +
-										"\r\n\t\t}";
-
-			return TestFileContents;
-		}
-
-		private string AppendUpdateQuery(
-			string ColumnName,
-			string UpdateQuery)
-		{
-			UpdateQuery += "\t\t\tif (null != " + ColumnName + ")\r\n" +
-				"\t\t\t{\r\n" +
-				"\t\t\t\tif (false == IsFirst)\r\n" +
-				"\t\t\t\t{\r\n" +
-				"\t\t\t\tSqlQuery += \", \";\r\n" +
-				"\t\t\t\t}\r\n" +
-				"\t\t\t\telse\r\n" +
-				"\t\t\t\t{\r\n" +
-				"\t\t\t\tIsFirst = false;\r\n" +
-				"\t\t\t\t}\r\n" +
-				"\t\t\t\tSqlQuery += \"[" + ColumnName + "]='\" + " + ColumnName + " + \"'\";\r\n" +
-				"\t\t\t}\r\n";
-
-			return UpdateQuery;
-		}
-
-		private ColumnTypes GetColumnType(
-			string Column)
-		{
-			ColumnTypes ColumnType = ColumnTypes.String;
-
-			if (Column.Contains("DATETIME"))
-			{
-				ColumnType = ColumnTypes.DateTime;
-			}
-			else if (Column.Contains("MEMO"))
-			{
-				ColumnType = ColumnTypes.Memo;
-			}
-			else if (Column.Contains("INTEGER"))
-			{
-				ColumnType = ColumnTypes.Number;
-			}
-			else if (Column.Contains("YESNO"))
-			{
-				ColumnType = ColumnTypes.YesNo;
-			}
-
-			return ColumnType;
-		}
-
-		private bool IsTimeField(
-			string Field)
-		{
-			bool ReturnCode = false;
-
-			if ((Field.Contains("Time")) || (Field.Contains("time")))
-			{
-				ReturnCode = true;
-			}
-
-			return ReturnCode;
-		}
-
-		/////////////////////////////////////////////////////////////////////
-		/// Method <c>CreateUpdateStatments</c>
-		/// <summary>
-		/// Crates files that have the  update functions and the test
-		/// functions for the given schema file.
-		/// </summary>
-		/////////////////////////////////////////////////////////////////////
-		public void CreateUpdateStatments(
-			string schemaFile,
-			string UpdateFile,
-			string TestFile)
-		{
-			try
-			{
-				if (File.Exists(schemaFile))
-				{
-					string fileContents = FileUtils.GetFileContents(schemaFile);
-
-					string[] Queries = GetTableDefinitions(fileContents);
-
-					//set up a streamwriter for adding text
-					StreamWriter streamWriter = new StreamWriter(UpdateFile, false, Encoding.Default);
-					string NewFileContents = GetFileHeader(); ;
-
-					//set up a streamwriter for adding text
-					StreamWriter TestFileStreamWriter = new StreamWriter(TestFile, false, Encoding.Default);
-					string TestFileContents = GetTestFileHeader();
-
-					foreach (string Table in Queries)
-					{
-						string TableName = GetTableNameFromTableDefinitions(Table);
-						string UpdateQuery = "UPDATE " + TableName + " SET \";\r\n\r\n";
-
-						string FunctionHeader = GetFunctionHeader(TableName);
-
-						string TestFunction = "\r\n\r\n\t\t/////////////////////////////////////////////////////////////////////" +
-							"\r\n\t\t/// Method <c>" + TableName + "</c>" +
-							"\r\n\t\t/// <summary>" +
-							"\r\n\t\t/// Tests Updating a " + TableName + " record" +
-							"\r\n\t\t/// </summary>" +
-							"\r\n\t\t/////////////////////////////////////////////////////////////////////" +
-							"\r\n\t\t[Test]" +
-							"\r\n\t\tpublic void " + TableName + "()" + "\r\n\t\t{" +
-							"\r\n\t\t\tbool ReturnCode = contactsUpdate." + TableName + "(";
-
-						string ColumnsInfo = GetColumnsInfo(Table);
-						string[] TableColumnParts = ColumnsInfo.Split(new char[] { '[' });
-
-						bool First = true;
-						//uint Index = 0;
-						string PrimaryKey = null;
-
-						for (uint Index = 1; Index < TableColumnParts.Length; Index++)
-						//foreach (string Column in TableColumnParts)
-						{
-							string Column = TableColumnParts[Index];
-							string[] ColumnParts = Column.Split(new char[] { ']' });
-
-							if (1 == Index)
-							{
-								PrimaryKey = ColumnParts[0];
-							}
-							// the first item is junk and
-							// the second item is the primary key,
-							// which we will never update
-							//else if (1 < Index)
-							else
-							{
-								string ColumnName = ColumnParts[0];
-								if (true == First)
-								{
-									UpdateQuery = AppendUpdateQuery(ColumnName, UpdateQuery);
-									First = false;
-								}
-								else
-								{
-									UpdateQuery = AppendUpdateQuery(ColumnName, UpdateQuery);
-									FunctionHeader += ",";
-									TestFunction += ", ";
-								}
-
-								FunctionHeader += "\r\n\t\t\tstring " + ColumnName;
-
-								ColumnTypes ColumnType = GetColumnType(ColumnParts[1]);
-
-								if (ColumnTypes.DateTime == ColumnType)
-								{
-									TestFunction += "\"" + DateTime.Now + "\"";
-								}
-								else if ((ColumnTypes.Number == ColumnType) || (ColumnTypes.YesNo == ColumnType))
-								{
-									TestFunction += "\"1\"";
-								}
-								else
-								{
-									TestFunction += "\"" + ColumnName + "\"";
-								}
-							}
-
-							if (ColumnParts[1].Contains("CONSTRAINT"))
-							{
-								break;
-							}
-						}
-
-						FunctionHeader += ",\r\n\t\t\tint PrimaryKey)\r\n\t\t{\r\n\t\t\tstring SqlQuery = \"";
-						//UpdateQuery += "\r\n";
-						TestFunction += ",1);";
-
-						string PrimaryKeyClause = "\r\n\t\t\tSqlQuery += \" WHERE " + PrimaryKey + "=\" + PrimaryKey;\r\n";
-						NewFileContents += FunctionHeader + UpdateQuery + PrimaryKeyClause + "\r\n" +
-							"\t\t\tbool ReturnedCode = database.UpdateCommand(SqlQuery);" +
-							"\r\n\r\n\t\t\treturn ReturnedCode;" +
-							"\r\n\t\t}";
-
-						TestFileContents += TestFunction + "\r\n" +
-							"\r\n\t\t\tAssert.IsTrue(ReturnCode);" +
-							"\r\n\t\t}";
-					}
-
-					NewFileContents += "\r\n\t}\r\n}\r\n";
-
-					streamWriter.Write(NewFileContents);
-
-					streamWriter.Close();
-
-					TestFileContents += "\r\n\t}\r\n}\r\n";
-
-					TestFileStreamWriter.Write(TestFileContents);
-
-					TestFileStreamWriter.Close();
-				}
-			}
-			catch (Exception Ex)
-			{
-				Console.WriteLine("Exception: " + Ex.ToString());
-			}
-		}
-
-		private bool ExportDataTableToCsv(
+		/// <param name="ExportTable"></param>
+		/// <param name="ExportFile"></param>
+		/// <returns></returns>
+		public static bool ExportDataTableToCsv(
 			DataTable ExportTable,
 			StreamWriter ExportFile)
 		{
@@ -501,27 +93,24 @@ namespace Zenware.DatabaseLibrary
 			return ReturnCode;
 		}
 
-		private DataTable GetTableNames(
-			CoreDatabase Database)
-		{
-			DataTable Tables = Database.GetSchemaTable();
-
-			return Tables;
-		}
-
 		/////////////////////////////////////////////////////////////////////
 		/// Method <c>ExportToCsv</c>
 		/// <summary>
-		/// Export all tables to similiarly named csv files
+		/// Export all tables to similarly named csv files
 		/// </summary>
 		/////////////////////////////////////////////////////////////////////
-		public bool ExportToCsv(
+		public static bool ExportToCsv(
 			string DatebaseFile,
 			string CsvPath)
 		{
 			bool ReturnCode = false;
 
 			// Open the database
+			string provider = "Microsoft.Jet.OLEDB.4.0";
+			if (Environment.Is64BitOperatingSystem)
+			{
+				provider = "Microsoft.ACE.OLEDB.12.0";
+			}
 			CoreDatabase Database = new CoreDatabase(provider, DatebaseFile);
 
 			// Get all the table names
@@ -547,6 +136,418 @@ namespace Zenware.DatabaseLibrary
 			}
 
 			Database.Shutdown();
+
+			return ReturnCode;
+		}
+
+		/// <summary>
+		/// GetColumnsInfo - returns details of a column statement
+		/// </summary>
+		/// <param name="DdlStatement"></param>
+		/// <returns></returns>
+		public static string GetColumnsInfo(string DdlStatement)
+		{
+			int SplitIndex = DdlStatement.IndexOf("(") + 1;
+			string ColumnsInfo = DdlStatement.Substring(SplitIndex);
+			return ColumnsInfo;
+		}
+
+		/// <summary>
+		/// GetTableDefinitions - returns an array of table definitions
+		/// </summary>
+		/// <param name="TableDefinitionsFile"></param>
+		/// <returns></returns>
+		public static string[] GetTableDefinitions(
+			string TableDefinitionsFile)
+		{
+			string[] StringSeparators = new string[] { "\r\n\r\n" };
+			string[] Queries = TableDefinitionsFile.Split(StringSeparators,
+				32000, StringSplitOptions.RemoveEmptyEntries);
+
+			return Queries;
+		}
+
+		/// <summary>
+		/// GetTableNameFromTableDefinitions - returns the name of the table
+		/// </summary>
+		/// <param name="DdlStatement"></param>
+		/// <returns></returns>
+		public static string GetTableNameFromTableDefinitions(
+			string DdlStatement)
+		{
+			string[] TableParts = DdlStatement.Split(new char[] { '(' });
+
+			string[] TableNameParts = TableParts[0].Split(new char[] { '[', ']' });
+
+			string TableName = TableNameParts[1];
+
+			return TableName;
+		}
+
+		/// <summary>
+		/// Get table names from the internal schema.
+		/// </summary>
+		/// <param name="Database"></param>
+		/// <returns></returns>
+		public static DataTable GetTableNames(
+			CoreDatabase Database)
+		{
+			DataTable Tables = Database.GetSchemaTable();
+
+			return Tables;
+		}
+
+		/// <summary>
+		/// Returns the column type
+		/// </summary>
+		/// <param name="Column"></param>
+		/// <returns></returns>
+		public static ColumnTypes GetColumnType(
+			string Column)
+		{
+			ColumnTypes ColumnType = ColumnTypes.String;
+
+			if (Column.ToLower().Contains("autonumber"))
+			{
+				ColumnType = ColumnTypes.AutoNumber;
+			}
+			if ((Column.ToLower().Contains("identity")) ||
+				(Column.ToLower().Contains("autoincrement")))
+			{
+				ColumnType = ColumnTypes.Identity;
+			}
+			else if (Column.ToLower().Contains("bigint"))
+			{
+				ColumnType = ColumnTypes.BigInt;
+			}
+			else if (Column.ToLower().Contains("longvarbinary"))
+			{
+				ColumnType = ColumnTypes.LongVarBinary;
+			}
+			else if (Column.ToLower().Contains("longvarchar"))
+			{
+				ColumnType = ColumnTypes.LongVarChar;
+			}
+			else if (Column.ToLower().Contains("varbinary"))
+			{
+				ColumnType = ColumnTypes.VarBinary;
+			}
+			else if (Column.ToLower().Contains("varchar"))
+			{
+				ColumnType = ColumnTypes.VarChar;
+			}
+			else if (Column.ToLower().Contains("binary"))
+			{
+				ColumnType = ColumnTypes.Binary;
+			}
+			else if (Column.ToLower().Contains("bit"))
+			{
+				ColumnType = ColumnTypes.Bit;
+			}
+			else if (Column.ToLower().Contains("longblob"))
+			{
+				ColumnType = ColumnTypes.LongBlob;
+			}
+			else if (Column.ToLower().Contains("mediumblob"))
+			{
+				ColumnType = ColumnTypes.MediumBlob;
+			}
+			else if (Column.ToLower().Contains("blob"))
+			{
+				ColumnType = ColumnTypes.Blob;
+			}
+			else if (Column.ToLower().Contains("boolean"))
+			{
+				ColumnType = ColumnTypes.Boolean;
+			}
+			else if (Column.ToLower().Contains("byte"))
+			{
+				ColumnType = ColumnTypes.Byte;
+			}
+			else if (Column.ToLower().Contains("nvarchar"))
+			{
+				ColumnType = ColumnTypes.NVarChar;
+			}
+			else if (Column.ToLower().Contains("char"))
+			{
+				ColumnType = ColumnTypes.Char;
+			}
+			else if (Column.ToLower().Contains("currency"))
+			{
+				ColumnType = ColumnTypes.Currency;
+			}
+			else if (Column.ToLower().Contains("cursor"))
+			{
+				ColumnType = ColumnTypes.Cursor;
+			}
+			else if (Column.ToLower().Contains("smalldatetime"))
+			{
+				ColumnType = ColumnTypes.SmallDateTime;
+			}
+			else if (Column.ToLower().Contains("smallint"))
+			{
+				ColumnType = ColumnTypes.SmallInt;
+			}
+			else if (Column.ToLower().Contains("smallmoney"))
+			{
+				ColumnType = ColumnTypes.SmallMoney;
+			}
+			else if (Column.ToLower().Contains("datetime2"))
+			{
+				ColumnType = ColumnTypes.DateTime2;
+			}
+			else if (Column.ToLower().Contains("datetimeoffset"))
+			{
+				ColumnType = ColumnTypes.DateTimeOffset;
+			}
+			else if (Column.ToLower().Contains("datetime"))
+			{
+				ColumnType = ColumnTypes.DateTime;
+			}
+			else if (Column.ToLower().Contains("date"))
+			{
+				ColumnType = ColumnTypes.Date;
+			}
+			else if (Column.ToLower().Contains("decimal"))
+			{
+				ColumnType = ColumnTypes.Decimal;
+			}
+			else if (Column.ToLower().Contains("double"))
+			{
+				ColumnType = ColumnTypes.Double;
+			}
+			else if (Column.ToLower().Contains("hyperlink"))
+			{
+				ColumnType = ColumnTypes.HyperLink;
+			}
+			else if (Column.ToLower().Contains("enum"))
+			{
+				ColumnType = ColumnTypes.Enum;
+			}
+			else if (Column.ToLower().Contains("float"))
+			{
+				ColumnType = ColumnTypes.Float;
+			}
+			else if (Column.ToLower().Contains("image"))
+			{
+				ColumnType = ColumnTypes.Image;
+			}
+			else if (Column.ToLower().Contains("integer"))
+			{
+				ColumnType = ColumnTypes.Integer;
+			}
+			else if (Column.ToLower().Contains("mediumint"))
+			{
+				ColumnType = ColumnTypes.MediumInt;
+			}
+			else if (Column.ToLower().Contains("tinyint"))
+			{
+				ColumnType = ColumnTypes.TinyInt;
+			}
+			else if (Column.ToLower().Contains("int"))
+			{
+				ColumnType = ColumnTypes.Int;
+			}
+			else if (Column.ToLower().Contains("javaobject"))
+			{
+				ColumnType = ColumnTypes.JavaObject;
+			}
+			else if (Column.ToLower().Contains("longtext"))
+			{
+				ColumnType = ColumnTypes.LongText;
+			}
+			else if (Column.ToLower().Contains("long"))
+			{
+				ColumnType = ColumnTypes.Long;
+			}
+			else if (Column.ToLower().Contains("lookupwizard"))
+			{
+				ColumnType = ColumnTypes.LookupWizard;
+			}
+			else if (Column.ToLower().Contains("mediumtext"))
+			{
+				ColumnType = ColumnTypes.MediumText;
+			}
+			else if (Column.ToLower().Contains("memo"))
+			{
+				ColumnType = ColumnTypes.Memo;
+			}
+			else if (Column.ToLower().Contains("money"))
+			{
+				ColumnType = ColumnTypes.Money;
+			}
+			else if (Column.ToLower().Contains("nchar"))
+			{
+				ColumnType = ColumnTypes.NChar;
+			}
+			else if (Column.ToLower().Contains("ntext"))
+			{
+				ColumnType = ColumnTypes.NText;
+			}
+			else if (Column.ToLower().Contains("number"))
+			{
+				ColumnType = ColumnTypes.Number;
+			}
+			else if (Column.ToLower().Contains("numeric"))
+			{
+				ColumnType = ColumnTypes.Numeric;
+			}
+			else if (Column.ToLower().Contains("oleobject"))
+			{
+				ColumnType = ColumnTypes.OleObject;
+			}
+			else if (Column.ToLower().Contains("ole"))
+			{
+				ColumnType = ColumnTypes.Ole;
+			}
+			else if (Column.ToLower().Contains("real"))
+			{
+				ColumnType = ColumnTypes.Real;
+			}
+			else if (Column.ToLower().Contains("set"))
+			{
+				ColumnType = ColumnTypes.Set;
+			}
+			else if (Column.ToLower().Contains("single"))
+			{
+				ColumnType = ColumnTypes.Single;
+			}
+			else if (Column.ToLower().Contains("sqlvariant"))
+			{
+				ColumnType = ColumnTypes.SqlVariant;
+			}
+			else if (Column.ToLower().Contains("string"))
+			{
+				ColumnType = ColumnTypes.String;
+			}
+			else if (Column.ToLower().Contains("table"))
+			{
+				ColumnType = ColumnTypes.Table;
+			}
+			else if (Column.ToLower().Contains("tinytext"))
+			{
+				ColumnType = ColumnTypes.TinyText;
+			}
+			else if (Column.ToLower().Contains("text"))
+			{
+				ColumnType = ColumnTypes.Text;
+			}
+			else if (Column.ToLower().Contains("timestamp"))
+			{
+				ColumnType = ColumnTypes.TimeStamp;
+			}
+			else if (Column.ToLower().Contains("time"))
+			{
+				ColumnType = ColumnTypes.Time;
+			}
+			else if (Column.ToLower().Contains("uniqueidentifier"))
+			{
+				ColumnType = ColumnTypes.UniqueIdentifier;
+			}
+			else if (Column.ToLower().Contains("xml"))
+			{
+				ColumnType = ColumnTypes.Xml;
+			}
+			else if (Column.ToLower().Contains("year"))
+			{
+				ColumnType = ColumnTypes.Year;
+			}
+			else if (Column.ToLower().Contains("yesno"))
+			{
+				ColumnType = ColumnTypes.Boolean;
+			}
+			else
+			{
+				ColumnType = ColumnTypes.Other;
+			}
+
+			return ColumnType;
+		}
+
+		/////////////////////////////////////////////////////////////////////
+		/// Method <c>CreateMdbFile</c>
+		/// <summary>
+		/// Creates an empty MDB (MS Jet / Access database) file.
+		/// </summary>
+		/////////////////////////////////////////////////////////////////////
+		public static void CreateMdbFile(
+			string NewFilePath)
+		{
+			Stream TemplateObjectStream = null;
+			FileStream NewFileStream = null;
+
+			try
+			{
+				byte[] EmbeddedResource;
+				Assembly ThisAssembly = Assembly.GetExecutingAssembly();
+
+				TemplateObjectStream = ThisAssembly.GetManifestResourceStream(
+					"DatabaseLibaryNet.template.mdb");
+				EmbeddedResource = new Byte[TemplateObjectStream.Length];
+				TemplateObjectStream.Read(EmbeddedResource, 0,
+					(int)TemplateObjectStream.Length);
+				NewFileStream = new FileStream(NewFilePath, FileMode.Create);
+				NewFileStream.Write(EmbeddedResource, 0,
+					(int)TemplateObjectStream.Length);
+				NewFileStream.Close();
+			}
+			catch (Exception Ex)
+			{
+				Console.WriteLine("Exception: " + Ex.ToString());
+			}
+		}
+
+		/// <summary>
+		/// Creates a mdb file with the given schema.
+		/// </summary>
+		/// <param name="SchemaFile"></param>
+		/// <param name="MdbFile"></param>
+		public static void ImportSchema(
+			string SchemaFile,
+			string MdbFile)
+		{
+			try
+			{
+				if (File.Exists(SchemaFile))
+				{
+					string provider = "Microsoft.Jet.OLEDB.4.0";
+					if (Environment.Is64BitOperatingSystem)
+					{
+						provider = "Microsoft.ACE.OLEDB.12.0";
+					}
+					string fileContents = FileUtils.GetFileContents(SchemaFile);
+
+					string[] StringSeparators = new string[] { "\r\n\r\n" };
+					string[] Queries = fileContents.Split(StringSeparators,
+															32000,
+															StringSplitOptions.RemoveEmptyEntries);
+
+					CoreDatabase Database = new CoreDatabase(provider,
+						MdbFile);
+
+					foreach (string SqlQuery in Queries)
+					{
+						Database.ExecuteNonQuery(SqlQuery);
+					}
+
+					Database.Shutdown();
+				}
+			}
+			catch (Exception Ex)
+			{
+				Console.WriteLine("Exception: " + Ex.ToString());
+			}
+		}
+
+		private bool IsTimeField(
+			string Field)
+		{
+			bool ReturnCode = false;
+
+			if ((Field.Contains("Time")) || (Field.Contains("time")))
+			{
+				ReturnCode = true;
+			}
 
 			return ReturnCode;
 		}
