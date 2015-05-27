@@ -9,7 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Zenware.DatabaseLibrary
+namespace DigitalZenWorks.Common.DatabaseLibrary
 {
 	/////////////////////////////////////////////////////////////////////////
 	/// <summary>

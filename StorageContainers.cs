@@ -10,9 +10,9 @@ using System.IO;
 using System.Reflection;
 using System.Text;
 
-using Zenware.Common.UtilsNet;
+using DigitalZenWorks.Common.Utils;
 
-namespace Zenware.DatabaseLibrary
+namespace DigitalZenWorks.Common.DatabaseLibrary
 {
 	/////////////////////////////////////////////////////////////////////////
 	/// Class <c>StorageContainers</c>
@@ -202,263 +202,263 @@ namespace Zenware.DatabaseLibrary
 		/// </summary>
 		/// <param name="Column"></param>
 		/// <returns></returns>
-		public static ColumnTypes GetColumnType(
+		public static ColumnType GetColumnType(
 			string Column)
 		{
-			ColumnTypes ColumnType = ColumnTypes.String;
+			ColumnType ColumnType = ColumnType.String;
 
 			if (Column.ToLower().Contains("autonumber"))
 			{
-				ColumnType = ColumnTypes.AutoNumber;
+				ColumnType = ColumnType.AutoNumber;
 			}
 			if ((Column.ToLower().Contains("identity")) ||
 				(Column.ToLower().Contains("autoincrement")))
 			{
-				ColumnType = ColumnTypes.Identity;
+				ColumnType = ColumnType.Identity;
 			}
 			else if (Column.ToLower().Contains("bigint"))
 			{
-				ColumnType = ColumnTypes.BigInt;
+				ColumnType = ColumnType.BigInt;
 			}
 			else if (Column.ToLower().Contains("longvarbinary"))
 			{
-				ColumnType = ColumnTypes.LongVarBinary;
+				ColumnType = ColumnType.LongVarBinary;
 			}
 			else if (Column.ToLower().Contains("longvarchar"))
 			{
-				ColumnType = ColumnTypes.LongVarChar;
+				ColumnType = ColumnType.LongVarChar;
 			}
 			else if (Column.ToLower().Contains("varbinary"))
 			{
-				ColumnType = ColumnTypes.VarBinary;
+				ColumnType = ColumnType.VarBinary;
 			}
 			else if (Column.ToLower().Contains("varchar"))
 			{
-				ColumnType = ColumnTypes.VarChar;
+				ColumnType = ColumnType.VarChar;
 			}
 			else if (Column.ToLower().Contains("binary"))
 			{
-				ColumnType = ColumnTypes.Binary;
+				ColumnType = ColumnType.Binary;
 			}
 			else if (Column.ToLower().Contains("bit"))
 			{
-				ColumnType = ColumnTypes.Bit;
+				ColumnType = ColumnType.Bit;
 			}
 			else if (Column.ToLower().Contains("longblob"))
 			{
-				ColumnType = ColumnTypes.LongBlob;
+				ColumnType = ColumnType.LongBlob;
 			}
 			else if (Column.ToLower().Contains("mediumblob"))
 			{
-				ColumnType = ColumnTypes.MediumBlob;
+				ColumnType = ColumnType.MediumBlob;
 			}
 			else if (Column.ToLower().Contains("blob"))
 			{
-				ColumnType = ColumnTypes.Blob;
+				ColumnType = ColumnType.Blob;
 			}
 			else if (Column.ToLower().Contains("boolean"))
 			{
-				ColumnType = ColumnTypes.Boolean;
+				ColumnType = ColumnType.Boolean;
 			}
 			else if (Column.ToLower().Contains("byte"))
 			{
-				ColumnType = ColumnTypes.Byte;
+				ColumnType = ColumnType.Byte;
 			}
 			else if (Column.ToLower().Contains("nvarchar"))
 			{
-				ColumnType = ColumnTypes.NVarChar;
+				ColumnType = ColumnType.NVarChar;
 			}
 			else if (Column.ToLower().Contains("char"))
 			{
-				ColumnType = ColumnTypes.Char;
+				ColumnType = ColumnType.Char;
 			}
 			else if (Column.ToLower().Contains("currency"))
 			{
-				ColumnType = ColumnTypes.Currency;
+				ColumnType = ColumnType.Currency;
 			}
 			else if (Column.ToLower().Contains("cursor"))
 			{
-				ColumnType = ColumnTypes.Cursor;
+				ColumnType = ColumnType.Cursor;
 			}
 			else if (Column.ToLower().Contains("smalldatetime"))
 			{
-				ColumnType = ColumnTypes.SmallDateTime;
+				ColumnType = ColumnType.SmallDateTime;
 			}
 			else if (Column.ToLower().Contains("smallint"))
 			{
-				ColumnType = ColumnTypes.SmallInt;
+				ColumnType = ColumnType.SmallInt;
 			}
 			else if (Column.ToLower().Contains("smallmoney"))
 			{
-				ColumnType = ColumnTypes.SmallMoney;
+				ColumnType = ColumnType.SmallMoney;
 			}
 			else if (Column.ToLower().Contains("datetime2"))
 			{
-				ColumnType = ColumnTypes.DateTime2;
+				ColumnType = ColumnType.DateTime2;
 			}
 			else if (Column.ToLower().Contains("datetimeoffset"))
 			{
-				ColumnType = ColumnTypes.DateTimeOffset;
+				ColumnType = ColumnType.DateTimeOffset;
 			}
 			else if (Column.ToLower().Contains("datetime"))
 			{
-				ColumnType = ColumnTypes.DateTime;
+				ColumnType = ColumnType.DateTime;
 			}
 			else if (Column.ToLower().Contains("date"))
 			{
-				ColumnType = ColumnTypes.Date;
+				ColumnType = ColumnType.Date;
 			}
 			else if (Column.ToLower().Contains("decimal"))
 			{
-				ColumnType = ColumnTypes.Decimal;
+				ColumnType = ColumnType.Decimal;
 			}
 			else if (Column.ToLower().Contains("double"))
 			{
-				ColumnType = ColumnTypes.Double;
+				ColumnType = ColumnType.Double;
 			}
 			else if (Column.ToLower().Contains("hyperlink"))
 			{
-				ColumnType = ColumnTypes.HyperLink;
+				ColumnType = ColumnType.Hyperlink;
 			}
 			else if (Column.ToLower().Contains("enum"))
 			{
-				ColumnType = ColumnTypes.Enum;
+				ColumnType = ColumnType.Enum;
 			}
 			else if (Column.ToLower().Contains("float"))
 			{
-				ColumnType = ColumnTypes.Float;
+				ColumnType = ColumnType.Float;
 			}
 			else if (Column.ToLower().Contains("image"))
 			{
-				ColumnType = ColumnTypes.Image;
+				ColumnType = ColumnType.Image;
 			}
 			else if (Column.ToLower().Contains("integer"))
 			{
-				ColumnType = ColumnTypes.Integer;
+				ColumnType = ColumnType.Integer;
 			}
 			else if (Column.ToLower().Contains("mediumint"))
 			{
-				ColumnType = ColumnTypes.MediumInt;
+				ColumnType = ColumnType.MediumInt;
 			}
 			else if (Column.ToLower().Contains("tinyint"))
 			{
-				ColumnType = ColumnTypes.TinyInt;
+				ColumnType = ColumnType.TinyInt;
 			}
 			else if (Column.ToLower().Contains("int"))
 			{
-				ColumnType = ColumnTypes.Int;
+				ColumnType = ColumnType.Int;
 			}
 			else if (Column.ToLower().Contains("javaobject"))
 			{
-				ColumnType = ColumnTypes.JavaObject;
+				ColumnType = ColumnType.JavaObject;
 			}
 			else if (Column.ToLower().Contains("longtext"))
 			{
-				ColumnType = ColumnTypes.LongText;
+				ColumnType = ColumnType.LongText;
 			}
 			else if (Column.ToLower().Contains("long"))
 			{
-				ColumnType = ColumnTypes.Long;
+				ColumnType = ColumnType.Long;
 			}
 			else if (Column.ToLower().Contains("lookupwizard"))
 			{
-				ColumnType = ColumnTypes.LookupWizard;
+				ColumnType = ColumnType.LookupWizard;
 			}
 			else if (Column.ToLower().Contains("mediumtext"))
 			{
-				ColumnType = ColumnTypes.MediumText;
+				ColumnType = ColumnType.MediumText;
 			}
 			else if (Column.ToLower().Contains("memo"))
 			{
-				ColumnType = ColumnTypes.Memo;
+				ColumnType = ColumnType.Memo;
 			}
 			else if (Column.ToLower().Contains("money"))
 			{
-				ColumnType = ColumnTypes.Money;
+				ColumnType = ColumnType.Money;
 			}
 			else if (Column.ToLower().Contains("nchar"))
 			{
-				ColumnType = ColumnTypes.NChar;
+				ColumnType = ColumnType.NChar;
 			}
 			else if (Column.ToLower().Contains("ntext"))
 			{
-				ColumnType = ColumnTypes.NText;
+				ColumnType = ColumnType.NText;
 			}
 			else if (Column.ToLower().Contains("number"))
 			{
-				ColumnType = ColumnTypes.Number;
+				ColumnType = ColumnType.Number;
 			}
 			else if (Column.ToLower().Contains("numeric"))
 			{
-				ColumnType = ColumnTypes.Numeric;
+				ColumnType = ColumnType.Numeric;
 			}
 			else if (Column.ToLower().Contains("oleobject"))
 			{
-				ColumnType = ColumnTypes.OleObject;
+				ColumnType = ColumnType.OleObject;
 			}
 			else if (Column.ToLower().Contains("ole"))
 			{
-				ColumnType = ColumnTypes.Ole;
+				ColumnType = ColumnType.Ole;
 			}
 			else if (Column.ToLower().Contains("real"))
 			{
-				ColumnType = ColumnTypes.Real;
+				ColumnType = ColumnType.Real;
 			}
 			else if (Column.ToLower().Contains("set"))
 			{
-				ColumnType = ColumnTypes.Set;
+				ColumnType = ColumnType.Set;
 			}
 			else if (Column.ToLower().Contains("single"))
 			{
-				ColumnType = ColumnTypes.Single;
+				ColumnType = ColumnType.Single;
 			}
 			else if (Column.ToLower().Contains("sqlvariant"))
 			{
-				ColumnType = ColumnTypes.SqlVariant;
+				ColumnType = ColumnType.SqlVariant;
 			}
 			else if (Column.ToLower().Contains("string"))
 			{
-				ColumnType = ColumnTypes.String;
+				ColumnType = ColumnType.String;
 			}
 			else if (Column.ToLower().Contains("table"))
 			{
-				ColumnType = ColumnTypes.Table;
+				ColumnType = ColumnType.Table;
 			}
 			else if (Column.ToLower().Contains("tinytext"))
 			{
-				ColumnType = ColumnTypes.TinyText;
+				ColumnType = ColumnType.TinyText;
 			}
 			else if (Column.ToLower().Contains("text"))
 			{
-				ColumnType = ColumnTypes.Text;
+				ColumnType = ColumnType.Text;
 			}
 			else if (Column.ToLower().Contains("timestamp"))
 			{
-				ColumnType = ColumnTypes.TimeStamp;
+				ColumnType = ColumnType.Timestamp;
 			}
 			else if (Column.ToLower().Contains("time"))
 			{
-				ColumnType = ColumnTypes.Time;
+				ColumnType = ColumnType.Time;
 			}
 			else if (Column.ToLower().Contains("uniqueidentifier"))
 			{
-				ColumnType = ColumnTypes.UniqueIdentifier;
+				ColumnType = ColumnType.UniqueIdentifier;
 			}
 			else if (Column.ToLower().Contains("xml"))
 			{
-				ColumnType = ColumnTypes.Xml;
+				ColumnType = ColumnType.Xml;
 			}
 			else if (Column.ToLower().Contains("year"))
 			{
-				ColumnType = ColumnTypes.Year;
+				ColumnType = ColumnType.Year;
 			}
 			else if (Column.ToLower().Contains("yesno"))
 			{
-				ColumnType = ColumnTypes.Boolean;
+				ColumnType = ColumnType.Boolean;
 			}
 			else
 			{
-				ColumnType = ColumnTypes.Other;
+				ColumnType = ColumnType.Other;
 			}
 
 			return ColumnType;
@@ -598,29 +598,29 @@ namespace Zenware.DatabaseLibrary
 			//        switch ((int)r["DATA_TYPE"])
 			//        {
 			//            case 3:	// Integer
-			//                col.ColumnType = (int)ColumnTypes.Integer;
+			//                col.ColumnType = (int)ColumnType.Integer;
 			//                break;
 			//            case 130:  // String
 			//                if (Int32.Parse(r["COLUMN_FLAGS"].ToString()) > 127)
 			//                {
-			//                    col.ColumnType = (int)ColumnTypes.Memo;
+			//                    col.ColumnType = (int)ColumnType.Memo;
 			//                }
 			//                else
 			//                {
-			//                    col.ColumnType = (int)ColumnTypes.Str;
+			//                    col.ColumnType = (int)ColumnType.Str;
 			//                }
 			//                break;
 			//            case 7:  // Date
-			//                col.ColumnType = (int)ColumnTypes.DateTime;
+			//                col.ColumnType = (int)ColumnType.DateTime;
 			//                break;
 			//            case 6:  // Currency
-			//                col.ColumnType = (int)ColumnTypes.Currency;
+			//                col.ColumnType = (int)ColumnType.Currency;
 			//                break;
 			//            case 11:  // Yes/No
-			//                col.ColumnType = (int)ColumnTypes.YesNo;
+			//                col.ColumnType = (int)ColumnType.YesNo;
 			//                break;
 			//            case 128:  // OLE
-			//                col.ColumnType = (int)ColumnTypes.OLE;
+			//                col.ColumnType = (int)ColumnType.OLE;
 			//                break;
 			//        }
 

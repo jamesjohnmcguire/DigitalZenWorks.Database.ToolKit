@@ -14,7 +14,7 @@ using System.Data.OleDb;
 using System.Data.SqlClient;
 using System.Globalization;
 
-namespace Zenware.DatabaseLibrary
+namespace DigitalZenWorks.Common.DatabaseLibrary
 {
 	/////////////////////////////////////////////////////////////////////////
 	/// Class <c>CoreDatabase</c>
@@ -342,14 +342,14 @@ namespace Zenware.DatabaseLibrary
 		/// Gets a DataSet based on the given query.
 		/// </summary>
 		/// <param name="sql"></param>
-		/// <param name="dataset"></param>
+		/// <param name="dataSet"></param>
 		/// <returns>number of records retrieved</returns>
 		/////////////////////////////////////////////////////////////////////
-		public int GetDataSet(string sql, out DataSet dataset)
+		public int GetDataSet(string sql, out DataSet dataSet)
 		{
 			int rowCount = -1;
 
-			dataset = new DataSet();
+			dataSet = new DataSet();
 
 			try
 			{
@@ -379,7 +379,7 @@ namespace Zenware.DatabaseLibrary
 
 					dataAdapter.SelectCommand = command;
 
-					rowCount = dataAdapter.Fill(dataset);
+					rowCount = dataAdapter.Fill(dataSet);
 
 					log.Info(CultureInfo.InvariantCulture,
 						m => m("OK - getDataSet - Query: {0}", sql));

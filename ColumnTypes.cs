@@ -1,5 +1,5 @@
 ﻿/////////////////////////////////////////////////////////////////////////////
-// ProjectCSharp.cs
+// $Id: UnitTests.cs 37 2015-05-27 05:42:58Z JamesMc $
 //
 // Copyright © 2015 by James John McGuire
 // All rights reserved.
@@ -10,7 +10,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Zenware.DatabaseLibrary
+namespace DigitalZenWorks.Common.DatabaseLibrary
 {
 	/// <summary>
 	/// Generic column types
@@ -18,7 +18,7 @@ namespace Zenware.DatabaseLibrary
 	/// 
 	/// TODO: Update to be less Access and more generic
 	/// </summary>
-	public enum ColumnTypes
+	public enum ColumnType
 	{
 		/////////////////////////////////////////////////////////////////////
 		/// <summary>
@@ -124,7 +124,7 @@ namespace Zenware.DatabaseLibrary
 		/// MS Access
 		/// </summary>
 		/////////////////////////////////////////////////////////////////////
-		HyperLink,
+		Hyperlink,
 		/////////////////////////////////////////////////////////////////////
 		/// <summary>
 		/// MySQL
@@ -356,7 +356,7 @@ namespace Zenware.DatabaseLibrary
 		/// MySQL, SQLServer
 		/// </summary>
 		/////////////////////////////////////////////////////////////////////
-		TimeStamp,
+		Timestamp,
 		/////////////////////////////////////////////////////////////////////
 		/// <summary>
 		/// MySQL, SQLServer
