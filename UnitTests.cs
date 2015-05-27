@@ -24,9 +24,9 @@ namespace Zenware.DatabaseLibrary
 	public class TransactionUnitTests
 	{
 		/// <summary>
-		/// m_DataLibObject
+		/// database
 		/// </summary>
-		protected CoreDatabase m_DataLib = null;
+		protected CoreDatabase database = null;
 		private string dataSource = AppDomain.CurrentDomain.BaseDirectory +
 			"TestDb.mdb";
 		private string dataSourceBackupsCsv = 
@@ -47,9 +47,9 @@ namespace Zenware.DatabaseLibrary
 				provider = "Microsoft.ACE.OLEDB.12.0";
 			}
 
-			m_DataLib = new CoreDatabase("TestDb", provider, dataSource);
+			database = new CoreDatabase(provider, dataSource);
 
-			m_DataLib.BeginTransaction();
+			database.BeginTransaction();
 		}
 
 		/////////////////////////////////////////////////////////////////////
@@ -66,8 +66,8 @@ namespace Zenware.DatabaseLibrary
 				ContextUtil.SetAbort();
 			}
 
-			m_DataLib.CommitTransaction();
-			m_DataLib.ShutDown();
+			database.CommitTransaction();
+			database.Shutdown();
 		}
 
 		/////////////////////////////////////////////////////////////////////////
@@ -105,7 +105,7 @@ namespace Zenware.DatabaseLibrary
 		[Test]
 		public void CanQueryTest()
 		{
-			bool canQuery = m_DataLib.CanQuery();
+			bool canQuery = database.CanQuery();
 
 			// No exceptions found
 			Assert.IsTrue(canQuery);
@@ -130,13 +130,10 @@ namespace Zenware.DatabaseLibrary
 			DataSet TempDataSet = null;
 			string SqlQueryCommand = "SELECT * FROM TestTable";
 
-			CoreDatabase m_oDBLib = null;
-			m_oDBLib = new CoreDatabase(
-				"TimeTracker",
-				provider,
-				dataSource);
+			CoreDatabase database = null;
+			database = new CoreDatabase(provider, dataSource);
 
-			m_oDBLib.GetDataSet(SqlQueryCommand, out TempDataSet);
+			database.GetDataSet(SqlQueryCommand, out TempDataSet);
 
 			// No exceptions found
 			Assert.IsTrue(AlwaysTrue);
@@ -157,7 +154,7 @@ namespace Zenware.DatabaseLibrary
 							@"(Description) VALUES " +
 							@"('" + Description + "')";
 
-			uint NewRowId	= m_DataLib.Insert(SqlQueryCommand);
+			uint NewRowId	= database.Insert(SqlQueryCommand);
 
 			VerifyRowExists(NewRowId, true);
 		}
@@ -176,12 +173,12 @@ namespace Zenware.DatabaseLibrary
 							@"(Description) VALUES " +
 							@"('" + Description + "')";
 
-			uint NewRowId = m_DataLib.Insert(SqlQueryCommand);
+			uint NewRowId = database.Insert(SqlQueryCommand);
 
 			SqlQueryCommand = "DELETE FROM TestTable " +
 				"WHERE id=" + NewRowId.ToString();
 
-			bool Result = m_DataLib.Delete(SqlQueryCommand);
+			bool Result = database.Delete(SqlQueryCommand);
 
 			Assert.IsTrue(Result);
 
@@ -213,7 +210,7 @@ namespace Zenware.DatabaseLibrary
 			DataRow TempDataRow = null;
 			string SqlQueryCommand = "Select * from TestTable where id=" + ExistingRowId.ToString();
 
-			bool HasData = m_DataLib.GetDataRow(SqlQueryCommand, out TempDataRow);
+			bool HasData = database.GetDataRow(SqlQueryCommand, out TempDataRow);
 
 			Assert.AreEqual(ShouldExist, HasData);
 		}

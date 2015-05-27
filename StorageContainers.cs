@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-// $Id: $
+// $Id: TestForm.cs 26 2015-03-25 12:59:31Z JamesMc $
 //
 // Copyright (c) 2006-2015 by James John McGuire
 // All rights reserved.
@@ -57,7 +57,7 @@ namespace Zenware.DatabaseLibrary
 		/////////////////////////////////////////////////////////////////////
 		/// Method <c>CreateMdbFile</c>
 		/// <summary>
-		/// Creates an empty MDB (MS Jet / Access databse) file.
+		/// Creates an empty MDB (MS Jet / Access database) file.
 		/// </summary>
 		/////////////////////////////////////////////////////////////////////
 		private void CreateMdbFile(
@@ -71,11 +71,14 @@ namespace Zenware.DatabaseLibrary
 				byte[] EmbeddedResource;
 				Assembly ThisAssembly = Assembly.GetExecutingAssembly();
 
-				TemplateObjectStream = ThisAssembly.GetManifestResourceStream("DatabaseLibaryNet.template.mdb");
+				TemplateObjectStream = ThisAssembly.GetManifestResourceStream(
+					"DatabaseLibaryNet.template.mdb");
 				EmbeddedResource = new Byte[TemplateObjectStream.Length];
-				TemplateObjectStream.Read(EmbeddedResource, 0, (int)TemplateObjectStream.Length);
+				TemplateObjectStream.Read(EmbeddedResource, 0,
+					(int)TemplateObjectStream.Length);
 				NewFileStream = new FileStream(NewFilePath, FileMode.Create);
-				NewFileStream.Write(EmbeddedResource, 0, (int)TemplateObjectStream.Length);
+				NewFileStream.Write(EmbeddedResource, 0,
+					(int)TemplateObjectStream.Length);
 				NewFileStream.Close();
 			}
 			catch (Exception Ex)
@@ -85,29 +88,27 @@ namespace Zenware.DatabaseLibrary
 		}
 
 		private void ImportSchema(
-			string SchemaFile,
+			string schemaFile,
 			string MdbFile)
 		{
 			try
 			{
-				if (File.Exists(SchemaFile))
+				if (File.Exists(schemaFile))
 				{
-					string fileContents = FileUtils.GetFileContents(SchemaFile);
+					string fileContents = FileUtils.GetFileContents(schemaFile);
 
 					string[] StringSeparators = new string[] { "\r\n\r\n" };
 					string[] Queries = fileContents.Split(StringSeparators,
-															32000,
-															StringSplitOptions.RemoveEmptyEntries);
+						32000, StringSplitOptions.RemoveEmptyEntries);
 
-					CoreDatabase Database = new CoreDatabase("DatabaseLibaryNET",
-															provider,
-															MdbFile);
+					CoreDatabase Database = new CoreDatabase(provider,
+						MdbFile);
 					foreach (string SqlQuery in Queries)
 					{
 						Database.ExecuteNonQuery(SqlQuery);
 					}
 
-					Database.ShutDown();
+					Database.Shutdown();
 				}
 			}
 			catch (Exception Ex)
@@ -162,7 +163,7 @@ namespace Zenware.DatabaseLibrary
 				"\r\n\t\t/// The core database object" +
 				"\r\n\t\t/// </summary>" +
 				"\r\n\t\t/////////////////////////////////////////////////////////////////////" +
-				"\r\n\t\tprivate CoreDatabase m_Database = null;" +
+				"\r\n\t\tprivate CoreDatabase database = null;" +
 				"\r\n\r\n\t\t/////////////////////////////////////////////////////////////////////" +
 				"\r\n\t\t/// Method <c>ContactsUpdate</c>" +
 				"\r\n\t\t/// <summary>" +
@@ -172,7 +173,7 @@ namespace Zenware.DatabaseLibrary
 				"\r\n\t\tpublic ContactsUpdate(" +
 				"\r\n\t\t\tCoreDatabase DatabaseObject)" +
 				"\r\n\t\t{" +
-				"\r\n\t\t\tm_Database = DatabaseObject;" +
+				"\r\n\t\t\tdatabase = DatabaseObject;" +
 				"\r\n\t\t}";
 
 			return FileHeader;
@@ -215,13 +216,13 @@ namespace Zenware.DatabaseLibrary
 										"\r\n\t\t/// The core database object" +
 										"\r\n\t\t/// </summary>" +
 										"\r\n\t\t/////////////////////////////////////////////////////////////////////" +
-										"\r\n\t\tprivate CoreDatabase m_Database = null;" +
+										"\r\n\t\tprivate CoreDatabase database = null;" +
 										"\r\n\r\n\t\t/////////////////////////////////////////////////////////////////////" +
 										"\r\n\t\t/// <summary>" +
 										"\r\n\t\t/// " +
 										"\r\n\t\t/// </summary>" +
 										"\r\n\t\t/////////////////////////////////////////////////////////////////////" +
-										"\r\n\t\tprivate ContactsUpdate m_ContactsUpdate = null;" +
+										"\r\n\t\tprivate ContactsUpdate contactsUpdate = null;" +
 										"\r\n" +
 										"\r\n\t\t/////////////////////////////////////////////////////////////////////" +
 										"\r\n\t\t/// Method <c>SetUp</c>" +
@@ -232,14 +233,14 @@ namespace Zenware.DatabaseLibrary
 										"\r\n\t\t[SetUp]" +
 										"\r\n\t\tpublic void SetUp()" +
 										"\r\n\t\t{" +
-										"\r\n\t\t\tm_Database = new CoreDatabase(" +
+										"\r\n\t\t\tdatabase = new CoreDatabase(" +
 										"\r\n\t\t\t\t\"ContactsPlus\"," +
 										"\r\n\t\t\t\t\"" + provider + "\"," +
 										"\r\n\t\t\t\t@\"" + userDataFolder + "\\data\\admin\\Contacts\\ContactsX.mdb\");" +
 										"\r\n" +
-										"\r\n\t\t\tm_Database.Initialize();" +
-										"\r\n\t\t\tm_Database.BeginTransaction();" +
-										"\r\n\t\t\tm_ContactsUpdate = new ContactsUpdate(m_Database);" +
+										"\r\n\t\t\tdatabase.Initialize();" +
+										"\r\n\t\t\tdatabase.BeginTransaction();" +
+										"\r\n\t\t\tcontactsUpdate = new ContactsUpdate(database);" +
 										"\r\n\t\t}" +
 										"\r\n" +
 										"\r\n\t\t/////////////////////////////////////////////////////////////////////" +
@@ -251,8 +252,8 @@ namespace Zenware.DatabaseLibrary
 										"\r\n\t\t[TearDown]" +
 										"\r\n\t\tpublic void TearDown()" +
 										"\r\n\t\t{" +
-										"\r\n\t\t\tm_Database.CommitTransaction();" +
-										"\r\n\t\t\tm_Database.ShutDown();" +
+										"\r\n\t\t\tdatabase.CommitTransaction();" +
+										"\r\n\t\t\tdatabase.ShutDown();" +
 										"\r\n\t\t}";
 
 			return TestFileContents;
@@ -324,15 +325,15 @@ namespace Zenware.DatabaseLibrary
 		/// </summary>
 		/////////////////////////////////////////////////////////////////////
 		public void CreateUpdateStatments(
-			string SchemaFile,
+			string schemaFile,
 			string UpdateFile,
 			string TestFile)
 		{
 			try
 			{
-				if (File.Exists(SchemaFile))
+				if (File.Exists(schemaFile))
 				{
-					string fileContents = FileUtils.GetFileContents(SchemaFile);
+					string fileContents = FileUtils.GetFileContents(schemaFile);
 
 					string[] Queries = GetTableDefinitions(fileContents);
 
@@ -359,7 +360,7 @@ namespace Zenware.DatabaseLibrary
 							"\r\n\t\t/////////////////////////////////////////////////////////////////////" +
 							"\r\n\t\t[Test]" +
 							"\r\n\t\tpublic void " + TableName + "()" + "\r\n\t\t{" +
-							"\r\n\t\t\tbool ReturnCode = m_ContactsUpdate." + TableName + "(";
+							"\r\n\t\t\tbool ReturnCode = contactsUpdate." + TableName + "(";
 
 						string ColumnsInfo = GetColumnsInfo(Table);
 						string[] TableColumnParts = ColumnsInfo.Split(new char[] { '[' });
@@ -427,7 +428,7 @@ namespace Zenware.DatabaseLibrary
 
 						string PrimaryKeyClause = "\r\n\t\t\tSqlQuery += \" WHERE " + PrimaryKey + "=\" + PrimaryKey;\r\n";
 						NewFileContents += FunctionHeader + UpdateQuery + PrimaryKeyClause + "\r\n" +
-							"\t\t\tbool ReturnedCode = m_Database.UpdateCommand(SqlQuery);" +
+							"\t\t\tbool ReturnedCode = database.UpdateCommand(SqlQuery);" +
 							"\r\n\r\n\t\t\treturn ReturnedCode;" +
 							"\r\n\t\t}";
 
@@ -521,9 +522,7 @@ namespace Zenware.DatabaseLibrary
 			bool ReturnCode = false;
 
 			// Open the database
-			CoreDatabase Database = new CoreDatabase("DatabaseLibaryNET",
-													provider,
-													DatebaseFile);
+			CoreDatabase Database = new CoreDatabase(provider, DatebaseFile);
 
 			// Get all the table names
 			DataTable TableNames = GetTableNames(Database);
@@ -547,7 +546,7 @@ namespace Zenware.DatabaseLibrary
 				ExportFile.Close();
 			}
 
-			Database.ShutDown();
+			Database.Shutdown();
 
 			return ReturnCode;
 		}

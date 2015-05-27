@@ -37,11 +37,6 @@ namespace Zenware.DatabaseLibrary
 		private string connectionString = string.Empty;
 
 		/// <summary>
-		/// The name of the client that is using the database.
-		/// </summary>
-		private string clientName = string.Empty;
-
-		/// <summary>
 		/// Database Connection Object
 		/// </summary>
 		private DbConnection connection = null;
@@ -82,8 +77,6 @@ namespace Zenware.DatabaseLibrary
 
 				// OleDbConnection is default
 				databaseType = DatabaseTypes.OleDb;
-
-				clientName = "DatabaseLibrary";
 			}
 		}
 
@@ -95,26 +88,8 @@ namespace Zenware.DatabaseLibrary
 		public CoreDatabase(string provider, string dataSource)
 		{
 			this.provider = provider;
-			connectionString = CreateConnectionString(provider, dataSource,
-				null);
+			connectionString = CreateConnectionString(dataSource, null);
 			databaseType = DatabaseTypes.OleDb;
-			clientName = "DatabaseLib";
-		}
-
-		/// <summary>
-		/// CoreDatabase - Constructor
-		/// </summary>
-		/// <param name="clientName"></param>
-		/// <param name="provider"></param>
-		/// <param name="dataSource"></param>
-		public CoreDatabase(string clientName, string provider,
-			string dataSource)
-		{
-			this.provider = provider;
-			connectionString = CreateConnectionString(provider, dataSource,
-				null);
-			databaseType = DatabaseTypes.OleDb;
-			this.clientName = clientName;
 		}
 
 		/// <summary>
@@ -126,10 +101,8 @@ namespace Zenware.DatabaseLibrary
 		public CoreDatabase(DatabaseTypes databaseType, string dataSource,
 			string catalog)
 		{
-			connectionString = CreateConnectionString(null, dataSource,
-				catalog);
+			connectionString = CreateConnectionString(dataSource, catalog);
 			this.databaseType = databaseType;
-			clientName = "DatabaseLib";
 		}
 
 		/// <summary>
@@ -141,7 +114,6 @@ namespace Zenware.DatabaseLibrary
 		{
 			connectionString = ConnectionString;
 			this.databaseType = databaseType;
-			clientName = "DatabaseLib";
 		}
 		#endregion constructors
 
@@ -163,11 +135,12 @@ namespace Zenware.DatabaseLibrary
 		/// Shut down the database.
 		/// </summary>
 		/////////////////////////////////////////////////////////////////////
-		public void ShutDown()
+		public void Shutdown()
 		{
 			Close();
 
-			System.GC.Collect();
+			// not unless we find it's really needed
+			//System.GC.Collect();
 		}
 		#endregion startup and shutdown
 
@@ -218,7 +191,7 @@ namespace Zenware.DatabaseLibrary
 		/// <summary>
 		/// This rolls back the transaction.
 		/// </summary>
-		public void RollBackTransaction()
+		public void RollbackTransaction()
 		{
 			if (null != databaseTransaction)
 			{
@@ -289,12 +262,12 @@ namespace Zenware.DatabaseLibrary
 					}
 				}
 			}
-			catch (Exception exNonQuery)
+			catch (Exception exception)
 			{
-				SetExceptionError(exNonQuery, "ExecuteNonQuery - " +
-					"An exception was encountered while attempting to " +
-					"execute the command. Exception: ", sql);
-				throw exNonQuery;
+				log.Error(CultureInfo.InvariantCulture,
+					m => m("Exception: {0} Command: {1}", exception.Message,
+					sql));
+				throw exception;
 			}
 			finally
 			{
@@ -609,8 +582,8 @@ namespace Zenware.DatabaseLibrary
 		}
 		#endregion methods
 
-		private string CreateConnectionString(string provider, 
-			string dataSource, string catalog)
+		private string CreateConnectionString(string dataSource,
+			string catalog)
 		{
 			string connectionString = null;
 
@@ -660,21 +633,24 @@ namespace Zenware.DatabaseLibrary
 			}
 			catch (OleDbException exception)
 			{
-				SetExceptionError(exception, "ExecuteNonQuery - An exception " +
-					"was encountered while attempting to execute the " +
-					"command. Exception: ", sql);
-			}
+				log.Error(CultureInfo.InvariantCulture,
+				m => m("Exception: {0} Command: {1}", exception.Message,
+				sql));
+				throw exception;
+							}
 			catch (InvalidOperationException exception)
 			{
-				SetExceptionError(exception, "ExecuteNonQuery - An exception " +
-					"was encountered while attempting to execute the " +
-					"command. Exception: ", sql);
+				log.Error(CultureInfo.InvariantCulture,
+					m => m("Exception: {0} Command: {1}", exception.Message,
+					sql));
+				throw exception;
 			}
 			catch (Exception exception)
 			{
-				SetExceptionError(exception,"ExecuteNonQuery - An exception " +
-					"was encountered while attempting to execute the " +
-					"command. Exception: ", sql);
+				log.Error(CultureInfo.InvariantCulture,
+					m => m("Exception: {0} Command: {1}", exception.Message,
+					sql));
+				throw exception;
 			}
 			finally
 			{
