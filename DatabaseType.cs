@@ -1,5 +1,5 @@
 ﻿/////////////////////////////////////////////////////////////////////////////
-// $Id$
+// $Id: DatabaseTypes.cs 38 2015-05-27 14:24:29Z JamesMc $
 //
 // Copyright (c) 2006-2015 by James John McGuire
 // All rights reserved.
@@ -16,7 +16,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 	/// Represents values to specify the types of databases
 	/// </summary>
 	/////////////////////////////////////////////////////////////////////////
-	public enum DatabaseTypes
+	public enum DatabaseType
 	{
 		/// <summary>
 		/// OleDb

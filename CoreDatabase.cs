@@ -29,12 +29,12 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/// <summary>
 		/// databaseType
 		/// </summary>
-		private DatabaseTypes databaseType;
+		private DatabaseType databaseType;
 
 		/// <summary>
 		/// The actual connection string used to connect to the database.
 		/// </summary>
-		private string connectionString = string.Empty;
+		private string connectionText = string.Empty;
 
 		/// <summary>
 		/// Database Connection Object
@@ -72,11 +72,11 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 			if ((ConfigurationManager.ConnectionStrings != null) &&
 				(ConfigurationManager.ConnectionStrings.Count > 0))
 			{
-				connectionString =
+				connectionText =
 					ConfigurationManager.ConnectionStrings[0].ConnectionString;
 
 				// OleDbConnection is default
-				databaseType = DatabaseTypes.OleDb;
+				databaseType = DatabaseType.OleDb;
 			}
 		}
 
@@ -88,8 +88,8 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		public CoreDatabase(string provider, string dataSource)
 		{
 			this.provider = provider;
-			connectionString = CreateConnectionString(dataSource, null);
-			databaseType = DatabaseTypes.OleDb;
+			connectionText = CreateConnectionString(dataSource, null);
+			databaseType = DatabaseType.OleDb;
 		}
 
 		/// <summary>
@@ -98,10 +98,10 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/// <param name="databaseType"></param>
 		/// <param name="dataSource"></param>
 		/// <param name="catalog"></param>
-		public CoreDatabase(DatabaseTypes databaseType, string dataSource,
+		public CoreDatabase(DatabaseType databaseType, string dataSource,
 			string catalog)
 		{
-			connectionString = CreateConnectionString(dataSource, catalog);
+			connectionText = CreateConnectionString(dataSource, catalog);
 			this.databaseType = databaseType;
 		}
 
@@ -110,9 +110,9 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/// </summary>
 		/// <param name="databaseType"></param>
 		/// <param name="ConnectionString"></param>
-		public CoreDatabase(DatabaseTypes databaseType, string ConnectionString)
+		public CoreDatabase(DatabaseType databaseType, string ConnectionString)
 		{
-			connectionString = ConnectionString;
+			connectionText = ConnectionString;
 			this.databaseType = databaseType;
 		}
 		#endregion constructors
@@ -360,17 +360,17 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 					DbDataAdapter dataAdapter = null;
 					switch (databaseType)
 					{
-						case DatabaseTypes.OleDb:
+						case DatabaseType.OleDb:
 						{
 							dataAdapter = new OleDbDataAdapter();
 							break;
 						}
-						case DatabaseTypes.SqlServer:
+						case DatabaseType.SqlServer:
 						{
 							dataAdapter = new SqlDataAdapter();
 							break;
 						}
-						case DatabaseTypes.MySql:
+						case DatabaseType.MySql:
 						{
 							dataAdapter = new MySqlDataAdapter();
 							break;
@@ -497,7 +497,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/// Temp test method
 		/// </summary>
 		/////////////////////////////////////////////////////////////////////
-		public void Test()
+		public int Test()
 		{
 			int returnCode = -1;
 			OleDbCommand commandObject1 = null;
@@ -506,7 +506,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 			try
 			{
 				OleDbConnection connection =
-					new OleDbConnection(connectionString);
+					new OleDbConnection(connectionText);
 
 				string sql =
 					"INSERT INTO Contacts (Notes) VALUES ('testing')";
@@ -549,6 +549,8 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 				}
 
 			}
+
+			return returnCode;
 		}
 
 		/////////////////////////////////////////////////////////////////////
@@ -565,7 +567,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 
 			if (true == returnCode)
 			{
-				if (DatabaseTypes.OleDb == databaseType)
+				if (DatabaseType.OleDb == databaseType)
 				{
 					tables = oleDbConnection.GetOleDbSchemaTable(
 						System.Data.OleDb.OleDbSchemaGuid.Tables,
@@ -585,25 +587,25 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		private string CreateConnectionString(string dataSource,
 			string catalog)
 		{
-			string connectionString = null;
+			string connectionText = null;
 
 			if (null != provider)
 			{
-				connectionString = "provider=" + provider;
+				connectionText = "provider=" + provider;
 			}
 
 			if (null != dataSource)
 			{
-				connectionString += "; Data Source=" + dataSource;
+				connectionText += "; Data Source=" + dataSource;
 			}
 
 			if (null != catalog)
 			{
-				connectionString +=
+				connectionText +=
 					"; Integrated Security=SSPI; Initial catalog=" + catalog;
 			}
 
-			return connectionString;
+			return connectionText;
 		}
 
 		/////////////////////////////////////////////////////////////////////
@@ -679,17 +681,17 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 				{
 					switch (databaseType)
 					{
-						case DatabaseTypes.OleDb:
+						case DatabaseType.OleDb:
 						{
 							command = new OleDbCommand();
 							break;
 						}
-						case DatabaseTypes.SqlServer:
+						case DatabaseType.SqlServer:
 						{
 							command = new SqlCommand();
 							break;
 						}
-						case DatabaseTypes.MySql:
+						case DatabaseType.MySql:
 						{
 							command = new MySqlCommand();
 							break;
@@ -737,21 +739,21 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 				{
 					switch (databaseType)
 					{
-						case DatabaseTypes.OleDb:
+						case DatabaseType.OleDb:
 						{
 							// Two statements help in debugging problems
-							oleDbConnection = new OleDbConnection(connectionString);
+							oleDbConnection = new OleDbConnection(connectionText);
 							connection = oleDbConnection;
 							break;
 						}
-						case DatabaseTypes.SqlServer:
+						case DatabaseType.SqlServer:
 						{
-							connection = new SqlConnection(connectionString);
+							connection = new SqlConnection(connectionText);
 							break;
 						}
-						case DatabaseTypes.MySql:
+						case DatabaseType.MySql:
 						{
-							mySqlConnection = new MySqlConnection(connectionString);
+							mySqlConnection = new MySqlConnection(connectionText);
 							connection = mySqlConnection;
 							break;
 						}
@@ -777,21 +779,6 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 			}
 
 			return returnValue;
-		}
-
-		/// <summary>
-		/// Sets an error message of an exception type for the log object.
-		/// </summary>
-		/// <param name="ex"></param>
-		/// <param name="message"></param>
-		/// <param name="command"></param>
-		private void SetExceptionError(Exception ex, string message,
-			string command)
-		{
-			log.Error(CultureInfo.InvariantCulture,
-				m => m("Error: {0} Command: {1}", message, command));
-			log.Error(CultureInfo.InvariantCulture,
-				m => m("Initialization Error: {0}", ex.Message));
 		}
 	}	// end class
 }	// end namespace
