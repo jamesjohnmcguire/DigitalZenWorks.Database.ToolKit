@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-// $Id: StorageContainers.cs 38 2015-05-27 14:24:29Z JamesMc $
+// $Id: DataDefinition.cs 38 2015-05-27 14:24:29Z JamesMc $
 //
 // Copyright (c) 2006-2015 by James John McGuire
 // All rights reserved.
@@ -11,7 +11,7 @@ using System.IO;
 namespace DigitalZenWorks.Common.DatabaseLibrary
 {
 	/////////////////////////////////////////////////////////////////////////
-	/// Class <c>StorageContainers</c>
+	/// Class <c>DataDefinition</c>
 	/// <summary>
 	/// Class for support on operations on complete data storage containers
 	/// </summary>
@@ -108,7 +108,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		}
 
 		/// <summary>
-		/// GetColumnsInfo - returns details of a column statement
+		/// GetColumnInfo - returns details of a column statement
 		/// </summary>
 		/// <param name="dataDefinition"></param>
 		/// <returns></returns>
@@ -402,7 +402,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		}
 
 		/// <summary>
-		/// GetTableNameFromTableDefinitions - returns the name of the table
+		/// GetTableName - returns the name of the table
 		/// </summary>
 		/// <param name="dataDefinition"></param>
 		/// <returns></returns>

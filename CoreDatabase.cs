@@ -433,6 +433,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/// <param name="sql"></param>
 		/// <returns>object item</returns>
 		/////////////////////////////////////////////////////////////////////
+		[CLSCompliantAttribute(false)]
 		public uint Insert(string sql)
 		{
 			bool finishTransaction = false;
