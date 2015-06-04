@@ -5,13 +5,9 @@
 // All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 using System;
-using System.Collections.Generic;
 using System.Data;
 using System.IO;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DigitalZenWorks.Common.DatabaseLibrary
 {
@@ -148,5 +144,37 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 			return returnCode;
 		}
 
+		/// <summary>
+		/// Makes a privileged connection string
+		/// </summary>
+		/// <param name="databaseFile"></param>
+		/// <returns></returns>
+		public static string MakePrivledgedConnectString(string databaseFile)
+		{
+			string provider = "Microsoft.Jet.OLEDB.4.0";
+			if (Environment.Is64BitOperatingSystem)
+			{
+				provider = "Microsoft.ACE.OLEDB.12.0";
+			}
+
+			string connectionString = "Provider=" + provider +
+				@";Password="""";User ID=Admin;" + "Data Source=" +
+				databaseFile + @";Mode=Share Deny None;" +
+				@"Extended Properties="""";" +
+				@"Jet OLEDB:System database="""";" +
+				@"Jet OLEDB:Registry Path="""";" +
+				@"Jet OLEDB:Database Password="""";Jet OLEDB:Engine Type=5;" +
+				@"Jet OLEDB:Database Locking Mode=1;" +
+				@"Jet OLEDB:Global Partial Bulk Ops=2;" +
+				@"Jet OLEDB:Global Bulk Transactions=1;" +
+				@"Jet OLEDB:New Database Password="""";" +
+				@"Jet OLEDB:Create System Database=False;" +
+				@"Jet OLEDB:Encrypt Database=False;" +
+				@"Jet OLEDB:Don't Copy Locale on Compact=False;" +
+				@"Jet OLEDB:Compact Without Replica Repair=False;" +
+				@"Jet OLEDB:SFP=False";
+
+			return connectionString;
+		}
 	}
 }

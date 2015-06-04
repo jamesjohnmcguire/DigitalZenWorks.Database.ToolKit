@@ -224,6 +224,7 @@
     <Compile Include="AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Column.cs" />
     <Compile Include="ColumnType.cs" />
     <Compile Include="CoreDatabase.cs">
       <SubType>Code</SubType>
@@ -231,6 +232,10 @@
     <Compile Include="DatabaseType.cs" />
     <Compile Include="DatabaseUtils.cs" />
     <Compile Include="DataDefinition.cs" />
+    <Compile Include="ForeignKey.cs" />
+    <Compile Include="OleDbSchema.cs" />
+    <Compile Include="Relationship.cs" />
+    <Compile Include="Table.cs" />
     <Compile Include="UnitTests.cs" />
   </ItemGroup>
   <ItemGroup>

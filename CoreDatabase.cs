@@ -26,6 +26,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 	public class CoreDatabase
 	{
 		#region private variables
+
 		/// <summary>
 		/// databaseType
 		/// </summary>
@@ -61,9 +62,11 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 			(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
 		private string provider = string.Empty;
+
 		#endregion private variables
 
 		#region constructors
+
 		/// <summary>
 		/// CoreDatabase - Default constructor
 		/// </summary>
@@ -115,9 +118,11 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 			connectionText = ConnectionString;
 			this.databaseType = databaseType;
 		}
+
 		#endregion constructors
 
 		#region startup and shutdown
+
 		/// <summary>
 		/// Closes the database connection and object
 		/// </summary>
@@ -142,9 +147,16 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 			// not unless we find it's really needed
 			//System.GC.Collect();
 		}
+
 		#endregion startup and shutdown
 
+		DbConnection Connection
+		{
+			get { return connection; }
+		}
+
 		#region transactions
+
 		/// <summary>
 		/// This opens a connection and begins the transaction.
 		/// </summary>
@@ -198,9 +210,11 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 				databaseTransaction.Rollback();
 			}
 		}
+
 		#endregion transactions
 
 		#region methods
+
 		/////////////////////////////////////////////////////////////////////
 		/// Method <c>CanQuery</c>
 		/// <summary>
@@ -548,7 +562,6 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 					commandObject2.Dispose();
 					commandObject2 = null;
 				}
-
 			}
 
 			return returnCode;
@@ -583,6 +596,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 
 			return tables;
 		}
+
 		#endregion methods
 
 		private string CreateConnectionString(string dataSource,
@@ -640,7 +654,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 				m => m("Exception: {0} Command: {1}", exception.Message,
 				sql));
 				throw exception;
-							}
+			}
 			catch (InvalidOperationException exception)
 			{
 				log.Error(CultureInfo.InvariantCulture,
