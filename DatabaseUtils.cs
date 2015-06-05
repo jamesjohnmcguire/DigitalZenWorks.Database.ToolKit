@@ -115,7 +115,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 			{
 				provider = "Microsoft.ACE.OLEDB.12.0";
 			}
-			CoreDatabase Database = new CoreDatabase(provider, databaseFile);
+			DataStorage Database = new DataStorage(provider, databaseFile);
 
 			// Get all the table names
 			DataTable TableNames = Database.GetSchemaTable();

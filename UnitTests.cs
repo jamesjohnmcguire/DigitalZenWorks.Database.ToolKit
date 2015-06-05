@@ -26,7 +26,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/// <summary>
 		/// database
 		/// </summary>
-		protected CoreDatabase database = null;
+		protected DataStorage database = null;
 		private string dataSource = AppDomain.CurrentDomain.BaseDirectory +
 			"TestDb.mdb";
 		private string dataSourceBackupsCsv = 
@@ -47,7 +47,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 				provider = "Microsoft.ACE.OLEDB.12.0";
 			}
 
-			database = new CoreDatabase(provider, dataSource);
+			database = new DataStorage(provider, dataSource);
 
 			database.BeginTransaction();
 		}
@@ -130,8 +130,8 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 			DataSet TempDataSet = null;
 			string SqlQueryCommand = "SELECT * FROM TestTable";
 
-			CoreDatabase database = null;
-			database = new CoreDatabase(provider, dataSource);
+			DataStorage database = null;
+			database = new DataStorage(provider, dataSource);
 
 			database.GetDataSet(SqlQueryCommand, out TempDataSet);
 

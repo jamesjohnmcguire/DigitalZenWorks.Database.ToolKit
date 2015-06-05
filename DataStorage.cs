@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-// $Id$
+// $Id: CoreDatabase.cs 42 2015-06-04 14:48:09Z JamesMc $
 //
 // Copyright (c) 2006-2015 by James John McGuire
 // All rights reserved.
@@ -23,7 +23,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 	/// transport
 	/// </summary>
 	/////////////////////////////////////////////////////////////////////////
-	public class CoreDatabase
+	public class DataStorage
 	{
 		#region private variables
 
@@ -70,7 +70,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/// <summary>
 		/// CoreDatabase - Default constructor
 		/// </summary>
-		public CoreDatabase()
+		public DataStorage()
 		{
 			if ((ConfigurationManager.ConnectionStrings != null) &&
 				(ConfigurationManager.ConnectionStrings.Count > 0))
@@ -88,7 +88,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/// </summary>
 		/// <param name="provider"></param>
 		/// <param name="dataSource"></param>
-		public CoreDatabase(string provider, string dataSource)
+		public DataStorage(string provider, string dataSource)
 		{
 			this.provider = provider;
 			connectionText = CreateConnectionString(dataSource, null);
@@ -101,7 +101,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/// <param name="databaseType"></param>
 		/// <param name="dataSource"></param>
 		/// <param name="catalog"></param>
-		public CoreDatabase(DatabaseType databaseType, string dataSource,
+		public DataStorage(DatabaseType databaseType, string dataSource,
 			string catalog)
 		{
 			connectionText = CreateConnectionString(dataSource, catalog);
@@ -113,7 +113,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/// </summary>
 		/// <param name="databaseType"></param>
 		/// <param name="ConnectionString"></param>
-		public CoreDatabase(DatabaseType databaseType, string ConnectionString)
+		public DataStorage(DatabaseType databaseType, string ConnectionString)
 		{
 			connectionText = ConnectionString;
 			this.databaseType = databaseType;

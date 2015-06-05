@@ -398,7 +398,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 					string[] Queries = fileContents.Split(StringSeparators,
 						32000, StringSplitOptions.RemoveEmptyEntries);
 
-					CoreDatabase Database = new CoreDatabase(provider,
+					DataStorage Database = new DataStorage(provider,
 						databaseFile);
 
 					foreach (string SqlQuery in Queries)

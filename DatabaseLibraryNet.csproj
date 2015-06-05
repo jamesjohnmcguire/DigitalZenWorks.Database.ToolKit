@@ -226,7 +226,7 @@
     </Compile>
     <Compile Include="Column.cs" />
     <Compile Include="ColumnType.cs" />
-    <Compile Include="CoreDatabase.cs">
+    <Compile Include="DataStorage.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="DatabaseType.cs" />
