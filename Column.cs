@@ -114,13 +114,14 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/// </summary>
 		/////////////////////////////////////////////////////////////////////
 		public Column(string name, int type, int length, bool unique,
-			bool nullable, string defaultvalue, int position)
+			bool nullable, string defaultValue, int position)
 		{
 			Name = name;
 			Type = type;
+			Length = length;
 			Unique = unique;
 			Nullable = nullable;
-			DefaultValue = defaultvalue;
+			DefaultValue = defaultValue;
 			Position = position;
 		}
 	}

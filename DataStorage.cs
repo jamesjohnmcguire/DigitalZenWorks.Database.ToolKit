@@ -150,6 +150,9 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 
 		#endregion startup and shutdown
 
+		/// <summary>
+		/// The database connection object
+		/// </summary>
 		public DbConnection Connection
 		{
 			get { return connection; }

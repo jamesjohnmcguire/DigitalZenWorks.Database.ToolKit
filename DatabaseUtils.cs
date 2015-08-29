@@ -105,7 +105,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/// </summary>
 		/////////////////////////////////////////////////////////////////////
 		public static bool ExportToCsv(string databaseFile,
-			string CsvPath)
+			string csvPath)
 		{
 			bool returnCode = false;
 
@@ -124,15 +124,15 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 			foreach (DataRow Table in TableNames.Rows)
 			{
 				string TableName = Table["TABLE_NAME"].ToString();
-				string CsvFile = CsvPath + "\\" + TableName + ".csv";
+				string csvFile = csvPath + "\\" + TableName + ".csv";
 
 				// Create the CSV file to which data will be exported.
-				StreamWriter file = new StreamWriter(CsvFile, false);
+				StreamWriter file = new StreamWriter(csvFile, false);
 
 				// export the table
 				string SqlQuery = "SELECT * FROM " + Table["TABLE_NAME"].ToString();
 				DataTable TableData = null;
-				int RowCount = Database.GetDataTable(SqlQuery, out TableData);
+				Database.GetDataTable(SqlQuery, out TableData);
 
 				ExportDataTableToCsv(TableData, file);
 
@@ -149,7 +149,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/// </summary>
 		/// <param name="databaseFile"></param>
 		/// <returns></returns>
-		public static string MakePrivledgedConnectString(string databaseFile)
+		public static string MakePriviledgedConnectString(string databaseFile)
 		{
 			string provider = "Microsoft.Jet.OLEDB.4.0";
 			if (Environment.Is64BitOperatingSystem)
