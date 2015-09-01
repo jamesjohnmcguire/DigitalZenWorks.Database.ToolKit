@@ -34,7 +34,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		public OleDbSchema(string databaseFile)
 		{
 			string connectionString =
-				DatabaseUtils.MakePrivledgedConnectString(databaseFile);
+				DatabaseUtils.MakePriviledgedConnectString(databaseFile);
 
 			oleDbConnection = new OleDbConnection(connectionString);
 		}

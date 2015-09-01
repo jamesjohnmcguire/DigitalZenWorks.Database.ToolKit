@@ -347,16 +347,16 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/// <summary>
 		/// GetTableDefinitions - returns an array of table definitions
 		/// </summary>
-		/// <param name="TableDefinitionsFile"></param>
+		/// <param name="tableDefinitionsFile"></param>
 		/// <returns></returns>
 		public static string[] GetTableDefinitions(
-			string TableDefinitionsFile)
+			string tableDefinitionsFile)
 		{
-			string[] StringSeparators = new string[] { "\r\n\r\n" };
-			string[] Queries = TableDefinitionsFile.Split(StringSeparators,
+			string[] stringSeparators = new string[] { "\r\n\r\n" };
+			string[] queries = tableDefinitionsFile.Split(stringSeparators,
 				32000, StringSplitOptions.RemoveEmptyEntries);
 
-			return Queries;
+			return queries;
 		}
 
 		/// <summary>
