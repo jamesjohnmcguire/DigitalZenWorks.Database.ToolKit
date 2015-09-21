@@ -17,12 +17,12 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 	public class DatabaseUtils
 	{
 		/////////////////////////////////////////////////////////////////////
-		/// Method <c>CreateMdbFile</c>
+		/// Method <c>CreateAccessDatabaseFile</c>
 		/// <summary>
 		/// Creates an empty MDB (MS Jet / Access database) file.
 		/// </summary>
 		/////////////////////////////////////////////////////////////////////
-		public static void CreateMdbFile(string filePath)
+		public static void CreateAccessDatabaseFile(string filePath)
 		{
 			Stream TemplateObjectStream = null;
 			FileStream NewFileStream = null;

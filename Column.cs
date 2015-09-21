@@ -82,6 +82,8 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/// The type of the column
 		/// </summary>
 		/////////////////////////////////////////////////////////////////////
+		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming",
+			"CA1721:PropertyNamesShouldNotMatchGetMethods")]
 		public int Type
 		{
 			get { return type; }
