@@ -14,7 +14,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 	/// <summary>
 	/// Class for common database uses
 	/// </summary>
-	public class DatabaseUtils
+	public class DatabaseUtilities
 	{
 		/////////////////////////////////////////////////////////////////////
 		/// Method <c>CreateAccessDatabaseFile</c>
