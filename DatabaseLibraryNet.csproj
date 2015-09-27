@@ -65,7 +65,7 @@
     <ConfigurationOverrideFile>
     </ConfigurationOverrideFile>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <DocumentationFile>bin\Debug\Zenware.Common.DatabaseLibrary.xml</DocumentationFile>
+    <DocumentationFile>bin\Debug\DigitalZenWorks.Common.DatabaseLibrary.xml</DocumentationFile>
     <DebugSymbols>true</DebugSymbols>
     <FileAlignment>4096</FileAlignment>
     <NoStdLib>false</NoStdLib>
@@ -112,7 +112,7 @@
     <OutputPath>$(SolutionDir)\Bin\$(Configuration)\$(Platform)</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <BaseAddress>285212672</BaseAddress>
-    <DocumentationFile>bin\Debug\Zenware.Common.DatabaseLibrary.xml</DocumentationFile>
+    <DocumentationFile>bin\Debug\DigitalZenWorks.Common.DatabaseLibrary.xml</DocumentationFile>
     <FileAlignment>4096</FileAlignment>
     <DebugType>full</DebugType>
     <PlatformTarget>x86</PlatformTarget>
@@ -186,8 +186,8 @@
     <ProjectGuid>{10BE1C1F-B18C-496B-9112-26B9BEE800B1}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>DatabaseLibraryNet</RootNamespace>
-    <AssemblyName>DatabaseLibraryNet</AssemblyName>
+    <RootNamespace>DigitalZenWorks.Common.DatabaseLibrary</RootNamespace>
+    <AssemblyName>DigitalZenWorks.Common.DatabaseLibrary</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -229,9 +229,9 @@
       <HintPath>..\..\packages\MySql.Data.6.9.7\lib\net45\MySql.Data.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="nunit.framework, Version=2.6.2.12296, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\Tools\NUnit\nunit.framework.dll</HintPath>
+    <Reference Include="nunit.framework, Version=2.6.4.14350, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\NUnit.2.6.4\lib\nunit.framework.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="System">
       <Name>System</Name>
@@ -255,7 +255,6 @@
     <Compile Include="Column.cs" />
     <Compile Include="ColumnType.cs" />
     <Compile Include="DatabaseType.cs" />
-    <Compile Include="DatabaseTypes.cs" />
     <Compile Include="DatabaseUtilities.cs" />
     <Compile Include="DataDefinition.cs" />
     <Compile Include="DataStorage.cs" />
@@ -279,6 +278,7 @@
     <ProjectReference Include="..\UtilsNET\UtilsNet.csproj">
       <Project>{3663da63-bb91-4b03-b4f7-23dd8eef9d61}</Project>
       <Name>UtilsNet</Name>
+      <Private>False</Private>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
