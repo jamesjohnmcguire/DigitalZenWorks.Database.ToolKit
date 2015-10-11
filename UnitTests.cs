@@ -33,13 +33,13 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 			AppDomain.CurrentDomain.BaseDirectory + @"\TestTable.csv";
 
 		/////////////////////////////////////////////////////////////////////
-		/// Method <c>SetUp</c>
+		/// Method <c>Setup</c>
 		/// <summary>
 		/// function that is called just before each test method is called.
 		/// </summary>
 		/////////////////////////////////////////////////////////////////////
 		[SetUp]
-		public void SetUp()
+		public void Setup()
 		{
 			string provider = "Microsoft.Jet.OLEDB.4.0";
 			if (Environment.Is64BitProcess)
@@ -53,13 +53,13 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		}
 
 		/////////////////////////////////////////////////////////////////////
-		/// Method <c>TearDownSetUp</c>
+		/// Method <c>Teardown</c>
 		/// <summary>
 		/// function that is called just after each test method is called.
 		/// </summary>
 		/////////////////////////////////////////////////////////////////////
 		[TearDown]
-		public void TearDown()
+		public void Teardown()
 		{
 			if (ContextUtil.IsInTransaction)
 			{
@@ -176,7 +176,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 			uint NewRowId = database.Insert(SqlQueryCommand);
 
 			SqlQueryCommand = "DELETE FROM TestTable " +
-				"WHERE id=" + NewRowId.ToString();
+				"WHERE id=" + NewRowId;
 
 			bool Result = database.Delete(SqlQueryCommand);
 
@@ -206,7 +206,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 			bool ShouldExist)
 		{
 			DataRow TempDataRow = null;
-			string SqlQueryCommand = "Select * from TestTable where id=" + ExistingRowId.ToString();
+			string SqlQueryCommand = "Select * from TestTable where id=" + ExistingRowId;
 
 			bool HasData = database.GetDataRow(SqlQueryCommand, out TempDataRow);
 
