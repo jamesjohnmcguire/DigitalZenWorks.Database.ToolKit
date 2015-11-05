@@ -4,18 +4,27 @@
 // Copyright (c) 2006-2015 by James John McGuire
 // All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
+using Common.Logging;
 using System;
 using System.Data;
+using System.Globalization;
 using System.IO;
 using System.Reflection;
+using System.Resources;
 
 namespace DigitalZenWorks.Common.DatabaseLibrary
 {
 	/// <summary>
 	/// Class for common database uses
 	/// </summary>
-	public class DatabaseUtilities
+	public static class DatabaseUtilities
 	{
+		private static readonly ILog log = LogManager.GetLogger
+			(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+		private static readonly ResourceManager stringTable =
+			new ResourceManager("DigitalZenWorks.Common.DatabaseLibrary",
+			Assembly.GetExecutingAssembly());
+
 		/////////////////////////////////////////////////////////////////////
 		/// Method <c>CreateAccessDatabaseFile</c>
 		/// <summary>
@@ -37,14 +46,18 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 				EmbeddedResource = new Byte[TemplateObjectStream.Length];
 				TemplateObjectStream.Read(EmbeddedResource, 0,
 					(int)TemplateObjectStream.Length);
-				NewFileStream = new FileStream(filePath, FileMode.Create);
-				NewFileStream.Write(EmbeddedResource, 0,
-					(int)TemplateObjectStream.Length);
-				NewFileStream.Close();
+				using (NewFileStream =
+					new FileStream(filePath, FileMode.Create))
+				{
+					NewFileStream.Write(EmbeddedResource, 0,
+						(int)TemplateObjectStream.Length);
+					NewFileStream.Close();
+				}
 			}
 			catch (Exception Ex)
 			{
-				Console.WriteLine("Exception: " + Ex.ToString());
+				log.Error(CultureInfo.InvariantCulture, m => m(
+					stringTable.GetString("EXCEPTION") + Ex.Message));
 			}
 		}
 
@@ -55,7 +68,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/// <param name="file"></param>
 		/// <returns></returns>
 		public static bool ExportDataTableToCsv(DataTable table,
-			StreamWriter file)
+			TextWriter file)
 		{
 			bool returnCode = false;
 
