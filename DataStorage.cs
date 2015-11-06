@@ -788,7 +788,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 			}
 			catch (Exception ex)
 			{
-				log.Error(CultureInfo.InvariantCulture,
+					log.Error(CultureInfo.InvariantCulture,
 					m => m("Initialization Error: {0}", ex.Message));
 				throw (ex);
 			}

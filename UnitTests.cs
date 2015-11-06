@@ -126,17 +126,16 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 				provider = "Microsoft.ACE.OLEDB.12.0";
 			}
 
-			bool AlwaysTrue = true;
 			DataSet TempDataSet = null;
 			string SqlQueryCommand = "SELECT * FROM TestTable";
 
 			DataStorage database = null;
 			database = new DataStorage(provider, dataSource);
 
-			database.GetDataSet(SqlQueryCommand, out TempDataSet);
+			int count = database.GetDataSet(SqlQueryCommand, out TempDataSet);
 
 			// No exceptions found
-			Assert.IsTrue(AlwaysTrue);
+			Assert.GreaterOrEqual(count, 0);
 		}
 
 		/////////////////////////////////////////////////////////////////////////
