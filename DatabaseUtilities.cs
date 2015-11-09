@@ -33,25 +33,25 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/////////////////////////////////////////////////////////////////////
 		public static void CreateAccessDatabaseFile(string filePath)
 		{
-			Stream TemplateObjectStream = null;
-			FileStream NewFileStream = null;
+			Stream templateObjectStream = null;
+			FileStream newFileStream = null;
 
 			try
 			{
 				byte[] EmbeddedResource;
-				Assembly ThisAssembly = Assembly.GetExecutingAssembly();
+				Assembly thisAssembly = Assembly.GetExecutingAssembly();
 
-				TemplateObjectStream = ThisAssembly.GetManifestResourceStream(
-					"DatabaseLibaryNet.template.mdb");
-				EmbeddedResource = new Byte[TemplateObjectStream.Length];
-				TemplateObjectStream.Read(EmbeddedResource, 0,
-					(int)TemplateObjectStream.Length);
-				using (NewFileStream =
+				templateObjectStream = thisAssembly.GetManifestResourceStream(
+					"DigitalZenWorks.Common.DatabaseLibrary.template.mdb");
+				EmbeddedResource = new Byte[templateObjectStream.Length];
+				templateObjectStream.Read(EmbeddedResource, 0,
+					(int)templateObjectStream.Length);
+				using (newFileStream =
 					new FileStream(filePath, FileMode.Create))
 				{
-					NewFileStream.Write(EmbeddedResource, 0,
-						(int)TemplateObjectStream.Length);
-					NewFileStream.Close();
+					newFileStream.Write(EmbeddedResource, 0,
+						(int)templateObjectStream.Length);
+					newFileStream.Close();
 				}
 			}
 			catch (Exception Ex)

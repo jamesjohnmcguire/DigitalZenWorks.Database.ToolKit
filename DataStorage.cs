@@ -298,6 +298,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 					command.Dispose();
 				}
 			}
+
 			return returnCode;
 		}
 
@@ -788,8 +789,8 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 			}
 			catch (Exception ex)
 			{
-					log.Error(CultureInfo.InvariantCulture,
-					m => m("Initialization Error: {0}", ex.Message));
+				log.Error(CultureInfo.InvariantCulture,
+				m => m("Initialization Error: {0}", ex.Message));
 				throw (ex);
 			}
 			finally
