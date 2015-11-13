@@ -387,7 +387,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		{
 			string[] TableParts = dataDefinition.Split(new char[] { '(' });
 
-			string[] TableNameParts = TableParts[0].Split(new char[] { '[', ']' });
+			string[] TableNameParts = TableParts[0].Split(new char[] { '[', ']', '`' });
 
 			string TableName = TableNameParts[1];
 
