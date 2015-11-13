@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Zenware.DatabaseLibrary
+namespace DigitalZenWorks.Common.DatabaseLibrary
 {
 	class TestFixture
 	{
