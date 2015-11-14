@@ -385,11 +385,15 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/// <returns></returns>
 		public static string GetTableName(string dataDefinition)
 		{
+			string TableName = null;
 			string[] TableParts = dataDefinition.Split(new char[] { '(' });
 
 			string[] TableNameParts = TableParts[0].Split(new char[] { '[', ']', '`' });
 
-			string TableName = TableNameParts[1];
+			if (TableNameParts.Length > 1)
+			{
+				TableName = TableNameParts[1];
+			}
 
 			return TableName;
 		}
