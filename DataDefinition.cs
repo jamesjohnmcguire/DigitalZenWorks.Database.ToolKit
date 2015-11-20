@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-// $Id: DataDefinition.cs 38 2015-05-27 14:24:29Z JamesMc $
+// $Id: $
 //
 // Copyright (c) 2006-2015 by James John McGuire
 // All rights reserved.
@@ -34,7 +34,8 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/// Export all tables to similarly named csv files
 		/// </summary>
 		/////////////////////////////////////////////////////////////////////
-		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes")]
+		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design",
+			"CA1031:DoNotCatchGeneralExceptionTypes")]
 		public static bool ExportSchema(string databaseFile, string schemaFile)
 		{
 			bool successCode = false;
@@ -86,281 +87,55 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		public static ColumnType GetColumnType(
 			string column)
 		{
-			ColumnType ColumnType = ColumnType.String;
+			string[] columnTypeComareKeys = { "autonumber", "identity",
+				"autoincrement", "bigint", "longvarbinary", "longvarchar",
+				"varbinary", "varchar", "binary", "bit", "longblob",
+				"mediumblob", "blob", "boolean", "byte", "nvarchar", "char",
+				"currency", "cursor", "smalldatetime", "smallint",
+				"smallmoney", "datetime2", "datetimeoffset", "datetime",
+				"date", "decimal", "double", "hyperlink", "enum", "float",
+				"image", "integer", "mediumint", "tinyint", "int",
+				"javaobject", "longtext", "long", "lookupwizard", "mediumtext",
+				"memo", "money", "nchar", "ntext", "number", "numeric",
+				"oleobject", "ole", "real", "set", "single", "sqlvariant",
+				"string", "table", "tinytext", "text", "timestamp", "time",
+				"uniqueidentifier", "xml", "year", "yesno" };
 
-			if (column.ToLower(CultureInfo.InvariantCulture).
-				Contains("autonumber"))
+		ColumnType[] types = { ColumnType.AutoNumber, ColumnType.Identity,
+			ColumnType.Identity, ColumnType.BigInt, ColumnType.LongVarBinary,
+			ColumnType.LongVarChar, ColumnType.VarBinary, ColumnType.VarChar,
+			ColumnType.Binary, ColumnType.Bit, ColumnType.LongBlob,
+			ColumnType.MediumBlob, ColumnType.Blob, ColumnType.Boolean,
+			ColumnType.Byte, ColumnType.NVarChar, ColumnType.Char,
+			ColumnType.Currency, ColumnType.Cursor, ColumnType.SmallDateTime,
+			ColumnType.SmallInt, ColumnType.SmallMoney, ColumnType.DateTime2,
+			ColumnType.DateTimeOffset, ColumnType.DateTime, ColumnType.Date,
+			ColumnType.Decimal, ColumnType.Double, ColumnType.Hyperlink,
+			ColumnType.Enum, ColumnType.Float, ColumnType.Image,
+			ColumnType.Integer, ColumnType.MediumInt, ColumnType.TinyInt,
+			ColumnType.Int, ColumnType.JavaObject, ColumnType.LongText,
+			ColumnType.Long, ColumnType.LookupWizard, ColumnType.MediumText,
+			ColumnType.Memo, ColumnType.Money, ColumnType.NChar,
+			ColumnType.NText, ColumnType.Number, ColumnType.Numeric,
+			ColumnType.OleObject, ColumnType.Ole, ColumnType.Real,
+			ColumnType.Set, ColumnType.Single, ColumnType.SqlVariant,
+			ColumnType.String, ColumnType.Table, ColumnType.TinyText,
+			ColumnType.Text, ColumnType.Timestamp, ColumnType.Time,
+			ColumnType.UniqueIdentifier, ColumnType.Xml, ColumnType.Year,
+			ColumnType.Boolean };
+
+			ColumnType columnType = ColumnType.Other;
+
+			for(int index=0; index < columnTypeComareKeys.Length; index++)
 			{
-				ColumnType = ColumnType.AutoNumber;
-			}
-			if ((column.ToLower(CultureInfo.InvariantCulture).
-				Contains("identity")) ||
-				(column.ToLower(CultureInfo.InvariantCulture).
-				Contains("autoincrement")))
-			{
-				ColumnType = ColumnType.Identity;
-			}
-			else if (column.ToLower(CultureInfo.InvariantCulture).
-				Contains("bigint"))
-			{
-				ColumnType = ColumnType.BigInt;
-			}
-			else if (column.ToLower(CultureInfo.InvariantCulture).
-				Contains("longvarbinary"))
-			{
-				ColumnType = ColumnType.LongVarBinary;
-			}
-			else if (column.ToLower(CultureInfo.InvariantCulture).
-				Contains("longvarchar"))
-			{
-				ColumnType = ColumnType.LongVarChar;
-			}
-			else if (column.ToLower(CultureInfo.InvariantCulture).
-				Contains("varbinary"))
-			{
-				ColumnType = ColumnType.VarBinary;
-			}
-			else if (column.ToLower(CultureInfo.InvariantCulture).
-				Contains("varchar"))
-			{
-				ColumnType = ColumnType.VarChar;
-			}
-			else if (column.ToLower(CultureInfo.InvariantCulture).
-				Contains("binary"))
-			{
-				ColumnType = ColumnType.Binary;
-			}
-			else if (column.ToLower(CultureInfo.InvariantCulture).
-				Contains("bit"))
-			{
-				ColumnType = ColumnType.Bit;
-			}
-			else if (column.ToLower(CultureInfo.InvariantCulture).
-				Contains("longblob"))
-			{
-				ColumnType = ColumnType.LongBlob;
-			}
-			else if (column.ToLower(CultureInfo.InvariantCulture).
-				Contains("mediumblob"))
-			{
-				ColumnType = ColumnType.MediumBlob;
-			}
-			else if (column.ToLower(CultureInfo.InvariantCulture).
-				Contains("blob"))
-			{
-				ColumnType = ColumnType.Blob;
-			}
-			else if (column.ToLower(CultureInfo.InvariantCulture).
-				Contains("boolean"))
-			{
-				ColumnType = ColumnType.Boolean;
-			}
-			else if (column.ToLower(CultureInfo.InvariantCulture).
-				Contains("byte"))
-			{
-				ColumnType = ColumnType.Byte;
-			}
-			else if (column.ToLower(CultureInfo.InvariantCulture).
-				Contains("nvarchar"))
-			{
-				ColumnType = ColumnType.NVarChar;
-			}
-			else if (column.ToLower(CultureInfo.InvariantCulture).
-				Contains("char"))
-			{
-				ColumnType = ColumnType.Char;
-			}
-			else if (column.ToLower(CultureInfo.InvariantCulture).
-				Contains("currency"))
-			{
-				ColumnType = ColumnType.Currency;
-			}
-			else if (column.ToLower(CultureInfo.InvariantCulture).Contains("cursor"))
-			{
-				ColumnType = ColumnType.Cursor;
-			}
-			else if (column.ToLower(CultureInfo.InvariantCulture).Contains("smalldatetime"))
-			{
-				ColumnType = ColumnType.SmallDateTime;
-			}
-			else if (column.ToLower(CultureInfo.InvariantCulture).Contains("smallint"))
-			{
-				ColumnType = ColumnType.SmallInt;
-			}
-			else if (column.ToLower(CultureInfo.InvariantCulture).Contains("smallmoney"))
-			{
-				ColumnType = ColumnType.SmallMoney;
-			}
-			else if (column.ToLower(CultureInfo.InvariantCulture).Contains("datetime2"))
-			{
-				ColumnType = ColumnType.DateTime2;
-			}
-			else if (column.ToLower(CultureInfo.InvariantCulture).Contains("datetimeoffset"))
-			{
-				ColumnType = ColumnType.DateTimeOffset;
-			}
-			else if (column.ToLower(CultureInfo.InvariantCulture).Contains("datetime"))
-			{
-				ColumnType = ColumnType.DateTime;
-			}
-			else if (column.ToLower(CultureInfo.InvariantCulture).Contains("date"))
-			{
-				ColumnType = ColumnType.Date;
-			}
-			else if (column.ToLower(CultureInfo.InvariantCulture).Contains("decimal"))
-			{
-				ColumnType = ColumnType.Decimal;
-			}
-			else if (column.ToLower(CultureInfo.InvariantCulture).Contains("double"))
-			{
-				ColumnType = ColumnType.Double;
-			}
-			else if (column.ToLower(CultureInfo.InvariantCulture).Contains("hyperlink"))
-			{
-				ColumnType = ColumnType.Hyperlink;
-			}
-			else if (column.ToLower(CultureInfo.InvariantCulture).Contains("enum"))
-			{
-				ColumnType = ColumnType.Enum;
-			}
-			else if (column.ToLower(CultureInfo.InvariantCulture).Contains("float"))
-			{
-				ColumnType = ColumnType.Float;
-			}
-			else if (column.ToLower(CultureInfo.InvariantCulture).Contains("image"))
-			{
-				ColumnType = ColumnType.Image;
-			}
-			else if (column.ToLower(CultureInfo.InvariantCulture).Contains("integer"))
-			{
-				ColumnType = ColumnType.Integer;
-			}
-			else if (column.ToLower(CultureInfo.InvariantCulture).Contains("mediumint"))
-			{
-				ColumnType = ColumnType.MediumInt;
-			}
-			else if (column.ToLower(CultureInfo.InvariantCulture).Contains("tinyint"))
-			{
-				ColumnType = ColumnType.TinyInt;
-			}
-			else if (column.ToLower(CultureInfo.InvariantCulture).Contains("int"))
-			{
-				ColumnType = ColumnType.Int;
-			}
-			else if (column.ToLower(CultureInfo.InvariantCulture).Contains("javaobject"))
-			{
-				ColumnType = ColumnType.JavaObject;
-			}
-			else if (column.ToLower(CultureInfo.InvariantCulture).Contains("longtext"))
-			{
-				ColumnType = ColumnType.LongText;
-			}
-			else if (column.ToLower(CultureInfo.InvariantCulture).Contains("long"))
-			{
-				ColumnType = ColumnType.Long;
-			}
-			else if (column.ToLower(CultureInfo.InvariantCulture).Contains("lookupwizard"))
-			{
-				ColumnType = ColumnType.LookupWizard;
-			}
-			else if (column.ToLower(CultureInfo.InvariantCulture).Contains("mediumtext"))
-			{
-				ColumnType = ColumnType.MediumText;
-			}
-			else if (column.ToLower(CultureInfo.InvariantCulture).Contains("memo"))
-			{
-				ColumnType = ColumnType.Memo;
-			}
-			else if (column.ToLower(CultureInfo.InvariantCulture).Contains("money"))
-			{
-				ColumnType = ColumnType.Money;
-			}
-			else if (column.ToLower(CultureInfo.InvariantCulture).Contains("nchar"))
-			{
-				ColumnType = ColumnType.NChar;
-			}
-			else if (column.ToLower(CultureInfo.InvariantCulture).Contains("ntext"))
-			{
-				ColumnType = ColumnType.NText;
-			}
-			else if (column.ToLower(CultureInfo.InvariantCulture).Contains("number"))
-			{
-				ColumnType = ColumnType.Number;
-			}
-			else if (column.ToLower(CultureInfo.InvariantCulture).Contains("numeric"))
-			{
-				ColumnType = ColumnType.Numeric;
-			}
-			else if (column.ToLower(CultureInfo.InvariantCulture).Contains("oleobject"))
-			{
-				ColumnType = ColumnType.OleObject;
-			}
-			else if (column.ToLower(CultureInfo.InvariantCulture).Contains("ole"))
-			{
-				ColumnType = ColumnType.Ole;
-			}
-			else if (column.ToLower(CultureInfo.InvariantCulture).Contains("real"))
-			{
-				ColumnType = ColumnType.Real;
-			}
-			else if (column.ToLower(CultureInfo.InvariantCulture).Contains("set"))
-			{
-				ColumnType = ColumnType.Set;
-			}
-			else if (column.ToLower(CultureInfo.InvariantCulture).Contains("single"))
-			{
-				ColumnType = ColumnType.Single;
-			}
-			else if (column.ToLower(CultureInfo.InvariantCulture).Contains("sqlvariant"))
-			{
-				ColumnType = ColumnType.SqlVariant;
-			}
-			else if (column.ToLower(CultureInfo.InvariantCulture).Contains("string"))
-			{
-				ColumnType = ColumnType.String;
-			}
-			else if (column.ToLower(CultureInfo.InvariantCulture).Contains("table"))
-			{
-				ColumnType = ColumnType.Table;
-			}
-			else if (column.ToLower(CultureInfo.InvariantCulture).Contains("tinytext"))
-			{
-				ColumnType = ColumnType.TinyText;
-			}
-			else if (column.ToLower(CultureInfo.InvariantCulture).Contains("text"))
-			{
-				ColumnType = ColumnType.Text;
-			}
-			else if (column.ToLower(CultureInfo.InvariantCulture).Contains("timestamp"))
-			{
-				ColumnType = ColumnType.Timestamp;
-			}
-			else if (column.ToLower(CultureInfo.InvariantCulture).Contains("time"))
-			{
-				ColumnType = ColumnType.Time;
-			}
-			else if (column.ToLower(CultureInfo.InvariantCulture).Contains("uniqueidentifier"))
-			{
-				ColumnType = ColumnType.UniqueIdentifier;
-			}
-			else if (column.ToLower(CultureInfo.InvariantCulture).Contains("xml"))
-			{
-				ColumnType = ColumnType.Xml;
-			}
-			else if (column.ToLower(CultureInfo.InvariantCulture).Contains("year"))
-			{
-				ColumnType = ColumnType.Year;
-			}
-			else if (column.ToLower(CultureInfo.InvariantCulture).Contains("yesno"))
-			{
-				ColumnType = ColumnType.Boolean;
-			}
-			else
-			{
-				ColumnType = ColumnType.Other;
+				if (CompareColumnType(column, columnTypeComareKeys[index],
+					types[index], ref columnType))
+				{
+					break;
+				}
 			}
 
-			return ColumnType;
+			return columnType;
 		}
 
 		/// <summary>
@@ -463,13 +238,15 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 			return returnCode;
 		}
 
-		private static bool CompareColumnType(string column, string nameCheck)
+		private static bool CompareColumnType(string column, string nameCheck,
+			ColumnType columnType, ref ColumnType columnTypeOut)
 		{
 			bool found = false;
 
 			if (column.ToLower(CultureInfo.InvariantCulture).
 				Contains("currency"))
 			{
+				columnTypeOut = columnType;
 				found = true;
 			}
 
