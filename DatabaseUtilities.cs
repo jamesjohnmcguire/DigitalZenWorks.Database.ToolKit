@@ -51,7 +51,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 				{
 					newFileStream.Write(EmbeddedResource, 0,
 						(int)templateObjectStream.Length);
-					newFileStream.Close();
+					//newFileStream.Close();
 				}
 			}
 			catch (Exception Ex)
