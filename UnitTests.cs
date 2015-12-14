@@ -26,7 +26,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/// <summary>
 		/// database
 		/// </summary>
-		protected DataStorage database = null;
+		private DataStorage database = null;
 		private string dataSource = AppDomain.CurrentDomain.BaseDirectory +
 			"TestDb.mdb";
 		private string dataSourceBackupsCsv = 
@@ -77,7 +77,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/// </summary>
 		/////////////////////////////////////////////////////////////////////
 		[Test]
-		public void BasicTest()
+		public static void BasicTest()
 		{
 			bool AlwaysTrue = true;
 
@@ -129,10 +129,10 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 			DataSet TempDataSet = null;
 			string SqlQueryCommand = "SELECT * FROM TestTable";
 
-			DataStorage database = null;
-			database = new DataStorage(provider, dataSource);
+			DataStorage dataStorage = new DataStorage(provider, dataSource);
 
-			int count = database.GetDataSet(SqlQueryCommand, out TempDataSet);
+			int count =
+				dataStorage.GetDataSet(SqlQueryCommand, out TempDataSet);
 
 			// No exceptions found
 			Assert.GreaterOrEqual(count, 0);

@@ -90,27 +90,27 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/// <summary>
 		/// Default Constructor
 		/// </summary>
-		/// <param name="Name"></param>
-		/// <param name="ColumnName"></param>
-		/// <param name="ParentTable"></param>
-		/// <param name="ParentTableColumn"></param>
+		/// <param name="name"></param>
+		/// <param name="columnName"></param>
+		/// <param name="parentTable"></param>
+		/// <param name="parentTableColumn"></param>
 		/// <param name="cascadeDelete"></param>
 		/// <param name="cascadeUpdate"></param>
 		/////////////////////////////////////////////////////////////////////
 		public ForeignKey(
-			string Name,
-			string ColumnName,
-			string ParentTable,
-			string ParentTableColumn,
+			string name,
+			string columnName,
+			string parentTable,
+			string parentTableColumn,
 			bool cascadeDelete,
 			bool cascadeUpdate)
 		{
-			name = Name;
-			columnName = ColumnName;
-			parentTable = ParentTable;
-			parentTableColumn = ParentTableColumn;
-			cascadeOnDelete = cascadeDelete;
-			cascadeOnUpdate = cascadeUpdate;
+			this.name = name;
+			this.columnName = columnName;
+			this.parentTable = parentTable;
+			this.parentTableColumn = parentTableColumn;
+			this.cascadeOnDelete = cascadeDelete;
+			this.cascadeOnUpdate = cascadeUpdate;
 		}
 	}
 }

@@ -5,6 +5,8 @@ using System.Text;
 
 namespace DigitalZenWorks.Common.DatabaseLibrary
 {
+	[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance",
+		"CA1812:AvoidUninstantiatedInternalClasses")]
 	class TestFixture
 	{
 	}

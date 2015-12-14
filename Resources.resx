@@ -120,4 +120,16 @@
   <data name="EXCEPTION" xml:space="preserve">
     <value>Exception: </value>
   </data>
+  <data name="FOREIGNKEY" xml:space="preserve">
+    <value>\t-FK:</value>
+  </data>
+  <data name="PRIMARYKEY" xml:space="preserve">
+    <value>\tPK =</value>
+  </data>
+  <data name="TABDASH" xml:space="preserve">
+    <value>\t-</value>
+  </data>
+  <data name="TABLE" xml:space="preserve">
+    <value>Table: </value>
+  </data>
 </root>

@@ -7,6 +7,8 @@
 using DigitalZenWorks.Common.DatabaseLibrary;
 using System;
 using System.Collections;
+using System.Reflection;
+using System.Resources;
 
 namespace DigitalZenWorks.Common.DatabaseLibrary
 {
@@ -21,6 +23,9 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		private ArrayList foreignKeys;
 		private string name = string.Empty;
 		private string primaryKey = string.Empty;
+		private static readonly ResourceManager stringTable =
+			new ResourceManager("DigitalZenWorks.Common.DatabaseLibrary",
+			Assembly.GetExecutingAssembly());
 
 		/////////////////////////////////////////////////////////////////////
 		/// <summary>
@@ -97,7 +102,10 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/////////////////////////////////////////////////////////////////////
 		public void AddColumn(Column column)
 		{
-			Columns.Add(column.Name, column);
+			if (null != column)
+			{
+				Columns.Add(column.Name, column);
+			}
 		}
 
 		/////////////////////////////////////////////////////////////////////
@@ -119,17 +127,22 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/////////////////////////////////////////////////////////////////////
 		public void DumpTable()
 		{
-			Console.WriteLine("Table: " + Name);
+			Console.WriteLine(stringTable.GetString("TABLE") + Name);
 			foreach (DictionaryEntry column in Columns)
 			{
-				Console.WriteLine("   -" + ((Column)column.Value).Name);
+				Console.WriteLine(stringTable.GetString("TABDASH") +
+					((Column)column.Value).Name);
 			}
 
-			Console.WriteLine("  PK = " + PrimaryKey);
+			Console.WriteLine(stringTable.GetString("PRIMARYKEY") +
+				PrimaryKey);
+
 			foreach (ForeignKey foreignKey in ForeignKeys)
 			{
-				Console.WriteLine("    -FK:{0} {1} {2}", foreignKey.Name,
+				string output = string.Format("{0} {1} {2}", foreignKey.Name,
 					foreignKey.ColumnName, foreignKey.ParentTable);
+				Console.WriteLine(stringTable.GetString("FOREIGNKEY") +
+					output);
 			}
 		}
 	}
