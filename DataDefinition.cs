@@ -243,8 +243,10 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		{
 			bool found = false;
 
-			if (column.ToLower(CultureInfo.InvariantCulture).
-				Contains("currency"))
+			if ((column.ToLower(CultureInfo.InvariantCulture).
+				Contains(nameCheck)) ||
+				(column.ToLower(CultureInfo.InvariantCulture).
+				Equals(nameCheck)))
 			{
 				columnTypeOut = columnType;
 				found = true;
