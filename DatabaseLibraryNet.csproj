@@ -272,10 +272,6 @@
     <Compile Include="UnitTests.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config">
-      <SubType>Designer</SubType>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <None Include="DatabaseLibraryNet.snk" />
     <None Include="packages.config" />
   </ItemGroup>
