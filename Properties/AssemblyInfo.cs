@@ -1,4 +1,5 @@
-﻿/////////////////////////////////////////////////////////////////////////////
+﻿using System.Resources;
+/////////////////////////////////////////////////////////////////////////////
 // $Id: $
 //
 // Copyright (c) 2006-2015 by James John McGuire
@@ -43,3 +44,5 @@ using System.Runtime.CompilerServices;
 [assembly: AssemblyFileVersion("1.0.0.0")]
 
 [assembly: CLSCompliant(true)]
+[assembly: NeutralResourcesLanguage("en-US")]
+

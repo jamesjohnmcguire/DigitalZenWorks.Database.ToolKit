@@ -72,31 +72,15 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		{
 			bool returnCode = false;
 
-			// First write the headers.
-			int ColumnCount = table.Columns.Count;
-
-			for (int Index = 0; Index < ColumnCount; Index++)
+			if (null != table)
 			{
-				file.Write("\"");
-				file.Write(table.Columns[Index]);
-				if (Index < ColumnCount - 1)
-				{
-					file.Write("\", ");
-				}
-			}
+				// First write the headers.
+				int ColumnCount = table.Columns.Count;
 
-			file.Write(file.NewLine);
-
-			// Now write all the rows.
-			foreach (DataRow Row in table.Rows)
-			{
 				for (int Index = 0; Index < ColumnCount; Index++)
 				{
 					file.Write("\"");
-					if (!Convert.IsDBNull(Row[Index]))
-					{
-						file.Write(Row[Index].ToString());
-					}
+					file.Write(table.Columns[Index]);
 					if (Index < ColumnCount - 1)
 					{
 						file.Write("\", ");
@@ -104,9 +88,28 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 				}
 
 				file.Write(file.NewLine);
-			}
 
-			returnCode = true;
+				// Now write all the rows.
+				foreach (DataRow Row in table.Rows)
+				{
+					for (int Index = 0; Index < ColumnCount; Index++)
+					{
+						file.Write("\"");
+						if (!Convert.IsDBNull(Row[Index]))
+						{
+							file.Write(Row[Index].ToString());
+						}
+						if (Index < ColumnCount - 1)
+						{
+							file.Write("\", ");
+						}
+					}
+
+					file.Write(file.NewLine);
+				}
+
+				returnCode = true;
+			}
 
 			return returnCode;
 		}
