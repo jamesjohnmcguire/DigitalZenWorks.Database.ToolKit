@@ -72,7 +72,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		{
 			bool returnCode = false;
 
-			if (null != table)
+			if ((null != table) && (null != file))
 			{
 				// First write the headers.
 				int ColumnCount = table.Columns.Count;
@@ -143,16 +143,16 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 				string csvFile = csvPath + "\\" + TableName + ".csv";
 
 				// Create the CSV file to which data will be exported.
-				StreamWriter file = new StreamWriter(csvFile, false);
+				using (StreamWriter file = new StreamWriter(csvFile, false))
+				{
 
-				// export the table
-				string SqlQuery = "SELECT * FROM " + Table["TABLE_NAME"].ToString();
-				DataTable TableData = null;
-				Database.GetDataTable(SqlQuery, out TableData);
+					// export the table
+					string SqlQuery = "SELECT * FROM " + Table["TABLE_NAME"].ToString();
+					DataTable TableData = null;
+					Database.GetDataTable(SqlQuery, out TableData);
 
-				ExportDataTableToCsv(TableData, file);
-
-				file.Close();
+					ExportDataTableToCsv(TableData, file);
+				}
 			}
 
 			Database.Shutdown();
