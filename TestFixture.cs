@@ -1,4 +1,4 @@
-// Copyright (c) 2006-2015 by James John McGuire
+// Copyright © 2009 - 2016 by James John McGuire
 using System;
 using System.Collections.Generic;
 using System.Text;

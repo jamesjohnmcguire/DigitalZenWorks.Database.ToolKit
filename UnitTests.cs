@@ -1,7 +1,7 @@
 /////////////////////////////////////////////////////////////////////////////
 // $Id$
 //
-// Copyright (c) 2006-2015 by James John McGuire
+// Copyright © 2006 - 2016 by James John McGuire
 // All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 using System;
@@ -21,7 +21,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 	/////////////////////////////////////////////////////////////////////////
 	[TestFixture]
 	[Transaction(TransactionOption.Required)]
-	public class TransactionUnitTests
+	public class TransactionUnitTests: IDisposable
 	{
 		/// <summary>
 		/// database
@@ -68,6 +68,31 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 
 			database.CommitTransaction();
 			database.Shutdown();
+		}
+
+		/// <summary>
+		/// Dispose
+		/// </summary>
+		/// <param name="disposing"></param>
+		protected virtual void Dispose(bool disposing)
+		{
+			if (disposing)
+			{
+				if (null != database)
+				{
+					database.Close();
+					database = null;
+				}
+			}
+		}
+
+		/// <summary>
+		/// Dispose
+		/// </summary>
+		public void Dispose()
+		{
+			Dispose(true);
+			GC.SuppressFinalize(this);
 		}
 
 		/////////////////////////////////////////////////////////////////////
@@ -129,13 +154,15 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 			DataSet TempDataSet = null;
 			string SqlQueryCommand = "SELECT * FROM TestTable";
 
-			DataStorage dataStorage = new DataStorage(provider, dataSource);
+			using (DataStorage dataStorage =
+				new DataStorage(provider, dataSource))
+			{
+				int count =
+					dataStorage.GetDataSet(SqlQueryCommand, out TempDataSet);
 
-			int count =
-				dataStorage.GetDataSet(SqlQueryCommand, out TempDataSet);
-
-			// No exceptions found
-			Assert.GreaterOrEqual(count, 0);
+				// No exceptions found
+				Assert.GreaterOrEqual(count, 0);
+			}
 		}
 
 		/////////////////////////////////////////////////////////////////////////

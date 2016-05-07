@@ -11,6 +11,7 @@ using System.Globalization;
 using System.IO;
 using System.Reflection;
 using System.Resources;
+using System.Security;
 
 namespace DigitalZenWorks.Common.DatabaseLibrary
 {
@@ -31,10 +32,10 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/// Creates an empty MDB (MS Jet / Access database) file.
 		/// </summary>
 		/////////////////////////////////////////////////////////////////////
-		public static void CreateAccessDatabaseFile(string filePath)
+		public static bool CreateAccessDatabaseFile(string filePath)
 		{
+			bool success = false;
 			Stream templateObjectStream = null;
-			FileStream newFileStream = null;
 
 			try
 			{
@@ -46,19 +47,39 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 				EmbeddedResource = new Byte[templateObjectStream.Length];
 				templateObjectStream.Read(EmbeddedResource, 0,
 					(int)templateObjectStream.Length);
-				using (newFileStream =
+				using (FileStream fileStream =
 					new FileStream(filePath, FileMode.Create))
 				{
-					newFileStream.Write(EmbeddedResource, 0,
+					fileStream.Write(EmbeddedResource, 0,
 						(int)templateObjectStream.Length);
-					//newFileStream.Close();
 				}
+
+				success = true;
 			}
-			catch (Exception Ex)
+			catch (Exception exception) when 
+				(exception is ArgumentNullException ||
+				exception is ArgumentException ||
+				exception is FileLoadException ||
+				exception is FileNotFoundException ||
+				exception is BadImageFormatException ||
+				exception is NotImplementedException ||
+				exception is ArgumentOutOfRangeException ||
+				exception is IOException ||
+				exception is NotSupportedException ||
+				exception is ObjectDisposedException ||
+				exception is SecurityException ||
+				exception is DirectoryNotFoundException ||
+				exception is PathTooLongException)
 			{
 				log.Error(CultureInfo.InvariantCulture, m => m(
-					stringTable.GetString("EXCEPTION") + Ex.Message));
+					stringTable.GetString("EXCEPTION") + exception.Message));
 			}
+			catch
+			{
+				throw;
+			}
+
+			return success;
 		}
 
 		/// <summary>
@@ -131,23 +152,25 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 			{
 				provider = "Microsoft.ACE.OLEDB.12.0";
 			}
-			DataStorage Database = new DataStorage(provider, databaseFile);
-
-			// Get all the table names
-			DataTable TableNames = Database.GetSchemaTable();
-
-			// for each table, select all the data
-			foreach (DataRow Table in TableNames.Rows)
+			using (DataStorage Database =
+				new DataStorage(provider, databaseFile))
 			{
-				string TableName = Table["TABLE_NAME"].ToString();
-				string csvFile = csvPath + "\\" + TableName + ".csv";
+				// Get all the table names
+				DataTable TableNames = Database.SchemaTable;
 
-				// Create the CSV file to which data will be exported.
+				// for each table, select all the data
+				foreach (DataRow Table in TableNames.Rows)
+				{
+					string TableName = Table["TABLE_NAME"].ToString();
+					string csvFile = csvPath + "\\" + TableName + ".csv";
+
+					// Create the CSV file to which data will be exported.
 				using (StreamWriter file = new StreamWriter(csvFile, false))
 				{
 
 					// export the table
-					string SqlQuery = "SELECT * FROM " + Table["TABLE_NAME"].ToString();
+						string SqlQuery = "SELECT * FROM " +
+							Table["TABLE_NAME"].ToString();
 					DataTable TableData = null;
 					Database.GetDataTable(SqlQuery, out TableData);
 
@@ -155,8 +178,8 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 				}
 			}
 
-			Database.Shutdown();
-
+				Database.Shutdown();
+			}
 			return returnCode;
 		}
 
@@ -165,7 +188,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/// </summary>
 		/// <param name="databaseFile"></param>
 		/// <returns></returns>
-		public static string MakePriviledgedConnectString(string databaseFile)
+		public static string MakePrivilegedConnectString(string databaseFile)
 		{
 			string provider = "Microsoft.Jet.OLEDB.4.0";
 			if (Environment.Is64BitOperatingSystem)

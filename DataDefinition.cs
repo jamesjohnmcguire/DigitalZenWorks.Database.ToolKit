@@ -11,6 +11,8 @@ using System.Data;
 using System.Collections;
 using System.Globalization;
 using System.IO;
+using System.Reflection;
+using System.Resources;
 
 namespace DigitalZenWorks.Common.DatabaseLibrary
 {
@@ -27,6 +29,9 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/// </summary>
 		private static readonly ILog log = LogManager.GetLogger
 			(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+		private static readonly ResourceManager stringTable =
+			new ResourceManager("DigitalZenWorks.Common.DatabaseLibrary",
+			Assembly.GetExecutingAssembly());
 
 		/////////////////////////////////////////////////////////////////////
 		/// Method <c>ExportSchema</c>
@@ -34,8 +39,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/// Export all tables to similarly named csv files
 		/// </summary>
 		/////////////////////////////////////////////////////////////////////
-		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design",
-			"CA1031:DoNotCatchGeneralExceptionTypes")]
+		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2202:Do not dispose objects multiple times")]
 		public static bool ExportSchema(string databaseFile, string schemaFile)
 		{
 			bool successCode = false;
@@ -58,10 +62,17 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 
 				successCode = true;
 			}
-			catch(Exception ex)
+			catch (Exception exception) when
+				(exception is ArgumentNullException ||
+				exception is ArgumentException ||
+				exception is InvalidOperationException)
 			{
-				log.Error(CultureInfo.InvariantCulture,
-					m => m("Exception: " + ex.Message));
+				log.Error(CultureInfo.InvariantCulture, m => m(
+					stringTable.GetString("EXCEPTION") + exception.Message));
+			}
+			catch
+			{
+				throw;
 			}
 
 			return successCode;
@@ -74,8 +85,15 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/// <returns></returns>
 		public static string GetColumnInfo(string dataDefinition)
 		{
-			int SplitIndex = dataDefinition.IndexOf("(") + 1;
-			string ColumnsInfo = dataDefinition.Substring(SplitIndex);
+			string ColumnsInfo = null;
+
+			if (!string.IsNullOrWhiteSpace(dataDefinition))
+			{
+				int SplitIndex = dataDefinition.IndexOf("(",
+					StringComparison.Ordinal) + 1;
+				ColumnsInfo = dataDefinition.Substring(SplitIndex);
+			}
+
 			return ColumnsInfo;
 		}
 
@@ -139,6 +157,64 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		}
 
 		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="relationships"></param>
+		/// <returns></returns>
+		public static ForeignKey[] GetForeignKeyRelationships(
+			Relationship[] relationships)
+		{
+			ForeignKey[] keys = null;
+
+			if (null != relationships)
+			{
+				int count = 0;
+				keys = new ForeignKey[relationships.Length];
+
+				// Add foreign keys to table, using relationships
+				foreach (Relationship relationship in relationships)
+				{
+					ForeignKey foreignKey =
+						GetForeignKeyRelationship(relationship);
+
+					keys[count] = foreignKey;
+					count++;
+				}
+			}
+
+			return keys;
+		}
+
+		/// <summary>
+		/// Gets a list of relationships
+		/// </summary>
+		/// <param name="oleDbSchema"></param>
+		/// <param name="tableName"></param>
+		/// <returns></returns>
+		public static ArrayList GetRelationships(OleDbSchema oleDbSchema,
+			string tableName)
+		{
+			ArrayList relationships = null;
+
+			if ((null != oleDbSchema) &&
+				(!string.IsNullOrWhiteSpace(tableName)))
+			{
+				relationships = new System.Collections.ArrayList();
+
+				DataTable foreignKeyTable = oleDbSchema.GetForeignKeys(tableName);
+
+				foreach (DataRow foreignKey in foreignKeyTable.Rows)
+				{
+					Relationship relationship = GetRelationship(foreignKey);
+					relationships.Add(relationship);
+				}
+
+			}
+
+			return relationships;
+		}
+
+		/// <summary>
 		/// GetTableDefinitions - returns an array of table definitions
 		/// </summary>
 		/// <param name="tableDefinitionsFile"></param>
@@ -146,9 +222,14 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		public static string[] GetTableDefinitions(
 			string tableDefinitionsFile)
 		{
-			string[] stringSeparators = new string[] { "\r\n\r\n" };
-			string[] queries = tableDefinitionsFile.Split(stringSeparators,
-				32000, StringSplitOptions.RemoveEmptyEntries);
+			string[] queries = null;
+
+			if (!string.IsNullOrWhiteSpace(tableDefinitionsFile))
+			{
+				string[] stringSeparators = new string[] { "\r\n\r\n" };
+				queries = tableDefinitionsFile.Split(stringSeparators,
+					32000, StringSplitOptions.RemoveEmptyEntries);
+			}
 
 			return queries;
 		}
@@ -161,13 +242,17 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		public static string GetTableName(string dataDefinition)
 		{
 			string TableName = null;
-			string[] TableParts = dataDefinition.Split(new char[] { '(' });
-
-			string[] TableNameParts = TableParts[0].Split(new char[] { '[', ']', '`' });
-
-			if (TableNameParts.Length > 1)
+			if (!string.IsNullOrWhiteSpace(dataDefinition))
 			{
-				TableName = TableNameParts[1];
+				string[] TableParts = dataDefinition.Split(new char[] { '(' });
+
+				string[] TableNameParts =
+					TableParts[0].Split(new char[] { '[', ']', '`' });
+
+				if (TableNameParts.Length > 1)
+				{
+					TableName = TableNameParts[1];
+				}
 			}
 
 			return TableName;
@@ -178,6 +263,9 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/// </summary>
 		/// <param name="schemaFile"></param>
 		/// <param name="databaseFile"></param>
+		[System.Diagnostics.CodeAnalysis.SuppressMessage(
+			"Microsoft.Reliability",
+			"CA2000:Dispose objects before losing scope")]
 		public static bool ImportSchema(string schemaFile, string databaseFile)
 		{
 			bool successCode = false;
@@ -186,36 +274,46 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 				if (File.Exists(schemaFile))
 				{
 					string provider = "Microsoft.Jet.OLEDB.4.0";
-					if (Environment.Is64BitOperatingSystem)
+					if (Environment.Is64BitProcess)
 					{
 						provider = "Microsoft.ACE.OLEDB.12.0";
 					}
-					string fileContents = FileUtils.GetFileContents(schemaFile);
+					string fileContents =
+						FileUtils.GetFileContents(schemaFile);
 
 					string[] StringSeparators = new string[] { "\r\n\r\n" };
 					string[] Queries = fileContents.Split(StringSeparators,
 						32000, StringSplitOptions.RemoveEmptyEntries);
 
-					DataStorage Database = new DataStorage(provider,
-						databaseFile);
-
-					foreach (string SqlQuery in Queries)
+					using (DataStorage database = new DataStorage(provider,
+						databaseFile))
 					{
-						log.Info(CultureInfo.InvariantCulture,
-							m => m("Command: " + SqlQuery));
+						foreach (string SqlQuery in Queries)
+						{
+							log.Info(CultureInfo.InvariantCulture, m => m(
+								stringTable.GetString("COMMAND") + SqlQuery));
 
-						Database.ExecuteNonQuery(SqlQuery);
+							database.ExecuteNonQuery(SqlQuery);
+						}
+
+						successCode = true;
 					}
-
-					Database.Shutdown();
-
-					successCode = true;
 				}
 			}
-			catch (Exception Ex)
+			catch (Exception exception) when
+				(exception is ArgumentNullException ||
+				exception is ArgumentException ||
+				exception is FileNotFoundException ||
+				exception is DirectoryNotFoundException ||
+				exception is IOException ||
+				exception is OutOfMemoryException)
 			{
-				log.Error(CultureInfo.InvariantCulture,
-					m => m("EXCEPTION: " + Ex.ToString()), Ex);
+				log.Error(CultureInfo.InvariantCulture, m => m(
+					stringTable.GetString("EXCEPTION") + exception.Message));
+			}
+			catch
+			{
+				throw;
 			}
 
 			return successCode;
@@ -230,9 +328,12 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		{
 			bool returnCode = false;
 
-			if ((field.Contains("Time")) || (field.Contains("time")))
+			if (!string.IsNullOrWhiteSpace(field))
 			{
-				returnCode = true;
+				if ((field.Contains("Time")) || (field.Contains("time")))
+				{
+					returnCode = true;
+				}
 			}
 
 			return returnCode;
@@ -243,29 +344,14 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		{
 			bool found = false;
 
-			if ((column.ToLower(CultureInfo.InvariantCulture).
-				Contains(nameCheck)) ||
-				(column.ToLower(CultureInfo.InvariantCulture).
-				Equals(nameCheck)))
+			if ((column.ToUpperInvariant().Contains(nameCheck)) ||
+				(column.ToUpperInvariant().Equals(nameCheck)))
 			{
 				columnTypeOut = columnType;
 				found = true;
 			}
 
 			return found;
-		}
-
-		private static void DumpTable(DataTable table)
-		{
-			foreach (DataRow row in table.Rows)
-			{
-				foreach (DataColumn column in table.Columns)
-				{
-					Console.WriteLine(column.ColumnName + " = " +
-						row[column].ToString());
-				}
-				Console.WriteLine();
-			}
 		}
 
 		private static Column FormatColumnFromDataRow(DataRow row)
@@ -283,7 +369,9 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 
 				case 130:  // String
 				{
-					if (Int32.Parse(row["COLUMN_FLAGS"].ToString()) > 127)
+					string flags = row["COLUMN_FLAGS"].ToString();
+
+					if (Int32.Parse(flags, CultureInfo.InvariantCulture) > 127)
 					{
 						column.Type = (int)ColumnType.Memo;
 					}
@@ -321,8 +409,10 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 
 			if (!row.IsNull("CHARACTER_MAXIMUM_LENGTH"))
 			{
+				string maxLength = row["CHARACTER_MAXIMUM_LENGTH"].ToString();
+
 				column.Length =
-					Int32.Parse(row["CHARACTER_MAXIMUM_LENGTH"].ToString());
+					Int32.Parse(maxLength, CultureInfo.InvariantCulture);
 			}
 
 			if (row["IS_NULLABLE"].ToString() == "True")
@@ -335,7 +425,9 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 				column.DefaultValue = row["COLUMN_DEFAULT"].ToString();
 			}
 
-			column.Position = Int32.Parse(row["ORDINAL_POSITION"].ToString());
+			string position = row["ORDINAL_POSITION"].ToString();
+			column.Position =
+				Int32.Parse(position, CultureInfo.InvariantCulture);
 
 			return column;
 		}
@@ -349,25 +441,6 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 				relationship.OnUpdateCascade);
 
 			return foreignKey;
-		}
-
-		private static ForeignKey[] GetForeignKeyRelationships(
-			Relationship[] relationships)
-		{
-			int count = 0;
-			ForeignKey[] keys = new ForeignKey[relationships.Length];
-
-			// Add foreign keys to table, using relationships
-			foreach (Relationship relationship in relationships)
-			{
-				ForeignKey foreignKey =
-					GetForeignKeyRelationship(relationship);
-
-				keys[count] = foreignKey;
-				count++;
-			}
-
-			return keys;
 		}
 
 		private static Relationship GetRelationship(DataRow foreignKey)
@@ -392,89 +465,79 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 			return relationship;
 		}
 
-		private static ArrayList GetRelationships(OleDbSchema oleDbSchema,
-			string tableName)
-		{
-			ArrayList relationships = new System.Collections.ArrayList();
-
-			DataTable foreignKeyTable = oleDbSchema.GetForeignKeys(tableName);
-
-			foreach (DataRow foreignKey in foreignKeyTable.Rows)
-			{
-				Relationship relationship = GetRelationship(foreignKey);
-				relationships.Add(relationship);
-			}
-
-			return relationships;
-		}
-
 		private static Hashtable GetSchema(string databaseFile)
 		{
-			OleDbSchema oleDbSchema = new OleDbSchema(databaseFile);
+			Hashtable tables = null;
 
-			Hashtable tables = new System.Collections.Hashtable();
-			ArrayList relationships = new System.Collections.ArrayList();
-
-			DataTable tableNames = oleDbSchema.GetTableNames();
-
-			foreach (DataRow row in tableNames.Rows)
+			using (OleDbSchema oleDbSchema = new OleDbSchema(databaseFile))
 			{
-				string tableName = row["TABLE_NAME"].ToString();
+				tables = new System.Collections.Hashtable();
+				ArrayList relationships = new System.Collections.ArrayList();
 
-				Table table = new Table(tableName);
+				DataTable tableNames = oleDbSchema.TableNames;
 
-			    Console.WriteLine("Getting Columns for " + tableName);
-			    DataTable dataColumns = oleDbSchema.GetTableColumns(tableName);
-
-				foreach (DataRow dataColumn in dataColumns.Rows)
+				foreach (DataRow row in tableNames.Rows)
 				{
-					Column column = FormatColumnFromDataRow(dataColumn);
+					string tableName = row["TABLE_NAME"].ToString();
 
-					table.AddColumn(column);
-				}
+					Table table = new Table(tableName);
 
-				// Get primary key
-				DataTable primary_key_table =
-					oleDbSchema.GetPrimaryKeys(tableName);
+					log.Info(CultureInfo.InvariantCulture,
+						m => m("Getting Columns for " + tableName));
+					DataTable dataColumns =
+						oleDbSchema.GetTableColumns(tableName);
 
-				foreach (DataRow pkrow in primary_key_table.Rows)
-				{
-					table.PrimaryKey = pkrow["COLUMN_NAME"].ToString();
-				}
-
-				// If PK is an integer change type to AutoNumber
-				if (table.PrimaryKey != "")
-				{
-					if (((Column)table.Columns[table.PrimaryKey]).Type ==
-						(int)ColumnType.Number)
+					foreach (DataRow dataColumn in dataColumns.Rows)
 					{
-						((Column)table.Columns[table.PrimaryKey]).Type =
-							(int)ColumnType.AutoNumber;
+						Column column = FormatColumnFromDataRow(dataColumn);
+
+						table.AddColumn(column);
 					}
-				}
 
-				DataTable foreignKeyTable =
-					oleDbSchema.GetForeignKeys(tableName);
+					// Get primary key
+					DataTable primary_key_table =
+						oleDbSchema.GetPrimaryKeys(tableName);
 
-				foreach (DataRow foreignKey in foreignKeyTable.Rows)
-				{
-					Relationship relationship = GetRelationship(foreignKey);
+					foreach (DataRow pkrow in primary_key_table.Rows)
+					{
+						table.PrimaryKey = pkrow["COLUMN_NAME"].ToString();
+					}
 
-					relationships.Add(relationship);
-				}
+					// If PK is an integer change type to AutoNumber
+					if (!string.IsNullOrWhiteSpace(table.PrimaryKey))
+					{
+						if (((Column)table.Columns[table.PrimaryKey]).Type ==
+							(int)ColumnType.Number)
+						{
+							((Column)table.Columns[table.PrimaryKey]).Type =
+								(int)ColumnType.AutoNumber;
+						}
+					}
+
+					DataTable foreignKeyTable =
+						oleDbSchema.GetForeignKeys(tableName);
+
+					foreach (DataRow foreignKey in foreignKeyTable.Rows)
+					{
+						Relationship relationship =
+							GetRelationship(foreignKey);
+
+						relationships.Add(relationship);
+					}
 	
-				tables.Add(table.Name, table);
-			}
+					tables.Add(table.Name, table);
+				}
 
-			// Add foreign keys to table, using relationships
-			foreach (Relationship relationship in relationships)
-			{
-				string name = relationship.ChildTable;
+				// Add foreign keys to table, using relationships
+				foreach (Relationship relationship in relationships)
+				{
+					string name = relationship.ChildTable;
 
-				ForeignKey foreignKey =
-					GetForeignKeyRelationship(relationship);
+					ForeignKey foreignKey =
+						GetForeignKeyRelationship(relationship);
 
-				((Table)tables[name]).AddForeignKey(foreignKey);
+					((Table)tables[name]).ForeignKeys.Add(foreignKey);
+				}
 			}
 
 			return tables;
@@ -590,7 +653,8 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 				}
 				case (int)ColumnType.String:
 				{
-					sql += String.Format(" VARCHAR({0})", column.Length);
+					sql += String.Format(CultureInfo.InvariantCulture,
+						" VARCHAR({0})", column.Length);
 					break;
 				}
 
@@ -640,7 +704,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 				sql += " IDENTITY";
 			}
 
-			if (!(column.DefaultValue == ""))
+			if (!string.IsNullOrWhiteSpace(column.DefaultValue))
 			{
 				sql += " DEFAULT " + column.DefaultValue;
 			}
@@ -655,14 +719,14 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 
 			if (foreignKey.ColumnName == foreignKey.ParentTableColumn)
 			{
-				sql = String.Format(
+				sql = String.Format(CultureInfo.InvariantCulture,
 					"CONSTRAINT `{0}` FOREIGN KEY (`{1}`) REFERENCES `{2}`",
 					foreignKey.Name, foreignKey.ColumnName,
 					foreignKey.ParentTable);
 			}
 			else
 			{
-				sql = String.Format(
+				sql = String.Format(CultureInfo.InvariantCulture,
 					"CONSTRAINT `{0}` FOREIGN KEY (`{1}`) " +
 					"REFERENCES `{2}` (`{3}`)", foreignKey.Name,
 					foreignKey.ColumnName, foreignKey.ParentTable,
@@ -687,8 +751,8 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		{
 			string sql = string.Empty;
 
-			sql += String.Format("CREATE TABLE `{0}` ({1}", table.Name,
-				Environment.NewLine);
+			sql += String.Format(CultureInfo.InvariantCulture,
+				"CREATE TABLE `{0}` ({1}", table.Name, Environment.NewLine);
 
 			// Sort Columns into ordinal positions
 			System.Collections.SortedList columns =
@@ -706,9 +770,9 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 					Environment.NewLine;
 			}
 
-			if (!(table.PrimaryKey == ""))
+			if (!string.IsNullOrWhiteSpace(table.PrimaryKey))
 			{
-				sql += String.Format(
+				sql += String.Format(CultureInfo.InvariantCulture,
 					"\tCONSTRAINT PrimaryKey PRIMARY KEY (`{0}`),{1}",
 					table.PrimaryKey, Environment.NewLine);
 			}
@@ -722,7 +786,8 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 			// Remove trailing ','
 			sql = sql.Remove(sql.Length - 3, 3);
 
-			sql += String.Format("{0});{0}", Environment.NewLine);
+			sql += String.Format(CultureInfo.InvariantCulture, "{0});{0}",
+				Environment.NewLine);
 
 			return sql;
 		}

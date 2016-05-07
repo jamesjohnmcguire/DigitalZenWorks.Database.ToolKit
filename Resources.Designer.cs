@@ -61,6 +61,15 @@ namespace DigitalZenWorks.Common.DatabaseLibrary {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Command: .
+        /// </summary>
+        internal static string COMMAND {
+            get {
+                return ResourceManager.GetString("COMMAND", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Exception: .
         /// </summary>
         internal static string EXCEPTION {

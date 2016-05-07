@@ -1,7 +1,7 @@
 ﻿/////////////////////////////////////////////////////////////////////////////
 // $Id: DataStorage.cs 42 2015-06-04 14:48:09Z JamesMc $
 //
-// Copyright (c) 2006-2015 by James John McGuire
+// Copyright © 2006 - 2016 by James John McGuire
 // All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 using Common.Logging;
@@ -13,6 +13,8 @@ using System.Data.Common;
 using System.Data.OleDb;
 using System.Data.SqlClient;
 using System.Globalization;
+using System.Reflection;
+using System.Resources;
 
 namespace DigitalZenWorks.Common.DatabaseLibrary
 {
@@ -23,7 +25,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 	/// transport
 	/// </summary>
 	/////////////////////////////////////////////////////////////////////////
-	public class DataStorage
+	public class DataStorage: IDisposable
 	{
 		#region private variables
 
@@ -63,7 +65,42 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 
 		private string provider = string.Empty;
 
+		private static readonly ResourceManager stringTable =
+			new ResourceManager("DigitalZenWorks.Common.DatabaseLibrary",
+			Assembly.GetExecutingAssembly());
 		#endregion private variables
+
+		/////////////////////////////////////////////////////////////////////
+		/// <summary>
+		/// Get the table schema information for the associated database.
+		/// </summary>
+		/////////////////////////////////////////////////////////////////////
+		public DataTable SchemaTable
+		{
+			get
+			{
+				DataTable tables = null;
+
+				bool returnCode = Initialize();
+
+				if (true == returnCode)
+				{
+					if (DatabaseType.OleDb == databaseType)
+					{
+						tables = oleDbConnection.GetOleDbSchemaTable(
+							System.Data.OleDb.OleDbSchemaGuid.Tables,
+							new Object[] { null, null, null, "TABLE" });
+					}
+					else
+					{
+						//tables = connection.GetSchema("TABLE");
+						tables = connection.GetSchema();
+					}
+				}
+
+				return tables;
+			}
+		}
 
 		#region constructors
 
@@ -112,10 +149,10 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/// DataStorage - Constructor
 		/// </summary>
 		/// <param name="databaseType"></param>
-		/// <param name="ConnectionString"></param>
-		public DataStorage(DatabaseType databaseType, string ConnectionString)
+		/// <param name="connectionString"></param>
+		public DataStorage(DatabaseType databaseType, string connectionString)
 		{
-			connectionText = ConnectionString;
+			connectionText = connectionString;
 			this.databaseType = databaseType;
 		}
 
@@ -128,11 +165,44 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/// </summary>
 		public void Close()
 		{
-			if (null != connection)
+			Dispose(true);
+		}
+
+		/// <summary>
+		/// Dispose
+		/// </summary>
+		/// <param name="disposing"></param>
+		protected virtual void Dispose(bool disposing)
+		{
+			if (disposing)
 			{
-				connection.Dispose();
-				connection = null;
+				if (null != connection)
+				{
+					connection.Dispose();
+					connection = null;
+				}
+
+				if (null != oleDbConnection)
+				{
+					oleDbConnection.Close();
+					oleDbConnection = null;
+				}
+
+				if (null != mySqlConnection)
+				{
+					mySqlConnection.Close();
+					mySqlConnection = null;
+				}
 			}
+		}
+
+		/// <summary>
+		/// Dispose
+		/// </summary>
+		public void Dispose()
+		{
+			Dispose(true);
+			GC.SuppressFinalize(this);
 		}
 
 		/////////////////////////////////////////////////////////////////////
@@ -174,10 +244,18 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 					databaseTransaction = connection.BeginTransaction();
 				}
 			}
-			catch (Exception ex)
+			catch (Exception exception) when
+				(exception is ArgumentNullException ||
+				exception is ArgumentException ||
+				exception is OleDbException ||
+				exception is InvalidOperationException)
 			{
-				log.Error(CultureInfo.InvariantCulture,
-					m => m("BeginTransaction Error: {0}", ex.Message));
+				log.Error(CultureInfo.InvariantCulture, m => m(
+					stringTable.GetString("EXCEPTION") + exception.Message));
+			}
+			catch
+			{
+				throw;
 			}
 		}
 
@@ -230,7 +308,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		{
 			bool canQuery = false;
 
-			DataTable Tables = GetSchemaTable();
+			DataTable Tables = SchemaTable;
 
 			if (Tables.Rows.Count > 0)
 			{
@@ -279,12 +357,16 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 					}
 				}
 			}
-			catch (Exception exception)
+			catch (Exception exception) when
+				(exception is ArgumentNullException ||
+				exception is ArgumentException)
 			{
-				log.Error(CultureInfo.InvariantCulture,
-					m => m("Exception: {0} Command: {1}", exception.Message,
-					sql));
-				throw exception;
+				log.Error(CultureInfo.InvariantCulture, m => m(
+					stringTable.GetString("EXCEPTION") + exception.Message));
+			}
+			catch
+			{
+				throw;
 			}
 			finally
 			{
@@ -363,19 +445,23 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/// <param name="dataSet"></param>
 		/// <returns>number of records retrieved</returns>
 		/////////////////////////////////////////////////////////////////////
+		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design",
+			"CA1021:AvoidOutParameters", MessageId = "1#")]
 		public int GetDataSet(string sql, out DataSet dataSet)
 		{
 			int rowCount = -1;
-
-			dataSet = new DataSet();
+			dataSet = null;
+			DbDataAdapter dataAdapter = null;
 
 			try
 			{
+				dataSet = new DataSet();
+				dataSet.Locale = CultureInfo.InvariantCulture;
+
 				DbCommand command = GetCommandObject(sql);
 
 				if (null != command)
 				{
-					DbDataAdapter dataAdapter = null;
 					switch (databaseType)
 					{
 						case DatabaseType.OleDb:
@@ -403,16 +489,32 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 						m => m("OK - getDataSet - Query: {0}", sql));
 				}
 			}
-			catch (Exception ex)
+			catch (Exception exception) when
+				(exception is ArgumentNullException ||
+				exception is ArgumentException ||
+				exception is OleDbException ||
+				exception is InvalidOperationException)
 			{
-				log.Error(CultureInfo.InvariantCulture,
-					m => m("Initialization Error: {0}", ex.Message));
+				log.Error(CultureInfo.InvariantCulture, m => m(
+					stringTable.GetString("EXCEPTION") + exception.Message));
+				log.Error(CultureInfo.InvariantCulture, m => m(
+					stringTable.GetString("COMMAND") + sql));
+			}
+			catch
+			{
+				throw;
 			}
 			finally
 			{
 				if (null == databaseTransaction)
 				{
 					Close();
+				}
+
+				if (null != dataAdapter)
+				{
+					dataAdapter.Dispose();
+					dataAdapter = null;
 				}
 			}
 
@@ -427,12 +529,15 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/// <param name="dataTable"> (for returning data)</param>
 		/// <returns>number of records retrieved</returns>
 		/////////////////////////////////////////////////////////////////////
+		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design",
+			"CA1021:AvoidOutParameters", MessageId = "1#")]
 		public int GetDataTable(string sql, out DataTable dataTable)
 		{
 			int recordsReturned = -1;
 			DataSet dataSet = null;
 
 			dataTable = new DataTable();
+			dataTable.Locale = CultureInfo.InvariantCulture;
 
 			recordsReturned = GetDataSet(sql, out dataSet);
 			if (dataSet.Tables.Count > 0)
@@ -524,32 +629,42 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 
 			try
 			{
-				OleDbConnection connection =
-					new OleDbConnection(connectionText);
-
-				string sql =
-					"INSERT INTO Contacts (Notes) VALUES ('testing')";
-				string Sql2 = "SELECT @@IDENTITY";
-
-				commandObject1 = new OleDbCommand(sql, connection);
-				commandObject2 = new OleDbCommand(Sql2, connection);
-
-				connection.Open();
-
-				//CommandObject.CommandTimeout = 30;
-
-				Object result = commandObject1.ExecuteScalar();
-
-				if (null != result)
+				using (OleDbConnection dbConnection =
+					new OleDbConnection(connectionText))
 				{
-					returnCode = (int)result;
-				}
 
-				returnCode = (int)commandObject2.ExecuteScalar();
+					string sql =
+						"INSERT INTO Contacts (Notes) VALUES ('testing')";
+					string Sql2 = "SELECT @@IDENTITY";
+
+					commandObject1 = new OleDbCommand(sql, dbConnection);
+					commandObject2 = new OleDbCommand(Sql2, dbConnection);
+
+					dbConnection.Open();
+					//CommandObject.CommandTimeout = 30;
+
+					Object result = commandObject1.ExecuteScalar();
+
+					if (null != result)
+					{
+						returnCode = (int)result;
+					}
+
+					returnCode = (int)commandObject2.ExecuteScalar();
+				}
 			}
-			catch (Exception ex)
+			catch (Exception exception) when
+				(exception is ArgumentNullException ||
+				exception is ArgumentException ||
+				exception is OleDbException ||
+				exception is InvalidOperationException)
 			{
-				throw (ex);
+				log.Error(CultureInfo.InvariantCulture, m => m(
+					stringTable.GetString("EXCEPTION") + exception.Message));
+			}
+			catch
+			{
+				throw;
 			}
 			finally
 			{
@@ -571,60 +686,30 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 			return returnCode;
 		}
 
-		/////////////////////////////////////////////////////////////////////
-		/// Method <c>GetSchemaTable</c>
-		/// <summary>
-		/// Get the table schema information for the associated database.
-		/// </summary>
-		/////////////////////////////////////////////////////////////////////
-		public DataTable GetSchemaTable()
-		{
-			DataTable tables = null;
-
-			bool returnCode = Initialize();
-
-			if (true == returnCode)
-			{
-				if (DatabaseType.OleDb == databaseType)
-				{
-					tables = oleDbConnection.GetOleDbSchemaTable(
-						System.Data.OleDb.OleDbSchemaGuid.Tables,
-						new Object[] { null, null, null, "TABLE" });
-				}
-				else
-				{
-					//tables = connection.GetSchema("TABLE");
-					tables = connection.GetSchema();
-				}
-			}
-
-			return tables;
-		}
-
 		#endregion methods
 
 		private string CreateConnectionString(string dataSource,
 			string catalog)
 		{
-			string connectionText = null;
+			string connectionString = null;
 
 			if (null != provider)
 			{
-				connectionText = "provider=" + provider;
+				connectionString = "provider=" + provider;
 			}
 
 			if (null != dataSource)
 			{
-				connectionText += "; Data Source=" + dataSource;
+				connectionString += "; Data Source=" + dataSource;
 			}
 
 			if (null != catalog)
 			{
-				connectionText +=
+				connectionString +=
 					"; Integrated Security=SSPI; Initial catalog=" + catalog;
 			}
 
-			return connectionText;
+			return connectionString;
 		}
 
 		/////////////////////////////////////////////////////////////////////
@@ -648,30 +733,25 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 
 					if (null != Result)
 					{
-						returnCode = Convert.ToUInt32(Result);
+						returnCode = Convert.ToUInt32(Result,
+							CultureInfo.InvariantCulture);
 					}
 				}
 			}
-			catch (OleDbException exception)
+			catch (Exception exception) when
+				(exception is ArgumentNullException ||
+				exception is ArgumentException ||
+				exception is OleDbException ||
+				exception is InvalidOperationException)
 			{
-				log.Error(CultureInfo.InvariantCulture,
-				m => m("Exception: {0} Command: {1}", exception.Message,
-				sql));
-				throw exception;
+				log.Error(CultureInfo.InvariantCulture, m => m(
+					stringTable.GetString("EXCEPTION") + exception.Message));
+				log.Error(CultureInfo.InvariantCulture, m => m(
+					stringTable.GetString("COMMAND") + sql));
 			}
-			catch (InvalidOperationException exception)
+			catch
 			{
-				log.Error(CultureInfo.InvariantCulture,
-					m => m("Exception: {0} Command: {1}", exception.Message,
-					sql));
-				throw exception;
-			}
-			catch (Exception exception)
-			{
-				log.Error(CultureInfo.InvariantCulture,
-					m => m("Exception: {0} Command: {1}", exception.Message,
-					sql));
-				throw exception;
+				throw;
 			}
 			finally
 			{
@@ -723,13 +803,28 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 					command.CommandTimeout = 30;
 				}
 			}
-			catch (Exception ex)
+			catch (Exception exception) when
+				(exception is ArgumentNullException ||
+				exception is ArgumentException ||
+				exception is OleDbException ||
+				exception is InvalidOperationException)
 			{
-				log.Error(CultureInfo.InvariantCulture,
-					m => m("Initialization Error: {0}", ex.Message));
+				log.Error(CultureInfo.InvariantCulture, m => m(
+					stringTable.GetString("EXCEPTION") + exception.Message));
+				log.Error(CultureInfo.InvariantCulture, m => m(
+					stringTable.GetString("COMMAND") + sql));
+			}
+			catch
+			{
+				throw;
 			}
 			finally
 			{
+				if (null != command)
+				{
+					command.Dispose();
+					command = null;
+				}
 			}
 
 			return command;
@@ -787,11 +882,18 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 
 				returnValue = true;
 			}
-			catch (Exception ex)
+			catch (Exception exception) when
+				(exception is ArgumentNullException ||
+				exception is ArgumentException ||
+				exception is OleDbException ||
+				exception is InvalidOperationException)
 			{
-				log.Error(CultureInfo.InvariantCulture,
-				m => m("Initialization Error: {0}", ex.Message));
-				throw (ex);
+				log.Error(CultureInfo.InvariantCulture, m => m(
+					stringTable.GetString("EXCEPTION") + exception.Message));
+			}
+			catch
+			{
+				throw;
 			}
 			finally
 			{
