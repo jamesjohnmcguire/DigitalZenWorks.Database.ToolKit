@@ -176,17 +176,17 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		{
 			if (disposing)
 			{
-				if (null != connection)
-				{
-					connection.Dispose();
-					connection = null;
-				}
+			if (null != connection)
+			{
+				connection.Dispose();
+				connection = null;
+			}
 
 				if (null != oleDbConnection)
 				{
 					oleDbConnection.Close();
 					oleDbConnection = null;
-				}
+		}
 
 				if (null != mySqlConnection)
 				{
@@ -256,7 +256,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 			catch
 			{
 				throw;
-			}
+		}
 		}
 
 		/// <summary>
@@ -418,6 +418,8 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/// <param name="dataRowOut"> (for returning data)</param>
 		/// <returns>Success / Failure</returns>
 		/////////////////////////////////////////////////////////////////////
+		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design",
+			"CA1021:AvoidOutParameters", MessageId = "1#")]
 		public bool GetDataRow(string sql, out DataRow dataRowOut)
 		{
 			bool hasData = false;
@@ -455,7 +457,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 
 			try
 			{
-				dataSet = new DataSet();
+			dataSet = new DataSet();
 				dataSet.Locale = CultureInfo.InvariantCulture;
 
 				DbCommand command = GetCommandObject(sql);
@@ -515,7 +517,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 				{
 					dataAdapter.Dispose();
 					dataAdapter = null;
-				}
+			}
 			}
 
 			return rowCount;
@@ -633,25 +635,25 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 					new OleDbConnection(connectionText))
 				{
 
-					string sql =
-						"INSERT INTO Contacts (Notes) VALUES ('testing')";
-					string Sql2 = "SELECT @@IDENTITY";
+				string sql =
+					"INSERT INTO Contacts (Notes) VALUES ('testing')";
+				string Sql2 = "SELECT @@IDENTITY";
 
 					commandObject1 = new OleDbCommand(sql, dbConnection);
 					commandObject2 = new OleDbCommand(Sql2, dbConnection);
 
 					dbConnection.Open();
-					//CommandObject.CommandTimeout = 30;
+				//CommandObject.CommandTimeout = 30;
 
-					Object result = commandObject1.ExecuteScalar();
+				Object result = commandObject1.ExecuteScalar();
 
-					if (null != result)
-					{
-						returnCode = (int)result;
-					}
-
-					returnCode = (int)commandObject2.ExecuteScalar();
+				if (null != result)
+				{
+					returnCode = (int)result;
 				}
+
+				returnCode = (int)commandObject2.ExecuteScalar();
+			}
 			}
 			catch (Exception exception) when
 				(exception is ArgumentNullException ||
@@ -715,7 +717,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/////////////////////////////////////////////////////////////////////
 		/// <summary>
 		/// The first column of the first row in the result set,
-		/// or a null reference if the result set is empt
+		/// or a null reference if the result set is empty
 		/// </summary>
 		/////////////////////////////////////////////////////////////////////
 		private uint ExecuteScalar(string sql)
@@ -768,6 +770,8 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 			return returnCode;
 		}
 
+		//private DbCommand GetCommandObject(string sql,
+		//	DbParameterCollection parameters)
 		private DbCommand GetCommandObject(string sql)
 		{
 			DbCommand command = null;
@@ -797,6 +801,11 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 						}
 					}
 
+					//foreach (DbParameter parameter in parameters)
+					//{
+					//	command.Parameters.Add(parameter);
+					//}
+
 					command.Transaction = databaseTransaction;
 					command.Connection = connection;
 					command.CommandText = sql;
@@ -824,7 +833,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 				{
 					command.Dispose();
 					command = null;
-				}
+			}
 			}
 
 			return command;

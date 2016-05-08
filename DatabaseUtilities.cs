@@ -36,6 +36,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		{
 			bool success = false;
 			Stream templateObjectStream = null;
+			FileStream fileStream = null;
 
 			try
 			{
@@ -47,16 +48,18 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 				EmbeddedResource = new Byte[templateObjectStream.Length];
 				templateObjectStream.Read(EmbeddedResource, 0,
 					(int)templateObjectStream.Length);
-				using (FileStream fileStream =
-					new FileStream(filePath, FileMode.Create))
+				fileStream = new FileStream(filePath, FileMode.Create);
 				{
-					fileStream.Write(EmbeddedResource, 0,
+					if (null != fileStream)
+					{
+						fileStream.Write(EmbeddedResource, 0,
 						(int)templateObjectStream.Length);
+					}
 				}
 
 				success = true;
 			}
-			catch (Exception exception) when 
+			catch (Exception exception) when
 				(exception is ArgumentNullException ||
 				exception is ArgumentException ||
 				exception is FileLoadException ||
@@ -77,6 +80,13 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 			catch
 			{
 				throw;
+			}
+			finally
+			{
+				if (null != fileStream)
+				{
+					fileStream.Close();
+				}
 			}
 
 			return success;
@@ -155,16 +165,16 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 			using (DataStorage Database =
 				new DataStorage(provider, databaseFile))
 			{
-				// Get all the table names
+			// Get all the table names
 				DataTable TableNames = Database.SchemaTable;
 
-				// for each table, select all the data
-				foreach (DataRow Table in TableNames.Rows)
-				{
-					string TableName = Table["TABLE_NAME"].ToString();
-					string csvFile = csvPath + "\\" + TableName + ".csv";
+			// for each table, select all the data
+			foreach (DataRow Table in TableNames.Rows)
+			{
+				string TableName = Table["TABLE_NAME"].ToString();
+				string csvFile = csvPath + "\\" + TableName + ".csv";
 
-					// Create the CSV file to which data will be exported.
+				// Create the CSV file to which data will be exported.
 				using (StreamWriter file = new StreamWriter(csvFile, false))
 				{
 
@@ -178,7 +188,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 				}
 			}
 
-				Database.Shutdown();
+			Database.Shutdown();
 			}
 			return returnCode;
 		}

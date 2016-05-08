@@ -170,19 +170,16 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 					m => m(stringTable.GetString("TABLE") + table.TableName));
 				output = stringTable.GetString("TABLE") +
 					table.TableName + Environment.NewLine;
-				
-				foreach (DataRow row in table.Rows)
+
+				foreach (DataColumn column in table.Columns)
 				{
-					foreach (DataColumn column in table.Columns)
-					{
-						log.Info(CultureInfo.InvariantCulture,
-							m => m(stringTable.GetString("TABDASH") +
-							column.ColumnName));
-						output += stringTable.GetString("TABDASH") +
-							column.ColumnName + Environment.NewLine;
-					}
+					log.Info(CultureInfo.InvariantCulture, m => m(
+						stringTable.GetString("TABDASH") + column.ColumnName));
+					output += stringTable.GetString("TABDASH") +
+						column.ColumnName + Environment.NewLine;
 				}
 			}
+
 			log.Info(CultureInfo.InvariantCulture, m => m(
 				stringTable.GetString("PRIMARYKEY") + table.PrimaryKey));
 			output += stringTable.GetString("PRIMARYKEY") + table.PrimaryKey +

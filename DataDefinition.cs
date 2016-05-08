@@ -157,7 +157,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		}
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		/// <param name="relationships"></param>
 		/// <returns></returns>
@@ -242,6 +242,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		public static string GetTableName(string dataDefinition)
 		{
 			string TableName = null;
+
 			if (!string.IsNullOrWhiteSpace(dataDefinition))
 			{
 				string[] TableParts = dataDefinition.Split(new char[] { '(' });
@@ -288,17 +289,17 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 					using (DataStorage database = new DataStorage(provider,
 						databaseFile))
 					{
-						foreach (string SqlQuery in Queries)
-						{
+					foreach (string SqlQuery in Queries)
+					{
 							log.Info(CultureInfo.InvariantCulture, m => m(
 								stringTable.GetString("COMMAND") + SqlQuery));
 
 							database.ExecuteNonQuery(SqlQuery);
-						}
-
-						successCode = true;
 					}
+
+					successCode = true;
 				}
+			}
 			}
 			catch (Exception exception) when
 				(exception is ArgumentNullException ||
@@ -472,72 +473,72 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 			using (OleDbSchema oleDbSchema = new OleDbSchema(databaseFile))
 			{
 				tables = new System.Collections.Hashtable();
-				ArrayList relationships = new System.Collections.ArrayList();
+			ArrayList relationships = new System.Collections.ArrayList();
 
 				DataTable tableNames = oleDbSchema.TableNames;
 
-				foreach (DataRow row in tableNames.Rows)
-				{
-					string tableName = row["TABLE_NAME"].ToString();
+			foreach (DataRow row in tableNames.Rows)
+			{
+				string tableName = row["TABLE_NAME"].ToString();
 
-					Table table = new Table(tableName);
+				Table table = new Table(tableName);
 
 					log.Info(CultureInfo.InvariantCulture,
 						m => m("Getting Columns for " + tableName));
 					DataTable dataColumns =
 						oleDbSchema.GetTableColumns(tableName);
 
-					foreach (DataRow dataColumn in dataColumns.Rows)
-					{
-						Column column = FormatColumnFromDataRow(dataColumn);
+				foreach (DataRow dataColumn in dataColumns.Rows)
+				{
+					Column column = FormatColumnFromDataRow(dataColumn);
 
-						table.AddColumn(column);
-					}
+					table.AddColumn(column);
+				}
 
-					// Get primary key
-					DataTable primary_key_table =
-						oleDbSchema.GetPrimaryKeys(tableName);
+				// Get primary key
+				DataTable primary_key_table =
+					oleDbSchema.GetPrimaryKeys(tableName);
 
-					foreach (DataRow pkrow in primary_key_table.Rows)
-					{
-						table.PrimaryKey = pkrow["COLUMN_NAME"].ToString();
-					}
+				foreach (DataRow pkrow in primary_key_table.Rows)
+				{
+					table.PrimaryKey = pkrow["COLUMN_NAME"].ToString();
+				}
 
-					// If PK is an integer change type to AutoNumber
+				// If PK is an integer change type to AutoNumber
 					if (!string.IsNullOrWhiteSpace(table.PrimaryKey))
+				{
+					if (((Column)table.Columns[table.PrimaryKey]).Type ==
+						(int)ColumnType.Number)
 					{
-						if (((Column)table.Columns[table.PrimaryKey]).Type ==
-							(int)ColumnType.Number)
-						{
-							((Column)table.Columns[table.PrimaryKey]).Type =
-								(int)ColumnType.AutoNumber;
-						}
+						((Column)table.Columns[table.PrimaryKey]).Type =
+							(int)ColumnType.AutoNumber;
 					}
+				}
 
-					DataTable foreignKeyTable =
-						oleDbSchema.GetForeignKeys(tableName);
+				DataTable foreignKeyTable =
+					oleDbSchema.GetForeignKeys(tableName);
 
-					foreach (DataRow foreignKey in foreignKeyTable.Rows)
-					{
+				foreach (DataRow foreignKey in foreignKeyTable.Rows)
+				{
 						Relationship relationship =
 							GetRelationship(foreignKey);
 
-						relationships.Add(relationship);
-					}
-	
-					tables.Add(table.Name, table);
+					relationships.Add(relationship);
 				}
 
-				// Add foreign keys to table, using relationships
-				foreach (Relationship relationship in relationships)
-				{
-					string name = relationship.ChildTable;
+				tables.Add(table.Name, table);
+			}
 
-					ForeignKey foreignKey =
-						GetForeignKeyRelationship(relationship);
+			// Add foreign keys to table, using relationships
+			foreach (Relationship relationship in relationships)
+			{
+				string name = relationship.ChildTable;
+
+				ForeignKey foreignKey =
+					GetForeignKeyRelationship(relationship);
 
 					((Table)tables[name]).ForeignKeys.Add(foreignKey);
-				}
+			}
 			}
 
 			return tables;
