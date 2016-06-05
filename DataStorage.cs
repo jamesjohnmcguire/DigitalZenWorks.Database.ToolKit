@@ -631,18 +631,16 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 
 			try
 			{
-				using (OleDbConnection dbConnection =
-					new OleDbConnection(connectionText))
-				{
+				Initialize();
 
 				string sql =
 					"INSERT INTO Contacts (Notes) VALUES ('testing')";
 				string Sql2 = "SELECT @@IDENTITY";
 
-					commandObject1 = new OleDbCommand(sql, dbConnection);
-					commandObject2 = new OleDbCommand(Sql2, dbConnection);
+				commandObject1 = new OleDbCommand(sql, oleDbConnection);
+				commandObject2 = new OleDbCommand(Sql2, oleDbConnection);
 
-					dbConnection.Open();
+				oleDbConnection.Open();
 				//CommandObject.CommandTimeout = 30;
 
 				Object result = commandObject1.ExecuteScalar();
@@ -653,7 +651,6 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 				}
 
 				returnCode = (int)commandObject2.ExecuteScalar();
-			}
 			}
 			catch (Exception exception) when
 				(exception is ArgumentNullException ||
