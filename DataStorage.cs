@@ -65,8 +65,8 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 
 		private string provider = string.Empty;
 
-		private static readonly ResourceManager stringTable =
-			new ResourceManager("DigitalZenWorks.Common.DatabaseLibrary",
+		private static readonly ResourceManager stringTable = new
+			ResourceManager("DigitalZenWorks.Common.DatabaseLibrary.Resources",
 			Assembly.GetExecutingAssembly());
 		#endregion private variables
 

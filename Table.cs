@@ -32,8 +32,8 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 
 		private string name = string.Empty;
 		private string primaryKey = string.Empty;
-		private static readonly ResourceManager stringTable =
-			new ResourceManager("DigitalZenWorks.Common.DatabaseLibrary",
+		private static readonly ResourceManager stringTable = new
+			ResourceManager("DigitalZenWorks.Common.DatabaseLibrary.Resources",
 			Assembly.GetExecutingAssembly());
 
 		/////////////////////////////////////////////////////////////////////

@@ -29,8 +29,8 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/// </summary>
 		private static readonly ILog log = LogManager.GetLogger
 			(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
-		private static readonly ResourceManager stringTable =
-			new ResourceManager("DigitalZenWorks.Common.DatabaseLibrary",
+		private static readonly ResourceManager stringTable = new
+			ResourceManager("DigitalZenWorks.Common.DatabaseLibrary.Resources",
 			Assembly.GetExecutingAssembly());
 
 		/////////////////////////////////////////////////////////////////////
@@ -105,42 +105,44 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		public static ColumnType GetColumnType(
 			string column)
 		{
-			string[] columnTypeComareKeys = { "autonumber", "identity",
-				"autoincrement", "bigint", "longvarbinary", "longvarchar",
-				"varbinary", "varchar", "binary", "bit", "longblob",
-				"mediumblob", "blob", "boolean", "byte", "nvarchar", "char",
-				"currency", "cursor", "smalldatetime", "smallint",
-				"smallmoney", "datetime2", "datetimeoffset", "datetime",
-				"date", "decimal", "double", "hyperlink", "enum", "float",
-				"image", "integer", "mediumint", "tinyint", "int",
-				"javaobject", "longtext", "long", "lookupwizard", "mediumtext",
-				"memo", "money", "nchar", "ntext", "number", "numeric",
-				"oleobject", "ole", "real", "set", "single", "sqlvariant",
-				"string", "table", "tinytext", "text", "timestamp", "time",
-				"uniqueidentifier", "xml", "year", "yesno" };
+			string[] columnTypeComareKeys = { "AUTONUMBER", "IDENTITY",
+				"AUTOINCREMENT", "BIGINT", "LONGVARBINARY", "LONGVARCHAR",
+				"VARBINARY", "VARCHAR", "BINARY", "BIT", "LONGBLOB",
+				"MEDIUMBLOB", "BLOB", "BOOLEAN", "BYTE", "NVARCHAR", "CHAR",
+				"CURRENCY", "CURSOR", "SMALLDATETIME", "SMALLINT",
+				"SMALLMONEY", "DATETIME2", "DATETIMEOFFSET", "DATETIME",
+				"DATE", "DECIMAL", "DOUBLE", "HYPERLINK", "ENUM", "FLOAT",
+				"IMAGE", "INTEGER", "MEDIUMINT", "TINYINT", "INT",
+				"JAVAOBJECT", "LONGTEXT", "LONG", "LOOKUPWIZARD", "MEDIUMTEXT",
+				"MEMO", "MONEY", "NCHAR", "NTEXT", "NUMBER", "NUMERIC",
+				"OLEOBJECT", "OLE", "REAL", "SET", "SINGLE", "SQLVARIANT",
+				"STRING", "TABLE", "TINYTEXT", "TEXT", "TIMESTAMP", "TIME",
+				"UNIQUEIDENTIFIER", "XML", "YEAR", "YESNO" };
 
-		ColumnType[] types = { ColumnType.AutoNumber, ColumnType.Identity,
-			ColumnType.Identity, ColumnType.BigInt, ColumnType.LongVarBinary,
-			ColumnType.LongVarChar, ColumnType.VarBinary, ColumnType.VarChar,
-			ColumnType.Binary, ColumnType.Bit, ColumnType.LongBlob,
-			ColumnType.MediumBlob, ColumnType.Blob, ColumnType.Boolean,
-			ColumnType.Byte, ColumnType.NVarChar, ColumnType.Char,
-			ColumnType.Currency, ColumnType.Cursor, ColumnType.SmallDateTime,
-			ColumnType.SmallInt, ColumnType.SmallMoney, ColumnType.DateTime2,
-			ColumnType.DateTimeOffset, ColumnType.DateTime, ColumnType.Date,
-			ColumnType.Decimal, ColumnType.Double, ColumnType.Hyperlink,
-			ColumnType.Enum, ColumnType.Float, ColumnType.Image,
-			ColumnType.Integer, ColumnType.MediumInt, ColumnType.TinyInt,
-			ColumnType.Int, ColumnType.JavaObject, ColumnType.LongText,
-			ColumnType.Long, ColumnType.LookupWizard, ColumnType.MediumText,
-			ColumnType.Memo, ColumnType.Money, ColumnType.NChar,
-			ColumnType.NText, ColumnType.Number, ColumnType.Numeric,
-			ColumnType.OleObject, ColumnType.Ole, ColumnType.Real,
-			ColumnType.Set, ColumnType.Single, ColumnType.SqlVariant,
-			ColumnType.String, ColumnType.Table, ColumnType.TinyText,
-			ColumnType.Text, ColumnType.Timestamp, ColumnType.Time,
-			ColumnType.UniqueIdentifier, ColumnType.Xml, ColumnType.Year,
-			ColumnType.Boolean };
+			ColumnType[] types = { ColumnType.AutoNumber, ColumnType.Identity,
+				ColumnType.Identity, ColumnType.BigInt,
+				ColumnType.LongVarBinary, ColumnType.LongVarChar,
+				ColumnType.VarBinary, ColumnType.VarChar, ColumnType.Binary,
+				ColumnType.Bit, ColumnType.LongBlob, ColumnType.MediumBlob,
+				ColumnType.Blob, ColumnType.Boolean, ColumnType.Byte,
+				ColumnType.NVarChar, ColumnType.Char, ColumnType.Currency,
+				ColumnType.Cursor, ColumnType.SmallDateTime,
+				ColumnType.SmallInt, ColumnType.SmallMoney,
+				ColumnType.DateTime2, ColumnType.DateTimeOffset,
+				ColumnType.DateTime, ColumnType.Date, ColumnType.Decimal,
+				ColumnType.Double, ColumnType.Hyperlink, ColumnType.Enum,
+				ColumnType.Float, ColumnType.Image, ColumnType.Integer,
+				ColumnType.MediumInt, ColumnType.TinyInt, ColumnType.Int,
+				ColumnType.JavaObject, ColumnType.LongText, ColumnType.Long,
+				ColumnType.LookupWizard, ColumnType.MediumText,
+				ColumnType.Memo, ColumnType.Money, ColumnType.NChar,
+				ColumnType.NText, ColumnType.Number, ColumnType.Numeric,
+				ColumnType.OleObject, ColumnType.Ole, ColumnType.Real,
+				ColumnType.Set, ColumnType.Single, ColumnType.SqlVariant,
+				ColumnType.String, ColumnType.Table, ColumnType.TinyText,
+				ColumnType.Text, ColumnType.Timestamp, ColumnType.Time,
+				ColumnType.UniqueIdentifier, ColumnType.Xml, ColumnType.Year,
+				ColumnType.Boolean };
 
 			ColumnType columnType = ColumnType.Other;
 
@@ -153,6 +155,11 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 				}
 			}
 
+			if (columnType == ColumnType.Other)
+			{
+				log.Warn(CultureInfo.InvariantCulture, m => m(
+					stringTable.GetString("WARNING_OTHER") + column));
+			}
 			return columnType;
 		}
 
@@ -291,10 +298,10 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 					{
 					foreach (string SqlQuery in Queries)
 					{
-							log.Info(CultureInfo.InvariantCulture, m => m(
-								stringTable.GetString("COMMAND") + SqlQuery));
+						log.Info(CultureInfo.InvariantCulture, m => m(
+							stringTable.GetString("COMMAND") + SqlQuery));
 
-							database.ExecuteNonQuery(SqlQuery);
+						database.ExecuteNonQuery(SqlQuery);
 					}
 
 					successCode = true;

@@ -22,8 +22,8 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 	{
 		private static readonly ILog log = LogManager.GetLogger
 			(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
-		private static readonly ResourceManager stringTable =
-			new ResourceManager("DigitalZenWorks.Common.DatabaseLibrary",
+		private static readonly ResourceManager stringTable = new
+			ResourceManager("DigitalZenWorks.Common.DatabaseLibrary.Resources",
 			Assembly.GetExecutingAssembly());
 
 		/////////////////////////////////////////////////////////////////////

@@ -135,4 +135,7 @@
   <data name="TABLE" xml:space="preserve">
     <value>Table: </value>
   </data>
+  <data name="WARNING_OTHER" xml:space="preserve">
+    <value>This column has been set to the 'Other' type: </value>
+  </data>
 </root>

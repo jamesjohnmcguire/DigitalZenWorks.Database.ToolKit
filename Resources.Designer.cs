@@ -113,5 +113,14 @@ namespace DigitalZenWorks.Common.DatabaseLibrary {
                 return ResourceManager.GetString("TABLE", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This column has been set to the &apos;Other&apos; type: .
+        /// </summary>
+        internal static string WARNING_OTHER {
+            get {
+                return ResourceManager.GetString("WARNING_OTHER", resourceCulture);
+            }
+        }
     }
 }
