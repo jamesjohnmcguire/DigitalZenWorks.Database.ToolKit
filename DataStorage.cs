@@ -824,14 +824,6 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 			{
 				throw;
 			}
-			finally
-			{
-				if (null != command)
-				{
-					command.Dispose();
-					command = null;
-			}
-			}
 
 			return command;
 		}
