@@ -308,9 +308,9 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		{
 			bool canQuery = false;
 
-			DataTable Tables = SchemaTable;
+			DataTable tables = SchemaTable;
 
-			if (Tables.Rows.Count > 0)
+			if ((null != tables) && (tables.Rows.Count > 0))
 			{
 				canQuery = true;
 			}
@@ -321,7 +321,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/////////////////////////////////////////////////////////////////////
 		/// Method <c>Delete</c>
 		/// <summary>
-		/// Performs an Sql DELETE command
+		/// Performs an SQL DELETE command
 		/// </summary>
 		/// <param name="sql"></param>
 		/// <returns>Success / Failure</returns>
@@ -341,12 +341,9 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		public bool ExecuteNonQuery(string sql)
 		{
 			bool returnCode = false;
-			DbCommand command = null;
 
-			try
+			using (DbCommand command = GetCommandObject(sql))
 			{
-				command = GetCommandObject(sql);
-
 				if (null != command)
 				{
 					int rowsEffected = command.ExecuteNonQuery();
@@ -356,28 +353,10 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 						returnCode = true;
 					}
 				}
-			}
-			catch (Exception exception) when
-				(exception is ArgumentNullException ||
-				exception is ArgumentException)
-			{
-				log.Error(CultureInfo.InvariantCulture, m => m(
-					stringTable.GetString("EXCEPTION") + exception.Message));
-			}
-			catch
-			{
-				throw;
-			}
-			finally
-			{
+
 				if (null == databaseTransaction)
 				{
 					Close();
-				}
-
-				if (null != command)
-				{
-					command.Dispose();
 				}
 			}
 
@@ -457,38 +436,39 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 
 			try
 			{
-			dataSet = new DataSet();
+				dataSet = new DataSet();
 				dataSet.Locale = CultureInfo.InvariantCulture;
 
-				DbCommand command = GetCommandObject(sql);
-
-				if (null != command)
+				using (DbCommand command = GetCommandObject(sql))
 				{
-					switch (databaseType)
+					if (null != command)
 					{
-						case DatabaseType.OleDb:
+						switch (databaseType)
 						{
-							dataAdapter = new OleDbDataAdapter();
-							break;
+							case DatabaseType.OleDb:
+								{
+									dataAdapter = new OleDbDataAdapter();
+									break;
+								}
+							case DatabaseType.SqlServer:
+								{
+									dataAdapter = new SqlDataAdapter();
+									break;
+								}
+							case DatabaseType.MySql:
+								{
+									dataAdapter = new MySqlDataAdapter();
+									break;
+								}
 						}
-						case DatabaseType.SqlServer:
-						{
-							dataAdapter = new SqlDataAdapter();
-							break;
-						}
-						case DatabaseType.MySql:
-						{
-							dataAdapter = new MySqlDataAdapter();
-							break;
-						}
+
+						dataAdapter.SelectCommand = command;
+
+						rowCount = dataAdapter.Fill(dataSet);
+
+						log.Info(CultureInfo.InvariantCulture,
+							m => m("OK - getDataSet - Query: {0}", sql));
 					}
-
-					dataAdapter.SelectCommand = command;
-
-					rowCount = dataAdapter.Fill(dataSet);
-
-					log.Info(CultureInfo.InvariantCulture,
-						m => m("OK - getDataSet - Query: {0}", sql));
 				}
 			}
 			catch (Exception exception) when
@@ -508,16 +488,16 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 			}
 			finally
 			{
-				if (null == databaseTransaction)
-				{
-					Close();
-				}
-
 				if (null != dataAdapter)
 				{
 					dataAdapter.Dispose();
 					dataAdapter = null;
-			}
+				}
+
+				if (null == databaseTransaction)
+				{
+					Close();
+				}
 			}
 
 			return rowCount;
@@ -720,12 +700,9 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		private uint ExecuteScalar(string sql)
 		{
 			uint returnCode = 0;
-			DbCommand command = null;
 
-			try
+			using (DbCommand command = GetCommandObject(sql))
 			{
-				command = GetCommandObject(sql);
-
 				if (null != command)
 				{
 					Object Result = command.ExecuteScalar();
@@ -736,39 +713,20 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 							CultureInfo.InvariantCulture);
 					}
 				}
-			}
-			catch (Exception exception) when
-				(exception is ArgumentNullException ||
-				exception is ArgumentException ||
-				exception is OleDbException ||
-				exception is InvalidOperationException)
-			{
-				log.Error(CultureInfo.InvariantCulture, m => m(
-					stringTable.GetString("EXCEPTION") + exception.Message));
-				log.Error(CultureInfo.InvariantCulture, m => m(
-					stringTable.GetString("COMMAND") + sql));
-			}
-			catch
-			{
-				throw;
-			}
-			finally
-			{
+
 				if (null == databaseTransaction)
 				{
 					Close();
 				}
-
-				if (null != command)
-				{
-					command.Dispose();
-				}
 			}
+
 			return returnCode;
 		}
 
 		//private DbCommand GetCommandObject(string sql,
 		//	DbParameterCollection parameters)
+		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability",
+			"CA2000:Dispose objects before losing scope")]
 		private DbCommand GetCommandObject(string sql)
 		{
 			DbCommand command = null;

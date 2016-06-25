@@ -211,7 +211,6 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 			VerifyRowExists(NewRowId, false);
 		}
 
-
 		/////////////////////////////////////////////////////////////////////////
 		/// Method <c>ExportToCsv</c>
 		/// <summary>
@@ -225,6 +224,20 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 				AppDomain.CurrentDomain.BaseDirectory);
 
 			Assert.IsTrue((File.Exists(dataSourceBackupsCsv)));
+		}
+
+		/////////////////////////////////////////////////////////////////////////
+		/// Method <c>SchemaTable</c>
+		/// <summary>
+		/// Delete Test
+		/// </summary>
+		/////////////////////////////////////////////////////////////////////////
+		[Test]
+		public void SchemaTable()
+		{
+			DataTable table = database.SchemaTable;
+
+			Assert.NotNull(table);
 		}
 
 		private void VerifyRowExists(
