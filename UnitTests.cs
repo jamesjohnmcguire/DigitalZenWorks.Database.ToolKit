@@ -4,12 +4,11 @@
 // Copyright © 2006 - 2016 by James John McGuire
 // All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
+using NUnit.Framework;
 using System;
 using System.Data;
 using System.EnterpriseServices;
 using System.IO;
-
-using NUnit.Framework;
 
 namespace DigitalZenWorks.Common.DatabaseLibrary
 {
@@ -41,11 +40,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		[SetUp]
 		public void Setup()
 		{
-			string provider = "Microsoft.Jet.OLEDB.4.0";
-			if (Environment.Is64BitProcess)
-			{
-				provider = "Microsoft.ACE.OLEDB.12.0";
-			}
+			string provider = "Microsoft.ACE.OLEDB.12.0";
 
 			database = new DataStorage(provider, dataSource);
 

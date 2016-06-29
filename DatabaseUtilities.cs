@@ -162,33 +162,37 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 			{
 				provider = "Microsoft.ACE.OLEDB.12.0";
 			}
+
 			using (DataStorage Database =
 				new DataStorage(provider, databaseFile))
 			{
-			// Get all the table names
+				// Get all the table names
 				DataTable TableNames = Database.SchemaTable;
 
-			// for each table, select all the data
-			foreach (DataRow Table in TableNames.Rows)
-			{
-				string TableName = Table["TABLE_NAME"].ToString();
-				string csvFile = csvPath + "\\" + TableName + ".csv";
-
-				// Create the CSV file to which data will be exported.
-				using (StreamWriter file = new StreamWriter(csvFile, false))
+				if (null != TableNames)
 				{
+					// for each table, select all the data
+					foreach (DataRow Table in TableNames.Rows)
+					{
+						string TableName = Table["TABLE_NAME"].ToString();
+						string csvFile = csvPath + "\\" + TableName + ".csv";
 
-					// export the table
-						string SqlQuery = "SELECT * FROM " +
-							Table["TABLE_NAME"].ToString();
-					DataTable TableData = null;
-					Database.GetDataTable(SqlQuery, out TableData);
+						// Create the CSV file to which data will be exported.
+						using (StreamWriter file =
+							new StreamWriter(csvFile, false))
+						{
+							// export the table
+							string SqlQuery = "SELECT * FROM " +
+								Table["TABLE_NAME"].ToString();
+							DataTable TableData = null;
+							Database.GetDataTable(SqlQuery, out TableData);
 
-					ExportDataTableToCsv(TableData, file);
+							ExportDataTableToCsv(TableData, file);
+						}
+					}
 				}
-			}
 
-			Database.Shutdown();
+				Database.Shutdown();
 			}
 			return returnCode;
 		}
