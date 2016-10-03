@@ -158,7 +158,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 
 			// Open the database
 			string provider = "Microsoft.Jet.OLEDB.4.0";
-			if (Environment.Is64BitOperatingSystem)
+			if (Environment.Is64BitProcess)
 			{
 				provider = "Microsoft.ACE.OLEDB.12.0";
 			}
@@ -175,7 +175,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 					foreach (DataRow Table in TableNames.Rows)
 					{
 						string TableName = Table["TABLE_NAME"].ToString();
-						string csvFile = csvPath + "\\" + TableName + ".csv";
+						string csvFile = csvPath + TableName + ".csv";
 
 						// Create the CSV file to which data will be exported.
 						using (StreamWriter file =

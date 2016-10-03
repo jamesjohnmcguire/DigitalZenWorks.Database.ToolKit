@@ -40,7 +40,11 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		[SetUp]
 		public void Setup()
 		{
-			string provider = "Microsoft.ACE.OLEDB.12.0";
+			string provider = "Microsoft.Jet.OLEDB.4.0";
+			if (Environment.Is64BitProcess)
+			{
+				provider = "Microsoft.ACE.OLEDB.12.0";
+			}
 
 			database = new DataStorage(provider, dataSource);
 
@@ -140,24 +144,13 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		[Test]
 		public void SelectTest()
 		{
-			string provider = "Microsoft.Jet.OLEDB.4.0";
-			if (Environment.Is64BitOperatingSystem)
-			{
-				provider = "Microsoft.ACE.OLEDB.12.0";
-			}
-
 			DataSet TempDataSet = null;
 			string SqlQueryCommand = "SELECT * FROM TestTable";
 
-			using (DataStorage dataStorage =
-				new DataStorage(provider, dataSource))
-			{
-				int count =
-					dataStorage.GetDataSet(SqlQueryCommand, out TempDataSet);
+			int count = database.GetDataSet(SqlQueryCommand, out TempDataSet);
 
-				// No exceptions found
-				Assert.GreaterOrEqual(count, 0);
-			}
+			// No exceptions found
+			Assert.GreaterOrEqual(count, 0);
 		}
 
 		/////////////////////////////////////////////////////////////////////////
