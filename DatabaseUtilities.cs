@@ -44,20 +44,29 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 				Assembly thisAssembly = Assembly.GetExecutingAssembly();
 
 				templateObjectStream = thisAssembly.GetManifestResourceStream(
-					"DigitalZenWorks.Common.DatabaseLibrary.template.mdb");
-				EmbeddedResource = new Byte[templateObjectStream.Length];
-				templateObjectStream.Read(EmbeddedResource, 0,
-					(int)templateObjectStream.Length);
-				fileStream = new FileStream(filePath, FileMode.Create);
-				{
-					if (null != fileStream)
-					{
-						fileStream.Write(EmbeddedResource, 0,
-						(int)templateObjectStream.Length);
-					}
-				}
+					"DigitalZenWorks.Common.DatabaseLibrary.template.accdb");
 
-				success = true;
+				if (null == templateObjectStream)
+				{
+					log.Error(CultureInfo.InvariantCulture, m => m(
+						"Failed to manifest resource stream"));
+				}
+				else
+				{
+					EmbeddedResource = new Byte[templateObjectStream.Length];
+					templateObjectStream.Read(EmbeddedResource, 0,
+						(int)templateObjectStream.Length);
+					fileStream = new FileStream(filePath, FileMode.Create);
+					{
+						if (null != fileStream)
+						{
+							fileStream.Write(EmbeddedResource, 0,
+							(int)templateObjectStream.Length);
+						}
+					}
+
+					success = true;
+				}
 			}
 			catch (Exception exception) when
 				(exception is ArgumentNullException ||
@@ -157,11 +166,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 			bool returnCode = false;
 
 			// Open the database
-			string provider = "Microsoft.Jet.OLEDB.4.0";
-			if (Environment.Is64BitProcess)
-			{
-				provider = "Microsoft.ACE.OLEDB.12.0";
-			}
+			string provider = "Microsoft.ACE.OLEDB.12.0";
 
 			using (DataStorage Database =
 				new DataStorage(provider, databaseFile))
@@ -204,11 +209,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/// <returns></returns>
 		public static string MakePrivilegedConnectString(string databaseFile)
 		{
-			string provider = "Microsoft.Jet.OLEDB.4.0";
-			if (Environment.Is64BitOperatingSystem)
-			{
-				provider = "Microsoft.ACE.OLEDB.12.0";
-			}
+			string provider = "Microsoft.ACE.OLEDB.12.0";
 
 			string connectionString = "Provider=" + provider +
 				@";Password="""";User ID=Admin;" + "Data Source=" +

@@ -40,11 +40,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		[SetUp]
 		public void Setup()
 		{
-			string provider = "Microsoft.Jet.OLEDB.4.0";
-			if (Environment.Is64BitProcess)
-			{
-				provider = "Microsoft.ACE.OLEDB.12.0";
-			}
+			string provider = "Microsoft.ACE.OLEDB.12.0";
 
 			database = new DataStorage(provider, dataSource);
 

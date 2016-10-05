@@ -281,11 +281,8 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 			{
 				if (File.Exists(schemaFile))
 				{
-					string provider = "Microsoft.Jet.OLEDB.4.0";
-					if (Environment.Is64BitProcess)
-					{
-						provider = "Microsoft.ACE.OLEDB.12.0";
-					}
+					string provider = "Microsoft.ACE.OLEDB.12.0";
+
 					string fileContents =
 						FileUtils.GetFileContents(schemaFile);
 
@@ -319,8 +316,11 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 				log.Error(CultureInfo.InvariantCulture, m => m(
 					stringTable.GetString("EXCEPTION") + exception.Message));
 			}
-			catch
+			catch (Exception exception)
 			{
+				log.Error(CultureInfo.InvariantCulture, m => m(
+					stringTable.GetString("EXCEPTION") + exception.Message));
+
 				throw;
 			}
 
