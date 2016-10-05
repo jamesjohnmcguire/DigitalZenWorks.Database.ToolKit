@@ -292,6 +292,9 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Template.accdb">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
     <Content Include="TestDb.mdb">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
