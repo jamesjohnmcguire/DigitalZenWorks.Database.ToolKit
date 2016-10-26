@@ -18,9 +18,19 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		private string name = string.Empty;
 		private bool nullable = false;
 		private int position = 1;
-		private int type = (int)ColumnType.Number;
+		private ColumnType type = ColumnType.Number;
 		private bool unique = false;
 
+		/////////////////////////////////////////////////////////////////////
+		/// <summary>
+		/// The type of the column
+		/// </summary>
+		/////////////////////////////////////////////////////////////////////
+		public ColumnType ColumnType
+		{
+			get { return type; }
+			set { type = value; }
+		}
 
 		/////////////////////////////////////////////////////////////////////
 		/// <summary>
@@ -35,14 +45,35 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 
 		/////////////////////////////////////////////////////////////////////
 		/// <summary>
+		/// Indicates whether the column is indexed or not.
+		/// </summary>
+		/////////////////////////////////////////////////////////////////////
+		public bool Indexed { get; set; }
+
+		/////////////////////////////////////////////////////////////////////
+		/// <summary>
 		/// The length of the column
 		/// </summary>
 		/////////////////////////////////////////////////////////////////////
 		public int Length
 		{
 			get { return length; }
-			set { type = value; }
+			set { length = value; }
 		}
+
+		/////////////////////////////////////////////////////////////////////
+		/// <summary>
+		/// Indicates the column's maximum value allowed.
+		/// </summary>
+		/////////////////////////////////////////////////////////////////////
+		public int MaxValue { get; set; }
+
+		/////////////////////////////////////////////////////////////////////
+		/// <summary>
+		/// Indicates the column's minimum value allowed.
+		/// </summary>
+		/////////////////////////////////////////////////////////////////////
+		public int MinValue { get; set; }
 
 		/////////////////////////////////////////////////////////////////////
 		/// <summary>
@@ -79,16 +110,10 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 
 		/////////////////////////////////////////////////////////////////////
 		/// <summary>
-		/// The type of the column
+		/// Indicates whether the column is the primary column.
 		/// </summary>
 		/////////////////////////////////////////////////////////////////////
-		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Naming",
-			"CA1721:PropertyNamesShouldNotMatchGetMethods")]
-		public int Type
-		{
-			get { return type; }
-			set { type = value; }
-		}
+		public bool Primary { get; set; }
 
 		/////////////////////////////////////////////////////////////////////
 		/// <summary>
@@ -115,11 +140,11 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/// Constructor
 		/// </summary>
 		/////////////////////////////////////////////////////////////////////
-		public Column(string name, int type, int length, bool unique,
+		public Column(string name, ColumnType type, int length, bool unique,
 			bool nullable, string defaultValue, int position)
 		{
 			Name = name;
-			Type = type;
+			ColumnType = type;
 			Length = length;
 			Unique = unique;
 			Nullable = nullable;

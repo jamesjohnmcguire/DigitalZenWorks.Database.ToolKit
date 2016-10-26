@@ -252,7 +252,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BaseCollection.cs" />
+    <Compile Include="DataObjectsBase.cs" />
     <Compile Include="Column.cs" />
     <Compile Include="ColumnType.cs" />
     <Compile Include="DatabaseType.cs" />

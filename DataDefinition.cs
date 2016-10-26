@@ -371,7 +371,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 			{
 				case 3:	// Number
 				{
-					column.Type = (int)ColumnType.Number;
+					column.ColumnType = ColumnType.Number;
 					break;
 				}
 
@@ -381,36 +381,36 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 
 					if (Int32.Parse(flags, CultureInfo.InvariantCulture) > 127)
 					{
-						column.Type = (int)ColumnType.Memo;
+						column.ColumnType = ColumnType.Memo;
 					}
 					else
 					{
-						column.Type = (int)ColumnType.String;
+						column.ColumnType = ColumnType.String;
 					}
 					break;
 				}
 
 				case 7:  // Date
 				{
-					column.Type = (int)ColumnType.DateTime;
+					column.ColumnType = ColumnType.DateTime;
 					break;
 				}
 
 				case 6:  // Currency
 				{
-					column.Type = (int)ColumnType.Currency;
+					column.ColumnType = ColumnType.Currency;
 					break;
 				}
 
 				case 11:  // Yes/No
 				{
-					column.Type = (int)ColumnType.YesNo;
+					column.ColumnType = ColumnType.YesNo;
 					break;
 				}
 
 				case 128:  // OLE
 				{
-					column.Type = (int)ColumnType.Ole;
+					column.ColumnType = ColumnType.Ole;
 					break;
 				}
 			}
@@ -514,11 +514,11 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 				// If PK is an integer change type to AutoNumber
 					if (!string.IsNullOrWhiteSpace(table.PrimaryKey))
 				{
-					if (((Column)table.Columns[table.PrimaryKey]).Type ==
-						(int)ColumnType.Number)
+					if (((Column)table.Columns[table.PrimaryKey]).ColumnType ==
+						ColumnType.Number)
 					{
-						((Column)table.Columns[table.PrimaryKey]).Type =
-							(int)ColumnType.AutoNumber;
+						((Column)table.Columns[table.PrimaryKey]).ColumnType =
+							ColumnType.AutoNumber;
 					}
 				}
 
@@ -651,46 +651,46 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 
 			sql += "`" + column.Name + "`";
 
-			switch (column.Type)
+			switch (column.ColumnType)
 			{
-				case (int)ColumnType.Number:
-				case (int)ColumnType.AutoNumber:
+				case ColumnType.Number:
+				case ColumnType.AutoNumber:
 				{
 					sql += " INTEGER";
 					break;
 				}
-				case (int)ColumnType.String:
+				case ColumnType.String:
 				{
 					sql += String.Format(CultureInfo.InvariantCulture,
 						" VARCHAR({0})", column.Length);
 					break;
 				}
 
-				case (int)ColumnType.Memo:
+				case ColumnType.Memo:
 				{
 					sql += " MEMO";
 					break;
 				}
 
-				case (int)ColumnType.DateTime:
+				case ColumnType.DateTime:
 				{
 					sql += " DATETIME";
 					break;
 				}
 
-				case (int)ColumnType.Currency:
+				case ColumnType.Currency:
 				{
 					sql += " CURRENCY";
 					break;
 				}
 
-				case (int)ColumnType.Ole:
+				case ColumnType.Ole:
 				{
 					sql += " OLEOBJECT";
 					break;
 				}
 
-				case (int)ColumnType.YesNo:
+				case ColumnType.YesNo:
 				{
 					sql += " OLEOBJECT";
 					break;
@@ -707,7 +707,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 				sql += " NOT NULL";
 			}
 
-			if (column.Type == (int)ColumnType.AutoNumber)
+			if (column.ColumnType == ColumnType.AutoNumber)
 			{
 				sql += " IDENTITY";
 			}

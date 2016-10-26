@@ -10,6 +10,7 @@
 /////////////////////////////////////////////////////////////////////////////
 using System;
 using System.Data;
+using System.Globalization;
 
 namespace DigitalZenWorks.Common.DatabaseLibrary
 {
@@ -18,15 +19,9 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 	/// Base class for database collection classes
 	/// </summary>
 	/////////////////////////////////////////////////////////////////////////
-	public class BaseCollection: IDisposable
+	public class DataObjectsBase: IDisposable
 	{
-		/////////////////////////////////////////////////////////////////////
-		/// <summary>
-		/// Represents the core database object
-		/// </summary>
-		/////////////////////////////////////////////////////////////////////
-		[CLSCompliantAttribute(false)]
-		protected DataStorage database = null;
+		private DataStorage database = null;
 
 		/////////////////////////////////////////////////////////////////////
 		/// <summary>
@@ -35,20 +30,37 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/////////////////////////////////////////////////////////////////////
 		private const string provider = "Microsoft.ACE.OLEDB.12.0";
 
+		private string tableName = null;
+
+		/////////////////////////////////////////////////////////////////////
+		/// <summary>
+		/// Represents the core database object
+		/// </summary>
+		/////////////////////////////////////////////////////////////////////
+		[CLSCompliantAttribute(false)]
+		protected DataStorage Database
+		{
+			get { return database; }
+		}
+
 		/////////////////////////////////////////////////////////////////////
 		/// <summary>
 		/// Contains the name of the primary database table associated with
 		/// this collection
 		/// </summary>
 		/////////////////////////////////////////////////////////////////////
-		protected string TableName = null;
+		protected string TableName
+		{
+			get { return tableName; }
+			set { tableName = value; }
+		}
 
 		/////////////////////////////////////////////////////////////////////
 		/// <summary>
-		/// Represents a collection of Addresses
+		/// Represents a base collection of data objects
 		/// </summary>
 		/////////////////////////////////////////////////////////////////////
-		public BaseCollection(string databaseFileName)
+		public DataObjectsBase(string databaseFileName)
 		{
 			string dataSource = AppDomain.CurrentDomain.BaseDirectory +
 				databaseFileName;
@@ -93,8 +105,8 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		{
 			bool returnCode = false;
 
-			string sql = string.Format(@"DELETE FROM {0} WHERE id ='{1}'",
-				table, id);
+			string sql = string.Format(CultureInfo.InvariantCulture,
+				@"DELETE FROM {0} WHERE id ='{1}'", table, id);
 
 			returnCode = database.Delete(sql);
 
@@ -109,7 +121,8 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		public DataTable GetAllDataTable(string table)
 		{
 			DataTable tableList = null;
-			string sql = string.Format(@"SELECT * FROM {0} ORDER BY id", table);
+			string sql = string.Format(CultureInfo.InvariantCulture,
+				@"SELECT * FROM {0} ORDER BY id", table);
 
 			database.GetDataTable(sql, out tableList);
 
@@ -123,8 +136,8 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/////////////////////////////////////////////////////////////////////
 		public DataRow GetBy(string table, string where)
 		{
-			string sql = string.Format(@"SELECT * FROM {0} WHERE {1}", table,
-				where);
+			string sql = string.Format(CultureInfo.InvariantCulture,
+				@"SELECT * FROM {0} WHERE {1}", table, where);
 
 			DataRow	dataRow	= null;
 
