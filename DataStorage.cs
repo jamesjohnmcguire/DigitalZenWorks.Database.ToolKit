@@ -763,7 +763,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 
 					command.Transaction = databaseTransaction;
 					command.Connection = connection;
-					command.CommandText = sql;
+				command.CommandText = sql;
 					command.CommandTimeout = 30;
 				}
 			}
