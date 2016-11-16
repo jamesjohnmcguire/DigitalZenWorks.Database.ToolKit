@@ -11,6 +11,7 @@
 using System;
 using System.Data;
 using System.Globalization;
+using System.IO;
 
 namespace DigitalZenWorks.Common.DatabaseLibrary
 {
@@ -62,8 +63,14 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/////////////////////////////////////////////////////////////////////
 		public DataObjectsBase(string databaseFileName)
 		{
-			string dataSource = AppDomain.CurrentDomain.BaseDirectory +
-				databaseFileName;
+			string dataSource = databaseFileName;
+
+			if (!File.Exists(databaseFileName))
+			{
+				dataSource = AppDomain.CurrentDomain.BaseDirectory +
+					databaseFileName;
+			}
+
 			database = new DataStorage(provider, dataSource);
 		}
 
