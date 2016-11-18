@@ -152,5 +152,28 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 
 			return dataRow;
 		}
+
+		/////////////////////////////////////////////////////////////////////
+		/// <summary>
+		/// Gets the id of the record identified by the where clause
+		/// </summary>
+		/////////////////////////////////////////////////////////////////////
+		public int GetIdByName(string tableName, string name)
+		{
+			int id = 0;
+
+			DataRow row = GetBy(tableName, "`name` = '" + name + "'");
+
+			if (null != row)
+			{
+				if (DBNull.Value != row[0])
+				{
+					id = Convert.ToInt32(row[0]);
+				}
+			}
+
+			return id;
+		}
+
 	} // End Class
 } // end Namespace
