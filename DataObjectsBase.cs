@@ -63,9 +63,11 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/////////////////////////////////////////////////////////////////////
 		public DataObjectsBase(string databaseFileName)
 		{
-			string dataSource = databaseFileName;
+			string dataSource = Environment.GetFolderPath(
+				Environment.SpecialFolder.LocalApplicationData) +
+				"\\" + databaseFileName;
 
-			if (!File.Exists(databaseFileName))
+			if (!File.Exists(dataSource))
 			{
 				dataSource = AppDomain.CurrentDomain.BaseDirectory +
 					databaseFileName;
