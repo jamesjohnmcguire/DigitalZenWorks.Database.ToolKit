@@ -244,19 +244,12 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 					databaseTransaction = connection.BeginTransaction();
 				}
 			}
-			catch (Exception exception) when
-				(exception is ArgumentNullException ||
-				exception is ArgumentException ||
-				exception is OleDbException ||
-				exception is InvalidOperationException)
+			catch (Exception exception)
 			{
 				log.Error(CultureInfo.InvariantCulture, m => m(
 					stringTable.GetString("EXCEPTION") + exception.Message));
-			}
-			catch
-			{
 				throw;
-		}
+			}
 		}
 
 		/// <summary>
@@ -471,19 +464,14 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 					}
 				}
 			}
-			catch (Exception exception) when
-				(exception is ArgumentNullException ||
-				exception is ArgumentException ||
-				exception is OleDbException ||
-				exception is InvalidOperationException)
+			catch (Exception exception)
 			{
+				RollbackTransaction();
+
 				log.Error(CultureInfo.InvariantCulture, m => m(
 					stringTable.GetString("EXCEPTION") + exception.Message));
 				log.Error(CultureInfo.InvariantCulture, m => m(
 					stringTable.GetString("COMMAND") + sql));
-			}
-			catch
-			{
 				throw;
 			}
 			finally
@@ -632,17 +620,13 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 
 				returnCode = (int)commandObject2.ExecuteScalar();
 			}
-			catch (Exception exception) when
-				(exception is ArgumentNullException ||
-				exception is ArgumentException ||
-				exception is OleDbException ||
-				exception is InvalidOperationException)
+			catch (Exception exception)
 			{
+				RollbackTransaction();
+
 				log.Error(CultureInfo.InvariantCulture, m => m(
 					stringTable.GetString("EXCEPTION") + exception.Message));
-			}
-			catch
-			{
+
 				throw;
 			}
 			finally
@@ -763,23 +747,19 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 
 					command.Transaction = databaseTransaction;
 					command.Connection = connection;
-				command.CommandText = sql;
+					command.CommandText = sql;
 					command.CommandTimeout = 30;
 				}
 			}
-			catch (Exception exception) when
-				(exception is ArgumentNullException ||
-				exception is ArgumentException ||
-				exception is OleDbException ||
-				exception is InvalidOperationException)
+			catch (Exception exception)
 			{
+				RollbackTransaction();
+
 				log.Error(CultureInfo.InvariantCulture, m => m(
 					stringTable.GetString("EXCEPTION") + exception.Message));
 				log.Error(CultureInfo.InvariantCulture, m => m(
 					stringTable.GetString("COMMAND") + sql));
-			}
-			catch
-			{
+
 				throw;
 			}
 
@@ -838,17 +818,13 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 
 				returnValue = true;
 			}
-			catch (Exception exception) when
-				(exception is ArgumentNullException ||
-				exception is ArgumentException ||
-				exception is OleDbException ||
-				exception is InvalidOperationException)
+			catch (Exception exception)
 			{
+				RollbackTransaction();
+
 				log.Error(CultureInfo.InvariantCulture, m => m(
 					stringTable.GetString("EXCEPTION") + exception.Message));
-			}
-			catch
-			{
+
 				throw;
 			}
 			finally

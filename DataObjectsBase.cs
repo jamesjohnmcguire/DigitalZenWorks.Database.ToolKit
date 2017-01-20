@@ -61,16 +61,13 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/// Represents a base collection of data objects
 		/// </summary>
 		/////////////////////////////////////////////////////////////////////
-		public DataObjectsBase(string databaseFileName)
+		public DataObjectsBase(string dataSource)
 		{
-			string dataSource = Environment.GetFolderPath(
-				Environment.SpecialFolder.LocalApplicationData) +
-				"\\" + databaseFileName;
-
 			if (!File.Exists(dataSource))
 			{
-				dataSource = AppDomain.CurrentDomain.BaseDirectory +
-					databaseFileName;
+				dataSource = Environment.GetFolderPath(
+					Environment.SpecialFolder.LocalApplicationData) +
+					"\\" + dataSource;
 			}
 
 			database = new DataStorage(provider, dataSource);
@@ -160,7 +157,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/// Gets the id of the record identified by the where clause
 		/// </summary>
 		/////////////////////////////////////////////////////////////////////
-		public int GetIdByName(string tableName, string name)
+		public virtual int GetIdByName(string tableName, string name)
 		{
 			int id = 0;
 
