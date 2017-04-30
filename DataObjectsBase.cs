@@ -157,17 +157,17 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/// Gets the id of the record identified by the where clause
 		/// </summary>
 		/////////////////////////////////////////////////////////////////////
-		public virtual int GetIdByName(string tableName, string name)
+		public virtual int GetIdByName(string table, string name)
 		{
 			int id = 0;
 
-			DataRow row = GetBy(tableName, "`name` = '" + name + "'");
+			DataRow row = GetBy(table, "`name` = '" + name + "'");
 
 			if (null != row)
 			{
 				if (DBNull.Value != row[0])
 				{
-					id = Convert.ToInt32(row[0]);
+					id = Convert.ToInt32(row[0], CultureInfo.InvariantCulture);
 				}
 			}
 
