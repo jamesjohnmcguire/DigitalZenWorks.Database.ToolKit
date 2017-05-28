@@ -7,6 +7,7 @@
 using NUnit.Framework;
 using System;
 using System.Data;
+using System.Data.OleDb;
 using System.EnterpriseServices;
 using System.IO;
 
@@ -30,6 +31,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 			"TestDb.mdb";
 		private string dataSourceBackupsCsv = 
 			AppDomain.CurrentDomain.BaseDirectory + @"\TestTable.csv";
+		private string provider = "Microsoft.ACE.OLEDB.12.0";
 
 		/////////////////////////////////////////////////////////////////////
 		/// Method <c>Setup</c>
@@ -40,8 +42,6 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		[SetUp]
 		public void Setup()
 		{
-			string provider = "Microsoft.ACE.OLEDB.12.0";
-
 			database = new DataStorage(provider, dataSource);
 
 			database.BeginTransaction();
@@ -102,6 +102,29 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 			bool AlwaysTrue = true;
 
 			Assert.IsTrue(AlwaysTrue);
+		}
+
+		/////////////////////////////////////////////////////////////////////
+		/// Method <c>DatabaseCanOpen</c>
+		/// <summary>
+		/// Test to see if test db exists
+		/// </summary>
+		/////////////////////////////////////////////////////////////////////
+		[Test]
+		public void DatabaseCanOpen()
+		{
+			string connectionString = null;
+
+			connectionString = string.Format("provider={0}; Data Source={1}",
+				provider, dataSource);
+			OleDbConnection oleDbConnection =
+				new OleDbConnection(connectionString);
+
+			oleDbConnection.Open();
+			oleDbConnection.Close();
+
+			// assuming no exceptions
+			Assert.IsTrue(File.Exists(dataSource));
 		}
 
 		/////////////////////////////////////////////////////////////////////

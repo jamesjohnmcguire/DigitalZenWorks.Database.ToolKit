@@ -7,6 +7,7 @@
 using Common.Logging;
 using MySql.Data.MySqlClient;
 using System;
+using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
 using System.Data.Common;
@@ -357,6 +358,36 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		}
 
 		/////////////////////////////////////////////////////////////////////
+		/// <summary>
+		/// Prepares and executes a Non-Query DB Command
+		/// </summary>
+		/////////////////////////////////////////////////////////////////////
+		public bool ExecuteNonQuery(string sql, IList<object> values)
+		{
+			bool returnCode = false;
+
+			using (DbCommand command = GetCommandObject(sql))
+			{
+				if (null != command)
+				{
+					int rowsEffected = command.ExecuteNonQuery();
+
+					if (rowsEffected > 0)
+					{
+						returnCode = true;
+					}
+				}
+
+				if (null == databaseTransaction)
+				{
+					Close();
+				}
+			}
+
+			return returnCode;
+		}
+
+		/////////////////////////////////////////////////////////////////////
 		/// Method <c>GetDataField</c>
 		/// <summary>
 		/// Gets a single field from a row of data
@@ -529,22 +560,86 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		[CLSCompliantAttribute(false)]
 		public uint Insert(string sql)
 		{
-			bool finishTransaction = false;
-			if (null == databaseTransaction)
+			uint returnCode = 0;
+
+			try
 			{
-				BeginTransaction();
-				finishTransaction = true;
+				bool finishTransaction = false;
+				if (null == databaseTransaction)
+				{
+					BeginTransaction();
+					finishTransaction = true;
+				}
+
+				// execute non query
+				ExecuteNonQuery(sql);
+
+				// get id of effected row
+				returnCode = ExecuteScalar("SELECT @@IDENTITY");
+
+				if (true == finishTransaction)
+				{
+					CommitTransaction();
+				}
+			}
+			catch (Exception exception)
+			{
+				RollbackTransaction();
+
+				log.Error(CultureInfo.InvariantCulture, m => m(
+					stringTable.GetString("EXCEPTION") + exception.Message));
+				log.Error(CultureInfo.InvariantCulture, m => m(
+					stringTable.GetString("COMMAND") + sql));
+
+				throw;
 			}
 
-			// execute non query
-			ExecuteNonQuery(sql);
+			return returnCode;
+		}
 
-			// get id of effected row
-			uint returnCode = ExecuteScalar("SELECT @@IDENTITY");
+		/////////////////////////////////////////////////////////////////////
+		/// Method <c>Insert</c>
+		/// <summary>
+		/// Performs an Sql UPDATE command
+		/// </summary>
+		/// <param name="sql"></param>
+		/// <returns>object item</returns>
+		/////////////////////////////////////////////////////////////////////
+		[CLSCompliantAttribute(false)]
+		public uint Insert(string sql, IList<object> values)
+		{
+			uint returnCode = 0;
 
-			if (true == finishTransaction)
+			try
 			{
-				CommitTransaction();
+				bool finishTransaction = false;
+				if (null == databaseTransaction)
+				{
+					BeginTransaction();
+					finishTransaction = true;
+				}
+
+				// execute non query
+				ExecuteNonQuery(sql);
+
+				// get id of effected row
+				returnCode = ExecuteScalar("SELECT @@IDENTITY");
+
+				if (true == finishTransaction)
+				{
+					CommitTransaction();
+				}
+			}
+			catch (Exception exception)
+			{
+				RollbackTransaction();
+
+				log.Error(CultureInfo.InvariantCulture, m => m(
+					stringTable.GetString("EXCEPTION") + exception.Message));
+				log.Error(CultureInfo.InvariantCulture, m => m(
+					stringTable.GetString("COMMAND") + sql));
+
+				throw;
 			}
 
 			return returnCode;
@@ -650,6 +745,21 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		}
 
 		#endregion methods
+
+		private OleDbParameterCollection AddParameters(
+			OleDbParameterCollection parameters, IList<object> values)
+		{
+			int index = 0;
+			foreach(object value in values)
+			{
+				parameters.AddWithValue("@parameter" + index.ToString(),
+					value);
+
+				index++;
+			}
+
+			return parameters;
+		}
 
 		private string CreateConnectionString(string dataSource,
 			string catalog)
