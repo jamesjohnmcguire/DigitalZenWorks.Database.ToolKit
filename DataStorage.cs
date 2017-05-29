@@ -769,7 +769,14 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 			{
 				string name = "@" + valuePair.Key;
 
-				parameters.AddWithValue(name, valuePair.Value);
+				if (null == valuePair.Value)
+				{
+					parameters.AddWithValue(name, DBNull.Value);
+				}
+				else
+				{
+					parameters.AddWithValue(name, valuePair.Value);
+				}
 			}
 
 			return parameters;
