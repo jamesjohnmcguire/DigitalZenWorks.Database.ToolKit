@@ -130,14 +130,14 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 				file.Write(file.NewLine);
 
 				// Now write all the rows.
-				foreach (DataRow Row in table.Rows)
+				foreach (DataRow row in table.Rows)
 				{
 					for (int Index = 0; Index < ColumnCount; Index++)
 					{
 						file.Write("\"");
-						if (!Convert.IsDBNull(Row[Index]))
+						if (!row.IsNull(Index))
 						{
-							file.Write(Row[Index].ToString());
+							file.Write(row[Index].ToString());
 						}
 						if (Index < ColumnCount - 1)
 						{

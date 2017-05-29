@@ -7,6 +7,7 @@
 using Common.Logging;
 using MySql.Data.MySqlClient;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
@@ -362,7 +363,8 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/// Prepares and executes a Non-Query DB Command
 		/// </summary>
 		/////////////////////////////////////////////////////////////////////
-		public bool ExecuteNonQuery(string sql, IList<object> values)
+		public bool ExecuteNonQuery(string sql,
+			IDictionary<string, object> values)
 		{
 			bool returnCode = false;
 
@@ -370,6 +372,18 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 			{
 				if (null != command)
 				{
+					if (null != values)
+					{
+						Type type = command.GetType();
+						if (!type.Equals(typeof(OleDbCommand)))
+						{
+							throw new InvalidOperationException();
+						}
+
+						OleDbCommand oleDbcommand = (OleDbCommand)command;
+						AddParameters(oleDbcommand.Parameters, values);
+					}
+
 					int rowsEffected = command.ExecuteNonQuery();
 
 					if (rowsEffected > 0)
@@ -603,10 +617,11 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/// Performs an Sql UPDATE command
 		/// </summary>
 		/// <param name="sql"></param>
+		/// <param name="values"></param>
 		/// <returns>object item</returns>
 		/////////////////////////////////////////////////////////////////////
 		[CLSCompliantAttribute(false)]
-		public uint Insert(string sql, IList<object> values)
+		public uint Insert(string sql, IDictionary<string, object> values)
 		{
 			uint returnCode = 0;
 
@@ -620,7 +635,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 				}
 
 				// execute non query
-				ExecuteNonQuery(sql);
+				ExecuteNonQuery(sql, values);
 
 				// get id of effected row
 				returnCode = ExecuteScalar("SELECT @@IDENTITY");
@@ -746,16 +761,15 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 
 		#endregion methods
 
-		private OleDbParameterCollection AddParameters(
-			OleDbParameterCollection parameters, IList<object> values)
+		private static OleDbParameterCollection AddParameters(
+			OleDbParameterCollection parameters,
+			IDictionary<string, object> values)
 		{
-			int index = 0;
-			foreach(object value in values)
+			foreach (KeyValuePair<string, object> valuePair in values)
 			{
-				parameters.AddWithValue("@parameter" + index.ToString(),
-					value);
+				string name = "@" + valuePair.Key;
 
-				index++;
+				parameters.AddWithValue(name, valuePair.Value);
 			}
 
 			return parameters;

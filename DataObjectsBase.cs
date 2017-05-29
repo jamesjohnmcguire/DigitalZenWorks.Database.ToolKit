@@ -165,7 +165,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 
 			if (null != row)
 			{
-				if (DBNull.Value != row[0])
+				if (!row.IsNull(0))
 				{
 					id = Convert.ToInt32(row[0], CultureInfo.InvariantCulture);
 				}

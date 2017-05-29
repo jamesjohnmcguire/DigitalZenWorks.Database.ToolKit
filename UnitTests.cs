@@ -8,6 +8,7 @@ using NUnit.Framework;
 using System;
 using System.Data;
 using System.Data.OleDb;
+using System.Globalization;
 using System.EnterpriseServices;
 using System.IO;
 
@@ -115,13 +116,14 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		{
 			string connectionString = null;
 
-			connectionString = string.Format("provider={0}; Data Source={1}",
-				provider, dataSource);
-			OleDbConnection oleDbConnection =
-				new OleDbConnection(connectionString);
-
-			oleDbConnection.Open();
-			oleDbConnection.Close();
+			connectionString = string.Format(CultureInfo.InvariantCulture,
+				"provider={0}; Data Source={1}", provider, dataSource);
+			using (OleDbConnection oleDbConnection =
+				new OleDbConnection(connectionString))
+			{
+				oleDbConnection.Open();
+				//oleDbConnection.Close();
+			}
 
 			// assuming no exceptions
 			Assert.IsTrue(File.Exists(dataSource));
