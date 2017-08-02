@@ -178,17 +178,17 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		{
 			if (disposing)
 			{
-			if (null != connection)
-			{
-				connection.Dispose();
-				connection = null;
-			}
+				if (null != connection)
+				{
+					connection.Dispose();
+					connection = null;
+				}
 
 				if (null != oleDbConnection)
 				{
 					oleDbConnection.Close();
 					oleDbConnection = null;
-		}
+				}
 
 				if (null != mySqlConnection)
 				{
