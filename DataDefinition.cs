@@ -68,7 +68,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 				exception is InvalidOperationException)
 			{
 				log.Error(CultureInfo.InvariantCulture, m => m(
-					stringTable.GetString("EXCEPTION") + exception.Message));
+					stringTable.GetString("EXCEPTION") + exception));
 			}
 			catch
 			{
@@ -314,12 +314,12 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 				exception is OutOfMemoryException)
 			{
 				log.Error(CultureInfo.InvariantCulture, m => m(
-					stringTable.GetString("EXCEPTION") + exception.Message));
+					stringTable.GetString("EXCEPTION") + exception));
 			}
 			catch (Exception exception)
 			{
 				log.Error(CultureInfo.InvariantCulture, m => m(
-					stringTable.GetString("EXCEPTION") + exception.Message));
+					stringTable.GetString("EXCEPTION") + exception));
 
 				throw;
 			}

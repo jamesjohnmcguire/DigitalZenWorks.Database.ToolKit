@@ -84,7 +84,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 				exception is PathTooLongException)
 			{
 				log.Error(CultureInfo.InvariantCulture, m => m(
-					stringTable.GetString("EXCEPTION") + exception.Message));
+					stringTable.GetString("EXCEPTION") + exception));
 			}
 			catch
 			{

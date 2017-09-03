@@ -142,10 +142,10 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/////////////////////////////////////////////////////////////////////
 		public DataRow GetBy(string table, string where)
 		{
+			DataRow dataRow = null;
+
 			string sql = string.Format(CultureInfo.InvariantCulture,
 				@"SELECT * FROM {0} WHERE {1}", table, where);
-
-			DataRow	dataRow	= null;
 
 			database.GetDataRow(sql, out dataRow);
 
@@ -157,11 +157,21 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/// Gets the id of the record identified by the where clause
 		/// </summary>
 		/////////////////////////////////////////////////////////////////////
+		public virtual DataRow GetByName(string table, string name)
+		{
+			return GetBy(table, "`name` = '" + name + "'");
+		}
+
+		/////////////////////////////////////////////////////////////////////
+		/// <summary>
+		/// Gets the id of the record identified by the where clause
+		/// </summary>
+		/////////////////////////////////////////////////////////////////////
 		public virtual int GetIdByName(string table, string name)
 		{
 			int id = 0;
 
-			DataRow row = GetBy(table, "`name` = '" + name + "'");
+			DataRow row = GetByName(table, name);
 
 			if (null != row)
 			{
@@ -173,6 +183,5 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 
 			return id;
 		}
-
 	} // End Class
 } // end Namespace
