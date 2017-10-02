@@ -5,6 +5,7 @@
 // All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 using Common.Logging;
+using DigitalZenWorks.Common.Utils;
 using System;
 using System.Data;
 using System.Globalization;
@@ -34,71 +35,9 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/////////////////////////////////////////////////////////////////////
 		public static bool CreateAccessDatabaseFile(string filePath)
 		{
-			bool success = false;
-			Stream templateObjectStream = null;
-			FileStream fileStream = null;
-
-			try
-			{
-				byte[] EmbeddedResource;
-				Assembly thisAssembly = Assembly.GetExecutingAssembly();
-
-				templateObjectStream = thisAssembly.GetManifestResourceStream(
-					"DigitalZenWorks.Common.DatabaseLibrary.template.accdb");
-
-				if (null == templateObjectStream)
-				{
-					log.Error(CultureInfo.InvariantCulture, m => m(
-						"Failed to manifest resource stream"));
-				}
-				else
-				{
-					EmbeddedResource = new Byte[templateObjectStream.Length];
-					templateObjectStream.Read(EmbeddedResource, 0,
-						(int)templateObjectStream.Length);
-					fileStream = new FileStream(filePath, FileMode.Create);
-					{
-						if (null != fileStream)
-						{
-							fileStream.Write(EmbeddedResource, 0,
-							(int)templateObjectStream.Length);
-						}
-					}
-
-					success = true;
-				}
-			}
-			catch (Exception exception) when
-				(exception is ArgumentNullException ||
-				exception is ArgumentException ||
-				exception is FileLoadException ||
-				exception is FileNotFoundException ||
-				exception is BadImageFormatException ||
-				exception is NotImplementedException ||
-				exception is ArgumentOutOfRangeException ||
-				exception is IOException ||
-				exception is NotSupportedException ||
-				exception is ObjectDisposedException ||
-				exception is SecurityException ||
-				exception is DirectoryNotFoundException ||
-				exception is PathTooLongException)
-			{
-				log.Error(CultureInfo.InvariantCulture, m => m(
-					stringTable.GetString("EXCEPTION") + exception));
-			}
-			catch
-			{
-				throw;
-			}
-			finally
-			{
-				if (null != fileStream)
-				{
-					fileStream.Close();
-				}
-			}
-
-			return success;
+			return FileUtils.CreateFileFromEmbeddedResource(
+				"DigitalZenWorks.Common.DatabaseLibrary.template.accdb",
+				filePath);
 		}
 
 		/// <summary>
