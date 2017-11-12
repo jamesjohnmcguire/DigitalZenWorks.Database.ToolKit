@@ -695,6 +695,22 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		}
 
 		/////////////////////////////////////////////////////////////////////
+		/// Method <c>Update</c>
+		/// <summary>
+		/// Performs an SQL UPDATE command
+		/// </summary>
+		/// <param name="sql"></param>
+		/// <param name="values"></param>
+		/// <returns>Success / Failure</returns>
+		/////////////////////////////////////////////////////////////////////
+		public bool Update(string sql, IDictionary<string, object> values)
+		{
+			bool returnCode = ExecuteNonQuery(sql, values);
+
+			return returnCode;
+		}
+
+		/////////////////////////////////////////////////////////////////////
 		/// <summary>
 		/// Temp test method
 		/// </summary>

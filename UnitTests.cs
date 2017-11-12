@@ -6,6 +6,7 @@
 /////////////////////////////////////////////////////////////////////////////
 using NUnit.Framework;
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Data.OleDb;
 using System.Globalization;
@@ -247,6 +248,48 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 			DataTable table = database.SchemaTable;
 
 			Assert.NotNull(table);
+		}
+
+		/////////////////////////////////////////////////////////////////////////
+		/// Method <c>Update</c>
+		/// <summary>
+		/// Update Test
+		/// </summary>
+		/////////////////////////////////////////////////////////////////////////
+		[Test]
+		public void Update()
+		{
+			string description = "Unit Test - Time: " + DateTime.Now;
+			string query = string.Format(
+				"UPDATE TestTable SET [Description] = '{0}'",
+				description);
+
+			bool result = database.Update(query);
+
+			Assert.True(result);
+		}
+
+		/////////////////////////////////////////////////////////////////////////
+		/// Method <c>UpdateWithParameters</c>
+		/// <summary>
+		/// Update with Parameters Test
+		/// </summary>
+		/////////////////////////////////////////////////////////////////////////
+		[Test]
+		public void UpdateWithParameters()
+		{
+			string description = "Unit Test - Time: " + DateTime.Now;
+			string query = string.Format(
+				"UPDATE TestTable SET [Description] = ?",
+				description);
+
+			IDictionary<string, object> parameters =
+				new Dictionary<string, object>();
+			parameters.Add("[Description]", description);
+
+			bool result = database.Update(query, parameters);
+
+			Assert.True(result);
 		}
 
 		private void VerifyRowExists(
