@@ -260,7 +260,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		public void Update()
 		{
 			string description = "Unit Test - Time: " + DateTime.Now;
-			string query = string.Format(
+			string query = string.Format(CultureInfo.InvariantCulture,
 				"UPDATE TestTable SET [Description] = '{0}'",
 				description);
 
@@ -279,9 +279,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		public void UpdateWithParameters()
 		{
 			string description = "Unit Test - Time: " + DateTime.Now;
-			string query = string.Format(
-				"UPDATE TestTable SET [Description] = ?",
-				description);
+			string query = "UPDATE TestTable SET [Description] = ?";
 
 			IDictionary<string, object> parameters =
 				new Dictionary<string, object>();
