@@ -412,13 +412,11 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		public object GetDataField(string sql)
 		{
 			object datafield = null;
-			DataRow DataRowOut = null;
+			DataRow dataRowOut = GetDataRow(sql);
 
-			bool success = GetDataRow(sql, out DataRowOut);
-
-			if (true == success)
+			if (null != dataRowOut)
 			{
-				datafield = DataRowOut.ItemArray[0];
+				datafield = dataRowOut.ItemArray[0];
 			}
 
 			return datafield;
@@ -430,28 +428,36 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/// Gets a single row of data
 		/// </summary>
 		/// <param name="sql"></param>
-		/// <param name="dataRowOut"> (for returning data)</param>
-		/// <returns>Success / Failure</returns>
+		/// <returns>DataRow</returns>
 		/////////////////////////////////////////////////////////////////////
-		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design",
-			"CA1021:AvoidOutParameters", MessageId = "1#")]
-		public bool GetDataRow(string sql, out DataRow dataRowOut)
+		public DataRow GetDataRow(string sql)
 		{
-			bool hasData = false;
+			return GetDataRow(sql, null);
+		}
+
+		/////////////////////////////////////////////////////////////////////
+		/// Method <c>GetDataRow</c>
+		/// <summary>
+		/// Gets a single row of data
+		/// </summary>
+		/// <param name="sql"></param>
+		/// <param name="values"></param>
+		/// <returns>DataRow, null on failure</returns>
+		/////////////////////////////////////////////////////////////////////
+		public DataRow GetDataRow(string sql,
+			IDictionary<string, object> values)
+		{
 			int recordsReturned = -1;
-			DataTable dataTable = null;
+			DataRow row = null;
 
-			dataRowOut = null;
-
-			recordsReturned = GetDataTable(sql, out dataTable);
+			DataTable dataTable = GetDataTable(sql, values);
 
 			if (recordsReturned > 0)
 			{
-				dataRowOut = dataTable.Rows[0];
-				hasData = true;
+				row = dataTable.Rows[0];
 			}
 
-			return hasData;
+			return row;
 		}
 
 		/////////////////////////////////////////////////////////////////////
@@ -465,6 +471,23 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design",
 			"CA1021:AvoidOutParameters", MessageId = "1#")]
 		public int GetDataSet(string sql, out DataSet dataSet)
+		{
+			return GetDataSet(sql, null, out dataSet);
+		}
+
+		/////////////////////////////////////////////////////////////////////
+		/// <summary>
+		/// Gets a DataSet based on the given query.
+		/// </summary>
+		/// <param name="sql"></param>
+		/// <param name="values"></param>
+		/// <param name="dataSet"></param>
+		/// <returns>number of records retrieved</returns>
+		/////////////////////////////////////////////////////////////////////
+		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design",
+			"CA1021:AvoidOutParameters", MessageId = "1#")]
+		public int GetDataSet(string sql, IDictionary<string, object> values,
+			out DataSet dataSet)
 		{
 			int rowCount = -1;
 			dataSet = null;
@@ -481,21 +504,28 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 					{
 						switch (databaseType)
 						{
-							case DatabaseType.OleDb:
-								{
-									dataAdapter = new OleDbDataAdapter();
-									break;
-								}
-							case DatabaseType.SqlServer:
-								{
-									dataAdapter = new SqlDataAdapter();
-									break;
-								}
-							case DatabaseType.MySql:
-								{
-									dataAdapter = new MySqlDataAdapter();
-									break;
-								}
+						case DatabaseType.OleDb:
+							{
+								dataAdapter = new OleDbDataAdapter();
+								break;
+							}
+						case DatabaseType.SqlServer:
+							{
+								dataAdapter = new SqlDataAdapter();
+								break;
+							}
+						case DatabaseType.MySql:
+							{
+								dataAdapter = new MySqlDataAdapter();
+								break;
+							}
+						}
+
+						if (null != values)
+						{
+							AddParameters(
+								(OleDbParameterCollection)command.Parameters,
+								values);
 						}
 
 						dataAdapter.SelectCommand = command;
@@ -539,26 +569,36 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/// GetDataTable
 		/// </summary>
 		/// <param name="sql"></param>
-		/// <param name="dataTable"> (for returning data)</param>
 		/// <returns>number of records retrieved</returns>
 		/////////////////////////////////////////////////////////////////////
-		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design",
-			"CA1021:AvoidOutParameters", MessageId = "1#")]
-		public int GetDataTable(string sql, out DataTable dataTable)
+		public DataTable GetDataTable(string sql)
 		{
-			int recordsReturned = -1;
+			return GetDataTable(sql, null);
+		}
+
+		/////////////////////////////////////////////////////////////////////
+		/// <summary>
+		/// GetDataTable
+		/// </summary>
+		/// <param name="sql"></param>
+		/// <param name="values"></param>
+		/// <returns>DataTable or null on failure</returns>
+		/////////////////////////////////////////////////////////////////////
+		public DataTable GetDataTable(string sql,
+			IDictionary<string, object> values)
+		{
 			DataSet dataSet = null;
 
-			dataTable = new DataTable();
+			DataTable dataTable = null;
 			dataTable.Locale = CultureInfo.InvariantCulture;
 
-			recordsReturned = GetDataSet(sql, out dataSet);
+			GetDataSet(sql, values, out dataSet);
 			if (dataSet.Tables.Count > 0)
 			{
 				dataTable = dataSet.Tables[0];
 			}
 
-			return recordsReturned;
+			return dataTable;
 		}
 
 		/////////////////////////////////////////////////////////////////////
@@ -569,44 +609,9 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/// <param name="sql"></param>
 		/// <returns>object item</returns>
 		/////////////////////////////////////////////////////////////////////
-		[CLSCompliantAttribute(false)]
-		public uint Insert(string sql)
+		public int Insert(string sql)
 		{
-			uint returnCode = 0;
-
-			try
-			{
-				bool finishTransaction = false;
-				if (null == databaseTransaction)
-				{
-					BeginTransaction();
-					finishTransaction = true;
-				}
-
-				// execute non query
-				ExecuteNonQuery(sql);
-
-				// get id of effected row
-				returnCode = ExecuteScalar("SELECT @@IDENTITY");
-
-				if (true == finishTransaction)
-				{
-					CommitTransaction();
-				}
-			}
-			catch (Exception exception)
-			{
-				RollbackTransaction();
-
-				log.Error(CultureInfo.InvariantCulture, m => m(
-					stringTable.GetString("EXCEPTION") + exception));
-				log.Error(CultureInfo.InvariantCulture, m => m(
-					stringTable.GetString("COMMAND") + sql));
-
-				throw;
-			}
-
-			return returnCode;
+			return Insert(sql, null);
 		}
 
 		/////////////////////////////////////////////////////////////////////
@@ -618,10 +623,9 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/// <param name="values"></param>
 		/// <returns>object item</returns>
 		/////////////////////////////////////////////////////////////////////
-		[CLSCompliantAttribute(false)]
-		public uint Insert(string sql, IDictionary<string, object> values)
+		public int Insert(string sql, IDictionary<string, object> values)
 		{
-			uint returnCode = 0;
+			int returnCode = 0;
 
 			try
 			{
@@ -689,9 +693,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/////////////////////////////////////////////////////////////////////
 		public bool Update(string sql)
 		{
-			bool returnCode = ExecuteNonQuery(sql);
-
-			return returnCode;
+			return ExecuteNonQuery(sql);
 		}
 
 		/////////////////////////////////////////////////////////////////////
@@ -705,9 +707,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/////////////////////////////////////////////////////////////////////
 		public bool Update(string sql, IDictionary<string, object> values)
 		{
-			bool returnCode = ExecuteNonQuery(sql, values);
-
-			return returnCode;
+			return ExecuteNonQuery(sql, values);
 		}
 
 		/////////////////////////////////////////////////////////////////////
@@ -826,9 +826,9 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/// or a null reference if the result set is empty
 		/// </summary>
 		/////////////////////////////////////////////////////////////////////
-		private uint ExecuteScalar(string sql)
+		private int ExecuteScalar(string sql)
 		{
-			uint returnCode = 0;
+			int result = 0;
 
 			using (DbCommand command = GetCommandObject(sql))
 			{
@@ -838,7 +838,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 
 					if (null != Result)
 					{
-						returnCode = Convert.ToUInt32(Result,
+						result = Convert.ToInt32(Result,
 							CultureInfo.InvariantCulture);
 					}
 				}
@@ -849,7 +849,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 				}
 			}
 
-			return returnCode;
+			return result;
 		}
 
 		//private DbCommand GetCommandObject(string sql,

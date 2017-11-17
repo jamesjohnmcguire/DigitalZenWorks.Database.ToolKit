@@ -130,7 +130,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 			string sql = string.Format(CultureInfo.InvariantCulture,
 				@"SELECT * FROM {0} ORDER BY id", table);
 
-			database.GetDataTable(sql, out tableList);
+			tableList = database.GetDataTable(sql);
 
 			return tableList;
 		}
@@ -147,7 +147,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 			string sql = string.Format(CultureInfo.InvariantCulture,
 				@"SELECT * FROM {0} WHERE {1}", table, where);
 
-			database.GetDataRow(sql, out dataRow);
+			dataRow = database.GetDataRow(sql);
 
 			return dataRow;
 		}

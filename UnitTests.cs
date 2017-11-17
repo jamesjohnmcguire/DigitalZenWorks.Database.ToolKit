@@ -190,9 +190,9 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 							@"(Description) VALUES " +
 							@"('" + Description + "')";
 
-			uint NewRowId	= database.Insert(SqlQueryCommand);
+			int rowId = database.Insert(SqlQueryCommand);
 
-			VerifyRowExists(NewRowId, true);
+			VerifyRowExists(rowId, true);
 		}
 
 		/////////////////////////////////////////////////////////////////////////
@@ -204,21 +204,19 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		[Test]
 		public void Delete()
 		{
-			string Description = "Unit Test - Time: " + DateTime.Now;
-			string SqlQueryCommand = "INSERT INTO TestTable " +
-							@"(Description) VALUES " +
-							@"('" + Description + "')";
+			string description = "Unit Test - Time: " + DateTime.Now;
+			string query = string.Format("INSERT INTO TestTable " +
+				"(Description) VALUES ('{0}')", description);
 
-			uint NewRowId = database.Insert(SqlQueryCommand);
+			int rowId = database.Insert(query);
 
-			SqlQueryCommand = "DELETE FROM TestTable " +
-				"WHERE id=" + NewRowId;
+			query = "DELETE FROM TestTable WHERE id=" + rowId;
 
-			bool Result = database.Delete(SqlQueryCommand);
+			bool Result = database.Delete(query);
 
 			Assert.IsTrue(Result);
 
-			VerifyRowExists(NewRowId, false);
+			VerifyRowExists(rowId, false);
 		}
 
 		/////////////////////////////////////////////////////////////////////////
@@ -290,16 +288,21 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 			Assert.True(result);
 		}
 
-		private void VerifyRowExists(
-			uint ExistingRowId,
-			bool ShouldExist)
+		private void VerifyRowExists(int existingRowId, bool shouldExist)
 		{
-			DataRow TempDataRow = null;
-			string SqlQueryCommand = "Select * from TestTable where id=" + ExistingRowId;
+			DataRow tempDataRow = null;
+			string sql = "Select * from TestTable where id=" + existingRowId;
 
-			bool HasData = database.GetDataRow(SqlQueryCommand, out TempDataRow);
+			tempDataRow = database.GetDataRow(sql);
 
-			Assert.AreEqual(ShouldExist, HasData);
+			if (true == shouldExist)
+			{
+				Assert.NotNull(tempDataRow);
+			}
+			else
+			{
+				Assert.IsNull(tempDataRow);
+			}
 		}
 	}	// end class
 

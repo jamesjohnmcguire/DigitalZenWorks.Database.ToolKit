@@ -132,8 +132,8 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 							// export the table
 							string SqlQuery = "SELECT * FROM " +
 								Table["TABLE_NAME"].ToString();
-							DataTable TableData = null;
-							Database.GetDataTable(SqlQuery, out TableData);
+							DataTable TableData =
+								Database.GetDataTable(SqlQuery);
 
 							ExportDataTableToCsv(TableData, file);
 						}
