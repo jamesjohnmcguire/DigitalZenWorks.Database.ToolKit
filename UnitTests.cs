@@ -166,13 +166,12 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		[Test]
 		public void SelectTest()
 		{
-			DataSet TempDataSet = null;
-			string SqlQueryCommand = "SELECT * FROM TestTable";
+			string query = "SELECT * FROM TestTable";
 
-			int count = database.GetDataSet(SqlQueryCommand, out TempDataSet);
+			DataSet dataSet = database.GetDataSet(query);
 
 			// No exceptions found
-			Assert.GreaterOrEqual(count, 0);
+			Assert.GreaterOrEqual(dataSet.Tables.Count, 0);
 		}
 
 		/////////////////////////////////////////////////////////////////////////
@@ -205,8 +204,9 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		public void Delete()
 		{
 			string description = "Unit Test - Time: " + DateTime.Now;
-			string query = string.Format("INSERT INTO TestTable " +
-				"(Description) VALUES ('{0}')", description);
+			string query = string.Format(CultureInfo.InvariantCulture,
+				"INSERT INTO TestTable (Description) VALUES ('{0}')",
+				description);
 
 			int rowId = database.Insert(query);
 

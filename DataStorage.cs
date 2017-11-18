@@ -465,14 +465,11 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/// Gets a DataSet based on the given query.
 		/// </summary>
 		/// <param name="sql"></param>
-		/// <param name="dataSet"></param>
-		/// <returns>number of records retrieved</returns>
+		/// <returns>DataSet or null on failure</returns>
 		/////////////////////////////////////////////////////////////////////
-		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design",
-			"CA1021:AvoidOutParameters", MessageId = "1#")]
-		public int GetDataSet(string sql, out DataSet dataSet)
+		public DataSet GetDataSet(string sql)
 		{
-			return GetDataSet(sql, null, out dataSet);
+			return GetDataSet(sql, null);
 		}
 
 		/////////////////////////////////////////////////////////////////////
@@ -481,16 +478,13 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/// </summary>
 		/// <param name="sql"></param>
 		/// <param name="values"></param>
-		/// <param name="dataSet"></param>
-		/// <returns>number of records retrieved</returns>
+		/// <returns>DataSet or null on failure</returns>
 		/////////////////////////////////////////////////////////////////////
-		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design",
-			"CA1021:AvoidOutParameters", MessageId = "1#")]
-		public int GetDataSet(string sql, IDictionary<string, object> values,
-			out DataSet dataSet)
+		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope")]
+		public DataSet GetDataSet(string sql,
+			IDictionary<string, object> values)
 		{
-			int rowCount = -1;
-			dataSet = null;
+			DataSet dataSet = null;
 			DbDataAdapter dataAdapter = null;
 
 			try
@@ -530,7 +524,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 
 						dataAdapter.SelectCommand = command;
 
-						rowCount = dataAdapter.Fill(dataSet);
+						dataAdapter.Fill(dataSet);
 
 						log.Info(CultureInfo.InvariantCulture,
 							m => m("OK - getDataSet - Query: {0}", sql));
@@ -561,7 +555,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 				}
 			}
 
-			return rowCount;
+			return dataSet;
 		}
 
 		/////////////////////////////////////////////////////////////////////
@@ -587,12 +581,10 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		public DataTable GetDataTable(string sql,
 			IDictionary<string, object> values)
 		{
-			DataSet dataSet = null;
-
 			DataTable dataTable = null;
-			dataTable.Locale = CultureInfo.InvariantCulture;
+			//dataTable.Locale = CultureInfo.InvariantCulture;
 
-			GetDataSet(sql, values, out dataSet);
+			DataSet dataSet = GetDataSet(sql, values);
 			if (dataSet.Tables.Count > 0)
 			{
 				dataTable = dataSet.Tables[0];
