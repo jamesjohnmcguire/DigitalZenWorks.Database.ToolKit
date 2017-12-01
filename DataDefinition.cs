@@ -277,6 +277,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		public static bool ImportSchema(string schemaFile, string databaseFile)
 		{
 			bool successCode = false;
+
 			try
 			{
 				if (File.Exists(schemaFile))
@@ -295,13 +296,31 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 					{
 					foreach (string SqlQuery in Queries)
 					{
-						log.Info(CultureInfo.InvariantCulture, m => m(
-							stringTable.GetString("COMMAND") + SqlQuery));
+							try
+							{
+								log.Info(CultureInfo.InvariantCulture, m => m(
+								stringTable.GetString("COMMAND") + SqlQuery));
 
-						database.ExecuteNonQuery(SqlQuery);
-					}
+								database.ExecuteNonQuery(SqlQuery);
+							}
+							catch (Exception exception) when
+								(exception is ArgumentNullException ||
+								exception is OutOfMemoryException ||
+								exception is System.Data.OleDb.OleDbException)
+							{
+								log.Error(CultureInfo.InvariantCulture, m => m(
+									stringTable.GetString("EXCEPTION") + exception));
+							}
+							catch (Exception exception)
+							{
+								log.Error(CultureInfo.InvariantCulture, m => m(
+									stringTable.GetString("EXCEPTION") + exception));
 
-					successCode = true;
+								throw;
+							}
+						}
+
+						successCode = true;
 				}
 			}
 			}
@@ -311,7 +330,8 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 				exception is FileNotFoundException ||
 				exception is DirectoryNotFoundException ||
 				exception is IOException ||
-				exception is OutOfMemoryException)
+				exception is OutOfMemoryException ||
+				exception is System.Data.OleDb.OleDbException)
 			{
 				log.Error(CultureInfo.InvariantCulture, m => m(
 					stringTable.GetString("EXCEPTION") + exception));
