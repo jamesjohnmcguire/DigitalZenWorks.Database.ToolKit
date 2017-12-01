@@ -447,12 +447,11 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		public DataRow GetDataRow(string sql,
 			IDictionary<string, object> values)
 		{
-			int recordsReturned = -1;
 			DataRow row = null;
 
 			DataTable dataTable = GetDataTable(sql, values);
 
-			if (recordsReturned > 0)
+			if (dataTable.Rows.Count > 0)
 			{
 				row = dataTable.Rows[0];
 			}
@@ -685,7 +684,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/////////////////////////////////////////////////////////////////////
 		public bool Update(string sql)
 		{
-			return ExecuteNonQuery(sql);
+			return ExecuteNonQuery(sql, null);
 		}
 
 		/////////////////////////////////////////////////////////////////////

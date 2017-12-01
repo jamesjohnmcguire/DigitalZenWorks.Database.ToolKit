@@ -291,7 +291,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		private void VerifyRowExists(int existingRowId, bool shouldExist)
 		{
 			DataRow tempDataRow = null;
-			string sql = "Select * from TestTable where id=" + existingRowId;
+			string sql = "Select * from TestTable where Id=" + existingRowId;
 
 			tempDataRow = database.GetDataRow(sql);
 
