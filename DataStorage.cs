@@ -335,27 +335,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/////////////////////////////////////////////////////////////////////
 		public bool ExecuteNonQuery(string sql)
 		{
-			bool returnCode = false;
-
-			using (DbCommand command = GetCommandObject(sql))
-			{
-				if (null != command)
-				{
-					int rowsEffected = command.ExecuteNonQuery();
-
-					if (rowsEffected > 0)
-					{
-						returnCode = true;
-					}
-				}
-
-				if (null == databaseTransaction)
-				{
-					Close();
-				}
-			}
-
-			return returnCode;
+			return ExecuteNonQuery(sql, null);
 		}
 
 		/////////////////////////////////////////////////////////////////////
@@ -368,22 +348,10 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		{
 			bool returnCode = false;
 
-			using (DbCommand command = GetCommandObject(sql))
+			using (DbCommand command = GetCommandObject(sql, values))
 			{
 				if (null != command)
 				{
-					if (null != values)
-					{
-						Type type = command.GetType();
-						if (!type.Equals(typeof(OleDbCommand)))
-						{
-							throw new InvalidOperationException();
-						}
-
-						OleDbCommand oleDbcommand = (OleDbCommand)command;
-						AddParameters(oleDbcommand.Parameters, values);
-					}
-
 					int rowsEffected = command.ExecuteNonQuery();
 
 					if (rowsEffected > 0)
@@ -479,7 +447,9 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/// <param name="values"></param>
 		/// <returns>DataSet or null on failure</returns>
 		/////////////////////////////////////////////////////////////////////
-		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope")]
+		[System.Diagnostics.CodeAnalysis.SuppressMessage(
+			"Microsoft.Reliability",
+			"CA2000:Dispose objects before losing scope")]
 		public DataSet GetDataSet(string sql,
 			IDictionary<string, object> values)
 		{
@@ -491,38 +461,30 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 				dataSet = new DataSet();
 				dataSet.Locale = CultureInfo.InvariantCulture;
 
-				using (DbCommand command = GetCommandObject(sql))
+				using (DbCommand command = GetCommandObject(sql, values))
 				{
 					if (null != command)
 					{
 						switch (databaseType)
 						{
-						case DatabaseType.OleDb:
+							case DatabaseType.OleDb:
 							{
 								dataAdapter = new OleDbDataAdapter();
 								break;
 							}
-						case DatabaseType.SqlServer:
+							case DatabaseType.SqlServer:
 							{
 								dataAdapter = new SqlDataAdapter();
 								break;
 							}
-						case DatabaseType.MySql:
+							case DatabaseType.MySql:
 							{
 								dataAdapter = new MySqlDataAdapter();
 								break;
 							}
 						}
 
-						if (null != values)
-						{
-							AddParameters(
-								(OleDbParameterCollection)command.Parameters,
-								values);
-						}
-
 						dataAdapter.SelectCommand = command;
-
 						dataAdapter.Fill(dataSet);
 
 						log.Info(CultureInfo.InvariantCulture,
@@ -766,10 +728,31 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 
 		#endregion methods
 
-		private static OleDbParameterCollection AddParameters(
-			OleDbParameterCollection parameters,
+		private static DbParameterCollection AddParameters(DbCommand command,
 			IDictionary<string, object> values)
 		{
+			DbParameterCollection parameters = command.Parameters;
+
+			foreach (KeyValuePair<string, object> valuePair in values)
+			{
+				if (null == valuePair.Value)
+				{
+					parameters.Add(DBNull.Value);
+				}
+				else
+				{
+					parameters.Add(valuePair.Value);
+				}
+			}
+
+			return parameters;
+		}
+
+		private static OleDbParameterCollection AddParameters(
+			OleDbCommand command, IDictionary<string, object> values)
+		{
+			OleDbParameterCollection parameters = command.Parameters;
+
 			foreach (KeyValuePair<string, object> valuePair in values)
 			{
 				string name = "@" + valuePair.Key;
@@ -821,7 +804,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		{
 			int result = 0;
 
-			using (DbCommand command = GetCommandObject(sql))
+			using (DbCommand command = GetCommandObject(sql, null))
 			{
 				if (null != command)
 				{
@@ -843,11 +826,13 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 			return result;
 		}
 
-		//private DbCommand GetCommandObject(string sql,
-		//	DbParameterCollection parameters)
-		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Reliability",
+		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security",
+			"CA2100:Review SQL queries for security vulnerabilities")]
+		[System.Diagnostics.CodeAnalysis.SuppressMessage(
+			"Microsoft.Reliability",
 			"CA2000:Dispose objects before losing scope")]
-		private DbCommand GetCommandObject(string sql)
+		private DbCommand GetCommandObject(string sql,
+			IDictionary<string, object> values)
 		{
 			DbCommand command = null;
 
@@ -876,10 +861,23 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 						}
 					}
 
-					//foreach (DbParameter parameter in parameters)
-					//{
-					//	command.Parameters.Add(parameter);
-					//}
+					if (null != values)
+					{
+						switch (databaseType)
+						{
+						case DatabaseType.OleDb:
+							{
+								AddParameters((OleDbCommand)command, values);
+								break;
+							}
+						case DatabaseType.SqlServer:
+						case DatabaseType.MySql:
+							{
+								AddParameters(command, values);
+								break;
+							}
+						}
+					}
 
 					command.Transaction = databaseTransaction;
 					command.Connection = connection;
