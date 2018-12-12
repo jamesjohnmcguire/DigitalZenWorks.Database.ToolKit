@@ -309,7 +309,7 @@
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\UtilsNET\UtilitiesNET.csproj">
+    <ProjectReference Include="..\UtilitiesNET\UtilitiesNET.csproj">
       <Project>{3663da63-bb91-4b03-b4f7-23dd8eef9d61}</Project>
       <Name>UtilitiesNET</Name>
     </ProjectReference>
