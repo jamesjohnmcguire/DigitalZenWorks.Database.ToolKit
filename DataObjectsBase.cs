@@ -58,6 +58,18 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 
 		/////////////////////////////////////////////////////////////////////
 		/// <summary>
+		/// Constructor for exiting DataStorage object
+		/// </summary>
+		/// <param name="database"></param>
+		/////////////////////////////////////////////////////////////////////
+		public DataObjectsBase(DataStorage database)
+		{
+
+			this.database = database;
+		}
+
+		/////////////////////////////////////////////////////////////////////
+		/// <summary>
 		/// Represents a base collection of data objects
 		/// </summary>
 		/////////////////////////////////////////////////////////////////////
@@ -71,6 +83,20 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 			}
 
 			database = new DataStorage(provider, dataSource);
+		}
+
+		/////////////////////////////////////////////////////////////////////
+		/// <summary>
+		/// Constructor for database type and connection string
+		/// </summary>
+		/// <param name="databaseType"></param>
+		/// <param name="connectionString"></param>
+		/////////////////////////////////////////////////////////////////////
+		public DataObjectsBase(
+			DatabaseType databaseType, string connectionString)
+		{
+
+			database = new DataStorage(databaseType, connectionString);
 		}
 
 		/////////////////////////////////////////////////////////////////////
