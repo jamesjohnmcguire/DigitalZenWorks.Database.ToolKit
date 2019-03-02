@@ -34,12 +34,12 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/// <summary>
 		/// databaseType
 		/// </summary>
-		private DatabaseType databaseType;
+		private readonly DatabaseType databaseType;
 
 		/// <summary>
 		/// The actual connection string used to connect to the database.
 		/// </summary>
-		private string connectionText = string.Empty;
+		private readonly string connectionText = string.Empty;
 
 		/// <summary>
 		/// Database Connection Object
@@ -65,7 +65,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		private static readonly ILog log = LogManager.GetLogger
 			(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-		private string provider = string.Empty;
+		private readonly string provider = string.Empty;
 
 		private static readonly ResourceManager stringTable = new
 			ResourceManager("DigitalZenWorks.Common.DatabaseLibrary.Resources",
