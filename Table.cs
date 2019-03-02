@@ -142,9 +142,13 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 
 			foreach (ForeignKey foreignKey in ForeignKeys)
 			{
-				string format = string.Format(CultureInfo.InvariantCulture,
-					"{0} {1} {2}", foreignKey.Name, foreignKey.ColumnName,
+				string format = string.Format(
+					CultureInfo.InvariantCulture,
+					"{0} {1} {2}",
+					foreignKey.Name,
+					foreignKey.ColumnName,
 					foreignKey.ParentTable);
+
 				log.Info(CultureInfo.InvariantCulture,
 					m => m(stringTable.GetString("FOREIGNKEY") + format));
 				output += stringTable.GetString("FOREIGNKEY") + format +

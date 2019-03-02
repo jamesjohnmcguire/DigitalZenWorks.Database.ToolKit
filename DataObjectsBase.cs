@@ -137,8 +137,11 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		{
 			bool returnCode = false;
 
-			string sql = string.Format(CultureInfo.InvariantCulture,
-				@"DELETE FROM {0} WHERE id ='{1}'", table, id);
+			string sql = string.Format(
+				CultureInfo.InvariantCulture,
+				@"DELETE FROM {0} WHERE id ='{1}'",
+				table,
+				id);
 
 			returnCode = database.Delete(sql);
 
@@ -153,8 +156,10 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		public DataTable GetAllDataTable(string table)
 		{
 			DataTable tableList = null;
-			string sql = string.Format(CultureInfo.InvariantCulture,
-				@"SELECT * FROM {0} ORDER BY id", table);
+			string sql = string.Format(
+				CultureInfo.InvariantCulture,
+				@"SELECT * FROM {0} ORDER BY id",
+				table);
 
 			tableList = database.GetDataTable(sql);
 
@@ -170,8 +175,11 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		{
 			DataRow dataRow = null;
 
-			string sql = string.Format(CultureInfo.InvariantCulture,
-				@"SELECT * FROM {0} WHERE {1}", table, where);
+			string sql = string.Format(
+				CultureInfo.InvariantCulture,
+				@"SELECT * FROM {0} WHERE {1}",
+				table,
+				where);
 
 			dataRow = database.GetDataRow(sql);
 

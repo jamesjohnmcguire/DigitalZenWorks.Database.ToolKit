@@ -681,8 +681,10 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 				}
 				case ColumnType.String:
 				{
-					sql += String.Format(CultureInfo.InvariantCulture,
-						" VARCHAR({0})", column.Length);
+					sql += string.Format(
+						CultureInfo.InvariantCulture,
+						" VARCHAR({0})",
+						column.Length);
 					break;
 				}
 
@@ -747,17 +749,21 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 
 			if (foreignKey.ColumnName == foreignKey.ParentTableColumn)
 			{
-				sql = String.Format(CultureInfo.InvariantCulture,
+				sql = string.Format(
+					CultureInfo.InvariantCulture,
 					"CONSTRAINT `{0}` FOREIGN KEY (`{1}`) REFERENCES `{2}`",
-					foreignKey.Name, foreignKey.ColumnName,
+					foreignKey.Name,
+					foreignKey.ColumnName,
 					foreignKey.ParentTable);
 			}
 			else
 			{
-				sql = String.Format(CultureInfo.InvariantCulture,
+				sql = string.Format(
+					CultureInfo.InvariantCulture,
 					"CONSTRAINT `{0}` FOREIGN KEY (`{1}`) " +
 					"REFERENCES `{2}` (`{3}`)", foreignKey.Name,
-					foreignKey.ColumnName, foreignKey.ParentTable,
+					foreignKey.ColumnName,
+					foreignKey.ParentTable,
 					foreignKey.ParentTableColumn);
 			}
 
@@ -779,8 +785,11 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		{
 			string sql = string.Empty;
 
-			sql += String.Format(CultureInfo.InvariantCulture,
-				"CREATE TABLE `{0}` ({1}", table.Name, Environment.NewLine);
+			sql += string.Format(
+				CultureInfo.InvariantCulture,
+				"CREATE TABLE `{0}` ({1}",
+				table.Name,
+				Environment.NewLine);
 
 			// Sort Columns into ordinal positions
 			System.Collections.SortedList columns =
@@ -800,9 +809,11 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 
 			if (!string.IsNullOrWhiteSpace(table.PrimaryKey))
 			{
-				sql += String.Format(CultureInfo.InvariantCulture,
+				sql += string.Format(
+					CultureInfo.InvariantCulture,
 					"\tCONSTRAINT PrimaryKey PRIMARY KEY (`{0}`),{1}",
-					table.PrimaryKey, Environment.NewLine);
+					table.PrimaryKey,
+					Environment.NewLine);
 			}
 
 			foreach (ForeignKey foreignKey in table.ForeignKeys)
@@ -814,7 +825,9 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 			// Remove trailing ','
 			sql = sql.Remove(sql.Length - 3, 3);
 
-			sql += String.Format(CultureInfo.InvariantCulture, "{0});{0}",
+			sql += string.Format(
+				CultureInfo.InvariantCulture,
+				"{0});{0}",
 				Environment.NewLine);
 
 			return sql;

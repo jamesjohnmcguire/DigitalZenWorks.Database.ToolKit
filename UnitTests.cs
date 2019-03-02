@@ -117,8 +117,11 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		{
 			string connectionString = null;
 
-			connectionString = string.Format(CultureInfo.InvariantCulture,
-				"provider={0}; Data Source={1}", provider, dataSource);
+			connectionString = string.Format(
+				CultureInfo.InvariantCulture,
+				"provider={0}; Data Source={1}",
+				provider,
+				dataSource);
 			using (OleDbConnection oleDbConnection =
 				new OleDbConnection(connectionString))
 			{
@@ -204,7 +207,8 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		public void Delete()
 		{
 			string description = "Unit Test - Time: " + DateTime.Now;
-			string query = string.Format(CultureInfo.InvariantCulture,
+			string query = string.Format(
+				CultureInfo.InvariantCulture,
 				"INSERT INTO TestTable (Description) VALUES ('{0}')",
 				description);
 
@@ -258,7 +262,8 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		public void Update()
 		{
 			string description = "Unit Test - Time: " + DateTime.Now;
-			string query = string.Format(CultureInfo.InvariantCulture,
+			string query = string.Format(
+				CultureInfo.InvariantCulture,
 				"UPDATE TestTable SET [Description] = '{0}'",
 				description);
 
