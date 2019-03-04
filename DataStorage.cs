@@ -313,6 +313,18 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 			return canQuery;
 		}
 
+		public static List<TItem> ConvertDataTable<TItem>(DataTable dataTable)
+		{
+			List<TItem> list = new List<TItem>();
+			foreach (DataRow row in dataTable.Rows)
+			{
+				TItem item = GetItem<TItem>(row);
+				list.Add(item);
+			}
+
+			return list;
+		}
+
 		/////////////////////////////////////////////////////////////////////
 		/// Method <c>Delete</c>
 		/// <summary>
@@ -768,6 +780,31 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 			}
 
 			return parameters;
+		}
+
+		private static TItem GetItem<TItem>(DataRow dataRow)
+		{
+			Type localType = typeof(TItem);
+			TItem instance = Activator.CreateInstance<TItem>();
+
+			foreach (DataColumn column in dataRow.Table.Columns)
+			{
+				foreach (PropertyInfo propertyDetails in
+					localType.GetProperties())
+				{
+					if (propertyDetails.Name == column.ColumnName)
+					{
+						propertyDetails.SetValue(
+							instance, dataRow[column.ColumnName], null);
+					}
+					else
+					{
+						continue;
+					}
+				}
+			}
+
+			return instance;
 		}
 
 		private string CreateConnectionString(string dataSource,
