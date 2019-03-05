@@ -792,10 +792,27 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 				foreach (PropertyInfo propertyDetails in
 					localType.GetProperties())
 				{
-					if (propertyDetails.Name == column.ColumnName)
+					if (propertyDetails.Name.Equals(
+						column.ColumnName, StringComparison.OrdinalIgnoreCase))
 					{
-						propertyDetails.SetValue(
-							instance, dataRow[column.ColumnName], null);
+						if (!propertyDetails.PropertyType.Name.Equals(
+							column.DataType.Name))
+						{
+							var columnValue = Convert.ChangeType(
+								dataRow[column.ColumnName],
+								propertyDetails.PropertyType);
+
+							propertyDetails.SetValue(
+								instance, columnValue, null);
+						}
+						else
+						{
+							if (dataRow[column.ColumnName] != DBNull.Value)
+							{
+								propertyDetails.SetValue(
+									instance, dataRow[column.ColumnName]);
+							}
+						}
 					}
 					else
 					{
