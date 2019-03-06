@@ -72,9 +72,13 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/// <summary>
 		/// Represents a base collection of data objects
 		/// </summary>
+		/// <param name="tableName"></param>
+		/// <param name="dataSource"></param>
 		/////////////////////////////////////////////////////////////////////
-		public DataObjectsBase(string dataSource)
+		public DataObjectsBase(string tableName, string dataSource)
 		{
+			this.tableName = tableName;
+
 			if (!File.Exists(dataSource))
 			{
 				dataSource = Environment.GetFolderPath(
@@ -89,12 +93,16 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/// <summary>
 		/// Constructor for database type and connection string
 		/// </summary>
+		/// <param name="tableName"></param>
 		/// <param name="databaseType"></param>
 		/// <param name="connectionString"></param>
 		/////////////////////////////////////////////////////////////////////
 		public DataObjectsBase(
-			DatabaseType databaseType, string connectionString)
+			string tableName,
+			DatabaseType databaseType,
+			string connectionString)
 		{
+			this.tableName = tableName;
 
 			database = new DataStorage(databaseType, connectionString);
 		}
