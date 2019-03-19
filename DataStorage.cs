@@ -789,34 +789,35 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 
 			foreach (DataColumn column in dataRow.Table.Columns)
 			{
-				foreach (PropertyInfo propertyDetails in
-					localType.GetProperties())
+				if (dataRow[column.ColumnName] != DBNull.Value)
 				{
-					if (propertyDetails.Name.Equals(
-						column.ColumnName, StringComparison.OrdinalIgnoreCase))
+					foreach (PropertyInfo propertyDetails in
+						localType.GetProperties())
 					{
-						if (!propertyDetails.PropertyType.Name.Equals(
-							column.DataType.Name))
+						if (propertyDetails.Name.Equals(
+							column.ColumnName,
+							StringComparison.OrdinalIgnoreCase))
 						{
-							var columnValue = Convert.ChangeType(
-								dataRow[column.ColumnName],
-								propertyDetails.PropertyType);
+							if (!propertyDetails.PropertyType.Name.Equals(
+								column.DataType.Name))
+							{
+								var columnValue = Convert.ChangeType(
+									dataRow[column.ColumnName],
+									propertyDetails.PropertyType);
 
-							propertyDetails.SetValue(
-								instance, columnValue, null);
-						}
-						else
-						{
-							if (dataRow[column.ColumnName] != DBNull.Value)
+								propertyDetails.SetValue(
+									instance, columnValue, null);
+							}
+							else
 							{
 								propertyDetails.SetValue(
 									instance, dataRow[column.ColumnName]);
 							}
 						}
-					}
-					else
-					{
-						continue;
+						else
+						{
+							continue;
+						}
 					}
 				}
 			}
