@@ -52,7 +52,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 			bool returnCode = false;
 
 			log.Info(CultureInfo.InvariantCulture, m => m(
-				General.CallingMethod() + ": " +
+				GeneralUtilities.CallingMethod() + ": " +
 				stringTable.GetString("BEGIN")));
 
 			if ((null != table) && (null != file))
