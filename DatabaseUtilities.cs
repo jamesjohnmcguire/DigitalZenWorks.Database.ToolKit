@@ -5,7 +5,7 @@
 // All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 using Common.Logging;
-using DigitalZenWorks.Common.Utils;
+using DigitalZenWorks.Common.Utilities;
 using System;
 using System.Data;
 using System.Globalization;
