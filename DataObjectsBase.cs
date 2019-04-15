@@ -72,6 +72,26 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/// <summary>
 		/// Represents a base collection of data objects
 		/// </summary>
+		/// <param name="dataSource"></param>
+		/////////////////////////////////////////////////////////////////////
+		public DataObjectsBase(string dataSource)
+		{
+			this.tableName = tableName;
+
+			if (!File.Exists(dataSource))
+			{
+				dataSource = Environment.GetFolderPath(
+					Environment.SpecialFolder.LocalApplicationData) +
+					"\\" + dataSource;
+			}
+
+			database = new DataStorage(provider, dataSource);
+		}
+
+		/////////////////////////////////////////////////////////////////////
+		/// <summary>
+		/// Represents a base collection of data objects
+		/// </summary>
 		/// <param name="tableName"></param>
 		/// <param name="dataSource"></param>
 		/////////////////////////////////////////////////////////////////////
