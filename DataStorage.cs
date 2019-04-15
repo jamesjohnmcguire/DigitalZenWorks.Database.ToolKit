@@ -138,12 +138,10 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/// DataStorage - Constructor
 		/// </summary>
 		/// <param name="databaseType"></param>
-		/// <param name="dataSource"></param>
-		/// <param name="catalog"></param>
-		public DataStorage(DatabaseType databaseType, string dataSource,
-			string catalog)
+		/// <param name="connectionString"></param>
+		public DataStorage(DatabaseType databaseType, string connectionString)
 		{
-			connectionText = CreateConnectionString(dataSource, catalog);
+			connectionText = connectionString;
 			this.databaseType = databaseType;
 		}
 
@@ -151,10 +149,12 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/// DataStorage - Constructor
 		/// </summary>
 		/// <param name="databaseType"></param>
-		/// <param name="connectionString"></param>
-		public DataStorage(DatabaseType databaseType, string connectionString)
+		/// <param name="dataSource"></param>
+		/// <param name="catalog"></param>
+		public DataStorage(
+			DatabaseType databaseType, string dataSource, string catalog)
 		{
-			connectionText = connectionString;
+			connectionText = CreateConnectionString(dataSource, catalog);
 			this.databaseType = databaseType;
 		}
 
