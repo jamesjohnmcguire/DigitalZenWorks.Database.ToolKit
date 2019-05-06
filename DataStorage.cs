@@ -5,6 +5,7 @@
 // All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 using Common.Logging;
+using DigitalZenWorks.Common.Utilities;
 using MySql.Data.MySqlClient;
 using System;
 using System.Collections;
@@ -794,9 +795,15 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 					foreach (PropertyInfo propertyDetails in
 						localType.GetProperties())
 					{
-						if (propertyDetails.Name.Equals(
+						string singularPascalCase =
+							GetSingularPascalName(column.ColumnName);
+
+						if ((propertyDetails.Name.Equals(
 							column.ColumnName,
-							StringComparison.OrdinalIgnoreCase))
+							StringComparison.OrdinalIgnoreCase)) ||
+							(propertyDetails.Name.Equals(
+							singularPascalCase,
+							StringComparison.OrdinalIgnoreCase)))
 						{
 							if (!propertyDetails.PropertyType.Name.Equals(
 								column.DataType.Name))
@@ -823,6 +830,11 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 			}
 
 			return instance;
+		}
+
+		private static string GetSingularPascalName(string columnName)
+		{
+			return GeneralUtilities.ConvertToPascalCaseFromKnr(columnName);
 		}
 
 		private string CreateConnectionString(string dataSource,
