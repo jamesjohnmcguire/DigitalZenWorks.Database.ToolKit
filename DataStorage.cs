@@ -790,10 +790,15 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 
 			foreach (DataColumn column in dataRow.Table.Columns)
 			{
+				bool found = false;
+
 				if (dataRow[column.ColumnName] != DBNull.Value)
 				{
+					PropertyInfo[] properitiesDetails =
+						localType.GetProperties();
+
 					foreach (PropertyInfo propertyDetails in
-						localType.GetProperties())
+						properitiesDetails)
 					{
 						string singularPascalCase =
 							GetSingularPascalName(column.ColumnName);
@@ -821,11 +826,15 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 									instance, dataRow[column.ColumnName]);
 							}
 						}
-						else
-						{
-							continue;
-						}
+
+						found = true;
+						break;
 					}
+				}
+
+				if (found == true)
+				{
+					break;
 				}
 			}
 
