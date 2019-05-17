@@ -825,16 +825,11 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 								propertyDetails.SetValue(
 									instance, dataRow[column.ColumnName]);
 							}
+
+							found = true;
+							break;
 						}
-
-						found = true;
-						break;
 					}
-				}
-
-				if (found == true)
-				{
-					break;
 				}
 			}
 
