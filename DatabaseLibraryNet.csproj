@@ -36,7 +36,7 @@
     <AssemblyTitle>DigitalZenWorks.Common.DatabaseLibrary</AssemblyTitle>
     <Company>James John McGuire</Company>
     <NeutralLanguage>en-US</NeutralLanguage>
-    <Copyright>Copyright © 2006 - 2016</Copyright>
+    <Copyright>Copyright © 2006 - 2019</Copyright>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <BaseAddress>285212672</BaseAddress>
