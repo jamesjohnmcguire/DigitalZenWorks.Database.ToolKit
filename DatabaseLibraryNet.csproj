@@ -1,45 +1,22 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <ProjectType>Local</ProjectType>
     <ProductVersion>9.0.30729</ProductVersion>
-    <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{10BE1C1F-B18C-496B-9112-26B9BEE800B1}</ProjectGuid>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ApplicationIcon>
-    </ApplicationIcon>
-    <AssemblyKeyContainerName>
-    </AssemblyKeyContainerName>
+    <ApplicationIcon />
+    <AssemblyKeyContainerName />
     <AssemblyName>DigitalZenWorks.Common.DatabaseLibrary</AssemblyName>
     <AssemblyOriginatorKeyFile>DatabaseLibraryNet.snk</AssemblyOriginatorKeyFile>
     <CodeAnalysisRuleSet>$(SolutionDir)\CodeAnalysis.ruleset</CodeAnalysisRuleSet>
     <DefaultClientScript>JScript</DefaultClientScript>
     <DefaultHTMLPageLayout>Grid</DefaultHTMLPageLayout>
     <DefaultTargetSchema>IE50</DefaultTargetSchema>
-    <DelaySign>false</DelaySign>
-    <OutputType>Library</OutputType>
     <RootNamespace>DigitalZenWorks.Common.DatabaseLibrary</RootNamespace>
     <RunPostBuildEvent>OnOutputUpdated</RunPostBuildEvent>
-    <StartupObject>
-    </StartupObject>
-    <FileUpgradeFlags>
-    </FileUpgradeFlags>
-    <UpgradeBackupLocation>
-    </UpgradeBackupLocation>
-    <SccProjectName>
-    </SccProjectName>
-    <SccLocalPath>
-    </SccLocalPath>
-    <SccAuxPath>
-    </SccAuxPath>
-    <SccProvider>
-    </SccProvider>
+    <StartupObject />
+    <FileUpgradeFlags />
+    <UpgradeBackupLocation />
     <SignAssembly>true</SignAssembly>
-    <OldToolsVersion>3.5</OldToolsVersion>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <IsWebBootstrapper>false</IsWebBootstrapper>
-    <TargetFrameworkProfile />
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
@@ -56,208 +33,95 @@
     <BootstrapperEnabled>true</BootstrapperEnabled>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\</SolutionDir>
     <OutputPath>$(SolutionDir)\Bin\$(Configuration)\$(Platform)</OutputPath>
-    <NuGetPackageImportStamp>
-    </NuGetPackageImportStamp>
+    <AssemblyTitle>DigitalZenWorks.Common.DatabaseLibrary</AssemblyTitle>
+    <Company>James John McGuire</Company>
+    <NeutralLanguage>en-US</NeutralLanguage>
+    <Copyright>Copyright © 2006 - 2016</Copyright>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
     <BaseAddress>285212672</BaseAddress>
-    <CheckForOverflowUnderflow>false</CheckForOverflowUnderflow>
-    <ConfigurationOverrideFile>
-    </ConfigurationOverrideFile>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <DocumentationFile>bin\Debug\DigitalZenWorks.Common.DatabaseLibrary.xml</DocumentationFile>
-    <DebugSymbols>true</DebugSymbols>
+    <ConfigurationOverrideFile />
     <FileAlignment>4096</FileAlignment>
     <NoStdLib>false</NoStdLib>
-    <NoWarn>
-    </NoWarn>
-    <Optimize>false</Optimize>
+    <NoWarn />
     <RegisterForComInterop>false</RegisterForComInterop>
     <RemoveIntegerChecks>false</RemoveIntegerChecks>
-    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
-    <WarningLevel>4</WarningLevel>
-    <DebugType>full</DebugType>
-    <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
     <BaseAddress>285212672</BaseAddress>
-    <CheckForOverflowUnderflow>false</CheckForOverflowUnderflow>
-    <ConfigurationOverrideFile>
-    </ConfigurationOverrideFile>
-    <DefineConstants>TRACE</DefineConstants>
-    <DocumentationFile>
-    </DocumentationFile>
-    <DebugSymbols>false</DebugSymbols>
+    <ConfigurationOverrideFile />
+    <DocumentationFile />
     <FileAlignment>4096</FileAlignment>
     <NoStdLib>false</NoStdLib>
-    <NoWarn>
-    </NoWarn>
-    <Optimize>true</Optimize>
+    <NoWarn />
     <RegisterForComInterop>false</RegisterForComInterop>
     <RemoveIntegerChecks>false</RemoveIntegerChecks>
-    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
-    <WarningLevel>4</WarningLevel>
-    <DebugType>none</DebugType>
-    <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
-    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
-    <DebugSymbols>true</DebugSymbols>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
     <BaseAddress>285212672</BaseAddress>
-    <DocumentationFile>bin\Debug\DigitalZenWorks.Common.DatabaseLibrary.xml</DocumentationFile>
     <FileAlignment>4096</FileAlignment>
-    <DebugType>full</DebugType>
-    <PlatformTarget>x86</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
-    <Prefer32Bit>false</Prefer32Bit>
     <CheckForOverflowUnderflow>true</CheckForOverflowUnderflow>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
-    <DefineConstants>TRACE</DefineConstants>
     <BaseAddress>285212672</BaseAddress>
-    <Optimize>true</Optimize>
     <FileAlignment>4096</FileAlignment>
-    <PlatformTarget>x86</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
-    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
-    <DebugSymbols>true</DebugSymbols>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
     <BaseAddress>285212672</BaseAddress>
-    <DocumentationFile>bin\Debug\Zenware.Common.DatabaseLibrary.xml</DocumentationFile>
     <FileAlignment>4096</FileAlignment>
-    <DebugType>full</DebugType>
-    <PlatformTarget>x64</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
-    <DefineConstants>TRACE</DefineConstants>
     <BaseAddress>285212672</BaseAddress>
-    <Optimize>true</Optimize>
     <FileAlignment>4096</FileAlignment>
-    <PlatformTarget>x64</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
-    <DebugSymbols>true</DebugSymbols>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
     <BaseAddress>285212672</BaseAddress>
-    <DocumentationFile>bin\Debug\Zenware.Common.DatabaseLibrary.xml</DocumentationFile>
     <FileAlignment>4096</FileAlignment>
-    <DebugType>full</DebugType>
-    <PlatformTarget>x64</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
-    <Prefer32Bit>false</Prefer32Bit>
     <CheckForOverflowUnderflow>true</CheckForOverflowUnderflow>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
-    <DefineConstants>TRACE</DefineConstants>
     <BaseAddress>285212672</BaseAddress>
-    <Optimize>true</Optimize>
     <FileAlignment>4096</FileAlignment>
-    <PlatformTarget>x64</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
-    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{10BE1C1F-B18C-496B-9112-26B9BEE800B1}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>DigitalZenWorks.Common.DatabaseLibrary</RootNamespace>
     <AssemblyName>DigitalZenWorks.Common.DatabaseLibrary</AssemblyName>
-    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
+    <TargetFramework>net472</TargetFramework>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
+  <Import Project="$(SolutionDir)\packages\NUnit.3.11.0\build\NUnit.props" Condition="Exists('$(SolutionDir)\packages\NUnit.3.11.0\build\NUnit.props')" />
   <ItemGroup>
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System">
-      <Name>System</Name>
-    </Reference>
+    <PackageReference Include="System.Management" Version="4.*" />
+  </ItemGroup>
+  <ItemGroup>
     <Reference Include="System.ComponentModel, Version=4.0.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.configuration" />
     <Reference Include="System.Configuration.Install" />
-    <Reference Include="System.Core">
-      <RequiredTargetFramework>3.5</RequiredTargetFramework>
-    </Reference>
-    <Reference Include="System.Data">
-      <Name>System.Data</Name>
-    </Reference>
-    <Reference Include="System.Data.OracleClient">
-      <Name>System.Data.OracleClient</Name>
-    </Reference>
-    <Reference Include="System.Drawing" />
+    <Reference Include="System.Data.OracleClient" />
     <Reference Include="System.Drawing.Design" />
     <Reference Include="System.EnterpriseServices" />
-    <Reference Include="System.Management" />
     <Reference Include="System.Runtime, Version=4.1.2.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="System.Transactions" />
-    <Reference Include="System.Xml">
-      <Name>System.XML</Name>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DataObjectsBase.cs" />
-    <Compile Include="Column.cs" />
-    <Compile Include="ColumnType.cs" />
-    <Compile Include="DatabaseType.cs" />
-    <Compile Include="DatabaseUtilities.cs" />
-    <Compile Include="DataDefinition.cs" />
-    <Compile Include="DataStorage.cs" />
-    <Compile Include="ForeignKey.cs" />
-    <Compile Include="IDatabaseCollection.cs" />
-    <Compile Include="OleDbSchema.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Relationship.cs" />
-    <Compile Include="Resources.Designer.cs">
+    <Compile Update="Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="Table.cs" />
-    <Compile Include="TestFixture.cs" />
-    <Compile Include="UnitTests.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="app.config" />
     <None Include="DatabaseLibraryNet.snk" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
     <EmbeddedResource Include="template.mdb">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
@@ -274,37 +138,16 @@
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\UtilitiesNET\UtilitiesNET.csproj">
-      <Project>{3663da63-bb91-4b03-b4f7-23dd8eef9d61}</Project>
-      <Name>UtilitiesNET</Name>
-    </ProjectReference>
+    <ProjectReference Include="..\UtilitiesNET\UtilitiesNET.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Common.Logging">
-      <Version>3.4.1</Version>
-    </PackageReference>
-    <PackageReference Include="Common.Logging.Core">
-      <Version>3.4.1</Version>
-    </PackageReference>
-    <PackageReference Include="Common.Logging.Log4Net208">
-      <Version>3.4.1</Version>
-    </PackageReference>
-    <PackageReference Include="Google.Protobuf">
-      <Version>3.7.0</Version>
-    </PackageReference>
-    <PackageReference Include="log4net">
-      <Version>2.0.8</Version>
-    </PackageReference>
-    <PackageReference Include="Microsoft.CSharp">
-      <Version>4.5.0</Version>
-    </PackageReference>
-    <PackageReference Include="MySql.Data">
-      <Version>8.0.15</Version>
-    </PackageReference>
-    <PackageReference Include="NUnit">
-      <Version>3.11.0</Version>
-    </PackageReference>
+    <PackageReference Include="Common.Logging" Version="3.4.1" />
+    <PackageReference Include="Common.Logging.Core" Version="3.4.1" />
+    <PackageReference Include="Common.Logging.Log4Net208" Version="3.4.1" />
+    <PackageReference Include="Google.Protobuf" Version="3.7.0" />
+    <PackageReference Include="log4net" Version="2.0.8" />
+    <PackageReference Include="Microsoft.CSharp" Version="4.5.0" />
+    <PackageReference Include="MySql.Data" Version="8.0.15" />
+    <PackageReference Include="NUnit" Version="3.11.0" />
   </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Import Project="$(SolutionDir)\packages\NUnit.3.11.0\build\NUnit.props" Condition="Exists('$(SolutionDir)\packages\NUnit.3.11.0\build\NUnit.props')" />
 </Project>
