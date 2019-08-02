@@ -18,7 +18,8 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 	/// Base class for database collection classes
 	/// </summary>
 	/////////////////////////////////////////////////////////////////////////
-	public class DataObjectsBase: IDisposable
+	public class DataObjectsBase
+		: IDisposable
 	{
 		private DataStorage database = null;
 
@@ -161,7 +162,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/////////////////////////////////////////////////////////////////////
 		public bool Delete(string table, int id)
 		{
-			bool returnCode = false;
+			bool returnCode;
 
 			string sql = string.Format(
 				CultureInfo.InvariantCulture,
@@ -181,7 +182,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/////////////////////////////////////////////////////////////////////
 		public DataTable GetAllDataTable(string table)
 		{
-			DataTable tableList = null;
+			DataTable tableList;
 			string sql = string.Format(
 				CultureInfo.InvariantCulture,
 				@"SELECT * FROM {0} ORDER BY id",
@@ -199,7 +200,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/////////////////////////////////////////////////////////////////////
 		public DataRow GetBy(string table, string where)
 		{
-			DataRow dataRow = null;
+			DataRow dataRow;
 
 			string sql = string.Format(
 				CultureInfo.InvariantCulture,

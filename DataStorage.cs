@@ -194,6 +194,12 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 					mySqlConnection.Close();
 					mySqlConnection = null;
 				}
+
+				if (null != databaseTransaction)
+				{
+					databaseTransaction.Dispose();
+					databaseTransaction = null;
+				}
 			}
 		}
 
