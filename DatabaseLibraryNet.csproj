@@ -116,7 +116,7 @@
   <PropertyGroup>
     <RootNamespace>DigitalZenWorks.Common.DatabaseLibrary</RootNamespace>
     <AssemblyName>DigitalZenWorks.Common.DatabaseLibrary</AssemblyName>
-    <TargetFramework>net461</TargetFramework>
+    <TargetFramework>net472</TargetFramework>
   </PropertyGroup>
   <Import Project="$(SolutionDir)\packages\NUnit.3.11.0\build\NUnit.props" Condition="Exists('$(SolutionDir)\packages\NUnit.3.11.0\build\NUnit.props')" />
   <ItemGroup>
@@ -153,7 +153,7 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
     <Content Include="TestDb.mdb">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
   <ItemGroup>
