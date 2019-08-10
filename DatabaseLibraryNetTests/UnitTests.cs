@@ -2,16 +2,18 @@
 // Copyright © 2006 - 2019 by James John McGuire
 // All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
+
+using DigitalZenWorks.Common.DatabaseLibrary;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.OleDb;
-using System.Globalization;
 using System.EnterpriseServices;
+using System.Globalization;
 using System.IO;
 
-namespace DigitalZenWorks.Common.DatabaseLibrary
+namespace DigitalZenWorks.Common.DatabaseLibrary.Tests
 {
 	/////////////////////////////////////////////////////////////////////////
 	/// Class <c>UnitTests</c>
