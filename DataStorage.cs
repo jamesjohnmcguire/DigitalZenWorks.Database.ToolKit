@@ -69,6 +69,9 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		private static readonly ResourceManager stringTable = new
 			ResourceManager("DigitalZenWorks.Common.DatabaseLibrary.Resources",
 			Assembly.GetExecutingAssembly());
+
+		private int timeOut = 30;
+
 		#endregion private variables
 
 		/////////////////////////////////////////////////////////////////////
@@ -102,6 +105,8 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 				return tables;
 			}
 		}
+
+		public int TimeOut { get { return timeOut; } set { timeOut = value; } }
 
 		#region constructors
 
@@ -703,7 +708,6 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 				commandObject2 = new OleDbCommand(Sql2, oleDbConnection);
 
 				oleDbConnection.Open();
-				//CommandObject.CommandTimeout = 30;
 
 				Object result = commandObject1.ExecuteScalar();
 
@@ -957,7 +961,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 					command.Transaction = databaseTransaction;
 					command.Connection = connection;
 					command.CommandText = sql;
-					command.CommandTimeout = 30;
+					command.CommandTimeout = timeOut;
 				}
 			}
 			catch (Exception exception)
