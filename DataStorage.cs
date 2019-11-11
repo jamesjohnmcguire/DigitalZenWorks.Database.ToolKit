@@ -6,7 +6,6 @@ using Common.Logging;
 using DigitalZenWorks.Common.Utilities;
 using MySql.Data.MySqlClient;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
@@ -26,7 +25,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 	/// transport
 	/// </summary>
 	/////////////////////////////////////////////////////////////////////////
-	public class DataStorage: IDisposable
+	public class DataStorage : IDisposable
 	{
 		#region private variables
 
@@ -944,13 +943,13 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 					{
 						switch (databaseType)
 						{
-						case DatabaseType.OleDb:
+							case DatabaseType.OleDb:
 							{
 								AddParameters((OleDbCommand)command, values);
 								break;
 							}
-						case DatabaseType.SqlServer:
-						case DatabaseType.MySql:
+							case DatabaseType.SqlServer:
+							case DatabaseType.MySql:
 							{
 								AddParameters(command, values);
 								break;
@@ -1046,5 +1045,5 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 
 			return returnValue;
 		}
-	}	// end class
-}	// end namespace
+	}   // end class
+}   // end namespace
