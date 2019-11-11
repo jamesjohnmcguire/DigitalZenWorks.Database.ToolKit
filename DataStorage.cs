@@ -27,8 +27,6 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 	/////////////////////////////////////////////////////////////////////////
 	public class DataStorage : IDisposable
 	{
-		#region private variables
-
 		/// <summary>
 		/// databaseType
 		/// </summary>
@@ -71,8 +69,6 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 
 		private int timeOut = 30;
 
-		#endregion private variables
-
 		/////////////////////////////////////////////////////////////////////
 		/// <summary>
 		/// Get the table schema information for the associated database.
@@ -106,8 +102,6 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		}
 
 		public int TimeOut { get { return timeOut; } set { timeOut = value; } }
-
-		#region constructors
 
 		/// <summary>
 		/// DataStorage - Default constructor
@@ -160,10 +154,6 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 			connectionText = CreateConnectionString(dataSource, catalog);
 			this.databaseType = databaseType;
 		}
-
-		#endregion constructors
-
-		#region startup and shutdown
 
 		/// <summary>
 		/// Closes the database connection and object
@@ -229,8 +219,6 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 			//System.GC.Collect();
 		}
 
-		#endregion startup and shutdown
-
 		/// <summary>
 		/// The database connection object
 		/// </summary>
@@ -238,8 +226,6 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		{
 			get { return connection; }
 		}
-
-		#region transactions
 
 		/// <summary>
 		/// This opens a connection and begins the transaction.
@@ -295,10 +281,6 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 				databaseTransaction.Rollback();
 			}
 		}
-
-		#endregion transactions
-
-		#region methods
 
 		/////////////////////////////////////////////////////////////////////
 		/// Method <c>CanQuery</c>
@@ -745,8 +727,6 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 
 			return returnCode;
 		}
-
-		#endregion methods
 
 		private static DbParameterCollection AddParameters(DbCommand command,
 			IDictionary<string, object> values)
