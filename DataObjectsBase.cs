@@ -75,8 +75,6 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/////////////////////////////////////////////////////////////////////
 		public DataObjectsBase(string dataSource)
 		{
-			this.tableName = tableName;
-
 			if (!File.Exists(dataSource))
 			{
 				dataSource = Environment.GetFolderPath(

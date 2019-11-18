@@ -488,6 +488,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 						}
 
 						dataAdapter.SelectCommand = command;
+
 						dataAdapter.Fill(dataSet);
 
 						log.Info(CultureInfo.InvariantCulture,
@@ -546,12 +547,13 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 			IDictionary<string, object> values)
 		{
 			DataTable dataTable = null;
-			//dataTable.Locale = CultureInfo.InvariantCulture;
 
-			DataSet dataSet = GetDataSet(sql, values);
-			if (dataSet.Tables.Count > 0)
+			using (DataSet dataSet = GetDataSet(sql, values))
 			{
-				dataTable = dataSet.Tables[0];
+				if (dataSet.Tables.Count > 0)
+				{
+					dataTable = dataSet.Tables[0];
+				}
 			}
 
 			return dataTable;
