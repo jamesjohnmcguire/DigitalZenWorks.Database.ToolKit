@@ -1,129 +1,59 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <ProjectType>Local</ProjectType>
-    <ProductVersion>9.0.30729</ProductVersion>
-    <RootNamespace>DigitalZenWorks.Common.DatabaseLibrary</RootNamespace>
-    <AssemblyName>DigitalZenWorks.Common.DatabaseLibrary</AssemblyName>
-    <TargetFrameworks>netstandard2.0</TargetFrameworks>
-    <ApplicationIcon />
-    <AssemblyKeyContainerName />
-    <AssemblyName>DigitalZenWorks.Common.DatabaseLibrary</AssemblyName>
-    <AssemblyOriginatorKeyFile>DatabaseLibraryNet.snk</AssemblyOriginatorKeyFile>
-    <CodeAnalysisRuleSet>$(SolutionDir)\CodeAnalysis.ruleset</CodeAnalysisRuleSet>
-    <DefaultClientScript>JScript</DefaultClientScript>
-    <DefaultHTMLPageLayout>Grid</DefaultHTMLPageLayout>
-    <DefaultTargetSchema>IE50</DefaultTargetSchema>
-    <RootNamespace>DigitalZenWorks.Common.DatabaseLibrary</RootNamespace>
-    <RunPostBuildEvent>OnOutputUpdated</RunPostBuildEvent>
-    <StartupObject />
-    <FileUpgradeFlags />
-    <UpgradeBackupLocation />
-    <SignAssembly>true</SignAssembly>
-    <IsWebBootstrapper>false</IsWebBootstrapper>
-    <PublishUrl>publish\</PublishUrl>
-    <Install>true</Install>
-    <InstallFrom>Disk</InstallFrom>
-    <UpdateEnabled>false</UpdateEnabled>
-    <UpdateMode>Foreground</UpdateMode>
-    <UpdateInterval>7</UpdateInterval>
-    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
-    <UpdatePeriodically>false</UpdatePeriodically>
-    <UpdateRequired>false</UpdateRequired>
-    <MapFileExtensions>true</MapFileExtensions>
-    <ApplicationRevision>0</ApplicationRevision>
-    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
-    <UseApplicationTrust>false</UseApplicationTrust>
-    <BootstrapperEnabled>true</BootstrapperEnabled>
-    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\</SolutionDir>
-    <OutputPath>$(SolutionDir)\Bin\$(Configuration)\$(Platform)</OutputPath>
-    <AssemblyTitle>DigitalZenWorks.Common.DatabaseLibrary</AssemblyTitle>
-    <Company>James John McGuire</Company>
-    <NeutralLanguage>en-US</NeutralLanguage>
-    <Copyright>Copyright © 2006 - 2019</Copyright>
-    <Platforms>AnyCPU;x86</Platforms>
-    <BaseAddress>285212672</BaseAddress>
-    <FileAlignment>4096</FileAlignment>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <ConfigurationOverrideFile />
-    <NoStdLib>false</NoStdLib>
-    <NoWarn />
-    <RegisterForComInterop>false</RegisterForComInterop>
-    <RemoveIntegerChecks>false</RemoveIntegerChecks>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">
-    <ConfigurationOverrideFile />
-    <NoStdLib>false</NoStdLib>
-    <NoWarn />
-    <RegisterForComInterop>false</RegisterForComInterop>
-    <RemoveIntegerChecks>false</RemoveIntegerChecks>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <ConfigurationOverrideFile />
-    <DocumentationFile />
-    <NoStdLib>false</NoStdLib>
-    <NoWarn />
-    <RegisterForComInterop>false</RegisterForComInterop>
-    <RemoveIntegerChecks>false</RemoveIntegerChecks>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x86'">
-    <ConfigurationOverrideFile />
-    <DocumentationFile />
-    <NoStdLib>false</NoStdLib>
-    <NoWarn />
-    <RegisterForComInterop>false</RegisterForComInterop>
-    <RemoveIntegerChecks>false</RemoveIntegerChecks>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
-    <CheckForOverflowUnderflow>true</CheckForOverflowUnderflow>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
-    <CheckForOverflowUnderflow>true</CheckForOverflowUnderflow>
-  </PropertyGroup>
-  <ItemGroup>
-    <Compile Remove="DatabaseLibraryNetTests\**" />
-    <EmbeddedResource Remove="DatabaseLibraryNetTests\**" />
-    <None Remove="DatabaseLibraryNetTests\**" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Update="Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="DatabaseLibraryNet.snk" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="template.mdb">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="template.accdb">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <Content Include="TestDb.mdb">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
-  <ItemGroup>
-    <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\UtilitiesNET\UtilitiesNET.csproj" />
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="Common.Logging" Version="3.4.1" />
-    <PackageReference Include="Common.Logging.Core" Version="3.4.1" />
-    <PackageReference Include="Common.Logging.Log4Net208" Version="3.4.1" />
-    <PackageReference Include="Google.Protobuf" Version="3.10.1" />
-    <PackageReference Include="log4net" Version="2.0.8" />
-    <PackageReference Include="Microsoft.CSharp" Version="4.6.0" />
-    <PackageReference Include="mysql.data" Version="8.0.18" />
-    <PackageReference Include="System.Data.OleDb" Version="4.6.0" />
-    <PackageReference Include="System.Data.SqlClient" Version="4.7.0" />
-    <PackageReference Include="System.Management" Version="4.6.0" />
-  </ItemGroup>
+
+	<PropertyGroup>
+		<TargetFramework>netstandard2.0</TargetFramework>
+		<AssemblyOriginatorKeyFile>DatabaseLibraryNet.snk</AssemblyOriginatorKeyFile>
+		<CodeAnalysisRuleSet>$(SolutionDir)\CodeAnalysis.ruleset</CodeAnalysisRuleSet>
+		<SignAssembly>true</SignAssembly>
+		<Company>James John McGuire</Company>
+		<NeutralLanguage>en-US</NeutralLanguage>
+		<Copyright>Copyright © 2006 - 2019</Copyright>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<Compile Remove="DatabaseLibraryNetTests\**" />
+		<EmbeddedResource Remove="DatabaseLibraryNetTests\**" />
+		<None Remove="DatabaseLibraryNetTests\**" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Compile Update="Resources.Designer.cs">
+			<AutoGen>True</AutoGen>
+			<DesignTime>True</DesignTime>
+			<DependentUpon>Resources.resx</DependentUpon>
+		</Compile>
+		<None Include="DatabaseLibraryNet.snk" />
+		<EmbeddedResource Include="template.mdb">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</EmbeddedResource>
+		<EmbeddedResource Include="template.accdb">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</EmbeddedResource>
+		<Content Include="TestDb.mdb">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\UtilitiesNET\UtilitiesNET.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="System.Diagnostics.Debug" Version="4.3.0" />
+		<PackageReference Include="System.IO.FileSystem" Version="4.3.0" />
+		<PackageReference Include="System.Net.NameResolution" Version="4.3.0" />
+		<PackageReference Include="System.Runtime.Extensions" Version="4.3.1" />
+		<PackageReference Include="System.Threading" Version="4.3.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Common.Logging" Version="3.4.1" />
+		<PackageReference Include="Common.Logging.Core" Version="3.4.1" />
+		<PackageReference Include="Common.Logging.Log4Net208" Version="3.4.1" />
+		<PackageReference Include="log4net" Version="2.0.8" />
+		<PackageReference Include="mysql.data" Version="8.0.18" />
+		<PackageReference Include="System.Data.OleDb" Version="4.6.0" />
+		<PackageReference Include="System.Data.SqlClient" Version="4.7.0" />
+	</ItemGroup>
+
 </Project>
