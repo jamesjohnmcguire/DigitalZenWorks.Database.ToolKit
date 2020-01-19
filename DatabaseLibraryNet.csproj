@@ -51,9 +51,9 @@
 		<PackageReference Include="Common.Logging.Core" Version="3.4.1" />
 		<PackageReference Include="Common.Logging.Log4Net208" Version="3.4.1" />
 		<PackageReference Include="log4net" Version="2.0.8" />
-		<PackageReference Include="mysql.data" Version="8.0.18" />
-		<PackageReference Include="System.Data.OleDb" Version="4.6.0" />
-		<PackageReference Include="System.Data.SqlClient" Version="4.7.0" />
+		<PackageReference Include="mysql.data" Version="8.0.19" />
+		<PackageReference Include="System.Data.OleDb" Version="4.7.0" />
+		<PackageReference Include="System.Data.SqlClient" Version="4.8.0" />
 	</ItemGroup>
 
 </Project>
