@@ -25,20 +25,21 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		private ArrayList foreignKeys = new System.Collections.ArrayList();
 
 		/// <summary>
-		/// Diagnostics object
+		/// Diagnostics object.
 		/// </summary>
-		private static readonly ILog log = LogManager.GetLogger
-			(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+		private static readonly ILog log = LogManager.GetLogger(
+			System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
 		private string name = string.Empty;
 		private string primaryKey = string.Empty;
 		private static readonly ResourceManager stringTable = new
-			ResourceManager("DigitalZenWorks.Common.DatabaseLibrary.Resources",
+			ResourceManager(
+			"DigitalZenWorks.Common.DatabaseLibrary.Resources",
 			Assembly.GetExecutingAssembly());
 
 		/////////////////////////////////////////////////////////////////////
 		/// <summary>
-		/// Represents the columns
+		/// Represents the columns.
 		/// </summary>
 		/////////////////////////////////////////////////////////////////////
 		public Hashtable Columns
@@ -48,7 +49,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 
 		/////////////////////////////////////////////////////////////////////
 		/// <summary>
-		/// Represents the foreign keys
+		/// Represents the foreign keys.
 		/// </summary>
 		/////////////////////////////////////////////////////////////////////
 		public ArrayList ForeignKeys
@@ -58,7 +59,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 
 		/////////////////////////////////////////////////////////////////////
 		/// <summary>
-		/// Represents a table name
+		/// Represents a table name.
 		/// </summary>
 		/////////////////////////////////////////////////////////////////////
 		public string Name
@@ -80,7 +81,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 
 		/////////////////////////////////////////////////////////////////////
 		/// <summary>
-		/// Default constructor
+		/// Default constructor.
 		/// </summary>
 		/////////////////////////////////////////////////////////////////////
 		public Table()
@@ -89,7 +90,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 
 		/////////////////////////////////////////////////////////////////////
 		/// <summary>
-		/// Constructor - with name
+		/// Constructor - with name.
 		/// </summary>
 		/// <param name="name"></param>
 		/////////////////////////////////////////////////////////////////////
@@ -101,7 +102,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 
 		/////////////////////////////////////////////////////////////////////
 		/// <summary>
-		/// Add a column
+		/// Add a column.
 		/// </summary>
 		/// <param name="column"></param>
 		/////////////////////////////////////////////////////////////////////
@@ -115,27 +116,30 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 
 		/////////////////////////////////////////////////////////////////////
 		/// <summary>
-		/// Writes out the table information
+		/// Writes out the table information.
 		/// </summary>
 		/// <returns>DataTable</returns>
 		/////////////////////////////////////////////////////////////////////
 		public string Dump()
 		{
-			log.Info(CultureInfo.InvariantCulture,
+			log.Info(
+				CultureInfo.InvariantCulture,
 				m => m(stringTable.GetString("TABLE") + Name));
 			string output = stringTable.GetString("TABLE") + Name +
 				Environment.NewLine;
 
 			foreach (DictionaryEntry column in Columns)
 			{
-				log.Info(CultureInfo.InvariantCulture,
+				log.Info(
+					CultureInfo.InvariantCulture,
 					m => m(stringTable.GetString("TABDASH") +
 					((Column)column.Value).Name));
 				output += stringTable.GetString("TABDASH") +
 					((Column)column.Value).Name + Environment.NewLine;
 			}
 
-			log.Info(CultureInfo.InvariantCulture,
+			log.Info(
+				CultureInfo.InvariantCulture,
 				m => m(stringTable.GetString("PRIMARYKEY") + PrimaryKey));
 			output += stringTable.GetString("PRIMARYKEY") + PrimaryKey +
 				Environment.NewLine;
@@ -149,7 +153,8 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 					foreignKey.ColumnName,
 					foreignKey.ParentTable);
 
-				log.Info(CultureInfo.InvariantCulture,
+				log.Info(
+					CultureInfo.InvariantCulture,
 					m => m(stringTable.GetString("FOREIGNKEY") + format));
 				output += stringTable.GetString("FOREIGNKEY") + format +
 					Environment.NewLine;
@@ -160,7 +165,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 
 		/////////////////////////////////////////////////////////////////////
 		/// <summary>
-		/// Writes out the table information
+		/// Writes out the table information.
 		/// </summary>
 		/// <returns>DataTable</returns>
 		/////////////////////////////////////////////////////////////////////
@@ -170,7 +175,8 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 
 			if (null != table)
 			{
-				log.Info(CultureInfo.InvariantCulture,
+				log.Info(
+					CultureInfo.InvariantCulture,
 					m => m(stringTable.GetString("TABLE") + table.TableName));
 				output = stringTable.GetString("TABLE") +
 					table.TableName + Environment.NewLine;

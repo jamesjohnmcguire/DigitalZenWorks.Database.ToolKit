@@ -16,7 +16,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 	/// Represents an OleDbSchema object
 	/// </summary>
 	/////////////////////////////////////////////////////////////////////////
-	public class OleDbSchema:  IDisposable
+	public class OleDbSchema : IDisposable
 	{
 		/////////////////////////////////////////////////////////////////////
 		/// <summary>
@@ -164,7 +164,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 
 		/////////////////////////////////////////////////////////////////////
 		/// <summary>
-		/// Gets the constraints from the given table
+		/// Gets the constraints from the given table.
 		/// </summary>
 		/// <returns>DataTable</returns>
 		/////////////////////////////////////////////////////////////////////

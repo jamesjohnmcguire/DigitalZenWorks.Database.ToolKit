@@ -19,24 +19,26 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 	/////////////////////////////////////////////////////////////////////////
 	/// Class <c>DataDefinition</c>
 	/// <summary>
-	/// Class for support on operations on complete data storage containers
+	/// Class for support on operations on complete data storage containers.
 	/// </summary>
 	/////////////////////////////////////////////////////////////////////////
 	public static class DataDefinition
 	{
 		/// <summary>
-		/// Diagnostics object
+		/// Diagnostics object.
 		/// </summary>
-		private static readonly ILog log = LogManager.GetLogger
-			(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+		private static readonly ILog log = LogManager.GetLogger(
+			System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
 		private static readonly ResourceManager stringTable = new
-			ResourceManager("DigitalZenWorks.Common.DatabaseLibrary.Resources",
+			ResourceManager(
+			"DigitalZenWorks.Common.DatabaseLibrary.Resources",
 			Assembly.GetExecutingAssembly());
 
 		/////////////////////////////////////////////////////////////////////
 		/// Method <c>ExportSchema</c>
 		/// <summary>
-		/// Export all tables to similarly named csv files
+		/// Export all tables to similarly named csv files.
 		/// </summary>
 		/////////////////////////////////////////////////////////////////////
 		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2202:Do not dispose objects multiple times")]
@@ -79,7 +81,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		}
 
 		/// <summary>
-		/// GetColumnInfo - returns details of a column statement
+		/// GetColumnInfo - returns details of a column statement.
 		/// </summary>
 		/// <param name="dataDefinition"></param>
 		/// <returns></returns>
@@ -89,7 +91,8 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 
 			if (!string.IsNullOrWhiteSpace(dataDefinition))
 			{
-				int SplitIndex = dataDefinition.IndexOf("(",
+				int SplitIndex = dataDefinition.IndexOf(
+					"(",
 					StringComparison.Ordinal) + 1;
 				ColumnsInfo = dataDefinition.Substring(SplitIndex);
 			}
@@ -98,7 +101,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		}
 
 		/// <summary>
-		/// Returns the column type
+		/// Returns the column type.
 		/// </summary>
 		/// <param name="column"></param>
 		/// <returns></returns>
@@ -146,10 +149,13 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 
 			ColumnType columnType = ColumnType.Other;
 
-			for(int index=0; index < columnTypeComareKeys.Length; index++)
+			for (int index = 0; index < columnTypeComareKeys.Length; index++)
 			{
-				if (CompareColumnType(column, columnTypeComareKeys[index],
-					types[index], ref columnType))
+				if (CompareColumnType(
+					column,
+					columnTypeComareKeys[index],
+					types[index],
+					ref columnType))
 				{
 					break;
 				}
@@ -160,6 +166,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 				log.Warn(CultureInfo.InvariantCulture, m => m(
 					stringTable.GetString("WARNING_OTHER") + column));
 			}
+
 			return columnType;
 		}
 
@@ -193,13 +200,13 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		}
 
 		/// <summary>
-		/// Gets a list of relationships
+		/// Gets a list of relationships.
 		/// </summary>
 		/// <param name="oleDbSchema"></param>
 		/// <param name="tableName"></param>
 		/// <returns></returns>
-		public static ArrayList GetRelationships(OleDbSchema oleDbSchema,
-			string tableName)
+		public static ArrayList GetRelationships(
+			OleDbSchema oleDbSchema, string tableName)
 		{
 			ArrayList relationships = null;
 
@@ -215,14 +222,13 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 					Relationship relationship = GetRelationship(foreignKey);
 					relationships.Add(relationship);
 				}
-
 			}
 
 			return relationships;
 		}
 
 		/// <summary>
-		/// GetTableDefinitions - returns an array of table definitions
+		/// GetTableDefinitions - returns an array of table definitions.
 		/// </summary>
 		/// <param name="tableDefinitionsFile"></param>
 		/// <returns></returns>
@@ -234,15 +240,17 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 			if (!string.IsNullOrWhiteSpace(tableDefinitionsFile))
 			{
 				string[] stringSeparators = new string[] { "\r\n\r\n" };
-				queries = tableDefinitionsFile.Split(stringSeparators,
-					32000, StringSplitOptions.RemoveEmptyEntries);
+				queries = tableDefinitionsFile.Split(
+					stringSeparators,
+					32000,
+					StringSplitOptions.RemoveEmptyEntries);
 			}
 
 			return queries;
 		}
 
 		/// <summary>
-		/// GetTableName - returns the name of the table
+		/// GetTableName - returns the name of the table.
 		/// </summary>
 		/// <param name="dataDefinition"></param>
 		/// <returns></returns>
@@ -288,14 +296,16 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 						FileUtils.GetFileContents(schemaFile);
 
 					string[] StringSeparators = new string[] { "\r\n\r\n" };
-					string[] Queries = fileContents.Split(StringSeparators,
-						32000, StringSplitOptions.RemoveEmptyEntries);
+					string[] Queries = fileContents.Split(
+						StringSeparators,
+						32000,
+						StringSplitOptions.RemoveEmptyEntries);
 
-					using (DataStorage database = new DataStorage(provider,
-						databaseFile))
+					using (DataStorage database = new DataStorage(
+						provider, databaseFile))
 					{
-					foreach (string SqlQuery in Queries)
-					{
+						foreach (string SqlQuery in Queries)
+						{
 							try
 							{
 								log.Info(CultureInfo.InvariantCulture, m => m(
@@ -321,8 +331,8 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 						}
 
 						successCode = true;
+					}
 				}
-			}
 			}
 			catch (Exception exception) when
 				(exception is ArgumentNullException ||
@@ -348,7 +358,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		}
 
 		/// <summary>
-		/// Checks to see if the given field is a time related field
+		/// Checks to see if the given field is a time related field.
 		/// </summary>
 		/// <param name="field"></param>
 		/// <returns></returns>
@@ -358,7 +368,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 
 			if (!string.IsNullOrWhiteSpace(field))
 			{
-				if ((field.Contains("Time")) || (field.Contains("time")))
+				if (field.Contains("Time") || field.Contains("time"))
 				{
 					returnCode = true;
 				}
@@ -367,13 +377,16 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 			return returnCode;
 		}
 
-		private static bool CompareColumnType(string column, string nameCheck,
-			ColumnType columnType, ref ColumnType columnTypeOut)
+		private static bool CompareColumnType(
+			string column,
+			string nameCheck,
+			ColumnType columnType,
+			ref ColumnType columnTypeOut)
 		{
 			bool found = false;
 
-			if ((column.ToUpperInvariant().Contains(nameCheck)) ||
-				(column.ToUpperInvariant().Equals(nameCheck)))
+			if (column.ToUpperInvariant().Contains(nameCheck) ||
+				column.ToUpperInvariant().Equals(nameCheck))
 			{
 				columnTypeOut = columnType;
 				found = true;
@@ -389,13 +402,13 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 
 			switch ((int)row["DATA_TYPE"])
 			{
-				case 3:	// Number
+				case 3: // Number
 				{
 					column.ColumnType = ColumnType.Number;
 					break;
 				}
 
-				case 130:  // String
+				case 130: // String
 				{
 					string flags = row["COLUMN_FLAGS"].ToString();
 
@@ -407,28 +420,29 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 					{
 						column.ColumnType = ColumnType.String;
 					}
+
 					break;
 				}
 
-				case 7:  // Date
+				case 7: // Date
 				{
 					column.ColumnType = ColumnType.DateTime;
 					break;
 				}
 
-				case 6:  // Currency
+				case 6: // Currency
 				{
 					column.ColumnType = ColumnType.Currency;
 					break;
 				}
 
-				case 11:  // Yes/No
+				case 11: // Yes/No
 				{
 					column.ColumnType = ColumnType.YesNo;
 					break;
 				}
 
-				case 128:  // OLE
+				case 128: // OLE
 				{
 					column.ColumnType = ColumnType.Ole;
 					break;
@@ -463,9 +477,12 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		private static ForeignKey GetForeignKeyRelationship(
 			Relationship relationship)
 		{
-			ForeignKey foreignKey = new ForeignKey(relationship.Name,
-				relationship.ChildTableCol, relationship.ParentTable,
-				relationship.ParentTableCol, relationship.OnDeleteCascade,
+			ForeignKey foreignKey = new ForeignKey(
+				relationship.Name,
+				relationship.ChildTableCol,
+				relationship.ParentTable,
+				relationship.ParentTableCol,
+				relationship.OnDeleteCascade,
 				relationship.OnUpdateCascade);
 
 			return foreignKey;
@@ -474,15 +491,15 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		private static Relationship GetRelationship(DataRow foreignKey)
 		{
 			Relationship relationship = new Relationship();
-				relationship.Name = foreignKey["FK_NAME"].ToString();
-				relationship.ParentTable =
-					foreignKey["PK_TABLE_NAME"].ToString();
-				relationship.ParentTableCol =
-					foreignKey["PK_COLUMN_NAME"].ToString();
-				relationship.ChildTable =
-					foreignKey["FK_TABLE_NAME"].ToString();
-				relationship.ChildTableCol =
-					foreignKey["FK_COLUMN_NAME"].ToString();
+			relationship.Name = foreignKey["FK_NAME"].ToString();
+			relationship.ParentTable =
+				foreignKey["PK_TABLE_NAME"].ToString();
+			relationship.ParentTableCol =
+				foreignKey["PK_COLUMN_NAME"].ToString();
+			relationship.ChildTable =
+				foreignKey["FK_TABLE_NAME"].ToString();
+			relationship.ChildTableCol =
+				foreignKey["FK_COLUMN_NAME"].ToString();
 
 			if (foreignKey["UPDATE_RULE"].ToString() != "NO ACTION")
 				relationship.OnUpdateCascade = true;
@@ -500,72 +517,73 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 			using (OleDbSchema oleDbSchema = new OleDbSchema(databaseFile))
 			{
 				tables = new System.Collections.Hashtable();
-			ArrayList relationships = new System.Collections.ArrayList();
+				ArrayList relationships = new System.Collections.ArrayList();
 
 				DataTable tableNames = oleDbSchema.TableNames;
 
-			foreach (DataRow row in tableNames.Rows)
-			{
-				string tableName = row["TABLE_NAME"].ToString();
+				foreach (DataRow row in tableNames.Rows)
+				{
+					string tableName = row["TABLE_NAME"].ToString();
 
-				Table table = new Table(tableName);
+					Table table = new Table(tableName);
 
-					log.Info(CultureInfo.InvariantCulture,
+					log.Info(
+						CultureInfo.InvariantCulture,
 						m => m("Getting Columns for " + tableName));
 					DataTable dataColumns =
 						oleDbSchema.GetTableColumns(tableName);
 
-				foreach (DataRow dataColumn in dataColumns.Rows)
-				{
-					Column column = FormatColumnFromDataRow(dataColumn);
-
-					table.AddColumn(column);
-				}
-
-				// Get primary key
-				DataTable primary_key_table =
-					oleDbSchema.GetPrimaryKeys(tableName);
-
-				foreach (DataRow pkrow in primary_key_table.Rows)
-				{
-					table.PrimaryKey = pkrow["COLUMN_NAME"].ToString();
-				}
-
-				// If PK is an integer change type to AutoNumber
-					if (!string.IsNullOrWhiteSpace(table.PrimaryKey))
-				{
-					if (((Column)table.Columns[table.PrimaryKey]).ColumnType ==
-						ColumnType.Number)
+					foreach (DataRow dataColumn in dataColumns.Rows)
 					{
-						((Column)table.Columns[table.PrimaryKey]).ColumnType =
-							ColumnType.AutoNumber;
+						Column column = FormatColumnFromDataRow(dataColumn);
+
+						table.AddColumn(column);
 					}
-				}
 
-				DataTable foreignKeyTable =
-					oleDbSchema.GetForeignKeys(tableName);
+					// Get primary key
+					DataTable primary_key_table =
+						oleDbSchema.GetPrimaryKeys(tableName);
 
-				foreach (DataRow foreignKey in foreignKeyTable.Rows)
-				{
+					foreach (DataRow pkrow in primary_key_table.Rows)
+					{
+						table.PrimaryKey = pkrow["COLUMN_NAME"].ToString();
+					}
+
+					// If PK is an integer change type to AutoNumber
+					if (!string.IsNullOrWhiteSpace(table.PrimaryKey))
+					{
+						if (((Column)table.Columns[table.PrimaryKey]).ColumnType ==
+							ColumnType.Number)
+						{
+							((Column)table.Columns[table.PrimaryKey]).ColumnType =
+								ColumnType.AutoNumber;
+						}
+					}
+
+					DataTable foreignKeyTable =
+						oleDbSchema.GetForeignKeys(tableName);
+
+					foreach (DataRow foreignKey in foreignKeyTable.Rows)
+					{
 						Relationship relationship =
 							GetRelationship(foreignKey);
 
-					relationships.Add(relationship);
+						relationships.Add(relationship);
+					}
+
+					tables.Add(table.Name, table);
 				}
 
-				tables.Add(table.Name, table);
-			}
+				// Add foreign keys to table, using relationships
+				foreach (Relationship relationship in relationships)
+				{
+					string name = relationship.ChildTable;
 
-			// Add foreign keys to table, using relationships
-			foreach (Relationship relationship in relationships)
-			{
-				string name = relationship.ChildTable;
-
-				ForeignKey foreignKey =
-					GetForeignKeyRelationship(relationship);
+					ForeignKey foreignKey =
+						GetForeignKeyRelationship(relationship);
 
 					((Table)tables[name]).ForeignKeys.Add(foreignKey);
-			}
+				}
 			}
 
 			return tables;
@@ -595,7 +613,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		}
 
 		/// <summary>
-		/// Performs a topological sort on a list with dependencies
+		/// Performs a topological sort on a list with dependencies.
 		/// </summary>
 		/// <param name="table">A table to be sorted with the structure
 		/// Object name, ArrayList dependencies.</param>
@@ -618,10 +636,12 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 					{
 						if (!sortedList.Contains(key))
 						{
-							log.Info(CultureInfo.InvariantCulture,
+							log.Info(
+								CultureInfo.InvariantCulture,
 								m => m("Adding: (ND) " + key.ToString()));
 							sortedList.Insert(0, key);
 						}
+
 						continue;
 					}
 
@@ -653,7 +673,8 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 					{
 						if (!sortedList.Contains(key))
 						{
-							log.Info(CultureInfo.InvariantCulture,
+							log.Info(
+								CultureInfo.InvariantCulture,
 								m => m("Adding: (D) " + key.ToString()));
 							sortedList.Add(key);
 						}
@@ -675,48 +696,29 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 			{
 				case ColumnType.Number:
 				case ColumnType.AutoNumber:
-				{
 					sql += " INTEGER";
 					break;
-				}
 				case ColumnType.String:
-				{
 					sql += string.Format(
 						CultureInfo.InvariantCulture,
 						" VARCHAR({0})",
 						column.Length);
 					break;
-				}
-
 				case ColumnType.Memo:
-				{
 					sql += " MEMO";
 					break;
-				}
-
 				case ColumnType.DateTime:
-				{
 					sql += " DATETIME";
 					break;
-				}
-
 				case ColumnType.Currency:
-				{
 					sql += " CURRENCY";
 					break;
-				}
-
 				case ColumnType.Ole:
-				{
 					sql += " OLEOBJECT";
 					break;
-				}
-
 				case ColumnType.YesNo:
-				{
 					sql += " OLEOBJECT";
 					break;
-				}
 			}
 
 			if (column.Unique)
@@ -832,6 +834,5 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 
 			return sql;
 		}
-
 	} // End class
 } // End Namespace

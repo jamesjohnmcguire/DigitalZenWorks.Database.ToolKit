@@ -13,7 +13,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 {
 	/////////////////////////////////////////////////////////////////////////
 	/// <summary>
-	/// Represents values to specify the types of databases
+	/// Represents values to specify the types of databases.
 	/// </summary>
 	/////////////////////////////////////////////////////////////////////////
 	public enum DatabaseType

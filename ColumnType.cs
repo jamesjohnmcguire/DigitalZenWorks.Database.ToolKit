@@ -10,7 +10,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 	/// Generic column types
 	/// Represents an enumeration of column types.
 	///
-	/// TODO: Update to be less Access and more generic
+	/// TODO: Update to be less Access and more generic.
 	/// </summary>
 	public enum ColumnType
 	{
@@ -20,7 +20,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/// Auto increment type
 		/// </summary>
 		/////////////////////////////////////////////////////////////////////
-		AutoNumber,	
+		AutoNumber,
 
 		/////////////////////////////////////////////////////////////////////
 		/// <summary>

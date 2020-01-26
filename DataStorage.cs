@@ -24,13 +24,13 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 	/// Class <c>DataStorage</c>
 	/// <summary>
 	/// Class for Generic database access independent of the underlying
-	/// transport
+	/// transport.
 	/// </summary>
 	/////////////////////////////////////////////////////////////////////////
 	public class DataStorage : IDisposable
 	{
 		/// <summary>
-		/// databaseType
+		/// databaseType.
 		/// </summary>
 		private readonly DatabaseType databaseType;
 
@@ -40,12 +40,12 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		private readonly string connectionText = string.Empty;
 
 		/// <summary>
-		/// Database Connection Object
+		/// Database Connection Object.
 		/// </summary>
 		private DbConnection connection = null;
 
 		/// <summary>
-		/// Ole Database Connection Object
+		/// Ole Database Connection Object.
 		/// </summary>
 		private OleDbConnection oleDbConnection = null;
 
@@ -53,20 +53,21 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 
 		// transactions
 		/// <summary>
-		/// transaction object
+		/// transaction object.
 		/// </summary>
 		private DbTransaction databaseTransaction;
 
 		/// <summary>
-		/// Diagnostics object
+		/// Diagnostics object.
 		/// </summary>
-		private static readonly ILog log = LogManager.GetLogger
-			(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+		private static readonly ILog log = LogManager.GetLogger(
+			System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
 		private readonly string provider = string.Empty;
 
 		private static readonly ResourceManager stringTable = new
-			ResourceManager("DigitalZenWorks.Common.DatabaseLibrary.Resources",
+			ResourceManager(
+			"DigitalZenWorks.Common.DatabaseLibrary.Resources",
 			Assembly.GetExecutingAssembly());
 
 		private int timeOut = 30;
@@ -94,7 +95,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 					}
 					else
 					{
-						//tables = connection.GetSchema("TABLE");
+						// tables = connection.GetSchema("TABLE");
 						tables = connection.GetSchema();
 					}
 				}
@@ -106,7 +107,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		public int TimeOut { get { return timeOut; } set { timeOut = value; } }
 
 		/// <summary>
-		/// DataStorage - Default constructor
+		/// DataStorage - Default constructor.
 		/// </summary>
 		public DataStorage()
 		{
@@ -122,7 +123,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		}
 
 		/// <summary>
-		/// DataStorage - Constructor
+		/// DataStorage - Constructor.
 		/// </summary>
 		/// <param name="provider"></param>
 		/// <param name="dataSource"></param>
@@ -134,7 +135,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		}
 
 		/// <summary>
-		/// DataStorage - Constructor
+		/// DataStorage - Constructor.
 		/// </summary>
 		/// <param name="databaseType"></param>
 		/// <param name="connectionString"></param>
@@ -145,7 +146,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		}
 
 		/// <summary>
-		/// DataStorage - Constructor
+		/// DataStorage - Constructor.
 		/// </summary>
 		/// <param name="databaseType"></param>
 		/// <param name="dataSource"></param>
@@ -158,7 +159,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		}
 
 		/// <summary>
-		/// Closes the database connection and object
+		/// Closes the database connection and object.
 		/// </summary>
 		public void Close()
 		{
@@ -166,7 +167,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		}
 
 		/// <summary>
-		/// Dispose
+		/// Dispose.
 		/// </summary>
 		/// <param name="disposing"></param>
 		protected virtual void Dispose(bool disposing)
@@ -200,7 +201,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		}
 
 		/// <summary>
-		/// Dispose
+		/// Dispose.
 		/// </summary>
 		public void Dispose()
 		{
@@ -218,11 +219,11 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 			Close();
 
 			// not unless we find it's really needed
-			//System.GC.Collect();
+			// System.GC.Collect();
 		}
 
 		/// <summary>
-		/// The database connection object
+		/// The database connection object.
 		/// </summary>
 		public DbConnection Connection
 		{
@@ -321,7 +322,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/////////////////////////////////////////////////////////////////////
 		/// Method <c>Delete</c>
 		/// <summary>
-		/// Performs an SQL DELETE command
+		/// Performs an SQL DELETE command.
 		/// </summary>
 		/// <param name="sql"></param>
 		/// <returns>Success / Failure</returns>
@@ -335,7 +336,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 
 		/////////////////////////////////////////////////////////////////////
 		/// <summary>
-		/// Prepares and executes a Non-Query DB Command
+		/// Prepares and executes a Non-Query DB Command.
 		/// </summary>
 		/////////////////////////////////////////////////////////////////////
 		public bool ExecuteNonQuery(string sql)
@@ -345,11 +346,11 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 
 		/////////////////////////////////////////////////////////////////////
 		/// <summary>
-		/// Prepares and executes a Non-Query DB Command
+		/// Prepares and executes a Non-Query DB Command.
 		/// </summary>
 		/////////////////////////////////////////////////////////////////////
-		public bool ExecuteNonQuery(string sql,
-			IDictionary<string, object> values)
+		public bool ExecuteNonQuery(
+			string sql, IDictionary<string, object> values)
 		{
 			bool returnCode = false;
 
@@ -377,7 +378,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/////////////////////////////////////////////////////////////////////
 		/// Method <c>GetDataField</c>
 		/// <summary>
-		/// Gets a single field from a row of data
+		/// Gets a single field from a row of data.
 		/// </summary>
 		/// <param name="sql"></param>
 		/// <returns>the field object</returns>
@@ -398,7 +399,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/////////////////////////////////////////////////////////////////////
 		/// Method <c>GetDataRow</c>
 		/// <summary>
-		/// Gets a single row of data
+		/// Gets a single row of data.
 		/// </summary>
 		/// <param name="sql"></param>
 		/// <returns>DataRow</returns>
@@ -411,14 +412,14 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/////////////////////////////////////////////////////////////////////
 		/// Method <c>GetDataRow</c>
 		/// <summary>
-		/// Gets a single row of data
+		/// Gets a single row of data.
 		/// </summary>
 		/// <param name="sql"></param>
 		/// <param name="values"></param>
 		/// <returns>DataRow, null on failure</returns>
 		/////////////////////////////////////////////////////////////////////
-		public DataRow GetDataRow(string sql,
-			IDictionary<string, object> values)
+		public DataRow GetDataRow(
+			string sql, IDictionary<string, object> values)
 		{
 			DataRow row = null;
 
@@ -455,8 +456,8 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		[System.Diagnostics.CodeAnalysis.SuppressMessage(
 			"Microsoft.Reliability",
 			"CA2000:Dispose objects before losing scope")]
-		public DataSet GetDataSet(string sql,
-			IDictionary<string, object> values)
+		public DataSet GetDataSet(
+			string sql, IDictionary<string, object> values)
 		{
 			DataSet dataSet = null;
 			DbDataAdapter dataAdapter = null;
@@ -473,27 +474,22 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 						switch (databaseType)
 						{
 							case DatabaseType.OleDb:
-							{
 								dataAdapter = new OleDbDataAdapter();
 								break;
-							}
 							case DatabaseType.SqlServer:
-							{
 								dataAdapter = new SqlDataAdapter();
 								break;
-							}
 							case DatabaseType.MySql:
-							{
 								dataAdapter = new MySqlDataAdapter();
 								break;
-							}
 						}
 
 						dataAdapter.SelectCommand = command;
 
 						dataAdapter.Fill(dataSet);
 
-						log.Info(CultureInfo.InvariantCulture,
+						log.Info(
+							CultureInfo.InvariantCulture,
 							m => m("OK - getDataSet - Query: {0}", sql));
 					}
 				}
@@ -545,8 +541,8 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/// <param name="values"></param>
 		/// <returns>DataTable or null on failure</returns>
 		/////////////////////////////////////////////////////////////////////
-		public DataTable GetDataTable(string sql,
-			IDictionary<string, object> values)
+		public DataTable GetDataTable(
+			string sql, IDictionary<string, object> values)
 		{
 			DataTable dataTable = null;
 
@@ -564,7 +560,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/////////////////////////////////////////////////////////////////////
 		/// Method <c>Insert</c>
 		/// <summary>
-		/// Performs an Sql UPDATE command
+		/// Performs an Sql UPDATE command.
 		/// </summary>
 		/// <param name="sql"></param>
 		/// <returns>object item</returns>
@@ -732,8 +728,8 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 			return returnCode;
 		}
 
-		private static DbParameterCollection AddParameters(DbCommand command,
-			IDictionary<string, object> values)
+		private static DbParameterCollection AddParameters(
+			DbCommand command, IDictionary<string, object> values)
 		{
 			DbParameterCollection parameters = command.Parameters;
 
@@ -794,12 +790,12 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 						string singularPascalCase =
 							GetSingularPascalName(column.ColumnName);
 
-						if ((propertyDetails.Name.Equals(
+						if (propertyDetails.Name.Equals(
 							column.ColumnName,
-							StringComparison.OrdinalIgnoreCase)) ||
-							(propertyDetails.Name.Equals(
+							StringComparison.OrdinalIgnoreCase) ||
+							propertyDetails.Name.Equals(
 							singularPascalCase,
-							StringComparison.OrdinalIgnoreCase)))
+							StringComparison.OrdinalIgnoreCase))
 						{
 							if (!propertyDetails.PropertyType.Name.Equals(
 								column.DataType.Name))
@@ -832,8 +828,8 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 			return GeneralUtilities.ConvertToPascalCaseFromKnr(columnName);
 		}
 
-		private string CreateConnectionString(string dataSource,
-			string catalog)
+		private string CreateConnectionString(
+			string dataSource, string catalog)
 		{
 			string connectionString = null;
 
@@ -859,7 +855,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/////////////////////////////////////////////////////////////////////
 		/// <summary>
 		/// The first column of the first row in the result set,
-		/// or a null reference if the result set is empty
+		/// or a null reference if the result set is empty.
 		/// </summary>
 		/////////////////////////////////////////////////////////////////////
 		private int ExecuteScalar(string sql)
@@ -874,8 +870,8 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 
 					if (null != Result)
 					{
-						result = Convert.ToInt32(Result,
-							CultureInfo.InvariantCulture);
+						result = Convert.ToInt32(
+							Result, CultureInfo.InvariantCulture);
 					}
 				}
 
@@ -888,13 +884,14 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 			return result;
 		}
 
-		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security",
+		[System.Diagnostics.CodeAnalysis.SuppressMessage(
+			"Microsoft.Security",
 			"CA2100:Review SQL queries for security vulnerabilities")]
 		[System.Diagnostics.CodeAnalysis.SuppressMessage(
 			"Microsoft.Reliability",
 			"CA2000:Dispose objects before losing scope")]
-		private DbCommand GetCommandObject(string sql,
-			IDictionary<string, object> values)
+		private DbCommand GetCommandObject(
+			string sql, IDictionary<string, object> values)
 		{
 			DbCommand command = null;
 
@@ -907,20 +904,14 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 					switch (databaseType)
 					{
 						case DatabaseType.OleDb:
-						{
 							command = new OleDbCommand();
 							break;
-						}
 						case DatabaseType.SqlServer:
-						{
 							command = new SqlCommand();
 							break;
-						}
 						case DatabaseType.MySql:
-						{
 							command = new MySqlCommand();
 							break;
-						}
 					}
 
 					if (null != values)
@@ -928,16 +919,12 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 						switch (databaseType)
 						{
 							case DatabaseType.OleDb:
-							{
 								AddParameters((OleDbCommand)command, values);
 								break;
-							}
 							case DatabaseType.SqlServer:
 							case DatabaseType.MySql:
-							{
 								AddParameters(command, values);
 								break;
-							}
 						}
 					}
 
@@ -963,7 +950,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		}
 
 		/// <summary>
-		/// Prepares all necessary class variables by various constructors
+		/// Prepares all necessary class variables by various constructors.
 		/// </summary>
 		private bool Initialize(bool forceReset = false)
 		{
@@ -986,23 +973,17 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 					switch (databaseType)
 					{
 						case DatabaseType.OleDb:
-						{
 							// Two statements help in debugging problems
 							oleDbConnection = new OleDbConnection(connectionText);
 							connection = oleDbConnection;
 							break;
-						}
 						case DatabaseType.SqlServer:
-						{
 							connection = new SqlConnection(connectionText);
 							break;
-						}
 						case DatabaseType.MySql:
-						{
 							mySqlConnection = new MySqlConnection(connectionText);
 							connection = mySqlConnection;
 							break;
-						}
 					}
 				}
 
@@ -1029,5 +1010,5 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 
 			return returnValue;
 		}
-	}   // end class
-}   // end namespace
+	} // end class
+} // end namespace

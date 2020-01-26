@@ -16,7 +16,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 {
 	/////////////////////////////////////////////////////////////////////////
 	/// <summary>
-	/// Base class for database collection classes
+	/// Base class for database collection classes.
 	/// </summary>
 	/////////////////////////////////////////////////////////////////////////
 	public class DataObjectsBase
@@ -26,7 +26,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 
 		/////////////////////////////////////////////////////////////////////
 		/// <summary>
-		/// Represents a provider type for a connection string
+		/// Represents a provider type for a connection string.
 		/// </summary>
 		/////////////////////////////////////////////////////////////////////
 		private const string provider = "Microsoft.ACE.OLEDB.12.0";
@@ -35,7 +35,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 
 		/////////////////////////////////////////////////////////////////////
 		/// <summary>
-		/// Represents the core database object
+		/// Represents the core database object.
 		/// </summary>
 		/////////////////////////////////////////////////////////////////////
 		[CLSCompliantAttribute(false)]
@@ -47,7 +47,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/////////////////////////////////////////////////////////////////////
 		/// <summary>
 		/// Contains the name of the primary database table associated with
-		/// this collection
+		/// this collection.
 		/// </summary>
 		/////////////////////////////////////////////////////////////////////
 		protected string TableName
@@ -58,19 +58,18 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 
 		/////////////////////////////////////////////////////////////////////
 		/// <summary>
-		/// Constructor for exiting DataStorage object
+		/// Constructor for exiting DataStorage object.
 		/// </summary>
 		/// <param name="database"></param>
 		/////////////////////////////////////////////////////////////////////
 		public DataObjectsBase(DataStorage database)
 		{
-
 			this.database = database;
 		}
 
 		/////////////////////////////////////////////////////////////////////
 		/// <summary>
-		/// Represents a base collection of data objects
+		/// Represents a base collection of data objects.
 		/// </summary>
 		/// <param name="dataSource"></param>
 		/////////////////////////////////////////////////////////////////////
@@ -88,7 +87,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 
 		/////////////////////////////////////////////////////////////////////
 		/// <summary>
-		/// Represents a base collection of data objects
+		/// Represents a base collection of data objects.
 		/// </summary>
 		/// <param name="tableName"></param>
 		/// <param name="dataSource"></param>
@@ -109,7 +108,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 
 		/////////////////////////////////////////////////////////////////////
 		/// <summary>
-		/// Constructor for database type and connection string
+		/// Constructor for database type and connection string.
 		/// </summary>
 		/// <param name="tableName"></param>
 		/// <param name="databaseType"></param>
@@ -127,7 +126,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 
 		/////////////////////////////////////////////////////////////////////
 		/// <summary>
-		/// Dispose
+		/// Dispose.
 		/// </summary>
 		/// <param name="disposing"></param>
 		/////////////////////////////////////////////////////////////////////
@@ -145,7 +144,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 
 		/////////////////////////////////////////////////////////////////////
 		/// <summary>
-		/// Dispose
+		/// Dispose.
 		/// </summary>
 		/////////////////////////////////////////////////////////////////////
 		public void Dispose()
@@ -156,7 +155,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 
 		/////////////////////////////////////////////////////////////////////
 		/// <summary>
-		/// Deletes the record identified by Id
+		/// Deletes the record identified by Id.
 		/// </summary>
 		/////////////////////////////////////////////////////////////////////
 		public bool Delete(string table, int id)
@@ -176,7 +175,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 
 		/////////////////////////////////////////////////////////////////////
 		/// <summary>
-		/// Returns a DataTable of the table
+		/// Returns a DataTable of the table.
 		/// </summary>
 		/////////////////////////////////////////////////////////////////////
 		public DataTable GetAllDataTable(string table)
@@ -194,7 +193,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 
 		/////////////////////////////////////////////////////////////////////
 		/// <summary>
-		/// Represents the record identified by the where clause
+		/// Represents the record identified by the where clause.
 		/// </summary>
 		/////////////////////////////////////////////////////////////////////
 		public DataRow GetBy(string table, string where)
@@ -214,7 +213,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 
 		/////////////////////////////////////////////////////////////////////
 		/// <summary>
-		/// Gets the id of the record identified by the where clause
+		/// Gets the id of the record identified by the where clause.
 		/// </summary>
 		/////////////////////////////////////////////////////////////////////
 		public virtual DataRow GetByName(string table, string name)
@@ -224,7 +223,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 
 		/////////////////////////////////////////////////////////////////////
 		/// <summary>
-		/// Gets the id of the record identified by the where clause
+		/// Gets the id of the record identified by the where clause.
 		/// </summary>
 		/////////////////////////////////////////////////////////////////////
 		public virtual int GetIdByName(string table, string name)
