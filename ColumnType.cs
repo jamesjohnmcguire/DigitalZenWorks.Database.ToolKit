@@ -1,6 +1,7 @@
 ﻿/////////////////////////////////////////////////////////////////////////////
-// Copyright © 2015 - 2019 by James John McGuire
-// All rights reserved.
+// <copyright file="ColumnType.cs" company="James John McGuire">
+// Copyright © 2006 - 2020 James John McGuire. All Rights Reserved.
+// </copyright>
 /////////////////////////////////////////////////////////////////////////////
 
 namespace DigitalZenWorks.Common.DatabaseLibrary

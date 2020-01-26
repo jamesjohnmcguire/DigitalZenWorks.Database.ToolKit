@@ -1,7 +1,9 @@
 ﻿/////////////////////////////////////////////////////////////////////////////
-// Copyright © 2006 - 2019 by James John McGuire
-// All rights reserved.
+// <copyright file="Table.cs" company="James John McGuire">
+// Copyright © 2006 - 2020 James John McGuire. All Rights Reserved.
+// </copyright>
 /////////////////////////////////////////////////////////////////////////////
+
 using Common.Logging;
 using System;
 using System.Collections;

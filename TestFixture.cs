@@ -1,4 +1,9 @@
-﻿// Copyright © 2009 - 2019 by James John McGuire
+﻿/////////////////////////////////////////////////////////////////////////////
+// <copyright file="TestFixture.cs" company="James John McGuire">
+// Copyright © 2006 - 2020 James John McGuire. All Rights Reserved.
+// </copyright>
+/////////////////////////////////////////////////////////////////////////////
+
 using System;
 using System.Collections.Generic;
 using System.Text;
