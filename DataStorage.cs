@@ -67,7 +67,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 
 		private static readonly ResourceManager stringTable = new
 			ResourceManager(
-			"DigitalZenWorks.Common.DatabaseLibrary.Resources",
+			"DatabaseLibraryNet.Resources",
 			Assembly.GetExecutingAssembly());
 
 		private int timeOut = 30;
@@ -111,6 +111,8 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/// </summary>
 		public DataStorage()
 		{
+			var test = stringTable.GetString("EXCEPTION", CultureInfo.InvariantCulture);
+
 			if ((ConfigurationManager.ConnectionStrings != null) &&
 				(ConfigurationManager.ConnectionStrings.Count > 0))
 			{
@@ -498,10 +500,15 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 			{
 				RollbackTransaction();
 
+				string message = stringTable.GetString(
+					"EXCEPTION", CultureInfo.InvariantCulture);
 				log.Error(CultureInfo.InvariantCulture, m => m(
-					stringTable.GetString("EXCEPTION") + exception));
+					message + exception));
+
+				message = stringTable.GetString(
+					"COMMAND", CultureInfo.InvariantCulture);
 				log.Error(CultureInfo.InvariantCulture, m => m(
-					stringTable.GetString("COMMAND") + sql));
+					message + sql));
 				throw;
 			}
 			finally
