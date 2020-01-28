@@ -7,17 +7,10 @@
 		<Copyright>Copyright © 2006 - 2020</Copyright>
 		<NeutralLanguage>en-US</NeutralLanguage>
 		<NoWarn>NU1701</NoWarn>
+		<Platforms>AnyCPU;x64</Platforms>
 		<SignAssembly>true</SignAssembly>
 		<TargetFramework>netstandard2.0</TargetFramework>
 	</PropertyGroup>
-
-	<ItemGroup>
-		<PackageReference Include="System.Diagnostics.Debug" Version="4.3.0" />
-		<PackageReference Include="System.IO.FileSystem" Version="4.3.0" />
-		<PackageReference Include="System.Net.NameResolution" Version="4.3.0" />
-		<PackageReference Include="System.Runtime.Extensions" Version="4.3.1" />
-		<PackageReference Include="System.Threading" Version="4.3.0" />
-	</ItemGroup>
 
 	<ItemGroup>
 		<PackageReference Include="Common.Logging" Version="3.4.1" />
@@ -54,18 +47,7 @@
 
 	<ItemGroup>
 	  <AdditionalFiles Include="stylecop.json" />
-	</ItemGroup>
-
-	<ItemGroup>
 	  <CodeAnalysisDictionary Include="CodeAnalysis.ruleset" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<Compile Update="Resources.Designer.cs">
-			<AutoGen>True</AutoGen>
-			<DesignTime>True</DesignTime>
-			<DependentUpon>Resources.resx</DependentUpon>
-		</Compile>
 		<None Include="DatabaseLibraryNet.snk" />
 		<EmbeddedResource Include="template.mdb">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
