@@ -1,4 +1,10 @@
-﻿using System;
+﻿/////////////////////////////////////////////////////////////////////////////
+// <copyright file="IDatabaseCollection.cs" company="James John McGuire">
+// Copyright © 2006 - 2020 James John McGuire. All Rights Reserved.
+// </copyright>
+/////////////////////////////////////////////////////////////////////////////
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;

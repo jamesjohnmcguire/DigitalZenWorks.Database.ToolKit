@@ -1,7 +1,9 @@
 ﻿/////////////////////////////////////////////////////////////////////////////
-// Copyright © 2006 - 2019 by James John McGuire
-// All rights reserved.
+// <copyright file="DatabaseUtilities.cs" company="James John McGuire">
+// Copyright © 2006 - 2020 James John McGuire. All Rights Reserved.
+// </copyright>
 /////////////////////////////////////////////////////////////////////////////
+
 using Common.Logging;
 using DigitalZenWorks.Common.Utilities;
 using System;
@@ -19,10 +21,12 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 	/// </summary>
 	public static class DatabaseUtilities
 	{
-		private static readonly ILog log = LogManager.GetLogger
-			(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+		private static readonly ILog log = LogManager.GetLogger(
+			System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
 		private static readonly ResourceManager stringTable = new
-			ResourceManager("DigitalZenWorks.Common.DatabaseLibrary.Resources",
+			ResourceManager(
+			"DatabaseLibraryNet.Resources",
 			Assembly.GetExecutingAssembly());
 
 		/////////////////////////////////////////////////////////////////////
@@ -44,8 +48,8 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/// <param name="table"></param>
 		/// <param name="file"></param>
 		/// <returns></returns>
-		public static bool ExportDataTableToCsv(DataTable table,
-			TextWriter file)
+		public static bool ExportDataTableToCsv(
+			DataTable table, TextWriter file)
 		{
 			bool returnCode = false;
 
@@ -80,6 +84,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 						{
 							file.Write(row[Index].ToString());
 						}
+
 						if (Index < ColumnCount - 1)
 						{
 							file.Write("\", ");
@@ -98,11 +103,11 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/////////////////////////////////////////////////////////////////////
 		/// Method <c>ExportToCsv</c>
 		/// <summary>
-		/// Export all tables to similarly named csv files
+		/// Export all tables to similarly named csv files.
 		/// </summary>
 		/////////////////////////////////////////////////////////////////////
-		public static bool ExportToCsv(string databaseFile,
-			string csvPath)
+		public static bool ExportToCsv(
+			string databaseFile, string csvPath)
 		{
 			bool returnCode = false;
 
@@ -140,11 +145,12 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 
 				Database.Shutdown();
 			}
+
 			return returnCode;
 		}
 
 		/// <summary>
-		/// Makes a privileged connection string
+		/// Makes a privileged connection string.
 		/// </summary>
 		/// <param name="databaseFile"></param>
 		/// <returns></returns>

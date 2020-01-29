@@ -1,6 +1,7 @@
 ﻿/////////////////////////////////////////////////////////////////////////////
-// Copyright © 2015 - 2019 by James John McGuire
-// All rights reserved.
+// <copyright file="ColumnType.cs" company="James John McGuire">
+// Copyright © 2006 - 2020 James John McGuire. All Rights Reserved.
+// </copyright>
 /////////////////////////////////////////////////////////////////////////////
 
 namespace DigitalZenWorks.Common.DatabaseLibrary
@@ -9,7 +10,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 	/// Generic column types
 	/// Represents an enumeration of column types.
 	///
-	/// TODO: Update to be less Access and more generic
+	/// TODO: Update to be less Access and more generic.
 	/// </summary>
 	public enum ColumnType
 	{
@@ -19,7 +20,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/// Auto increment type
 		/// </summary>
 		/////////////////////////////////////////////////////////////////////
-		AutoNumber,	
+		AutoNumber,
 
 		/////////////////////////////////////////////////////////////////////
 		/// <summary>

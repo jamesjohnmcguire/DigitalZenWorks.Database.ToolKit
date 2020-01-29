@@ -1,7 +1,9 @@
 ﻿/////////////////////////////////////////////////////////////////////////////
-// Copyright © 2006 - 2019 by James John McGuire
-// All rights reserved.
+// <copyright file="Column.cs" company="James John McGuire">
+// Copyright © 2006 - 2020 James John McGuire. All Rights Reserved.
+// </copyright>
 /////////////////////////////////////////////////////////////////////////////
+
 namespace DigitalZenWorks.Common.DatabaseLibrary
 {
 	/////////////////////////////////////////////////////////////////////////
@@ -21,7 +23,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 
 		/////////////////////////////////////////////////////////////////////
 		/// <summary>
-		/// The type of the column
+		/// The type of the column.
 		/// </summary>
 		/////////////////////////////////////////////////////////////////////
 		public ColumnType ColumnType
@@ -32,7 +34,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 
 		/////////////////////////////////////////////////////////////////////
 		/// <summary>
-		/// Represents the default value of the column
+		/// Represents the default value of the column.
 		/// </summary>
 		/////////////////////////////////////////////////////////////////////
 		public string DefaultValue
@@ -50,7 +52,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 
 		/////////////////////////////////////////////////////////////////////
 		/// <summary>
-		/// The length of the column
+		/// The length of the column.
 		/// </summary>
 		/////////////////////////////////////////////////////////////////////
 		public int Length
@@ -75,7 +77,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 
 		/////////////////////////////////////////////////////////////////////
 		/// <summary>
-		/// The name of the column
+		/// The name of the column.
 		/// </summary>
 		/////////////////////////////////////////////////////////////////////
 		public string Name
@@ -86,7 +88,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 
 		/////////////////////////////////////////////////////////////////////
 		/// <summary>
-		/// Represents whether the column can have a null value
+		/// Represents whether the column can have a null value.
 		/// </summary>
 		/////////////////////////////////////////////////////////////////////
 		public bool Nullable
@@ -97,7 +99,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 
 		/////////////////////////////////////////////////////////////////////
 		/// <summary>
-		/// Represents the position of the column
+		/// Represents the position of the column.
 		/// </summary>
 		/////////////////////////////////////////////////////////////////////
 		public int Position
@@ -115,7 +117,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 
 		/////////////////////////////////////////////////////////////////////
 		/// <summary>
-		/// Represents whether the column requires unique values
+		/// Represents whether the column requires unique values.
 		/// </summary>
 		/////////////////////////////////////////////////////////////////////
 		public bool Unique
@@ -126,7 +128,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 
 		/////////////////////////////////////////////////////////////////////
 		/// <summary>
-		/// Default Constructor
+		/// Default Constructor.
 		/// </summary>
 		/////////////////////////////////////////////////////////////////////
 		public Column()
@@ -135,11 +137,17 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 
 		/////////////////////////////////////////////////////////////////////
 		/// <summary>
-		/// Constructor
+		/// Constructor.
 		/// </summary>
 		/////////////////////////////////////////////////////////////////////
-		public Column(string name, ColumnType type, int length, bool unique,
-			bool nullable, string defaultValue, int position)
+		public Column(
+			string name,
+			ColumnType type,
+			int length,
+			bool unique,
+			bool nullable,
+			string defaultValue,
+			int position)
 		{
 			Name = name;
 			ColumnType = type;

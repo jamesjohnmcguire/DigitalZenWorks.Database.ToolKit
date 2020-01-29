@@ -1,4 +1,10 @@
-﻿using System;
+﻿/////////////////////////////////////////////////////////////////////////////
+// <copyright file="Relationship.cs" company="James John McGuire">
+// Copyright © 2006 - 2020 James John McGuire. All Rights Reserved.
+// </copyright>
+/////////////////////////////////////////////////////////////////////////////
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -7,7 +13,7 @@ using System.Threading.Tasks;
 namespace DigitalZenWorks.Common.DatabaseLibrary
 {
 	/// <summary>
-	/// A class to hold foreign key constraints temporarily
+	/// A class to hold foreign key constraints temporarily.
 	/// </summary>
 	public class Relationship
 	{
@@ -20,55 +26,61 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		private bool updateCascade;
 
 		/// <summary>
-		/// Name
+		/// Name.
 		/// </summary>
 		public string Name
 		{
 			get { return name; }
 			set { name = value; }
 		}
+
 		/// <summary>
-		/// Parent Table
+		/// Parent Table.
 		/// </summary>
 		public string ParentTable
 		{
 			get { return parent; }
 			set { parent = value; }
 		}
+
 		/// <summary>
-		/// Parent Table Column
+		/// Parent Table Column.
 		/// </summary>
 		public string ParentTableCol
 		{
 			get { return parentColumn; }
 			set { parentColumn = value; }
 		}
+
 		/// <summary>
-		/// Child Table
+		/// Child Table.
 		/// </summary>
 		public string ChildTable
 		{
 			get { return child; }
 			set { child = value; }
 		}
+
 		/// <summary>
-		/// Child Table Column
+		/// Child Table Column.
 		/// </summary>
 		public string ChildTableCol
 		{
 			get { return childColumn; }
 			set { childColumn = value; }
 		}
+
 		/// <summary>
-		/// Indicates whether update cascades
+		/// Indicates whether update cascades.
 		/// </summary>
 		public bool OnUpdateCascade
 		{
 			get { return updateCascade; }
 			set { updateCascade = value; }
 		}
+
 		/// <summary>
-		/// Indicates whether delete cascades
+		/// Indicates whether delete cascades.
 		/// </summary>
 		public bool OnDeleteCascade
 		{

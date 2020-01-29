@@ -1,7 +1,9 @@
 ﻿/////////////////////////////////////////////////////////////////////////////
-// Copyright © 2006 - 2019 by James John McGuire
-// All rights reserved.
+// <copyright file="OleDbSchema.cs" company="James John McGuire">
+// Copyright © 2006 - 2020 James John McGuire. All Rights Reserved.
+// </copyright>
 /////////////////////////////////////////////////////////////////////////////
+
 using System;
 using System.Data;
 using System.Data.OleDb;
@@ -14,7 +16,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 	/// Represents an OleDbSchema object
 	/// </summary>
 	/////////////////////////////////////////////////////////////////////////
-	public class OleDbSchema:  IDisposable
+	public class OleDbSchema : IDisposable
 	{
 		/////////////////////////////////////////////////////////////////////
 		/// <summary>
@@ -162,7 +164,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 
 		/////////////////////////////////////////////////////////////////////
 		/// <summary>
-		/// Gets the constraints from the given table
+		/// Gets the constraints from the given table.
 		/// </summary>
 		/// <returns>DataTable</returns>
 		/////////////////////////////////////////////////////////////////////
