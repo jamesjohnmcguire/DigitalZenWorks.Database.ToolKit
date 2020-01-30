@@ -7,10 +7,9 @@
 		<Copyright>Copyright © 2006 - 2020</Copyright>
 		<NeutralLanguage>en-US</NeutralLanguage>
 		<NoWarn>NU1701</NoWarn>
-		<Platforms>AnyCPU;x64</Platforms>
+		<Platforms>AnyCPU;x86;x64</Platforms>
 		<SignAssembly>true</SignAssembly>
 		<TargetFramework>netstandard2.0</TargetFramework>
-		<Platforms>AnyCPU;x86</Platforms>
 	</PropertyGroup>
 
 	<ItemGroup>
