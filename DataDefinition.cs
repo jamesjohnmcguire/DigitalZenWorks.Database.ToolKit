@@ -70,7 +70,9 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 				exception is InvalidOperationException)
 			{
 				log.Error(CultureInfo.InvariantCulture, m => m(
-					stringTable.GetString("EXCEPTION") + exception));
+					stringTable.GetString(
+						"EXCEPTION", CultureInfo.InvariantCulture) +
+						exception));
 			}
 			catch
 			{
@@ -149,22 +151,28 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 
 			ColumnType columnType = ColumnType.Other;
 
-			for (int index = 0; index < columnTypeComareKeys.Length; index++)
+			if (column != null)
 			{
-				if (CompareColumnType(
-					column,
-					columnTypeComareKeys[index],
-					types[index],
-					ref columnType))
+				for (int index = 0; index < columnTypeComareKeys.Length;
+					index++)
 				{
-					break;
+					if (CompareColumnType(
+						column,
+						columnTypeComareKeys[index],
+						types[index],
+						ref columnType))
+					{
+						break;
+					}
 				}
 			}
 
 			if (columnType == ColumnType.Other)
 			{
 				log.Warn(CultureInfo.InvariantCulture, m => m(
-					stringTable.GetString("WARNING_OTHER") + column));
+					stringTable.GetString(
+						"WARNING_OTHER", CultureInfo.InvariantCulture) +
+						column));
 			}
 
 			return columnType;
@@ -309,7 +317,9 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 							try
 							{
 								log.Info(CultureInfo.InvariantCulture, m => m(
-								stringTable.GetString("COMMAND") + SqlQuery));
+								stringTable.GetString(
+									"COMMAND", CultureInfo.InvariantCulture) +
+									SqlQuery));
 
 								database.ExecuteNonQuery(SqlQuery);
 							}
@@ -319,12 +329,18 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 								exception is System.Data.OleDb.OleDbException)
 							{
 								log.Error(CultureInfo.InvariantCulture, m => m(
-									stringTable.GetString("EXCEPTION") + exception));
+									stringTable.GetString(
+										"EXCEPTION",
+										CultureInfo.InvariantCulture) +
+										exception));
 							}
 							catch (Exception exception)
 							{
 								log.Error(CultureInfo.InvariantCulture, m => m(
-									stringTable.GetString("EXCEPTION") + exception));
+									stringTable.GetString(
+										"EXCEPTION",
+										CultureInfo.InvariantCulture) +
+										exception));
 
 								throw;
 							}
@@ -344,12 +360,16 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 				exception is System.Data.OleDb.OleDbException)
 			{
 				log.Error(CultureInfo.InvariantCulture, m => m(
-					stringTable.GetString("EXCEPTION") + exception));
+					stringTable.GetString(
+						"EXCEPTION",
+						CultureInfo.InvariantCulture) + exception));
 			}
 			catch (Exception exception)
 			{
 				log.Error(CultureInfo.InvariantCulture, m => m(
-					stringTable.GetString("EXCEPTION") + exception));
+					stringTable.GetString(
+						"EXCEPTION",
+						CultureInfo.InvariantCulture) + exception));
 
 				throw;
 			}

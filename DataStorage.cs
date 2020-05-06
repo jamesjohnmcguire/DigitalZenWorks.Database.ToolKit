@@ -249,7 +249,9 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 			catch (Exception exception)
 			{
 				log.Error(CultureInfo.InvariantCulture, m => m(
-					stringTable.GetString("EXCEPTION") + exception));
+					stringTable.GetString(
+						"EXCEPTION",
+						CultureInfo.InvariantCulture) + exception));
 				throw;
 			}
 		}
@@ -312,10 +314,14 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		public static List<TItem> ConvertDataTable<TItem>(DataTable dataTable)
 		{
 			List<TItem> list = new List<TItem>();
-			foreach (DataRow row in dataTable.Rows)
+
+			if (dataTable != null)
 			{
-				TItem item = GetItem<TItem>(row);
-				list.Add(item);
+				foreach (DataRow row in dataTable.Rows)
+				{
+					TItem item = GetItem<TItem>(row);
+					list.Add(item);
+				}
 			}
 
 			return list;
@@ -615,9 +621,13 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 				RollbackTransaction();
 
 				log.Error(CultureInfo.InvariantCulture, m => m(
-					stringTable.GetString("EXCEPTION") + exception));
+					stringTable.GetString(
+						"EXCEPTION",
+						CultureInfo.InvariantCulture) + exception));
 				log.Error(CultureInfo.InvariantCulture, m => m(
-					stringTable.GetString("COMMAND") + sql));
+					stringTable.GetString(
+						"COMMAND",
+						CultureInfo.InvariantCulture) + sql));
 
 				throw;
 			}
@@ -711,7 +721,9 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 				RollbackTransaction();
 
 				log.Error(CultureInfo.InvariantCulture, m => m(
-					stringTable.GetString("EXCEPTION") + exception));
+					stringTable.GetString(
+						"EXCEPTION",
+						CultureInfo.InvariantCulture) + exception));
 
 				throw;
 			}
@@ -809,7 +821,8 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 							{
 								var columnValue = Convert.ChangeType(
 									dataRow[column.ColumnName],
-									propertyDetails.PropertyType);
+									propertyDetails.PropertyType,
+									CultureInfo.InvariantCulture);
 
 								propertyDetails.SetValue(
 									instance, columnValue, null);
@@ -946,9 +959,13 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 				RollbackTransaction();
 
 				log.Error(CultureInfo.InvariantCulture, m => m(
-					stringTable.GetString("EXCEPTION") + exception));
+					stringTable.GetString(
+						"EXCEPTION",
+						CultureInfo.InvariantCulture) + exception));
 				log.Error(CultureInfo.InvariantCulture, m => m(
-					stringTable.GetString("COMMAND") + sql));
+					stringTable.GetString(
+						"COMMAND",
+						CultureInfo.InvariantCulture) + sql));
 
 				throw;
 			}
@@ -1007,7 +1024,9 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 				RollbackTransaction();
 
 				log.Error(CultureInfo.InvariantCulture, m => m(
-					stringTable.GetString("EXCEPTION") + exception));
+					stringTable.GetString(
+						"EXCEPTION",
+						CultureInfo.InvariantCulture) + exception));
 
 				throw;
 			}

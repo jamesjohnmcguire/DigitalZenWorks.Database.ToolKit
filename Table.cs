@@ -21,8 +21,8 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 	/////////////////////////////////////////////////////////////////////////
 	public class Table
 	{
-		private Hashtable columns = new System.Collections.Hashtable();
-		private ArrayList foreignKeys = new System.Collections.ArrayList();
+		private readonly Hashtable columns = new System.Collections.Hashtable();
+		private readonly ArrayList foreignKeys = new System.Collections.ArrayList();
 
 		/// <summary>
 		/// Diagnostics object.
@@ -124,24 +124,35 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		{
 			log.Info(
 				CultureInfo.InvariantCulture,
-				m => m(stringTable.GetString("TABLE") + Name));
-			string output = stringTable.GetString("TABLE") + Name +
-				Environment.NewLine;
+				m => m(stringTable.GetString(
+					"TABLE", 
+					CultureInfo.InvariantCulture) + Name));
+			string output = stringTable.GetString(
+				"TABLE",
+				CultureInfo.InvariantCulture) + Name + Environment.NewLine;
 
 			foreach (DictionaryEntry column in Columns)
 			{
 				log.Info(
 					CultureInfo.InvariantCulture,
-					m => m(stringTable.GetString("TABDASH") +
-					((Column)column.Value).Name));
-				output += stringTable.GetString("TABDASH") +
+					m => m(stringTable.GetString(
+						"TABDASH",
+						CultureInfo.InvariantCulture) +
+						((Column)column.Value).Name));
+				output += stringTable.GetString(
+					"TABDASH",
+					CultureInfo.InvariantCulture) +
 					((Column)column.Value).Name + Environment.NewLine;
 			}
 
 			log.Info(
 				CultureInfo.InvariantCulture,
-				m => m(stringTable.GetString("PRIMARYKEY") + PrimaryKey));
-			output += stringTable.GetString("PRIMARYKEY") + PrimaryKey +
+				m => m(stringTable.GetString(
+					"PRIMARYKEY",
+					CultureInfo.InvariantCulture) + PrimaryKey));
+			output += stringTable.GetString(
+				"PRIMARYKEY",
+				CultureInfo.InvariantCulture) + PrimaryKey +
 				Environment.NewLine;
 
 			foreach (ForeignKey foreignKey in ForeignKeys)
@@ -155,8 +166,12 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 
 				log.Info(
 					CultureInfo.InvariantCulture,
-					m => m(stringTable.GetString("FOREIGNKEY") + format));
-				output += stringTable.GetString("FOREIGNKEY") + format +
+					m => m(stringTable.GetString(
+						"FOREIGNKEY",
+						CultureInfo.InvariantCulture) + format));
+				output += stringTable.GetString(
+					"FOREIGNKEY",
+					CultureInfo.InvariantCulture) + format +
 					Environment.NewLine;
 			}
 
@@ -177,23 +192,36 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 			{
 				log.Info(
 					CultureInfo.InvariantCulture,
-					m => m(stringTable.GetString("TABLE") + table.TableName));
-				output = stringTable.GetString("TABLE") +
+					m => m(stringTable.GetString(
+						"TABLE",
+						CultureInfo.InvariantCulture) + table.TableName));
+				output = stringTable.GetString(
+					"TABLE",
+					CultureInfo.InvariantCulture) +
 					table.TableName + Environment.NewLine;
 
 				foreach (DataColumn column in table.Columns)
 				{
 					log.Info(CultureInfo.InvariantCulture, m => m(
-						stringTable.GetString("TABDASH") + column.ColumnName));
-					output += stringTable.GetString("TABDASH") +
+						stringTable.GetString(
+							"TABDASH",
+							CultureInfo.InvariantCulture) +
+							column.ColumnName));
+					output += stringTable.GetString(
+						"TABDASH",
+						CultureInfo.InvariantCulture) +
 						column.ColumnName + Environment.NewLine;
 				}
-			}
 
-			log.Info(CultureInfo.InvariantCulture, m => m(
-				stringTable.GetString("PRIMARYKEY") + table.PrimaryKey));
-			output += stringTable.GetString("PRIMARYKEY") + table.PrimaryKey +
-				Environment.NewLine;
+				log.Info(CultureInfo.InvariantCulture, m => m(
+					stringTable.GetString(
+						"PRIMARYKEY",
+						CultureInfo.InvariantCulture) + table.PrimaryKey));
+				output += stringTable.GetString(
+					"PRIMARYKEY",
+					CultureInfo.InvariantCulture) +
+					table.PrimaryKey + Environment.NewLine;
+			}
 
 			return output;
 		}

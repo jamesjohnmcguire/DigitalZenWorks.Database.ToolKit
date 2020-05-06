@@ -55,7 +55,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 
 			log.Info(CultureInfo.InvariantCulture, m => m(
 				GeneralUtilities.CallingMethod() + ": " +
-				stringTable.GetString("BEGIN")));
+				stringTable.GetString("BEGIN", CultureInfo.InvariantCulture)));
 
 			if ((null != table) && (null != file))
 			{
