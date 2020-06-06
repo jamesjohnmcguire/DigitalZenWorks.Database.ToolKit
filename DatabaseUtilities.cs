@@ -26,7 +26,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 
 		private static readonly ResourceManager stringTable = new
 			ResourceManager(
-			"DatabaseLibraryNet.Resources",
+			"DigitalZenWorks.Common.DatabaseLibrary.Resources",
 			Assembly.GetExecutingAssembly());
 
 		/////////////////////////////////////////////////////////////////////
