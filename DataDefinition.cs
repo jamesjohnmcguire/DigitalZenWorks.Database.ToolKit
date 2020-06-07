@@ -406,7 +406,8 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 			bool found = false;
 
 			if (column.ToUpperInvariant().Contains(nameCheck) ||
-				column.ToUpperInvariant().Equals(nameCheck))
+				column.ToUpperInvariant().Equals(
+					nameCheck, StringComparison.Ordinal))
 			{
 				columnTypeOut = columnType;
 				found = true;
@@ -432,7 +433,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 				{
 					string flags = row["COLUMN_FLAGS"].ToString();
 
-					if (Int32.Parse(flags, CultureInfo.InvariantCulture) > 127)
+					if (int.Parse(flags, CultureInfo.InvariantCulture) > 127)
 					{
 						column.ColumnType = ColumnType.Memo;
 					}
@@ -474,7 +475,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 				string maxLength = row["CHARACTER_MAXIMUM_LENGTH"].ToString();
 
 				column.Length =
-					Int32.Parse(maxLength, CultureInfo.InvariantCulture);
+					int.Parse(maxLength, CultureInfo.InvariantCulture);
 			}
 
 			if (row["IS_NULLABLE"].ToString() == "True")
@@ -489,7 +490,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 
 			string position = row["ORDINAL_POSITION"].ToString();
 			column.Position =
-				Int32.Parse(position, CultureInfo.InvariantCulture);
+				int.Parse(position, CultureInfo.InvariantCulture);
 
 			return column;
 		}
@@ -767,7 +768,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		// Write the SQL for a Foreign Key constraint
 		private static string WriteForeignKeySql(ForeignKey foreignKey)
 		{
-			string sql = string.Empty;
+			string sql;
 
 			if (foreignKey.ColumnName == foreignKey.ParentTableColumn)
 			{
@@ -780,11 +781,19 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 			}
 			else
 			{
+				string constraint = "CONSTRAINT";
+				string key = "FOREIGN KEY";
+				string references = "REFERENCES";
+				string statement = "{0} `{1}` {2} (`{3}`) {4} `{5}` (`{6}`)";
+
 				sql = string.Format(
 					CultureInfo.InvariantCulture,
-					"CONSTRAINT `{0}` FOREIGN KEY (`{1}`) " +
-					"REFERENCES `{2}` (`{3}`)", foreignKey.Name,
+					statement,
+					constraint,
+					foreignKey.Name,
+					key,
 					foreignKey.ColumnName,
+					references,
 					foreignKey.ParentTable,
 					foreignKey.ParentTableColumn);
 			}

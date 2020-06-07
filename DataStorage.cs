@@ -91,7 +91,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 					{
 						tables = oleDbConnection.GetOleDbSchemaTable(
 							System.Data.OleDb.OleDbSchemaGuid.Tables,
-							new Object[] { null, null, null, "TABLE" });
+							new object[] { null, null, null, "TABLE" });
 					}
 					else
 					{
@@ -707,7 +707,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 
 				oleDbConnection.Open();
 
-				Object result = commandObject1.ExecuteScalar();
+				object result = commandObject1.ExecuteScalar();
 
 				if (null != result)
 				{
@@ -796,8 +796,6 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 
 			foreach (DataColumn column in dataRow.Table.Columns)
 			{
-				bool found = false;
-
 				if (dataRow[column.ColumnName] != DBNull.Value)
 				{
 					PropertyInfo[] properitiesDetails =
@@ -817,7 +815,8 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 							StringComparison.OrdinalIgnoreCase))
 						{
 							if (!propertyDetails.PropertyType.Name.Equals(
-								column.DataType.Name))
+								column.DataType.Name,
+								StringComparison.Ordinal))
 							{
 								var columnValue = Convert.ChangeType(
 									dataRow[column.ColumnName],
@@ -833,7 +832,6 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 									instance, dataRow[column.ColumnName]);
 							}
 
-							found = true;
 							break;
 						}
 					}
@@ -886,7 +884,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 			{
 				if (null != command)
 				{
-					Object Result = command.ExecuteScalar();
+					object Result = command.ExecuteScalar();
 
 					if (null != Result)
 					{
