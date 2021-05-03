@@ -7,7 +7,8 @@
 		<CodeAnalysisRuleSet>CodeAnalysis.ruleset</CodeAnalysisRuleSet>
 		<Company>James John McGuire</Company>
 		<Copyright>Copyright © 2006 - 2021</Copyright>
-		<NeutralLanguage>en-US</NeutralLanguage>
+		<EnableNETAnalyzers>true</EnableNETAnalyzers>
+		<NeutralLanguage>en</NeutralLanguage>
 		<NoWarn>NU1605;NU1701</NoWarn>
 		<OutputPath>$(SolutionDir)\Bin\$(Configuration)\$(Platform)</OutputPath>
 		<Platforms>AnyCPU;x86;x64</Platforms>
@@ -21,17 +22,13 @@
 		<PackageReference Include="Common.Logging.Core" Version="3.4.1" />
 		<PackageReference Include="Common.Logging.Log4Net208" Version="3.4.1" />
 		<PackageReference Include="log4net" Version="2.0.8" />
-		<PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="3.0.0">
-			<PrivateAssets>all</PrivateAssets>
-			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-		</PackageReference>
-		<PackageReference Include="mysql.data" Version="8.0.20" />
+		<PackageReference Include="MySql.data" Version="8.0.24" />
 		<PackageReference Include="StyleCop.Analyzers" Version="1.1.118">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
-		<PackageReference Include="System.Data.OleDb" Version="4.7.1" />
-		<PackageReference Include="System.Data.SqlClient" Version="4.8.1" />
+		<PackageReference Include="System.Data.OleDb" Version="5.0.0" />
+		<PackageReference Include="System.Data.SqlClient" Version="4.8.2" />
 	</ItemGroup>
 
 	<ItemGroup>
