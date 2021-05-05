@@ -656,6 +656,11 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 			return connected;
 		}
 
+		public bool Open()
+		{
+			return Initialize();
+		}
+
 		/////////////////////////////////////////////////////////////////////
 		/// Method <c>Update</c>
 		/// <summary>
@@ -1027,9 +1032,6 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 						CultureInfo.InvariantCulture) + exception));
 
 				throw;
-			}
-			finally
-			{
 			}
 
 			return returnValue;
