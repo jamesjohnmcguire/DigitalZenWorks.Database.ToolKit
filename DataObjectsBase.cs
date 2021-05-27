@@ -1,4 +1,4 @@
-/////////////////////////////////////////////////////////////////////////////
+﻿/////////////////////////////////////////////////////////////////////////////
 // <copyright file="DataObjectsBase.cs" company="James John McGuire">
 // Copyright © 2006 - 2021 James John McGuire. All Rights Reserved.
 // </copyright>
@@ -22,8 +22,6 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 	public class DataObjectsBase
 		: IDisposable
 	{
-		private DataStorage database = null;
-
 		/////////////////////////////////////////////////////////////////////
 		/// <summary>
 		/// Represents a provider type for a connection string.
@@ -31,30 +29,9 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/////////////////////////////////////////////////////////////////////
 		private const string provider = "Microsoft.ACE.OLEDB.12.0";
 
+		private DataStorage database = null;
+
 		private string tableName = null;
-
-		/////////////////////////////////////////////////////////////////////
-		/// <summary>
-		/// Represents the core database object.
-		/// </summary>
-		/////////////////////////////////////////////////////////////////////
-		[CLSCompliantAttribute(false)]
-		protected DataStorage Database
-		{
-			get { return database; }
-		}
-
-		/////////////////////////////////////////////////////////////////////
-		/// <summary>
-		/// Contains the name of the primary database table associated with
-		/// this collection.
-		/// </summary>
-		/////////////////////////////////////////////////////////////////////
-		protected string TableName
-		{
-			get { return tableName; }
-			set { tableName = value; }
-		}
 
 		/////////////////////////////////////////////////////////////////////
 		/// <summary>
@@ -126,20 +103,25 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 
 		/////////////////////////////////////////////////////////////////////
 		/// <summary>
-		/// Dispose.
+		/// Represents the core database object.
 		/// </summary>
-		/// <param name="disposing"></param>
 		/////////////////////////////////////////////////////////////////////
-		protected virtual void Dispose(bool disposing)
+		[CLSCompliantAttribute(false)]
+		protected DataStorage Database
 		{
-			if (disposing)
-			{
-				if (null != database)
-				{
-					database.Close();
-					database = null;
-				}
-			}
+			get { return database; }
+		}
+
+		/////////////////////////////////////////////////////////////////////
+		/// <summary>
+		/// Contains the name of the primary database table associated with
+		/// this collection.
+		/// </summary>
+		/////////////////////////////////////////////////////////////////////
+		protected string TableName
+		{
+			get { return tableName; }
+			set { tableName = value; }
 		}
 
 		/////////////////////////////////////////////////////////////////////
@@ -241,6 +223,24 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 			}
 
 			return id;
+		}
+
+		/////////////////////////////////////////////////////////////////////
+		/// <summary>
+		/// Dispose.
+		/// </summary>
+		/// <param name="disposing"></param>
+		/////////////////////////////////////////////////////////////////////
+		protected virtual void Dispose(bool disposing)
+		{
+			if (disposing)
+			{
+				if (null != database)
+				{
+					database.Close();
+					database = null;
+				}
+			}
 		}
 	} // End Class
 } // end Namespace

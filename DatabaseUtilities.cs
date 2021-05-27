@@ -17,20 +17,20 @@ using System.Security;
 namespace DigitalZenWorks.Common.DatabaseLibrary
 {
 	/// <summary>
-	/// Class for common database uses
+	/// Class for common database uses.
 	/// </summary>
 	public static class DatabaseUtilities
 	{
-		private static readonly ILog log = LogManager.GetLogger(
+		private static readonly ILog Log = LogManager.GetLogger(
 			System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-		private static readonly ResourceManager stringTable = new
+		private static readonly ResourceManager StringTable = new
 			ResourceManager(
 			"DigitalZenWorks.Common.DatabaseLibrary.Resources",
 			Assembly.GetExecutingAssembly());
 
 		/////////////////////////////////////////////////////////////////////
-		/// Method <c>CreateAccessDatabaseFile</c>
+		/// Method <c>CreateAccessDatabaseFile.</c>
 		/// <summary>
 		/// Creates an empty MDB (MS Jet / Access database) file.
 		/// </summary>
@@ -45,28 +45,28 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/// <summary>
 		/// Export the data table to csv file.
 		/// </summary>
-		/// <param name="table"></param>
-		/// <param name="file"></param>
-		/// <returns></returns>
+		/// <param name="table">The table to export.</param>
+		/// <param name="file">The file to export to.</param>
+		/// <returns>Indicates whether the action was successful.</returns>
 		public static bool ExportDataTableToCsv(
 			DataTable table, TextWriter file)
 		{
 			bool returnCode = false;
 
-			log.Info(CultureInfo.InvariantCulture, m => m(
+			Log.Info(CultureInfo.InvariantCulture, m => m(
 				GeneralUtilities.CallingMethod() + ": " +
-				stringTable.GetString("BEGIN", CultureInfo.InvariantCulture)));
+				StringTable.GetString("BEGIN", CultureInfo.InvariantCulture)));
 
 			if ((null != table) && (null != file))
 			{
 				// First write the headers.
-				int ColumnCount = table.Columns.Count;
+				int columnCount = table.Columns.Count;
 
-				for (int Index = 0; Index < ColumnCount; Index++)
+				for (int index = 0; index < columnCount; index++)
 				{
 					file.Write("\"");
-					file.Write(table.Columns[Index]);
-					if (Index < ColumnCount - 1)
+					file.Write(table.Columns[index]);
+					if (index < columnCount - 1)
 					{
 						file.Write("\", ");
 					}
@@ -77,15 +77,15 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 				// Now write all the rows.
 				foreach (DataRow row in table.Rows)
 				{
-					for (int Index = 0; Index < ColumnCount; Index++)
+					for (int index = 0; index < columnCount; index++)
 					{
 						file.Write("\"");
-						if (!row.IsNull(Index))
+						if (!row.IsNull(index))
 						{
-							file.Write(row[Index].ToString());
+							file.Write(row[index].ToString());
 						}
 
-						if (Index < ColumnCount - 1)
+						if (index < columnCount - 1)
 						{
 							file.Write("\", ");
 						}
@@ -101,7 +101,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		}
 
 		/////////////////////////////////////////////////////////////////////
-		/// Method <c>ExportToCsv</c>
+		/// Method <c>ExportToCsv.</c>
 		/// <summary>
 		/// Export all tables to similarly named csv files.
 		/// </summary>
@@ -114,36 +114,36 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 			// Open the database
 			string provider = "Microsoft.ACE.OLEDB.12.0";
 
-			using (DataStorage Database =
+			using (DataStorage database =
 				new DataStorage(provider, databaseFile))
 			{
 				// Get all the table names
-				DataTable TableNames = Database.SchemaTable;
+				DataTable tableNames = database.SchemaTable;
 
-				if (null != TableNames)
+				if (null != tableNames)
 				{
 					// for each table, select all the data
-					foreach (DataRow Table in TableNames.Rows)
+					foreach (DataRow table in tableNames.Rows)
 					{
-						string TableName = Table["TABLE_NAME"].ToString();
-						string csvFile = csvPath + TableName + ".csv";
+						string tableName = table["TABLE_NAME"].ToString();
+						string csvFile = csvPath + tableName + ".csv";
 
 						// Create the CSV file to which data will be exported.
 						using (StreamWriter file =
 							new StreamWriter(csvFile, false))
 						{
 							// export the table
-							string SqlQuery = "SELECT * FROM " +
-								Table["TABLE_NAME"].ToString();
-							DataTable TableData =
-								Database.GetDataTable(SqlQuery);
+							string sqlQuery = "SELECT * FROM " +
+								table["TABLE_NAME"].ToString();
+							DataTable tableData =
+								database.GetDataTable(sqlQuery);
 
-							ExportDataTableToCsv(TableData, file);
+							ExportDataTableToCsv(tableData, file);
 						}
 					}
 				}
 
-				Database.Shutdown();
+				database.Shutdown();
 			}
 
 			return returnCode;
@@ -152,8 +152,8 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/// <summary>
 		/// Makes a privileged connection string.
 		/// </summary>
-		/// <param name="databaseFile"></param>
-		/// <returns></returns>
+		/// <param name="databaseFile">The database file to use.</param>
+		/// <returns>The completed connection string.</returns>
 		public static string MakePrivilegedConnectString(string databaseFile)
 		{
 			string provider = "Microsoft.ACE.OLEDB.12.0";

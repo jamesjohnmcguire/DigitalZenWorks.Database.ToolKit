@@ -21,7 +21,7 @@ using System.Resources;
 namespace DigitalZenWorks.Common.DatabaseLibrary
 {
 	/////////////////////////////////////////////////////////////////////////
-	/// Class <c>DataStorage</c>
+	/// Class <c>DataStorage.</c>
 	/// <summary>
 	/// Class for Generic database access independent of the underlying
 	/// transport.
@@ -29,6 +29,17 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 	/////////////////////////////////////////////////////////////////////////
 	public class DataStorage : IDisposable
 	{
+		/// <summary>
+		/// Diagnostics object.
+		/// </summary>
+		private static readonly ILog Log = LogManager.GetLogger(
+			System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
+		private static readonly ResourceManager StringTable = new
+			ResourceManager(
+			"DigitalZenWorks.Common.DatabaseLibrary.Resources",
+			Assembly.GetExecutingAssembly());
+
 		/// <summary>
 		/// databaseType.
 		/// </summary>
@@ -38,6 +49,8 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/// The actual connection string used to connect to the database.
 		/// </summary>
 		private readonly string connectionText = string.Empty;
+
+		private readonly string provider = string.Empty;
 
 		/// <summary>
 		/// Database Connection Object.
@@ -57,25 +70,69 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/// </summary>
 		private DbTransaction databaseTransaction;
 
-		/// <summary>
-		/// Diagnostics object.
-		/// </summary>
-		private static readonly ILog log = LogManager.GetLogger(
-			System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
-
-		private readonly string provider = string.Empty;
-
-		private static readonly ResourceManager stringTable = new
-			ResourceManager(
-			"DigitalZenWorks.Common.DatabaseLibrary.Resources",
-			Assembly.GetExecutingAssembly());
-
 		private int timeOut = 30;
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="DataStorage"/> class.
+		/// </summary>
+		public DataStorage()
+		{
+			var test = StringTable.GetString("EXCEPTION", CultureInfo.InvariantCulture);
+
+			if ((ConfigurationManager.ConnectionStrings != null) &&
+				(ConfigurationManager.ConnectionStrings.Count > 0))
+			{
+				connectionText =
+					ConfigurationManager.ConnectionStrings[0].ConnectionString;
+
+				// OleDbConnection is default
+				databaseType = DatabaseType.OleDb;
+			}
+		}
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="DataStorage"/> class.
+		/// </summary>
+		/// <param name="provider">The provider to use.</param>
+		/// <param name="dataSource">The datasource to use.</param>
+		public DataStorage(string provider, string dataSource)
+		{
+			this.provider = provider;
+			connectionText = CreateConnectionString(dataSource, null);
+			databaseType = DatabaseType.OleDb;
+		}
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="DataStorage"/> class.
+		/// </summary>
+		/// <param name="databaseType">The database type.</param>
+		/// <param name="connectionString">The connection string.</param>
+		public DataStorage(DatabaseType databaseType, string connectionString)
+		{
+			connectionText = connectionString;
+			this.databaseType = databaseType;
+		}
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="DataStorage"/> class.
+		/// </summary>
+		/// <param name="databaseType">The database type.</param>
+		/// <param name="dataSource">The data source to use.</param>
+		/// <param name="catalog">The catalog to use.</param>
+		public DataStorage(
+			DatabaseType databaseType, string dataSource, string catalog)
+		{
+			connectionText = CreateConnectionString(dataSource, catalog);
+			this.databaseType = databaseType;
+		}
 
 		/////////////////////////////////////////////////////////////////////
 		/// <summary>
-		/// Get the table schema information for the associated database.
+		/// Gets get the table schema information for the associated database.
 		/// </summary>
+		/// <value>
+		/// Get the table schema information for the associated database.
+		/// </value>
 		/////////////////////////////////////////////////////////////////////
 		public DataTable SchemaTable
 		{
@@ -107,57 +164,30 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		public int TimeOut { get { return timeOut; } set { timeOut = value; } }
 
 		/// <summary>
-		/// DataStorage - Default constructor.
+		/// Gets the database connection object.
 		/// </summary>
-		public DataStorage()
+		/// <value>
+		/// The database connection object.
+		/// </value>
+		public DbConnection Connection
 		{
-			var test = stringTable.GetString("EXCEPTION", CultureInfo.InvariantCulture);
+			get { return connection; }
+		}
 
-			if ((ConfigurationManager.ConnectionStrings != null) &&
-				(ConfigurationManager.ConnectionStrings.Count > 0))
+		public static List<TItem> ConvertDataTable<TItem>(DataTable dataTable)
+		{
+			List<TItem> list = new List<TItem>();
+
+			if (dataTable != null)
 			{
-				connectionText =
-					ConfigurationManager.ConnectionStrings[0].ConnectionString;
-
-				// OleDbConnection is default
-				databaseType = DatabaseType.OleDb;
+				foreach (DataRow row in dataTable.Rows)
+				{
+					TItem item = GetItem<TItem>(row);
+					list.Add(item);
+				}
 			}
-		}
 
-		/// <summary>
-		/// DataStorage - Constructor.
-		/// </summary>
-		/// <param name="provider"></param>
-		/// <param name="dataSource"></param>
-		public DataStorage(string provider, string dataSource)
-		{
-			this.provider = provider;
-			connectionText = CreateConnectionString(dataSource, null);
-			databaseType = DatabaseType.OleDb;
-		}
-
-		/// <summary>
-		/// DataStorage - Constructor.
-		/// </summary>
-		/// <param name="databaseType"></param>
-		/// <param name="connectionString"></param>
-		public DataStorage(DatabaseType databaseType, string connectionString)
-		{
-			connectionText = connectionString;
-			this.databaseType = databaseType;
-		}
-
-		/// <summary>
-		/// DataStorage - Constructor.
-		/// </summary>
-		/// <param name="databaseType"></param>
-		/// <param name="dataSource"></param>
-		/// <param name="catalog"></param>
-		public DataStorage(
-			DatabaseType databaseType, string dataSource, string catalog)
-		{
-			connectionText = CreateConnectionString(dataSource, catalog);
-			this.databaseType = databaseType;
+			return list;
 		}
 
 		/// <summary>
@@ -166,40 +196,6 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		public void Close()
 		{
 			Dispose(true);
-		}
-
-		/// <summary>
-		/// Dispose.
-		/// </summary>
-		/// <param name="disposing"></param>
-		protected virtual void Dispose(bool disposing)
-		{
-			if (disposing)
-			{
-				if (null != connection)
-				{
-					connection.Dispose();
-					connection = null;
-				}
-
-				if (null != oleDbConnection)
-				{
-					oleDbConnection.Close();
-					oleDbConnection = null;
-				}
-
-				if (null != mySqlConnection)
-				{
-					mySqlConnection.Close();
-					mySqlConnection = null;
-				}
-
-				if (null != databaseTransaction)
-				{
-					databaseTransaction.Dispose();
-					databaseTransaction = null;
-				}
-			}
 		}
 
 		/// <summary>
@@ -225,14 +221,6 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		}
 
 		/// <summary>
-		/// The database connection object.
-		/// </summary>
-		public DbConnection Connection
-		{
-			get { return connection; }
-		}
-
-		/// <summary>
 		/// This opens a connection and begins the transaction.
 		/// </summary>
 		public void BeginTransaction()
@@ -248,8 +236,8 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 			}
 			catch (Exception exception)
 			{
-				log.Error(CultureInfo.InvariantCulture, m => m(
-					stringTable.GetString(
+				Log.Error(CultureInfo.InvariantCulture, m => m(
+					StringTable.GetString(
 						"EXCEPTION",
 						CultureInfo.InvariantCulture) + exception));
 				throw;
@@ -290,12 +278,12 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		}
 
 		/////////////////////////////////////////////////////////////////////
-		/// Method <c>CanQuery</c>
+		/// Method <c>CanQuery.</c>
 		/// <summary>
 		/// Checks to see if the database can return a valid query. Helper
 		/// function for unit tests.
 		/// </summary>
-		/// <returns>true if connection is open, false otherwise</returns>
+		/// <returns>true if connection is open, false otherwise.</returns>
 		/////////////////////////////////////////////////////////////////////
 		public bool CanQuery()
 		{
@@ -311,29 +299,13 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 			return canQuery;
 		}
 
-		public static List<TItem> ConvertDataTable<TItem>(DataTable dataTable)
-		{
-			List<TItem> list = new List<TItem>();
-
-			if (dataTable != null)
-			{
-				foreach (DataRow row in dataTable.Rows)
-				{
-					TItem item = GetItem<TItem>(row);
-					list.Add(item);
-				}
-			}
-
-			return list;
-		}
-
 		/////////////////////////////////////////////////////////////////////
-		/// Method <c>Delete</c>
+		/// Method <c>Delete.</c>
 		/// <summary>
 		/// Performs an SQL DELETE command.
 		/// </summary>
-		/// <param name="sql"></param>
-		/// <returns>Success / Failure</returns>
+		/// <param name="sql">The sql statement to execute.</param>
+		/// <returns>Success / Failure.</returns>
 		/////////////////////////////////////////////////////////////////////
 		public bool Delete(string sql)
 		{
@@ -384,12 +356,12 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		}
 
 		/////////////////////////////////////////////////////////////////////
-		/// Method <c>GetDataField</c>
+		/// Method <c>GetDataField.</c>
 		/// <summary>
 		/// Gets a single field from a row of data.
 		/// </summary>
 		/// <param name="sql"></param>
-		/// <returns>the field object</returns>
+		/// <returns>the field object.</returns>
 		/////////////////////////////////////////////////////////////////////
 		public object GetDataField(string sql)
 		{
@@ -405,12 +377,12 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		}
 
 		/////////////////////////////////////////////////////////////////////
-		/// Method <c>GetDataRow</c>
+		/// Method <c>GetDataRow.</c>
 		/// <summary>
 		/// Gets a single row of data.
 		/// </summary>
 		/// <param name="sql"></param>
-		/// <returns>DataRow</returns>
+		/// <returns>DataRow.</returns>
 		/////////////////////////////////////////////////////////////////////
 		public DataRow GetDataRow(string sql)
 		{
@@ -418,13 +390,13 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		}
 
 		/////////////////////////////////////////////////////////////////////
-		/// Method <c>GetDataRow</c>
+		/// Method <c>GetDataRow.</c>
 		/// <summary>
 		/// Gets a single row of data.
 		/// </summary>
-		/// <param name="sql"></param>
-		/// <param name="values"></param>
-		/// <returns>DataRow, null on failure</returns>
+		/// <param name="sql">The sql stement to use.</param>
+		/// <param name="values">The values of fields to get.</param>
+		/// <returns>DataRow, null on failure.</returns>
 		/////////////////////////////////////////////////////////////////////
 		public DataRow GetDataRow(
 			string sql, IDictionary<string, object> values)
@@ -446,7 +418,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/// Gets a DataSet based on the given query.
 		/// </summary>
 		/// <param name="sql"></param>
-		/// <returns>DataSet or null on failure</returns>
+		/// <returns>DataSet or null on failure.</returns>
 		/////////////////////////////////////////////////////////////////////
 		public DataSet GetDataSet(string sql)
 		{
@@ -459,11 +431,8 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/// </summary>
 		/// <param name="sql"></param>
 		/// <param name="values"></param>
-		/// <returns>DataSet or null on failure</returns>
+		/// <returns>DataSet or null on failure.</returns>
 		/////////////////////////////////////////////////////////////////////
-		[System.Diagnostics.CodeAnalysis.SuppressMessage(
-			"Microsoft.Reliability",
-			"CA2000:Dispose objects before losing scope")]
 		public DataSet GetDataSet(
 			string sql, IDictionary<string, object> values)
 		{
@@ -496,7 +465,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 
 						dataAdapter.Fill(dataSet);
 
-						log.Info(
+						Log.Info(
 							CultureInfo.InvariantCulture,
 							m => m("OK - getDataSet - Query: {0}", sql));
 					}
@@ -506,14 +475,14 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 			{
 				RollbackTransaction();
 
-				string message = stringTable.GetString(
+				string message = StringTable.GetString(
 					"EXCEPTION", CultureInfo.InvariantCulture);
-				log.Error(CultureInfo.InvariantCulture, m => m(
+				Log.Error(CultureInfo.InvariantCulture, m => m(
 					message + exception));
 
-				message = stringTable.GetString(
+				message = StringTable.GetString(
 					"COMMAND", CultureInfo.InvariantCulture);
-				log.Error(CultureInfo.InvariantCulture, m => m(
+				Log.Error(CultureInfo.InvariantCulture, m => m(
 					message + sql));
 				throw;
 			}
@@ -536,10 +505,10 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 
 		/////////////////////////////////////////////////////////////////////
 		/// <summary>
-		/// GetDataTable
+		/// GetDataTable.
 		/// </summary>
 		/// <param name="sql"></param>
-		/// <returns>number of records retrieved</returns>
+		/// <returns>number of records retrieved.</returns>
 		/////////////////////////////////////////////////////////////////////
 		public DataTable GetDataTable(string sql)
 		{
@@ -548,11 +517,11 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 
 		/////////////////////////////////////////////////////////////////////
 		/// <summary>
-		/// GetDataTable
+		/// GetDataTable.
 		/// </summary>
 		/// <param name="sql"></param>
 		/// <param name="values"></param>
-		/// <returns>DataTable or null on failure</returns>
+		/// <returns>DataTable or null on failure.</returns>
 		/////////////////////////////////////////////////////////////////////
 		public DataTable GetDataTable(
 			string sql, IDictionary<string, object> values)
@@ -571,12 +540,12 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		}
 
 		/////////////////////////////////////////////////////////////////////
-		/// Method <c>Insert</c>
+		/// Method <c>Insert.</c>
 		/// <summary>
 		/// Performs an Sql UPDATE command.
 		/// </summary>
 		/// <param name="sql"></param>
-		/// <returns>object item</returns>
+		/// <returns>object item.</returns>
 		/////////////////////////////////////////////////////////////////////
 		public int Insert(string sql)
 		{
@@ -584,13 +553,13 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		}
 
 		/////////////////////////////////////////////////////////////////////
-		/// Method <c>Insert</c>
+		/// Method <c>Insert.</c>
 		/// <summary>
-		/// Performs an Sql UPDATE command
+		/// Performs an Sql UPDATE command.
 		/// </summary>
 		/// <param name="sql"></param>
 		/// <param name="values"></param>
-		/// <returns>object item</returns>
+		/// <returns>object item.</returns>
 		/////////////////////////////////////////////////////////////////////
 		public int Insert(string sql, IDictionary<string, object> values)
 		{
@@ -620,12 +589,12 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 			{
 				RollbackTransaction();
 
-				log.Error(CultureInfo.InvariantCulture, m => m(
-					stringTable.GetString(
+				Log.Error(CultureInfo.InvariantCulture, m => m(
+					StringTable.GetString(
 						"EXCEPTION",
 						CultureInfo.InvariantCulture) + exception));
-				log.Error(CultureInfo.InvariantCulture, m => m(
-					stringTable.GetString(
+				Log.Error(CultureInfo.InvariantCulture, m => m(
+					StringTable.GetString(
 						"COMMAND",
 						CultureInfo.InvariantCulture) + sql));
 
@@ -636,12 +605,12 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		}
 
 		/////////////////////////////////////////////////////////////////////
-		/// Method <c>IsConnected</c>
+		/// Method <c>IsConnected.</c>
 		/// <summary>
 		/// Checks to see if the database is open and connected. Helper function
 		/// for unit tests.
 		/// </summary>
-		/// <returns>true if connection is open, false otherwise</returns>
+		/// <returns>true if connection is open, false otherwise.</returns>
 		/////////////////////////////////////////////////////////////////////
 		public bool IsConnected()
 		{
@@ -662,12 +631,12 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		}
 
 		/////////////////////////////////////////////////////////////////////
-		/// Method <c>Update</c>
+		/// Method <c>Update.</c>
 		/// <summary>
-		/// Performs an Sql UPDATE command
+		/// Performs an Sql UPDATE command.
 		/// </summary>
 		/// <param name="sql"></param>
-		/// <returns>Success / Failure</returns>
+		/// <returns>Success / Failure.</returns>
 		/////////////////////////////////////////////////////////////////////
 		public bool Update(string sql)
 		{
@@ -675,13 +644,13 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		}
 
 		/////////////////////////////////////////////////////////////////////
-		/// Method <c>Update</c>
+		/// Method <c>Update.</c>
 		/// <summary>
-		/// Performs an SQL UPDATE command
+		/// Performs an SQL UPDATE command.
 		/// </summary>
 		/// <param name="sql"></param>
 		/// <param name="values"></param>
-		/// <returns>Success / Failure</returns>
+		/// <returns>Success / Failure.</returns>
 		/////////////////////////////////////////////////////////////////////
 		public bool Update(string sql, IDictionary<string, object> values)
 		{
@@ -690,7 +659,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 
 		/////////////////////////////////////////////////////////////////////
 		/// <summary>
-		/// Temp test method
+		/// Temp test method.
 		/// </summary>
 		/////////////////////////////////////////////////////////////////////
 		public int Test()
@@ -705,10 +674,10 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 
 				string sql =
 					"INSERT INTO Contacts (Notes) VALUES ('testing')";
-				string Sql2 = "SELECT @@IDENTITY";
+				string sql2 = "SELECT @@IDENTITY";
 
 				commandObject1 = new OleDbCommand(sql, oleDbConnection);
-				commandObject2 = new OleDbCommand(Sql2, oleDbConnection);
+				commandObject2 = new OleDbCommand(sql2, oleDbConnection);
 
 				oleDbConnection.Open();
 
@@ -725,8 +694,8 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 			{
 				RollbackTransaction();
 
-				log.Error(CultureInfo.InvariantCulture, m => m(
-					stringTable.GetString(
+				Log.Error(CultureInfo.InvariantCulture, m => m(
+					StringTable.GetString(
 						"EXCEPTION",
 						CultureInfo.InvariantCulture) + exception));
 
@@ -750,6 +719,40 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 			}
 
 			return returnCode;
+		}
+
+		/// <summary>
+		/// Dispose.
+		/// </summary>
+		/// <param name="disposing"></param>
+		protected virtual void Dispose(bool disposing)
+		{
+			if (disposing)
+			{
+				if (null != connection)
+				{
+					connection.Dispose();
+					connection = null;
+				}
+
+				if (null != oleDbConnection)
+				{
+					oleDbConnection.Close();
+					oleDbConnection = null;
+				}
+
+				if (null != mySqlConnection)
+				{
+					mySqlConnection.Close();
+					mySqlConnection = null;
+				}
+
+				if (null != databaseTransaction)
+				{
+					databaseTransaction.Dispose();
+					databaseTransaction = null;
+				}
+			}
 		}
 
 		private static DbParameterCollection AddParameters(
@@ -889,12 +892,12 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 			{
 				if (null != command)
 				{
-					object Result = command.ExecuteScalar();
+					object field = command.ExecuteScalar();
 
-					if (null != Result)
+					if (null != field)
 					{
 						result = Convert.ToInt32(
-							Result, CultureInfo.InvariantCulture);
+							field, CultureInfo.InvariantCulture);
 					}
 				}
 
@@ -910,9 +913,6 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		[System.Diagnostics.CodeAnalysis.SuppressMessage(
 			"Microsoft.Security",
 			"CA2100:Review SQL queries for security vulnerabilities")]
-		[System.Diagnostics.CodeAnalysis.SuppressMessage(
-			"Microsoft.Reliability",
-			"CA2000:Dispose objects before losing scope")]
 		private DbCommand GetCommandObject(
 			string sql, IDictionary<string, object> values)
 		{
@@ -961,12 +961,12 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 			{
 				RollbackTransaction();
 
-				log.Error(CultureInfo.InvariantCulture, m => m(
-					stringTable.GetString(
+				Log.Error(CultureInfo.InvariantCulture, m => m(
+					StringTable.GetString(
 						"EXCEPTION",
 						CultureInfo.InvariantCulture) + exception));
-				log.Error(CultureInfo.InvariantCulture, m => m(
-					stringTable.GetString(
+				Log.Error(CultureInfo.InvariantCulture, m => m(
+					StringTable.GetString(
 						"COMMAND",
 						CultureInfo.InvariantCulture) + sql));
 
@@ -1026,8 +1026,8 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 			{
 				RollbackTransaction();
 
-				log.Error(CultureInfo.InvariantCulture, m => m(
-					stringTable.GetString(
+				Log.Error(CultureInfo.InvariantCulture, m => m(
+					StringTable.GetString(
 						"EXCEPTION",
 						CultureInfo.InvariantCulture) + exception));
 

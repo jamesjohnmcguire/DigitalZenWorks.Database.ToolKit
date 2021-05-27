@@ -8,7 +8,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 {
 	/////////////////////////////////////////////////////////////////////////
 	/// <summary>
-	/// Represents a foreign key
+	/// Represents a foreign key.
 	/// </summary>
 	/////////////////////////////////////////////////////////////////////////
 	public class ForeignKey
@@ -22,73 +22,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 
 		/////////////////////////////////////////////////////////////////////
 		/// <summary>
-		/// Cascade On Delete
-		/// </summary>
-		/////////////////////////////////////////////////////////////////////
-		public bool CascadeOnDelete
-		{
-			get { return cascadeOnDelete; }
-			set { cascadeOnDelete = value; }
-		}
-
-		/////////////////////////////////////////////////////////////////////
-		/// <summary>
-		/// Cascade On Update
-		/// </summary>
-		/////////////////////////////////////////////////////////////////////
-		public bool CascadeOnUpdate
-		{
-			get { return cascadeOnUpdate; }
-			set { cascadeOnUpdate = value; }
-		}
-
-		/////////////////////////////////////////////////////////////////////
-		/// <summary>
-		/// Column Name
-		/// </summary>
-		/////////////////////////////////////////////////////////////////////
-		public string ColumnName
-		{
-			get { return columnName; }
-			set { columnName = value; }
-		}
-
-		/////////////////////////////////////////////////////////////////////
-		/// <summary>
-		/// Foreign Key Name
-		/// </summary>
-		/////////////////////////////////////////////////////////////////////
-		public string Name
-		{
-			get { return name; }
-			set { name = value; }
-		}
-
-		/////////////////////////////////////////////////////////////////////
-		/// <summary>
-		/// Parent Table
-		/// </summary>
-		/////////////////////////////////////////////////////////////////////
-		public string ParentTable
-		{
-			get { return parentTable; }
-			set { parentTable = value; }
-		}
-
-		/////////////////////////////////////////////////////////////////////
-		/// <summary>
-		/// Parent Table Column.
-		/// </summary>
-		/////////////////////////////////////////////////////////////////////
-		public string ParentTableColumn
-		{
-			get { return parentTableColumn; }
-			set { parentTableColumn = value; }
-		}
-
-		/////////////////////////////////////////////////////////////////////
-		/// <summary>
-		/// Default Constructor
+		/// Initializes a new instance of the <see cref="ForeignKey"/> class.
 		/// </summary>
 		/// <param name="name"></param>
 		/// <param name="columnName"></param>
@@ -111,6 +45,90 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 			this.parentTableColumn = parentTableColumn;
 			this.cascadeOnDelete = cascadeDelete;
 			this.cascadeOnUpdate = cascadeUpdate;
+		}
+
+		/////////////////////////////////////////////////////////////////////
+		/// <summary>
+		/// Gets or sets a value indicating whether cascade On Delete.
+		/// </summary>
+		/// <value>
+		/// A value indicating whether cascade On Delete.
+		/// </value>
+		/////////////////////////////////////////////////////////////////////
+		public bool CascadeOnDelete
+		{
+			get { return cascadeOnDelete; }
+			set { cascadeOnDelete = value; }
+		}
+
+		/////////////////////////////////////////////////////////////////////
+		/// <summary>
+		/// Gets or sets a value indicating whether cascade On Update.
+		/// </summary>
+		/// <value>
+		/// A value indicating whether cascade On Update.
+		/// </value>
+		/////////////////////////////////////////////////////////////////////
+		public bool CascadeOnUpdate
+		{
+			get { return cascadeOnUpdate; }
+			set { cascadeOnUpdate = value; }
+		}
+
+		/////////////////////////////////////////////////////////////////////
+		/// <summary>
+		/// Gets or sets column Name.
+		/// </summary>
+		/// <value>
+		/// Column Name.
+		/// </value>
+		/////////////////////////////////////////////////////////////////////
+		public string ColumnName
+		{
+			get { return columnName; }
+			set { columnName = value; }
+		}
+
+		/////////////////////////////////////////////////////////////////////
+		/// <summary>
+		/// Gets or sets foreign Key Name.
+		/// </summary>
+		/// <value>
+		/// Foreign Key Name.
+		/// </value>
+		/////////////////////////////////////////////////////////////////////
+		public string Name
+		{
+			get { return name; }
+			set { name = value; }
+		}
+
+		/////////////////////////////////////////////////////////////////////
+		/// <summary>
+		/// Gets or sets parent Table.
+		/// </summary>
+		/// <value>
+		/// Parent Table.
+		/// </value>
+		/////////////////////////////////////////////////////////////////////
+		public string ParentTable
+		{
+			get { return parentTable; }
+			set { parentTable = value; }
+		}
+
+		/////////////////////////////////////////////////////////////////////
+		/// <summary>
+		/// Gets or sets parent Table Column.
+		/// </summary>
+		/// <value>
+		/// Parent Table Column.
+		/// </value>
+		/////////////////////////////////////////////////////////////////////
+		public string ParentTableColumn
+		{
+			get { return parentTableColumn; }
+			set { parentTableColumn = value; }
 		}
 	}
 }

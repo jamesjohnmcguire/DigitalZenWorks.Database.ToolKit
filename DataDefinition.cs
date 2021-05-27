@@ -7,8 +7,8 @@
 using Common.Logging;
 using DigitalZenWorks.Common.Utilities;
 using System;
-using System.Data;
 using System.Collections;
+using System.Data;
 using System.Globalization;
 using System.IO;
 using System.Reflection;
@@ -17,7 +17,7 @@ using System.Resources;
 namespace DigitalZenWorks.Common.DatabaseLibrary
 {
 	/////////////////////////////////////////////////////////////////////////
-	/// Class <c>DataDefinition</c>
+	/// Class <c>DataDefinition.</c>
 	/// <summary>
 	/// Class for support on operations on complete data storage containers.
 	/// </summary>
@@ -27,21 +27,20 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/// <summary>
 		/// Diagnostics object.
 		/// </summary>
-		private static readonly ILog log = LogManager.GetLogger(
+		private static readonly ILog Log = LogManager.GetLogger(
 			System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-		private static readonly ResourceManager stringTable = new
+		private static readonly ResourceManager StringTable = new
 			ResourceManager(
 			"DigitalZenWorks.Common.DatabaseLibrary.Resources",
 			Assembly.GetExecutingAssembly());
 
 		/////////////////////////////////////////////////////////////////////
-		/// Method <c>ExportSchema</c>
+		/// Method <c>ExportSchema.</c>
 		/// <summary>
 		/// Export all tables to similarly named csv files.
 		/// </summary>
 		/////////////////////////////////////////////////////////////////////
-		[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2202:Do not dispose objects multiple times")]
 		public static bool ExportSchema(string databaseFile, string schemaFile)
 		{
 			bool successCode = false;
@@ -69,8 +68,8 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 				exception is ArgumentException ||
 				exception is InvalidOperationException)
 			{
-				log.Error(CultureInfo.InvariantCulture, m => m(
-					stringTable.GetString(
+				Log.Error(CultureInfo.InvariantCulture, m => m(
+					StringTable.GetString(
 						"EXCEPTION", CultureInfo.InvariantCulture) +
 						exception));
 			}
@@ -85,32 +84,34 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/// <summary>
 		/// GetColumnInfo - returns details of a column statement.
 		/// </summary>
-		/// <param name="dataDefinition"></param>
-		/// <returns></returns>
+		/// <param name="dataDefinition">The data definition to use.</param>
+		/// <returns>The details of the column.</returns>
 		public static string GetColumnInfo(string dataDefinition)
 		{
-			string ColumnsInfo = null;
+			string columnsInfo = null;
 
 			if (!string.IsNullOrWhiteSpace(dataDefinition))
 			{
-				int SplitIndex = dataDefinition.IndexOf(
+				int splitIndex = dataDefinition.IndexOf(
 					"(",
 					StringComparison.Ordinal) + 1;
-				ColumnsInfo = dataDefinition.Substring(SplitIndex);
+				columnsInfo = dataDefinition.Substring(splitIndex);
 			}
 
-			return ColumnsInfo;
+			return columnsInfo;
 		}
 
 		/// <summary>
 		/// Returns the column type.
 		/// </summary>
-		/// <param name="column"></param>
-		/// <returns></returns>
+		/// <param name="column">The column to use.</param>
+		/// <returns>The column type.</returns>
 		public static ColumnType GetColumnType(
 			string column)
 		{
-			string[] columnTypeComareKeys = { "AUTONUMBER", "IDENTITY",
+			string[] columnTypeComareKeys =
+			{
+				"AUTONUMBER", "IDENTITY",
 				"AUTOINCREMENT", "BIGINT", "LONGVARBINARY", "LONGVARCHAR",
 				"VARBINARY", "VARCHAR", "BINARY", "BIT", "LONGBLOB",
 				"MEDIUMBLOB", "BLOB", "BOOLEAN", "BYTE", "NVARCHAR", "CHAR",
@@ -122,9 +123,12 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 				"MEMO", "MONEY", "NCHAR", "NTEXT", "NUMBER", "NUMERIC",
 				"OLEOBJECT", "OLE", "REAL", "SET", "SINGLE", "SQLVARIANT",
 				"STRING", "TABLE", "TINYTEXT", "TEXT", "TIMESTAMP", "TIME",
-				"UNIQUEIDENTIFIER", "XML", "YEAR", "YESNO" };
+				"UNIQUEIDENTIFIER", "XML", "YEAR", "YESNO"
+			};
 
-			ColumnType[] types = { ColumnType.AutoNumber, ColumnType.Identity,
+			ColumnType[] types =
+			{
+				ColumnType.AutoNumber, ColumnType.Identity,
 				ColumnType.Identity, ColumnType.BigInt,
 				ColumnType.LongVarBinary, ColumnType.LongVarChar,
 				ColumnType.VarBinary, ColumnType.VarChar, ColumnType.Binary,
@@ -147,7 +151,8 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 				ColumnType.String, ColumnType.Table, ColumnType.TinyText,
 				ColumnType.Text, ColumnType.Timestamp, ColumnType.Time,
 				ColumnType.UniqueIdentifier, ColumnType.Xml, ColumnType.Year,
-				ColumnType.Boolean };
+				ColumnType.Boolean
+			};
 
 			ColumnType columnType = ColumnType.Other;
 
@@ -169,8 +174,8 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 
 			if (columnType == ColumnType.Other)
 			{
-				log.Warn(CultureInfo.InvariantCulture, m => m(
-					stringTable.GetString(
+				Log.Warn(CultureInfo.InvariantCulture, m => m(
+					StringTable.GetString(
 						"WARNING_OTHER", CultureInfo.InvariantCulture) +
 						column));
 			}
@@ -179,10 +184,10 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		}
 
 		/// <summary>
-		///
+		/// Gets the foreign key relationships.
 		/// </summary>
-		/// <param name="relationships"></param>
-		/// <returns></returns>
+		/// <param name="relationships">A set of relationships.</param>
+		/// <returns>The foreign key relationships.</returns>
 		public static ForeignKey[] GetForeignKeyRelationships(
 			Relationship[] relationships)
 		{
@@ -210,9 +215,9 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/// <summary>
 		/// Gets a list of relationships.
 		/// </summary>
-		/// <param name="oleDbSchema"></param>
-		/// <param name="tableName"></param>
-		/// <returns></returns>
+		/// <param name="oleDbSchema">The OLE database schema.</param>
+		/// <param name="tableName">The table name.</param>
+		/// <returns>A list of relationships.</returns>
 		public static ArrayList GetRelationships(
 			OleDbSchema oleDbSchema, string tableName)
 		{
@@ -238,8 +243,8 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/// <summary>
 		/// GetTableDefinitions - returns an array of table definitions.
 		/// </summary>
-		/// <param name="tableDefinitionsFile"></param>
-		/// <returns></returns>
+		/// <param name="tableDefinitionsFile">The table definitions file.</param>
+		/// <returns>An array of table definitions.</returns>
 		public static string[] GetTableDefinitions(
 			string tableDefinitionsFile)
 		{
@@ -260,36 +265,33 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/// <summary>
 		/// GetTableName - returns the name of the table.
 		/// </summary>
-		/// <param name="dataDefinition"></param>
-		/// <returns></returns>
+		/// <param name="dataDefinition">The data definition.</param>
+		/// <returns>The name of the table.</returns>
 		public static string GetTableName(string dataDefinition)
 		{
-			string TableName = null;
+			string tableName = null;
 
 			if (!string.IsNullOrWhiteSpace(dataDefinition))
 			{
-				string[] TableParts = dataDefinition.Split(new char[] { '(' });
+				string[] tableParts = dataDefinition.Split(new char[] { '(' });
 
-				string[] TableNameParts =
-					TableParts[0].Split(new char[] { '[', ']', '`' });
+				string[] tableNameParts =
+					tableParts[0].Split(new char[] { '[', ']', '`' });
 
-				if (TableNameParts.Length > 1)
+				if (tableNameParts.Length > 1)
 				{
-					TableName = TableNameParts[1];
+					tableName = tableNameParts[1];
 				}
 			}
 
-			return TableName;
+			return tableName;
 		}
 
 		/// <summary>
 		/// Creates a mdb file with the given schema.
 		/// </summary>
-		/// <param name="schemaFile"></param>
-		/// <param name="databaseFile"></param>
-		[System.Diagnostics.CodeAnalysis.SuppressMessage(
-			"Microsoft.Reliability",
-			"CA2000:Dispose objects before losing scope")]
+		/// <param name="schemaFile">The schema file.</param>
+		/// <param name="databaseFile">The database file.</param>
 		public static bool ImportSchema(string schemaFile, string databaseFile)
 		{
 			bool successCode = false;
@@ -303,41 +305,41 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 					string fileContents =
 						FileUtils.GetFileContents(schemaFile);
 
-					string[] StringSeparators = new string[] { "\r\n\r\n" };
-					string[] Queries = fileContents.Split(
-						StringSeparators,
+					string[] stringSeparators = new string[] { "\r\n\r\n" };
+					string[] queries = fileContents.Split(
+						stringSeparators,
 						32000,
 						StringSplitOptions.RemoveEmptyEntries);
 
 					using (DataStorage database = new DataStorage(
 						provider, databaseFile))
 					{
-						foreach (string SqlQuery in Queries)
+						foreach (string sqlQuery in queries)
 						{
 							try
 							{
-								log.Info(CultureInfo.InvariantCulture, m => m(
-								stringTable.GetString(
+								Log.Info(CultureInfo.InvariantCulture, m => m(
+								StringTable.GetString(
 									"COMMAND", CultureInfo.InvariantCulture) +
-									SqlQuery));
+									sqlQuery));
 
-								database.ExecuteNonQuery(SqlQuery);
+								database.ExecuteNonQuery(sqlQuery);
 							}
 							catch (Exception exception) when
 								(exception is ArgumentNullException ||
 								exception is OutOfMemoryException ||
 								exception is System.Data.OleDb.OleDbException)
 							{
-								log.Error(CultureInfo.InvariantCulture, m => m(
-									stringTable.GetString(
+								Log.Error(CultureInfo.InvariantCulture, m => m(
+									StringTable.GetString(
 										"EXCEPTION",
 										CultureInfo.InvariantCulture) +
 										exception));
 							}
 							catch (Exception exception)
 							{
-								log.Error(CultureInfo.InvariantCulture, m => m(
-									stringTable.GetString(
+								Log.Error(CultureInfo.InvariantCulture, m => m(
+									StringTable.GetString(
 										"EXCEPTION",
 										CultureInfo.InvariantCulture) +
 										exception));
@@ -359,15 +361,15 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 				exception is OutOfMemoryException ||
 				exception is System.Data.OleDb.OleDbException)
 			{
-				log.Error(CultureInfo.InvariantCulture, m => m(
-					stringTable.GetString(
+				Log.Error(CultureInfo.InvariantCulture, m => m(
+					StringTable.GetString(
 						"EXCEPTION",
 						CultureInfo.InvariantCulture) + exception));
 			}
 			catch (Exception exception)
 			{
-				log.Error(CultureInfo.InvariantCulture, m => m(
-					stringTable.GetString(
+				Log.Error(CultureInfo.InvariantCulture, m => m(
+					StringTable.GetString(
 						"EXCEPTION",
 						CultureInfo.InvariantCulture) + exception));
 
@@ -380,8 +382,8 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/// <summary>
 		/// Checks to see if the given field is a time related field.
 		/// </summary>
-		/// <param name="field"></param>
-		/// <returns></returns>
+		/// <param name="field">The field to check.</param>
+		/// <returns>Whether the field is a time related field.</returns>
 		public static bool IsTimeField(string field)
 		{
 			bool returnCode = false;
@@ -523,10 +525,14 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 				foreignKey["FK_COLUMN_NAME"].ToString();
 
 			if (foreignKey["UPDATE_RULE"].ToString() != "NO ACTION")
+			{
 				relationship.OnUpdateCascade = true;
+			}
 
 			if (foreignKey["DELETE_RULE"].ToString() != "NO ACTION")
+			{
 				relationship.OnDeleteCascade = true;
+			}
 
 			return relationship;
 		}
@@ -548,7 +554,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 
 					Table table = new Table(tableName);
 
-					log.Info(
+					Log.Info(
 						CultureInfo.InvariantCulture,
 						m => m("Getting Columns for " + tableName));
 					DataTable dataColumns =
@@ -619,14 +625,14 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 
 			foreach (DictionaryEntry entry in hashTable)
 			{
-				string Name = (string)entry.Key;
+				string name = (string)entry.Key;
 				Table table = (Table)entry.Value;
 				foreach (ForeignKey foreignKeys in table.ForeignKeys)
 				{
 					dependencies.Add(foreignKeys.ParentTable);
 				}
 
-				list.Add(Name, new ArrayList(dependencies));
+				list.Add(name, new ArrayList(dependencies));
 				dependencies.Clear();
 			}
 
@@ -657,7 +663,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 					{
 						if (!sortedList.Contains(key))
 						{
-							log.Info(
+							Log.Info(
 								CultureInfo.InvariantCulture,
 								m => m("Adding: (ND) " + key.ToString()));
 							sortedList.Insert(0, key);
@@ -694,7 +700,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 					{
 						if (!sortedList.Contains(key))
 						{
-							log.Info(
+							Log.Info(
 								CultureInfo.InvariantCulture,
 								m => m("Adding: (D) " + key.ToString()));
 							sortedList.Add(key);
