@@ -1,15 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net472</TargetFramework>
-
-    <IsPackable>false</IsPackable>
-    <AssemblyName>DigitalZenWorks.Common.DatabaseLibary.Tests</AssemblyName>
-
-    <RootNamespace>DigitalZenWorks.Common.DatabaseLibary.Tests</RootNamespace>
-
-    <Platforms>AnyCPU;x64;x86</Platforms>
-  </PropertyGroup>
+		<AssemblyName>DigitalZenWorks.Common.DatabaseLibary.Tests</AssemblyName>
+		<Platforms>x86;x64</Platforms>
+		<RootNamespace>DigitalZenWorks.Common.DatabaseLibary.Tests</RootNamespace>
+		<TargetFramework>net48</TargetFramework>
+	</PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\DatabaseLibraryNet.csproj" />
