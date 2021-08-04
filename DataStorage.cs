@@ -318,6 +318,8 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/// <summary>
 		/// Prepares and executes a Non-Query DB Command.
 		/// </summary>
+		/// <param name="sql">The sql statement to execute.</param>
+		/// <returns>A value indicating success or not.</returns>
 		/////////////////////////////////////////////////////////////////////
 		public bool ExecuteNonQuery(string sql)
 		{
@@ -328,6 +330,8 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/// <summary>
 		/// Prepares and executes a Non-Query DB Command.
 		/// </summary>
+		/// <param name="sql">The sql statement to execute.</param>
+		/// <returns>A value indicating success or not.</returns>
 		/////////////////////////////////////////////////////////////////////
 		public bool ExecuteNonQuery(
 			string sql, IDictionary<string, object> values)
@@ -360,7 +364,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/// <summary>
 		/// Gets a single field from a row of data.
 		/// </summary>
-		/// <param name="sql"></param>
+		/// <param name="sql">The sql statement to execute.</param>
 		/// <returns>the field object.</returns>
 		/////////////////////////////////////////////////////////////////////
 		public object GetDataField(string sql)
@@ -381,7 +385,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/// <summary>
 		/// Gets a single row of data.
 		/// </summary>
-		/// <param name="sql"></param>
+		/// <param name="sql">The sql statement to execute.</param>
 		/// <returns>DataRow.</returns>
 		/////////////////////////////////////////////////////////////////////
 		public DataRow GetDataRow(string sql)
@@ -394,7 +398,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/// <summary>
 		/// Gets a single row of data.
 		/// </summary>
-		/// <param name="sql">The sql stement to use.</param>
+		/// <param name="sql">The sql statement to execute.</param>
 		/// <param name="values">The values of fields to get.</param>
 		/// <returns>DataRow, null on failure.</returns>
 		/////////////////////////////////////////////////////////////////////
@@ -417,7 +421,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/// <summary>
 		/// Gets a DataSet based on the given query.
 		/// </summary>
-		/// <param name="sql"></param>
+		/// <param name="sql">The sql statement to execute.</param>
 		/// <returns>DataSet or null on failure.</returns>
 		/////////////////////////////////////////////////////////////////////
 		public DataSet GetDataSet(string sql)
@@ -429,7 +433,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/// <summary>
 		/// Gets a DataSet based on the given query.
 		/// </summary>
-		/// <param name="sql"></param>
+		/// <param name="sql">The sql statement to execute.</param>
 		/// <param name="values"></param>
 		/// <returns>DataSet or null on failure.</returns>
 		/////////////////////////////////////////////////////////////////////
@@ -507,7 +511,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/// <summary>
 		/// GetDataTable.
 		/// </summary>
-		/// <param name="sql"></param>
+		/// <param name="sql">The sql statement to execute.</param>
 		/// <returns>number of records retrieved.</returns>
 		/////////////////////////////////////////////////////////////////////
 		public DataTable GetDataTable(string sql)
@@ -519,7 +523,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/// <summary>
 		/// GetDataTable.
 		/// </summary>
-		/// <param name="sql"></param>
+		/// <param name="sql">The sql statement to execute.</param>
 		/// <param name="values"></param>
 		/// <returns>DataTable or null on failure.</returns>
 		/////////////////////////////////////////////////////////////////////
@@ -544,7 +548,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/// <summary>
 		/// Performs an Sql UPDATE command.
 		/// </summary>
-		/// <param name="sql"></param>
+		/// <param name="sql">The sql statement to execute.</param>
 		/// <returns>object item.</returns>
 		/////////////////////////////////////////////////////////////////////
 		public int Insert(string sql)
@@ -557,7 +561,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/// <summary>
 		/// Performs an Sql UPDATE command.
 		/// </summary>
-		/// <param name="sql"></param>
+		/// <param name="sql">The sql statement to execute.</param>
 		/// <param name="values"></param>
 		/// <returns>object item.</returns>
 		/////////////////////////////////////////////////////////////////////
@@ -635,8 +639,8 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/// <summary>
 		/// Performs an Sql UPDATE command.
 		/// </summary>
-		/// <param name="sql"></param>
-		/// <returns>Success / Failure.</returns>
+		/// <param name="sql">The sql statement to execute.</param>
+		/// <returns>A value indicating success or not.</returns>
 		/////////////////////////////////////////////////////////////////////
 		public bool Update(string sql)
 		{
@@ -648,9 +652,9 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/// <summary>
 		/// Performs an SQL UPDATE command.
 		/// </summary>
-		/// <param name="sql"></param>
+		/// <param name="sql">The sql statement to execute.</param>
 		/// <param name="values"></param>
-		/// <returns>Success / Failure.</returns>
+		/// <returns>A value indicating success or not.</returns>
 		/////////////////////////////////////////////////////////////////////
 		public bool Update(string sql, IDictionary<string, object> values)
 		{
@@ -661,6 +665,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/// <summary>
 		/// Temp test method.
 		/// </summary>
+		/// <returns>A value indicating success or not.</returns>
 		/////////////////////////////////////////////////////////////////////
 		public int Test()
 		{
@@ -912,7 +917,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 
 		[System.Diagnostics.CodeAnalysis.SuppressMessage(
 			"Microsoft.Security",
-			"CA2100:Review SQL queries for security vulnerabilities")]
+			"CA2100:Review SQL queries for security vulnerabilities", Justification = "This is a generic function.  Evaluations should be done higher up the chain.")]
 		private DbCommand GetCommandObject(
 			string sql, IDictionary<string, object> values)
 		{
