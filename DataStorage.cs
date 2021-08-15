@@ -77,8 +77,6 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/// </summary>
 		public DataStorage()
 		{
-			var test = StringTable.GetString("EXCEPTION", CultureInfo.InvariantCulture);
-
 			if ((ConfigurationManager.ConnectionStrings != null) &&
 				(ConfigurationManager.ConnectionStrings.Count > 0))
 			{
@@ -87,6 +85,19 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 
 				// OleDbConnection is default
 				databaseType = DatabaseType.OleDb;
+			}
+			else
+			{
+				if (Environment.Is64BitProcess)
+				{
+					connectionText = "Provider=Microsoft.ACE.OLEDB.12.0;" +
+						"Data Source=TimeTracker.accdb";
+				}
+				else
+				{
+					connectionText = "Provider=Microsoft.Jet.OLEDB.4.0;" +
+						"Data Source=TimeTracker.accdb";
+				}
 			}
 		}
 
