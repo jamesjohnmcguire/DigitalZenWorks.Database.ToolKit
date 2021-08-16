@@ -55,7 +55,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 			if (!File.Exists(dataSource))
 			{
 				dataSource = Environment.GetFolderPath(
-					Environment.SpecialFolder.LocalApplicationData) +
+					Environment.SpecialFolder.ApplicationData) +
 					"\\" + dataSource;
 			}
 
