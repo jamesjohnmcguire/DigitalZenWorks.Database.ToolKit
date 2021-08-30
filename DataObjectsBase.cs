@@ -27,7 +27,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/// Represents a provider type for a connection string.
 		/// </summary>
 		/////////////////////////////////////////////////////////////////////
-		private const string provider = "Microsoft.ACE.OLEDB.12.0";
+		private const string Provider = "Microsoft.ACE.OLEDB.12.0";
 
 		private DataStorage database = null;
 
@@ -35,9 +35,10 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 
 		/////////////////////////////////////////////////////////////////////
 		/// <summary>
-		/// Constructor for exiting DataStorage object.
+		/// Initializes a new instance of the <see cref="DataObjectsBase"/>
+		/// class.
 		/// </summary>
-		/// <param name="database"></param>
+		/// <param name="database">The DataStorage object to use.</param>
 		/////////////////////////////////////////////////////////////////////
 		public DataObjectsBase(DataStorage database)
 		{
@@ -46,9 +47,10 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 
 		/////////////////////////////////////////////////////////////////////
 		/// <summary>
-		/// Represents a base collection of data objects.
+		/// Initializes a new instance of the <see cref="DataObjectsBase"/>
+		/// class.
 		/// </summary>
-		/// <param name="dataSource"></param>
+		/// <param name="dataSource">The data source to use.</param>
 		/////////////////////////////////////////////////////////////////////
 		public DataObjectsBase(string dataSource)
 		{
@@ -59,15 +61,16 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 					"\\" + dataSource;
 			}
 
-			database = new DataStorage(provider, dataSource);
+			database = new DataStorage(Provider, dataSource);
 		}
 
 		/////////////////////////////////////////////////////////////////////
 		/// <summary>
-		/// Represents a base collection of data objects.
+		/// Initializes a new instance of the <see cref="DataObjectsBase"/>
+		/// class.
 		/// </summary>
-		/// <param name="tableName"></param>
-		/// <param name="dataSource"></param>
+		/// <param name="tableName">The table name to use.</param>
+		/// <param name="dataSource">The data source to use.</param>
 		/////////////////////////////////////////////////////////////////////
 		public DataObjectsBase(string tableName, string dataSource)
 		{
@@ -80,16 +83,18 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 					"\\" + dataSource;
 			}
 
-			database = new DataStorage(provider, dataSource);
+			database = new DataStorage(Provider, dataSource);
 		}
 
 		/////////////////////////////////////////////////////////////////////
 		/// <summary>
-		/// Constructor for database type and connection string.
+		/// Initializes a new instance of the <see cref="DataObjectsBase"/>
+		/// class.
 		/// </summary>
-		/// <param name="tableName"></param>
-		/// <param name="databaseType"></param>
-		/// <param name="connectionString"></param>
+		/// <param name="tableName">The table name to use.</param>
+		/// <param name="databaseType">The database type.</param>
+		/// <param name="connectionString">The connection string
+		/// to use.</param>
 		/////////////////////////////////////////////////////////////////////
 		public DataObjectsBase(
 			string tableName,
@@ -103,8 +108,9 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 
 		/////////////////////////////////////////////////////////////////////
 		/// <summary>
-		/// Represents the core database object.
+		/// Gets the core database object.
 		/// </summary>
+		/// <value>Represents the core database object.</value>
 		/////////////////////////////////////////////////////////////////////
 		[CLSCompliantAttribute(false)]
 		protected DataStorage Database
@@ -114,9 +120,11 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 
 		/////////////////////////////////////////////////////////////////////
 		/// <summary>
-		/// Contains the name of the primary database table associated with
+		/// Gets or sets the name of the primary database table associated with
 		/// this collection.
 		/// </summary>
+		/// <value>Contains the name of the primary database table associated
+		/// with this collection.</value>
 		/////////////////////////////////////////////////////////////////////
 		protected string TableName
 		{
@@ -139,6 +147,9 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/// <summary>
 		/// Deletes the record identified by Id.
 		/// </summary>
+		/// <param name="table">The name of the table.</param>
+		/// <param name="id">The id of item.</param>
+		/// <returns>A value indicating success or not.</returns>
 		/////////////////////////////////////////////////////////////////////
 		public bool Delete(string table, int id)
 		{
@@ -159,6 +170,8 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/// <summary>
 		/// Returns a DataTable of the table.
 		/// </summary>
+		/// <param name="table">The name of the table.</param>
+		/// <returns>A DataTable object.</returns>
 		/////////////////////////////////////////////////////////////////////
 		public DataTable GetAllDataTable(string table)
 		{
@@ -177,6 +190,9 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/// <summary>
 		/// Represents the record identified by the where clause.
 		/// </summary>
+		/// <param name="table">The name of the table.</param>
+		/// <param name="where">The where clause to use.</param>
+		/// <returns>A DataRow object.</returns>
 		/////////////////////////////////////////////////////////////////////
 		public DataRow GetBy(string table, string where)
 		{
@@ -197,6 +213,9 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/// <summary>
 		/// Gets the id of the record identified by the where clause.
 		/// </summary>
+		/// <param name="table">The name of the table.</param>
+		/// <param name="name">The name of item to get.</param>
+		/// <returns>A DataRow object.</returns>
 		/////////////////////////////////////////////////////////////////////
 		public virtual DataRow GetByName(string table, string name)
 		{
@@ -207,6 +226,9 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/// <summary>
 		/// Gets the id of the record identified by the where clause.
 		/// </summary>
+		/// <param name="table">The name of the table.</param>
+		/// <param name="name">The name of item to get.</param>
+		/// <returns>The id of the record.</returns>
 		/////////////////////////////////////////////////////////////////////
 		public virtual int GetIdByName(string table, string name)
 		{
@@ -229,7 +251,8 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/// <summary>
 		/// Dispose.
 		/// </summary>
-		/// <param name="disposing"></param>
+		/// <param name="disposing">Indicates whether it is
+		/// currently disposing.</param>
 		/////////////////////////////////////////////////////////////////////
 		protected virtual void Dispose(bool disposing)
 		{

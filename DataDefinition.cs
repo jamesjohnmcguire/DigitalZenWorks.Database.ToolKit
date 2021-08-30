@@ -40,6 +40,9 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/// <summary>
 		/// Export all tables to similarly named csv files.
 		/// </summary>
+		/// <returns>A values indicating success or not.</returns>
+		/// <param name="databaseFile">The database file to use.</param>
+		/// <param name="schemaFile">The schema file to export to.</param>
 		/////////////////////////////////////////////////////////////////////
 		public static bool ExportSchema(string databaseFile, string schemaFile)
 		{
@@ -292,6 +295,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/// </summary>
 		/// <param name="schemaFile">The schema file.</param>
 		/// <param name="databaseFile">The database file.</param>
+		/// <returns>A values indicating success or not.</returns>
 		public static bool ImportSchema(string schemaFile, string databaseFile)
 		{
 			bool successCode = false;

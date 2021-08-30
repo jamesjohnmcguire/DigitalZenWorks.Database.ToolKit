@@ -172,6 +172,12 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 			}
 		}
 
+		/// <summary>
+		/// Gets or sets or set the time out value.
+		/// </summary>
+		/// <value>
+		/// The time out value.
+		/// </value>
 		public int TimeOut { get { return timeOut; } set { timeOut = value; } }
 
 		/// <summary>
@@ -185,6 +191,12 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 			get { return connection; }
 		}
 
+		/// <summary>
+		/// Converts a data table to a list.
+		/// </summary>
+		/// <typeparam name="TItem">The type of item.</typeparam>
+		/// <param name="dataTable">The data table to convert.</param>
+		/// <returns>Returns a list of items from the data table.</returns>
 		public static List<TItem> ConvertDataTable<TItem>(DataTable dataTable)
 		{
 			List<TItem> list = new List<TItem>();
@@ -342,6 +354,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/// Prepares and executes a Non-Query DB Command.
 		/// </summary>
 		/// <param name="sql">The sql statement to execute.</param>
+		/// <param name="values">The values to use in the query.</param>
 		/// <returns>A value indicating success or not.</returns>
 		/////////////////////////////////////////////////////////////////////
 		public bool ExecuteNonQuery(
@@ -445,7 +458,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/// Gets a DataSet based on the given query.
 		/// </summary>
 		/// <param name="sql">The sql statement to execute.</param>
-		/// <param name="values"></param>
+		/// <param name="values">The values to use in the query.</param>
 		/// <returns>DataSet or null on failure.</returns>
 		/////////////////////////////////////////////////////////////////////
 		public DataSet GetDataSet(
@@ -535,7 +548,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/// GetDataTable.
 		/// </summary>
 		/// <param name="sql">The sql statement to execute.</param>
-		/// <param name="values"></param>
+		/// <param name="values">The values to use in the query.</param>
 		/// <returns>DataTable or null on failure.</returns>
 		/////////////////////////////////////////////////////////////////////
 		public DataTable GetDataTable(
@@ -573,7 +586,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/// Performs an Sql UPDATE command.
 		/// </summary>
 		/// <param name="sql">The sql statement to execute.</param>
-		/// <param name="values"></param>
+		/// <param name="values">The values to use in the query.</param>
 		/// <returns>object item.</returns>
 		/////////////////////////////////////////////////////////////////////
 		public int Insert(string sql, IDictionary<string, object> values)
@@ -664,7 +677,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/// Performs an SQL UPDATE command.
 		/// </summary>
 		/// <param name="sql">The sql statement to execute.</param>
-		/// <param name="values"></param>
+		/// <param name="values">The values to use in the query.</param>
 		/// <returns>A value indicating success or not.</returns>
 		/////////////////////////////////////////////////////////////////////
 		public bool Update(string sql, IDictionary<string, object> values)
@@ -740,7 +753,8 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/// <summary>
 		/// Dispose.
 		/// </summary>
-		/// <param name="disposing"></param>
+		/// <param name="disposing">Indicates whether it is
+		/// currently disposing.</param>
 		protected virtual void Dispose(bool disposing)
 		{
 			if (disposing)
@@ -928,7 +942,8 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 
 		[System.Diagnostics.CodeAnalysis.SuppressMessage(
 			"Microsoft.Security",
-			"CA2100:Review SQL queries for security vulnerabilities", Justification = "This is a generic function.  Evaluations should be done higher up the chain.")]
+			"CA2100:Review SQL queries for security vulnerabilities",
+			Justification = "This is a generic function.  Evaluations should be done higher up the chain.")]
 		private DbCommand GetCommandObject(
 			string sql, IDictionary<string, object> values)
 		{

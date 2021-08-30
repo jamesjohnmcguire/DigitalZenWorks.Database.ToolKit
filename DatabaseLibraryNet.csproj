@@ -8,6 +8,7 @@
 		<Company>James John McGuire</Company>
 		<Copyright>Copyright © 2006 - 2021</Copyright>
 		<EnableNETAnalyzers>true</EnableNETAnalyzers>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 		<NeutralLanguage>en</NeutralLanguage>
 		<NoWarn>NU1605;NU1701</NoWarn>
 		<OutputPath>$(SolutionDir)\Bin\$(Configuration)\$(Platform)</OutputPath>
