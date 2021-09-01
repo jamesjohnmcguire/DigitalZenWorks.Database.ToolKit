@@ -12,8 +12,16 @@ using System.Threading.Tasks;
 
 namespace DigitalZenWorks.Common.DatabaseLibrary
 {
+	/// <summary>
+	/// Database collection interface.
+	/// </summary>
 	public interface IDatabaseCollection : IDisposable
 	{
+		/// <summary>
+		/// Get id from name method.
+		/// </summary>
+		/// <param name="name">The name of item.</param>
+		/// <returns>The id of the record.</returns>
 		int GetIdFromName(string name);
 	}
 }

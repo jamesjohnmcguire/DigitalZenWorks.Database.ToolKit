@@ -34,6 +34,8 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/// <summary>
 		/// Creates an empty MDB (MS Jet / Access database) file.
 		/// </summary>
+		/// <param name="filePath">The file path of the database.</param>
+		/// <returns>A values indicating success or not.</returns>
 		/////////////////////////////////////////////////////////////////////
 		public static bool CreateAccessDatabaseFile(string filePath)
 		{
@@ -105,6 +107,9 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/// <summary>
 		/// Export all tables to similarly named csv files.
 		/// </summary>
+		/// <param name="databaseFile">The database file to use.</param>
+		/// <param name="csvPath">The csv file to export to.</param>
+		/// <returns>A values indicating success or not.</returns>
 		/////////////////////////////////////////////////////////////////////
 		public static bool ExportToCsv(
 			string databaseFile, string csvPath)

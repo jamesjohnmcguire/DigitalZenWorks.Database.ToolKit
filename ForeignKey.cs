@@ -24,12 +24,14 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/// <summary>
 		/// Initializes a new instance of the <see cref="ForeignKey"/> class.
 		/// </summary>
-		/// <param name="name"></param>
-		/// <param name="columnName"></param>
-		/// <param name="parentTable"></param>
-		/// <param name="parentTableColumn"></param>
-		/// <param name="cascadeDelete"></param>
-		/// <param name="cascadeUpdate"></param>
+		/// <param name="name">The name of the foreign key.</param>
+		/// <param name="columnName">The column name.</param>
+		/// <param name="parentTable">The parent table.</param>
+		/// <param name="parentTableColumn">The parent table column.</param>
+		/// <param name="cascadeDelete">Indicates wheter to use
+		/// cascading deletes.</param>
+		/// <param name="cascadeUpdate">Indicates wheter to use
+		/// cascading updates.</param>
 		/////////////////////////////////////////////////////////////////////
 		public ForeignKey(
 			string name,

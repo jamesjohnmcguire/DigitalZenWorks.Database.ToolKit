@@ -653,6 +653,10 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 			return connected;
 		}
 
+		/// <summary>
+		/// Opens the database.
+		/// </summary>
+		/// <returns>A values indicating success or not.</returns>
 		public bool Open()
 		{
 			return Initialize();

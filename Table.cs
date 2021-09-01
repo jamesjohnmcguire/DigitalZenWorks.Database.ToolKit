@@ -51,7 +51,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/// <summary>
 		/// Initializes a new instance of the <see cref="Table"/> class.
 		/// </summary>
-		/// <param name="name"></param>
+		/// <param name="name">The name of the table.</param>
 		/////////////////////////////////////////////////////////////////////
 		public Table(string name)
 			: this()
@@ -117,6 +117,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/// <summary>
 		/// Writes out the table information.
 		/// </summary>
+		/// <param name="table">The name of the table.</param>
 		/// <returns>DataTable.</returns>
 		/////////////////////////////////////////////////////////////////////
 		public static string Dump(DataTable table)
@@ -165,7 +166,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/// <summary>
 		/// Add a column.
 		/// </summary>
-		/// <param name="column"></param>
+		/// <param name="column">The name of the column.</param>
 		/////////////////////////////////////////////////////////////////////
 		public void AddColumn(Column column)
 		{

@@ -26,8 +26,9 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		private bool updateCascade;
 
 		/// <summary>
-		/// Name.
+		/// Gets or sets name.
 		/// </summary>
+		/// <value>The name.</value>
 		public string Name
 		{
 			get { return name; }
@@ -35,8 +36,9 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		}
 
 		/// <summary>
-		/// Parent Table.
+		/// Gets or sets parent Table.
 		/// </summary>
+		/// <value>The Parent Table.</value>
 		public string ParentTable
 		{
 			get { return parent; }
@@ -44,8 +46,9 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		}
 
 		/// <summary>
-		/// Parent Table Column.
+		/// Gets or sets parent Table Column.
 		/// </summary>
+		/// <value>The Parent Table Column.</value>
 		public string ParentTableCol
 		{
 			get { return parentColumn; }
@@ -53,8 +56,9 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		}
 
 		/// <summary>
-		/// Child Table.
+		/// Gets or sets child Table.
 		/// </summary>
+		/// <value>The Child Table.</value>
 		public string ChildTable
 		{
 			get { return child; }
@@ -62,8 +66,9 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		}
 
 		/// <summary>
-		/// Child Table Column.
+		/// Gets or sets child Table Column.
 		/// </summary>
+		/// <value>The Child Table Column.</value>
 		public string ChildTableCol
 		{
 			get { return childColumn; }
@@ -71,8 +76,9 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		}
 
 		/// <summary>
-		/// Indicates whether update cascades.
+		/// Gets or sets a value indicating whether indicates whether update cascades.
 		/// </summary>
+		/// <value>Indicates whether update cascades.</value>
 		public bool OnUpdateCascade
 		{
 			get { return updateCascade; }
@@ -80,8 +86,9 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		}
 
 		/// <summary>
-		/// Indicates whether delete cascades.
+		/// Gets or sets a value indicating whether indicates whether delete cascades.
 		/// </summary>
+		/// <value>Indicates whether delete cascades.</value>
 		public bool OnDeleteCascade
 		{
 			get { return deleteCascade; }

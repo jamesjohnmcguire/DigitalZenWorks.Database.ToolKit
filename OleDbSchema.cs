@@ -29,7 +29,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/// <summary>
 		/// Initializes a new instance of the <see cref="OleDbSchema"/> class.
 		/// </summary>
-		/// <param name="databaseFile"></param>
+		/// <param name="databaseFile">The database file to use.</param>
 		/////////////////////////////////////////////////////////////////////
 		public OleDbSchema(string databaseFile)
 		{
@@ -77,6 +77,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/// <summary>
 		/// Gets the constraints from the given table.
 		/// </summary>
+		/// <param name="tableName">The name of the table.</param>
 		/// <returns>DataTable.</returns>
 		/////////////////////////////////////////////////////////////////////
 		public DataTable GetConstraints(string tableName)
@@ -96,6 +97,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/// <summary>
 		/// Gets the foreign keys from the given table.
 		/// </summary>
+		/// <param name="tableName">The name of the table.</param>
 		/// <returns>DataTable.</returns>
 		/////////////////////////////////////////////////////////////////////
 		public DataTable GetForeignKeys(string tableName)
@@ -115,6 +117,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/// <summary>
 		/// Gets the primary keys from the given table.
 		/// </summary>
+		/// <param name="tableName">The name of the table.</param>
 		/// <returns>DataTable.</returns>
 		/////////////////////////////////////////////////////////////////////
 		public DataTable GetPrimaryKeys(string tableName)
@@ -134,6 +137,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/// <summary>
 		/// Gets the column names from the given table.
 		/// </summary>
+		/// <param name="tableName">The name of the table.</param>
 		/// <returns>DataTable.</returns>
 		/////////////////////////////////////////////////////////////////////
 		public DataTable GetTableColumns(string tableName)
@@ -154,6 +158,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/// Gets the constraints from the given table.
 		/// </summary>
 		/// <returns>DataTable.</returns>
+		/// <param name="tableName">The name of the table.</param>
 		/////////////////////////////////////////////////////////////////////
 		public DataTable GetTableConstraints(string tableName)
 		{
@@ -171,7 +176,8 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/// <summary>
 		/// Dispose.
 		/// </summary>
-		/// <param name="disposing"></param>
+		/// <param name="disposing">Indicates whether the object is
+		/// currently disposing.</param>
 		protected virtual void Dispose(bool disposing)
 		{
 			if (disposing)
