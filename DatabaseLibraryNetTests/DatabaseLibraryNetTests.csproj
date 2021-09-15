@@ -1,7 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
+	<PropertyGroup>
+		<AnalysisMode>AllEnabledByDefault</AnalysisMode>
+		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
 		<AssemblyName>DigitalZenWorks.Common.DatabaseLibary.Tests</AssemblyName>
+		<IsTestProject>true</IsTestProject>
+		<OutputPath>$(SolutionDir)\Bin\$(Configuration)\$(Platform)</OutputPath>
 		<Platforms>x86;x64</Platforms>
 		<RootNamespace>DigitalZenWorks.Common.DatabaseLibary.Tests</RootNamespace>
 		<TargetFramework>net48</TargetFramework>
