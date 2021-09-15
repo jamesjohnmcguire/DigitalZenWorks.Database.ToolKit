@@ -31,11 +31,11 @@ namespace DigitalZenWorks.Common.DatabaseLibrary.Tests
 		/// database
 		/// </summary>
 		private DataStorage database;
-		private string dataSource = AppDomain.CurrentDomain.BaseDirectory +
-			"TestDb.mdb";
-		private string dataSourceBackupsCsv = 
+		private readonly string dataSource =
+			AppDomain.CurrentDomain.BaseDirectory + "TestDb.mdb";
+		private readonly string dataSourceBackupsCsv = 
 			AppDomain.CurrentDomain.BaseDirectory + @"\TestTable.csv";
-		private string provider = "Microsoft.ACE.OLEDB.12.0";
+		private readonly string provider = "Microsoft.ACE.OLEDB.12.0";
 
 		/////////////////////////////////////////////////////////////////////
 		/// Method <c>Setup</c>
@@ -117,9 +117,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary.Tests
 		[Test]
 		public void DatabaseCanOpen()
 		{
-			string connectionString = null;
-
-			connectionString = string.Format(
+			string connectionString = string.Format(
 				CultureInfo.InvariantCulture,
 				"provider={0}; Data Source={1}",
 				provider,
@@ -297,10 +295,9 @@ namespace DigitalZenWorks.Common.DatabaseLibrary.Tests
 
 		private void VerifyRowExists(int existingRowId, bool shouldExist)
 		{
-			DataRow tempDataRow = null;
 			string sql = "Select * from TestTable where Id=" + existingRowId;
 
-			tempDataRow = database.GetDataRow(sql);
+			DataRow tempDataRow = database.GetDataRow(sql);
 
 			if (true == shouldExist)
 			{
