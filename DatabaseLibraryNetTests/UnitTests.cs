@@ -13,6 +13,8 @@ using System.EnterpriseServices;
 using System.Globalization;
 using System.IO;
 
+[assembly: CLSCompliant(true)]
+
 namespace DigitalZenWorks.Common.DatabaseLibrary.Tests
 {
 	/////////////////////////////////////////////////////////////////////////
@@ -28,7 +30,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary.Tests
 		/// <summary>
 		/// database
 		/// </summary>
-		private DataStorage database = null;
+		private DataStorage database;
 		private string dataSource = AppDomain.CurrentDomain.BaseDirectory +
 			"TestDb.mdb";
 		private string dataSourceBackupsCsv = 
