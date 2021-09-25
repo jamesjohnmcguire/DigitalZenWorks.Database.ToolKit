@@ -11,6 +11,7 @@ using System.Data;
 using System.Data.OleDb;
 using System.Globalization;
 using System.IO;
+using System.Reflection;
 
 [assembly: CLSCompliant(true)]
 
@@ -29,11 +30,10 @@ namespace DigitalZenWorks.Common.DatabaseLibrary.Tests
 		/// database
 		/// </summary>
 		private DataStorage database;
-		private readonly string dataSource =
-			AppDomain.CurrentDomain.BaseDirectory + "TestDb.mdb";
-		private readonly string dataSourceBackupsCsv = 
-			AppDomain.CurrentDomain.BaseDirectory + @"\TestTable.csv";
 		private readonly string provider = "Microsoft.ACE.OLEDB.12.0";
+		private string applicationPath;
+		private string dataSource;
+		private string dataSourceBackupsCsv;
 
 		/////////////////////////////////////////////////////////////////////
 		/// Method <c>Setup</c>
@@ -44,6 +44,17 @@ namespace DigitalZenWorks.Common.DatabaseLibrary.Tests
 		[SetUp]
 		public void Setup()
 		{
+			Assembly assembly = Assembly.GetExecutingAssembly();
+			string codeBase = assembly.CodeBase;
+
+			UriBuilder uri = new UriBuilder(codeBase);
+			string path = Uri.UnescapeDataString(uri.Path);
+			applicationPath = Path.GetDirectoryName(path);
+
+			dataSource = applicationPath + "\\TestDb.mdb";
+
+			dataSourceBackupsCsv = applicationPath + "\\TestTable.csv";
+
 			database = new DataStorage(provider, dataSource);
 
 			database.BeginTransaction();
@@ -225,8 +236,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary.Tests
 		[Test]
 		public void ExportToCsv()
 		{
-			DatabaseUtilities.ExportToCsv(dataSource,
-				AppDomain.CurrentDomain.BaseDirectory);
+			DatabaseUtilities.ExportToCsv(dataSource, applicationPath);
 
 			Assert.IsTrue((File.Exists(dataSourceBackupsCsv)));
 		}
