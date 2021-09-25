@@ -9,7 +9,6 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.OleDb;
-using System.EnterpriseServices;
 using System.Globalization;
 using System.IO;
 
@@ -24,7 +23,6 @@ namespace DigitalZenWorks.Common.DatabaseLibrary.Tests
 	/// </summary>
 	/////////////////////////////////////////////////////////////////////////
 	[TestFixture]
-	[Transaction(TransactionOption.Required)]
 	public class TransactionUnitTests: IDisposable
 	{
 		/// <summary>
@@ -60,11 +58,6 @@ namespace DigitalZenWorks.Common.DatabaseLibrary.Tests
 		[TearDown]
 		public void Teardown()
 		{
-			if (ContextUtil.IsInTransaction)
-			{
-				ContextUtil.SetAbort();
-			}
-
 			database.CommitTransaction();
 			database.Shutdown();
 		}
