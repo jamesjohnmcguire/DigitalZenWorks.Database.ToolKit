@@ -62,7 +62,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 						Environment.NewLine;
 				}
 
-				FileUtils.SaveFile(schemaText, schemaFile);
+				File.WriteAllText(schemaFile, schemaText);
 
 				successCode = true;
 			}
@@ -306,8 +306,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 				{
 					string provider = "Microsoft.ACE.OLEDB.12.0";
 
-					string fileContents =
-						FileUtils.GetFileContents(schemaFile);
+					string fileContents = File.ReadAllText(schemaFile);
 
 					string[] stringSeparators = new string[] { "\r\n\r\n" };
 					string[] queries = fileContents.Split(
