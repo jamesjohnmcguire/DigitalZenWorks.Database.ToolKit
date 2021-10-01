@@ -30,7 +30,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary.Tests
 		/// </summary>
 		private DataStorage database;
 		private readonly string dataSource =
-			AppDomain.CurrentDomain.BaseDirectory + "TestDb.mdb";
+			AppDomain.CurrentDomain.BaseDirectory + "TestDb.accdb";
 		private readonly string dataSourceBackupsCsv = 
 			AppDomain.CurrentDomain.BaseDirectory + @"\TestTable.csv";
 		private readonly string provider = "Microsoft.ACE.OLEDB.12.0";
@@ -45,8 +45,6 @@ namespace DigitalZenWorks.Common.DatabaseLibrary.Tests
 		public void Setup()
 		{
 			database = new DataStorage(provider, dataSource);
-
-			database.BeginTransaction();
 		}
 
 		/////////////////////////////////////////////////////////////////////
