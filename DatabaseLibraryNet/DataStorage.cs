@@ -286,6 +286,8 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 			if (null != databaseTransaction)
 			{
 				databaseTransaction.Commit();
+
+				databaseTransaction = null;
 			}
 		}
 
