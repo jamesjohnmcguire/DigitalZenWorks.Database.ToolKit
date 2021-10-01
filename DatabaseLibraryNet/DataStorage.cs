@@ -1059,6 +1059,15 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 
 				returnValue = true;
 			}
+			catch (AccessViolationException exception)
+			{
+				RollbackTransaction();
+
+				Log.Error(CultureInfo.InvariantCulture, m => m(
+					StringTable.GetString(
+						"EXCEPTION",
+						CultureInfo.InvariantCulture) + exception));
+			}
 			catch (Exception exception)
 			{
 				RollbackTransaction();
