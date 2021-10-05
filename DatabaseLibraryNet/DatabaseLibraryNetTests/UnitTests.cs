@@ -56,8 +56,11 @@ namespace DigitalZenWorks.Common.DatabaseLibrary.Tests
 		[TearDown]
 		public void Teardown()
 		{
-			database.CommitTransaction();
-			database.Shutdown();
+			if (database != null)
+			{
+				database.CommitTransaction();
+				database.Shutdown();
+			}
 		}
 
 		/// <summary>
