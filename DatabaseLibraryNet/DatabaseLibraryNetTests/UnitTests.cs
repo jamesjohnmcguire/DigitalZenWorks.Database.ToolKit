@@ -239,8 +239,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary.Tests
 		[Test]
 		public void ExportToCsv()
 		{
-			DatabaseUtilities.ExportToCsv(dataSource,
-				AppDomain.CurrentDomain.BaseDirectory);
+			DatabaseUtilities.ExportToCsv(dataSource, applicationPath);
 
 			Assert.IsTrue((File.Exists(dataSourceBackupsCsv)));
 		}
