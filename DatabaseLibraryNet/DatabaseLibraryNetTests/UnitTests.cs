@@ -56,8 +56,6 @@ namespace DigitalZenWorks.Common.DatabaseLibrary.Tests
 			dataSourceBackupsCsv = applicationPath + "\\TestTable.csv";
 
 			database = new DataStorage(provider, dataSource);
-
-			database.BeginTransaction();
 		}
 
 		/////////////////////////////////////////////////////////////////////
