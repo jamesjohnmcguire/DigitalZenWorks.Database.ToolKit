@@ -7,7 +7,6 @@
 		<CodeAnalysisRuleSet>..\CodeAnalysis.ruleset</CodeAnalysisRuleSet>
 		<IsTestProject>true</IsTestProject>
 		<OutputPath>$(SolutionDir)\Bin\$(Configuration)\$(Platform)</OutputPath>
-		<Platforms>x86;x64</Platforms>
 		<RootNamespace>DigitalZenWorks.Common.DatabaseLibary.Tests</RootNamespace>
 		<TargetFramework>netcoreapp3.1</TargetFramework>
 	</PropertyGroup>

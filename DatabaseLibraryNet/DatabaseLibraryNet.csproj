@@ -12,7 +12,6 @@
 		<NeutralLanguage>en</NeutralLanguage>
 		<NoWarn>NU1605;NU1701</NoWarn>
 		<OutputPath>$(SolutionDir)\Bin\$(Configuration)\$(Platform)</OutputPath>
-		<Platforms>x86;x64</Platforms>
 		<RootNamespace>DigitalZenWorks.Common.DatabaseLibrary</RootNamespace>
 		<SignAssembly>true</SignAssembly>
 		<TargetFramework>netstandard2.0</TargetFramework>
