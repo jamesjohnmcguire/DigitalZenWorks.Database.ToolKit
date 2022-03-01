@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.31624.102
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DatabaseLibraryNet", "DatabaseLibraryNet\DatabaseLibraryNet.csproj", "{A6B5D4F9-5877-49B3-9B53-B3117DD6A541}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DatabaseLibraryNet", "DatabaseLibraryNet\DigitalZenWorks.Database.ToolKit.csproj", "{A6B5D4F9-5877-49B3-9B53-B3117DD6A541}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DatabaseLibraryNetTests", "DatabaseLibraryNet\DatabaseLibraryNetTests\DatabaseLibraryNetTests.csproj", "{4A64DEEE-971F-43EB-80B5-F09CE3D483F4}"
 EndProject
