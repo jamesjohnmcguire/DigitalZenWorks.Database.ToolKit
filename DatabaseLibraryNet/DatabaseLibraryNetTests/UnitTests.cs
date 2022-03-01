@@ -3,7 +3,7 @@
 // All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-using DigitalZenWorks.Common.DatabaseLibrary;
+using DigitalZenWorks.Database.ToolKit;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
@@ -15,7 +15,7 @@ using System.Reflection;
 
 [assembly: CLSCompliant(true)]
 
-namespace DigitalZenWorks.Common.DatabaseLibrary.Tests
+namespace DigitalZenWorks.Database.ToolKit.Tests
 {
 	/////////////////////////////////////////////////////////////////////////
 	/// Class <c>UnitTests</c>

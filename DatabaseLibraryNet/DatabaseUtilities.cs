@@ -14,7 +14,7 @@ using System.Reflection;
 using System.Resources;
 using System.Security;
 
-namespace DigitalZenWorks.Common.DatabaseLibrary
+namespace DigitalZenWorks.Database.ToolKit
 {
 	/// <summary>
 	/// Class for common database uses.
@@ -26,7 +26,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 
 		private static readonly ResourceManager StringTable = new
 			ResourceManager(
-			"DigitalZenWorks.Common.DatabaseLibrary.Resources",
+			"DigitalZenWorks.Database.ToolKit.Resources",
 			Assembly.GetExecutingAssembly());
 
 		/////////////////////////////////////////////////////////////////////
@@ -40,7 +40,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		public static bool CreateAccessDatabaseFile(string filePath)
 		{
 			return FileUtils.CreateFileFromEmbeddedResource(
-				"DigitalZenWorks.Common.DatabaseLibrary.template.accdb",
+				"DigitalZenWorks.Database.ToolKit.template.accdb",
 				filePath);
 		}
 

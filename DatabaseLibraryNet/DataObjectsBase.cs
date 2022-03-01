@@ -12,7 +12,7 @@ using System.Data;
 using System.Globalization;
 using System.IO;
 
-namespace DigitalZenWorks.Common.DatabaseLibrary
+namespace DigitalZenWorks.Database.ToolKit
 {
 	/////////////////////////////////////////////////////////////////////////
 	/// <summary>

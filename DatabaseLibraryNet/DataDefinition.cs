@@ -14,7 +14,7 @@ using System.IO;
 using System.Reflection;
 using System.Resources;
 
-namespace DigitalZenWorks.Common.DatabaseLibrary
+namespace DigitalZenWorks.Database.ToolKit
 {
 	/////////////////////////////////////////////////////////////////////////
 	/// Class <c>DataDefinition.</c>
@@ -32,7 +32,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 
 		private static readonly ResourceManager StringTable = new
 			ResourceManager(
-			"DigitalZenWorks.Common.DatabaseLibrary.Resources",
+			"DigitalZenWorks.Database.ToolKit.Resources",
 			Assembly.GetExecutingAssembly());
 
 		/////////////////////////////////////////////////////////////////////

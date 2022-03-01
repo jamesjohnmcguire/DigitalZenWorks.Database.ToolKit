@@ -8,7 +8,7 @@ using System;
 using System.Data;
 using System.Data.OleDb;
 
-namespace DigitalZenWorks.Common.DatabaseLibrary
+namespace DigitalZenWorks.Database.ToolKit
 {
 	/////////////////////////////////////////////////////////////////////////
 	/// Class <c>OleDbSchema.</c>
