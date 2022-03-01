@@ -12,7 +12,7 @@
 	</PropertyGroup>
 
   <ItemGroup>
-	<ProjectReference Include="..\DatabaseLibraryNet.csproj" />
+	<ProjectReference Include="..\DigitalZenWorks.Database.ToolKit.csproj" />
   </ItemGroup>
 
   <ItemGroup>

@@ -2,7 +2,7 @@
 
 	<PropertyGroup>
 		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-		<AssemblyName>DigitalZenWorks.Common.DatabaseLibrary</AssemblyName>
+		<AssemblyTitle>DigitalZenWorks.Database.ToolKit</AssemblyTitle>
 		<AssemblyOriginatorKeyFile>DatabaseLibraryNet.snk</AssemblyOriginatorKeyFile>
 		<CodeAnalysisRuleSet>CodeAnalysis.ruleset</CodeAnalysisRuleSet>
 		<Company>James John McGuire</Company>
@@ -12,7 +12,7 @@
 		<NeutralLanguage>en</NeutralLanguage>
 		<NoWarn>NU1605;NU1701</NoWarn>
 		<OutputPath>$(SolutionDir)\Bin\$(Configuration)\$(Platform)</OutputPath>
-		<RootNamespace>DigitalZenWorks.Common.DatabaseLibrary</RootNamespace>
+		<RootNamespace>DigitalZenWorks.Database.ToolKit</RootNamespace>
 		<SignAssembly>true</SignAssembly>
 		<TargetFramework>netstandard2.0</TargetFramework>
 	</PropertyGroup>
