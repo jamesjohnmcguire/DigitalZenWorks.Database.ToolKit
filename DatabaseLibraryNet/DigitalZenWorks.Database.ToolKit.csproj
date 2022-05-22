@@ -31,10 +31,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\UtilitiesNET\UtilitiesNET.csproj" />
-	</ItemGroup>
-
-	<ItemGroup>
 		<Compile Remove="DatabaseLibraryNetTests\**" />
 		<EmbeddedResource Remove="DatabaseLibraryNetTests\**" />
 		<None Remove="DatabaseLibraryNetTests\**" />
