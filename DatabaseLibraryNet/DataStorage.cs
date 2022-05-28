@@ -765,21 +765,17 @@ namespace DigitalZenWorks.Database.ToolKit
 		{
 			if (disposing)
 			{
-				if (null != connection)
-				{
-					connection.Dispose();
-					connection = null;
-				}
-
 				if (null != oleDbConnection)
 				{
 					oleDbConnection.Close();
+					oleDbConnection.Dispose();
 					oleDbConnection = null;
 				}
 
 				if (null != mySqlConnection)
 				{
 					mySqlConnection.Close();
+					mySqlConnection.Dispose();
 					mySqlConnection = null;
 				}
 
@@ -787,6 +783,13 @@ namespace DigitalZenWorks.Database.ToolKit
 				{
 					databaseTransaction.Dispose();
 					databaseTransaction = null;
+				}
+
+				if (null != connection)
+				{
+					connection.Close();
+					connection.Dispose();
+					connection = null;
 				}
 			}
 		}
@@ -1055,6 +1058,9 @@ namespace DigitalZenWorks.Database.ToolKit
 					(connection.State != ConnectionState.Open))
 				{
 					connection.Open();
+					connection.Close();
+					Dispose(true);
+					connection = null;
 				}
 
 				returnValue = true;
