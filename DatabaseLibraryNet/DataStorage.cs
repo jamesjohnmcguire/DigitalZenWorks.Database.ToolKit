@@ -14,6 +14,7 @@ using System.Data;
 using System.Data.Common;
 using System.Data.OleDb;
 using System.Data.SqlClient;
+using System.Data.SQLite;
 using System.Globalization;
 using System.Reflection;
 using System.Resources;
@@ -63,6 +64,8 @@ namespace DigitalZenWorks.Database.ToolKit
 		private OleDbConnection oleDbConnection = null;
 
 		private MySqlConnection mySqlConnection = null;
+
+		private SQLiteConnection sqliteConnection = null;
 
 		// transactions
 		/// <summary>
@@ -779,6 +782,13 @@ namespace DigitalZenWorks.Database.ToolKit
 					mySqlConnection = null;
 				}
 
+				if (null != sqliteConnection)
+				{
+					sqliteConnection.Close();
+					sqliteConnection.Dispose();
+					sqliteConnection = null;
+				}
+
 				if (null != databaseTransaction)
 				{
 					databaseTransaction.Dispose();
@@ -975,6 +985,9 @@ namespace DigitalZenWorks.Database.ToolKit
 						case DatabaseType.MySql:
 							command = new MySqlCommand();
 							break;
+						case DatabaseType.SQLite:
+							command = new SQLiteCommand();
+							break;
 					}
 
 					if (null != values)
@@ -986,6 +999,7 @@ namespace DigitalZenWorks.Database.ToolKit
 								break;
 							case DatabaseType.SqlServer:
 							case DatabaseType.MySql:
+							case DatabaseType.SQLite:
 								AddParameters(command, values);
 								break;
 						}
@@ -1041,15 +1055,22 @@ namespace DigitalZenWorks.Database.ToolKit
 					{
 						case DatabaseType.OleDb:
 							// Two statements help in debugging problems
-							oleDbConnection = new OleDbConnection(connectionText);
+							oleDbConnection =
+								new OleDbConnection(connectionText);
 							connection = oleDbConnection;
 							break;
 						case DatabaseType.SqlServer:
-							connection = new SqlConnection(connectionText);
+							connection =
+								new SqlConnection(connectionText);
 							break;
 						case DatabaseType.MySql:
-							mySqlConnection = new MySqlConnection(connectionText);
+							mySqlConnection =
+								new MySqlConnection(connectionText);
 							connection = mySqlConnection;
+							break;
+						case DatabaseType.SQLite:
+							sqliteConnection =
+								new SQLiteConnection(connectionText);
 							break;
 					}
 				}

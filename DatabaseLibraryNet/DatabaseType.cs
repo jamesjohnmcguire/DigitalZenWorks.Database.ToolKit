@@ -36,6 +36,11 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// <summary>
 		/// MySql
 		/// </summary>
-		MySql
+		MySql,
+
+		/// <summary>
+		/// SQLite
+		/// </summary>
+		SQLite
 	}
 }
