@@ -51,8 +51,6 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// </summary>
 		private readonly string connectionText = string.Empty;
 
-		private readonly string provider = string.Empty;
-
 		/// <summary>
 		/// Database Connection Object.
 		/// </summary>
@@ -102,18 +100,6 @@ namespace DigitalZenWorks.Database.ToolKit
 						"Data Source=TimeTracker.accdb";
 				}
 			}
-		}
-
-		/// <summary>
-		/// Initializes a new instance of the <see cref="DataStorage"/> class.
-		/// </summary>
-		/// <param name="provider">The provider to use.</param>
-		/// <param name="dataSource">The datasource to use.</param>
-		public DataStorage(string provider, string dataSource)
-		{
-			this.provider = provider;
-			connectionText = CreateConnectionString(dataSource, null);
-			databaseType = DatabaseType.OleDb;
 		}
 
 		/// <summary>
@@ -891,7 +877,7 @@ namespace DigitalZenWorks.Database.ToolKit
 		}
 
 		private string CreateConnectionString(
-			string dataSource, string catalog)
+			string provider, string dataSource, string catalog)
 		{
 			string connectionString = null;
 
