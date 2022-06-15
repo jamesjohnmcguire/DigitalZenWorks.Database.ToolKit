@@ -19,6 +19,11 @@ namespace DigitalZenWorks.Database.ToolKit
 	public enum DatabaseType
 	{
 		/// <summary>
+		/// Unknown
+		/// </summary>
+		Unknown,
+
+		/// <summary>
 		/// OleDb
 		/// </summary>
 		OleDb,

@@ -44,7 +44,7 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// <summary>
 		/// databaseType.
 		/// </summary>
-		private readonly DatabaseType databaseType;
+		private readonly DatabaseType databaseType = DatabaseType.Unknown;
 
 		/// <summary>
 		/// The actual connection string used to connect to the database.
