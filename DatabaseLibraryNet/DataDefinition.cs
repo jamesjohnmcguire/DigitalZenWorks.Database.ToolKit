@@ -305,6 +305,11 @@ namespace DigitalZenWorks.Database.ToolKit
 				if (File.Exists(schemaFile))
 				{
 					string provider = "Microsoft.ACE.OLEDB.12.0";
+					string connectionString = string.Format(
+						CultureInfo.InvariantCulture,
+						"provider={0}; Data Source={1}",
+						provider,
+						databaseFile);
 
 					string fileContents = File.ReadAllText(schemaFile);
 
@@ -315,7 +320,7 @@ namespace DigitalZenWorks.Database.ToolKit
 						StringSplitOptions.RemoveEmptyEntries);
 
 					using (DataStorage database = new DataStorage(
-						provider, databaseFile))
+						DatabaseType.OleDb, connectionString))
 					{
 						foreach (string sqlQuery in queries)
 						{

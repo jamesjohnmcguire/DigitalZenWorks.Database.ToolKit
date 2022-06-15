@@ -55,9 +55,16 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 			applicationPath = applicationPath + "\\";
 
 			dataSource = applicationPath + "TestDb.accdb";
-			dataSourceBackupsCsv = applicationPath + "TestTable.csv";
 
-			database = new DataStorage(provider, dataSource);
+			string connectionString = string.Format(
+				CultureInfo.InvariantCulture,
+				"provider={0}; Data Source={1}",
+				provider,
+				dataSource);
+
+			database = new DataStorage(DatabaseType.OleDb, connectionString);
+
+			dataSourceBackupsCsv = applicationPath + "TestTable.csv";
 		}
 
 		/////////////////////////////////////////////////////////////////////

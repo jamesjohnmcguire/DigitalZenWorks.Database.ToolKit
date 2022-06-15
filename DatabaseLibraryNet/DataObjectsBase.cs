@@ -61,7 +61,13 @@ namespace DigitalZenWorks.Database.ToolKit
 					"\\" + dataSource;
 			}
 
-			database = new DataStorage(Provider, dataSource);
+			string connectionString = string.Format(
+				CultureInfo.InvariantCulture,
+				"provider={0}; Data Source={1}",
+				Provider,
+				dataSource);
+
+			database = new DataStorage(DatabaseType.OleDb, connectionString);
 		}
 
 		/////////////////////////////////////////////////////////////////////
@@ -83,7 +89,13 @@ namespace DigitalZenWorks.Database.ToolKit
 					"\\" + dataSource;
 			}
 
-			database = new DataStorage(Provider, dataSource);
+			string connectionString = string.Format(
+				CultureInfo.InvariantCulture,
+				"provider={0}; Data Source={1}",
+				Provider,
+				dataSource);
+
+			database = new DataStorage(DatabaseType.OleDb, connectionString);
 		}
 
 		/////////////////////////////////////////////////////////////////////

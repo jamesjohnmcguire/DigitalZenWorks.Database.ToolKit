@@ -118,9 +118,14 @@ namespace DigitalZenWorks.Database.ToolKit
 
 			// Open the database
 			string provider = "Microsoft.ACE.OLEDB.12.0";
+			string connectionString = string.Format(
+				CultureInfo.InvariantCulture,
+				"provider={0}; Data Source={1}",
+				provider,
+				databaseFile);
 
 			using (DataStorage database =
-				new DataStorage(provider, databaseFile))
+				new DataStorage(DatabaseType.OleDb, connectionString))
 			{
 				// Get all the table names
 				DataTable tableNames = database.SchemaTable;
