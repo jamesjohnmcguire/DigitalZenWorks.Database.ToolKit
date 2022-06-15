@@ -1,6 +1,6 @@
 ﻿/////////////////////////////////////////////////////////////////////////////
 // <copyright file="DatabaseType.cs" company="James John McGuire">
-// Copyright © 2006 - 2021 James John McGuire. All Rights Reserved.
+// Copyright © 2006 - 2022 James John McGuire. All Rights Reserved.
 // </copyright>
 /////////////////////////////////////////////////////////////////////////////
 
@@ -9,7 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace DigitalZenWorks.Common.DatabaseLibrary
+namespace DigitalZenWorks.Database.ToolKit
 {
 	/////////////////////////////////////////////////////////////////////////
 	/// <summary>
@@ -36,6 +36,11 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		/// <summary>
 		/// MySql
 		/// </summary>
-		MySql
+		MySql,
+
+		/// <summary>
+		/// SQLite
+		/// </summary>
+		SQLite
 	}
 }

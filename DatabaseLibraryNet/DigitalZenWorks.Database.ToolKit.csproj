@@ -2,18 +2,17 @@
 
 	<PropertyGroup>
 		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-		<AssemblyName>DigitalZenWorks.Common.DatabaseLibrary</AssemblyName>
+		<AssemblyTitle>DigitalZenWorks.Database.ToolKit</AssemblyTitle>
 		<AssemblyOriginatorKeyFile>DatabaseLibraryNet.snk</AssemblyOriginatorKeyFile>
 		<CodeAnalysisRuleSet>CodeAnalysis.ruleset</CodeAnalysisRuleSet>
 		<Company>James John McGuire</Company>
-		<Copyright>Copyright © 2006 - 2021</Copyright>
+		<Copyright>Copyright © 2006 - 2022</Copyright>
 		<EnableNETAnalyzers>true</EnableNETAnalyzers>
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 		<NeutralLanguage>en</NeutralLanguage>
 		<NoWarn>NU1605;NU1701</NoWarn>
 		<OutputPath>$(SolutionDir)\Bin\$(Configuration)\$(Platform)</OutputPath>
-		<Platforms>x86;x64</Platforms>
-		<RootNamespace>DigitalZenWorks.Common.DatabaseLibrary</RootNamespace>
+		<RootNamespace>DigitalZenWorks.Database.ToolKit</RootNamespace>
 		<SignAssembly>true</SignAssembly>
 		<TargetFramework>netstandard2.0</TargetFramework>
 	</PropertyGroup>
@@ -21,17 +20,15 @@
 	<ItemGroup>
 		<PackageReference Include="Common.Logging" Version="3.4.1" />
 		<PackageReference Include="Common.Logging.Core" Version="3.4.1" />
-		<PackageReference Include="MySql.data" Version="8.0.26" />
+		<PackageReference Include="DigitalZenWorks.Common.Utilities" Version="1.1.59" />
+		<PackageReference Include="MySql.Data" Version="8.0.29" />
 		<PackageReference Include="StyleCop.Analyzers" Version="1.1.118">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
-		<PackageReference Include="System.Data.OleDb" Version="5.0.0" />
+		<PackageReference Include="System.Data.OleDb" Version="6.0.0" />
 		<PackageReference Include="System.Data.SqlClient" Version="4.8.3" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<ProjectReference Include="..\UtilitiesNET\UtilitiesNET.csproj" />
+		<PackageReference Include="System.Data.SQLite.Core" Version="1.0.116" />
 	</ItemGroup>
 
 	<ItemGroup>

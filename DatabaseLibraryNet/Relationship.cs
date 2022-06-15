@@ -1,6 +1,6 @@
 ﻿/////////////////////////////////////////////////////////////////////////////
 // <copyright file="Relationship.cs" company="James John McGuire">
-// Copyright © 2006 - 2021 James John McGuire. All Rights Reserved.
+// Copyright © 2006 - 2022 James John McGuire. All Rights Reserved.
 // </copyright>
 /////////////////////////////////////////////////////////////////////////////
 
@@ -10,7 +10,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DigitalZenWorks.Common.DatabaseLibrary
+namespace DigitalZenWorks.Database.ToolKit
 {
 	/// <summary>
 	/// A class to hold foreign key constraints temporarily.

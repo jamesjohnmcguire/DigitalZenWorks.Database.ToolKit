@@ -1,6 +1,6 @@
 ﻿/////////////////////////////////////////////////////////////////////////////
 // <copyright file="DataStorage.cs" company="James John McGuire">
-// Copyright © 2006 - 2021 James John McGuire. All Rights Reserved.
+// Copyright © 2006 - 2022 James John McGuire. All Rights Reserved.
 // </copyright>
 /////////////////////////////////////////////////////////////////////////////
 
@@ -14,11 +14,12 @@ using System.Data;
 using System.Data.Common;
 using System.Data.OleDb;
 using System.Data.SqlClient;
+using System.Data.SQLite;
 using System.Globalization;
 using System.Reflection;
 using System.Resources;
 
-namespace DigitalZenWorks.Common.DatabaseLibrary
+namespace DigitalZenWorks.Database.ToolKit
 {
 	/////////////////////////////////////////////////////////////////////////
 	/// Class <c>DataStorage.</c>
@@ -37,7 +38,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 
 		private static readonly ResourceManager StringTable = new
 			ResourceManager(
-			"DigitalZenWorks.Common.DatabaseLibrary.Resources",
+			"DigitalZenWorks.Database.ToolKit.Resources",
 			Assembly.GetExecutingAssembly());
 
 		/// <summary>
@@ -63,6 +64,8 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		private OleDbConnection oleDbConnection = null;
 
 		private MySqlConnection mySqlConnection = null;
+
+		private SQLiteConnection sqliteConnection = null;
 
 		// transactions
 		/// <summary>
@@ -765,28 +768,38 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 		{
 			if (disposing)
 			{
-				if (null != connection)
-				{
-					connection.Dispose();
-					connection = null;
-				}
-
 				if (null != oleDbConnection)
 				{
 					oleDbConnection.Close();
+					oleDbConnection.Dispose();
 					oleDbConnection = null;
 				}
 
 				if (null != mySqlConnection)
 				{
 					mySqlConnection.Close();
+					mySqlConnection.Dispose();
 					mySqlConnection = null;
+				}
+
+				if (null != sqliteConnection)
+				{
+					sqliteConnection.Close();
+					sqliteConnection.Dispose();
+					sqliteConnection = null;
 				}
 
 				if (null != databaseTransaction)
 				{
 					databaseTransaction.Dispose();
 					databaseTransaction = null;
+				}
+
+				if (null != connection)
+				{
+					connection.Close();
+					connection.Dispose();
+					connection = null;
 				}
 			}
 		}
@@ -972,6 +985,9 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 						case DatabaseType.MySql:
 							command = new MySqlCommand();
 							break;
+						case DatabaseType.SQLite:
+							command = new SQLiteCommand();
+							break;
 					}
 
 					if (null != values)
@@ -983,6 +999,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 								break;
 							case DatabaseType.SqlServer:
 							case DatabaseType.MySql:
+							case DatabaseType.SQLite:
 								AddParameters(command, values);
 								break;
 						}
@@ -1038,15 +1055,22 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 					{
 						case DatabaseType.OleDb:
 							// Two statements help in debugging problems
-							oleDbConnection = new OleDbConnection(connectionText);
+							oleDbConnection =
+								new OleDbConnection(connectionText);
 							connection = oleDbConnection;
 							break;
 						case DatabaseType.SqlServer:
-							connection = new SqlConnection(connectionText);
+							connection =
+								new SqlConnection(connectionText);
 							break;
 						case DatabaseType.MySql:
-							mySqlConnection = new MySqlConnection(connectionText);
+							mySqlConnection =
+								new MySqlConnection(connectionText);
 							connection = mySqlConnection;
+							break;
+						case DatabaseType.SQLite:
+							sqliteConnection =
+								new SQLiteConnection(connectionText);
 							break;
 					}
 				}
@@ -1055,6 +1079,9 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 					(connection.State != ConnectionState.Open))
 				{
 					connection.Open();
+					connection.Close();
+					Dispose(true);
+					connection = null;
 				}
 
 				returnValue = true;

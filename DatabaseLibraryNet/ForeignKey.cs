@@ -1,10 +1,10 @@
 ﻿/////////////////////////////////////////////////////////////////////////////
 // <copyright file="ForeignKey.cs" company="James John McGuire">
-// Copyright © 2006 - 2021 James John McGuire. All Rights Reserved.
+// Copyright © 2006 - 2022 James John McGuire. All Rights Reserved.
 // </copyright>
 /////////////////////////////////////////////////////////////////////////////
 
-namespace DigitalZenWorks.Common.DatabaseLibrary
+namespace DigitalZenWorks.Database.ToolKit
 {
 	/////////////////////////////////////////////////////////////////////////
 	/// <summary>

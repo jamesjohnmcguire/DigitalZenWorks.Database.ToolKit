@@ -1,6 +1,6 @@
 ﻿/////////////////////////////////////////////////////////////////////////////
 // <copyright file="DataDefinition.cs" company="James John McGuire">
-// Copyright © 2006 - 2021 James John McGuire. All Rights Reserved.
+// Copyright © 2006 - 2022 James John McGuire. All Rights Reserved.
 // </copyright>
 /////////////////////////////////////////////////////////////////////////////
 
@@ -14,7 +14,7 @@ using System.IO;
 using System.Reflection;
 using System.Resources;
 
-namespace DigitalZenWorks.Common.DatabaseLibrary
+namespace DigitalZenWorks.Database.ToolKit
 {
 	/////////////////////////////////////////////////////////////////////////
 	/// Class <c>DataDefinition.</c>
@@ -32,7 +32,7 @@ namespace DigitalZenWorks.Common.DatabaseLibrary
 
 		private static readonly ResourceManager StringTable = new
 			ResourceManager(
-			"DigitalZenWorks.Common.DatabaseLibrary.Resources",
+			"DigitalZenWorks.Database.ToolKit.Resources",
 			Assembly.GetExecutingAssembly());
 
 		/////////////////////////////////////////////////////////////////////
