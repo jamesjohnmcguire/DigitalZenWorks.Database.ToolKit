@@ -127,19 +127,6 @@ namespace DigitalZenWorks.Database.ToolKit
 			this.databaseType = databaseType;
 		}
 
-		/// <summary>
-		/// Initializes a new instance of the <see cref="DataStorage"/> class.
-		/// </summary>
-		/// <param name="databaseType">The database type.</param>
-		/// <param name="dataSource">The data source to use.</param>
-		/// <param name="catalog">The catalog to use.</param>
-		public DataStorage(
-			DatabaseType databaseType, string dataSource, string catalog)
-		{
-			connectionText = CreateConnectionString(dataSource, catalog);
-			this.databaseType = databaseType;
-		}
-
 		/////////////////////////////////////////////////////////////////////
 		/// <summary>
 		/// Gets get the table schema information for the associated database.
