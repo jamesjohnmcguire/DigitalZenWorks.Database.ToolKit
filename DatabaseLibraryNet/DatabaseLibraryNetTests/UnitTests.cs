@@ -38,13 +38,13 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 		private string dataSourceBackupsCsv;
 
 		/////////////////////////////////////////////////////////////////////
-		/// Method <c>Setup</c>
+		/// Method <c>OneTimeSetUp</c>
 		/// <summary>
-		/// function that is called just before each test method is called.
+		/// One time set up method.
 		/// </summary>
 		/////////////////////////////////////////////////////////////////////
-		[SetUp]
-		public void Setup()
+		[OneTimeSetUp]
+		public void OneTimeSetUp()
 		{
 			Assembly assembly = Assembly.GetExecutingAssembly();
 			string codeBase = assembly.CodeBase;
