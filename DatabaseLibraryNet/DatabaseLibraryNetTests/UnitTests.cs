@@ -28,8 +28,6 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 	{
 		private readonly string provider = "Microsoft.ACE.OLEDB.12.0";
 
-		private string applicationPath;
-
 		/// <summary>
 		/// database
 		/// </summary>
@@ -50,7 +48,7 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 
 			UriBuilder uri = new UriBuilder(codeBase);
 			string path = Uri.UnescapeDataString(uri.Path);
-			applicationPath = Path.GetDirectoryName(path);
+			string applicationPath = Path.GetDirectoryName(path);
 			applicationPath = applicationPath + "\\";
 
 			dataSource = applicationPath + "TestDb.accdb";
