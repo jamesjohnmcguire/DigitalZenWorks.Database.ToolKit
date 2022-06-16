@@ -35,7 +35,6 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 		/// </summary>
 		private DataStorage database;
 		private string dataSource;
-		private string dataSourceBackupsCsv;
 
 		/////////////////////////////////////////////////////////////////////
 		/// Method <c>OneTimeSetUp</c>
@@ -63,8 +62,6 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 				dataSource);
 
 			database = new DataStorage(DatabaseType.OleDb, connectionString);
-
-			dataSourceBackupsCsv = applicationPath + "TestTable.csv";
 		}
 
 		/////////////////////////////////////////////////////////////////////
@@ -240,15 +237,19 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 		/////////////////////////////////////////////////////////////////////////
 		/// Method <c>ExportToCsv</c>
 		/// <summary>
-		/// Delete Test
+		/// Export to CSV Test
 		/// </summary>
 		/////////////////////////////////////////////////////////////////////////
 		[Test]
 		public void ExportToCsv()
 		{
-			DatabaseUtilities.ExportToCsv(dataSource, applicationPath);
+			string tempPath = Path.GetTempPath();
 
-			Assert.IsTrue((File.Exists(dataSourceBackupsCsv)));
+			DatabaseUtilities.ExportToCsv(dataSource, tempPath);
+
+			string csvFile = tempPath + "TestTable.csv";
+
+			Assert.IsTrue(File.Exists(csvFile));
 		}
 
 		/////////////////////////////////////////////////////////////////////////
