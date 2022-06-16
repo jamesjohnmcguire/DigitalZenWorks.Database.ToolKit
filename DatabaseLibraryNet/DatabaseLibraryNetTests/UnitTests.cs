@@ -43,15 +43,7 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 		[OneTimeSetUp]
 		public void OneTimeSetUp()
 		{
-			Assembly assembly = Assembly.GetExecutingAssembly();
-			string codeBase = assembly.CodeBase;
-
-			UriBuilder uri = new UriBuilder(codeBase);
-			string path = Uri.UnescapeDataString(uri.Path);
-			string applicationPath = Path.GetDirectoryName(path);
-			applicationPath = applicationPath + "\\";
-
-			dataSource = applicationPath + "TestDb.accdb";
+			dataSource = GetTestDatabasePath();
 
 			string connectionString = string.Format(
 				CultureInfo.InvariantCulture,
@@ -303,6 +295,21 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 			bool result = database.Update(query, parameters);
 
 			Assert.True(result);
+		}
+
+		private static string GetTestDatabasePath()
+		{
+			Assembly assembly = Assembly.GetExecutingAssembly();
+			string codeBase = assembly.CodeBase;
+
+			UriBuilder uri = new UriBuilder(codeBase);
+			string path = Uri.UnescapeDataString(uri.Path);
+			string applicationPath = Path.GetDirectoryName(path);
+			applicationPath = applicationPath + "\\";
+
+			string databasePath = applicationPath + "TestDb.accdb";
+
+			return databasePath;
 		}
 
 		private void VerifyRowExists(int existingRowId, bool shouldExist)
