@@ -26,8 +26,6 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 	[TestFixture]
 	public class TransactionUnitTests: IDisposable
 	{
-		private readonly string provider = "Microsoft.ACE.OLEDB.12.0";
-
 		/// <summary>
 		/// database
 		/// </summary>
@@ -43,6 +41,8 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 		[OneTimeSetUp]
 		public void OneTimeSetUp()
 		{
+			string provider = "Microsoft.ACE.OLEDB.12.0";
+
 			dataSource = GetTestDatabasePath();
 
 			string connectionString = string.Format(
@@ -118,6 +118,8 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 		[Test]
 		public void DatabaseCanOpen()
 		{
+			string provider = "Microsoft.ACE.OLEDB.12.0";
+
 			string connectionString = string.Format(
 				CultureInfo.InvariantCulture,
 				"provider={0}; Data Source={1}",
@@ -127,7 +129,7 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 				new OleDbConnection(connectionString))
 			{
 				oleDbConnection.Open();
-				//oleDbConnection.Close();
+				oleDbConnection.Close();
 			}
 
 			// assuming no exceptions
