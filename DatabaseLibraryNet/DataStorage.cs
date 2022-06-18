@@ -770,7 +770,6 @@ namespace DigitalZenWorks.Database.ToolKit
 
 				if (null != connection)
 				{
-					connection.Close();
 					connection.Dispose();
 					connection = null;
 				}
