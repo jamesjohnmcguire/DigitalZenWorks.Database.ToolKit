@@ -8,6 +8,7 @@ using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.Common;
 using System.Data.OleDb;
 using System.Data.SQLite;
 using System.Globalization;
@@ -123,7 +124,12 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 
 			bool result = database.ExecuteNonQuery(statement);
 
-			Assert.IsTrue(result);
+			statement = "SELECT name FROM sqlite_master " +
+				"WHERE type = 'table' AND name = 'TestTable';";
+
+			DbDataReader dbDataReader = database.ExecuteReader(statement);
+
+			Assert.IsTrue(dbDataReader.HasRows);
 		}
 
 		/////////////////////////////////////////////////////////////////////
