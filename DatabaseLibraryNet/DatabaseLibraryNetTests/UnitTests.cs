@@ -42,19 +42,16 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 		[OneTimeSetUp]
 		public void OneTimeSetUp()
 		{
-			string provider = "Microsoft.ACE.OLEDB.12.0";
-
 			dataSource = GetTestDatabasePath();
 
 			SQLiteConnection.CreateFile(dataSource);
 
 			string connectionString = string.Format(
 				CultureInfo.InvariantCulture,
-				"provider={0}; Data Source={1}",
-				provider,
+				"Data Source = {0}; Version = 3;",
 				dataSource);
 
-			database = new DataStorage(DatabaseType.OleDb, connectionString);
+			database = new DataStorage(DatabaseType.SQLite, connectionString);
 		}
 
 		/////////////////////////////////////////////////////////////////////
@@ -325,9 +322,7 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 
 			// A 0 byte sized file is created.  Need to remove it.
 			File.Delete(fileName);
-			string databasePath = Path.ChangeExtension(fileName, ".accdb");
-
-			DatabaseUtilities.CreateAccessDatabaseFile(databasePath);
+			string databasePath = Path.ChangeExtension(fileName, ".db");
 
 			return databasePath;
 		}
