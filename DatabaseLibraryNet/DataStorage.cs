@@ -1052,9 +1052,6 @@ namespace DigitalZenWorks.Database.ToolKit
 					(connection.State != ConnectionState.Open))
 				{
 					connection.Open();
-					connection.Close();
-					Dispose(true);
-					connection = null;
 				}
 
 				returnValue = true;
