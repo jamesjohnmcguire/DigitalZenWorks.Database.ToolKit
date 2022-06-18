@@ -601,6 +601,7 @@ namespace DigitalZenWorks.Database.ToolKit
 			switch (databaseType)
 			{
 				case DatabaseType.OleDb:
+				case DatabaseType.SqlServer:
 					statement = "SELECT @@IDENTITY";
 					break;
 				case DatabaseType.SQLite:
