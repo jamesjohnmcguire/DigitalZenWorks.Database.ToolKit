@@ -1059,7 +1059,9 @@ namespace DigitalZenWorks.Database.ToolKit
 
 				returnValue = true;
 			}
-			catch (AccessViolationException exception)
+			catch (Exception exception) when
+				(exception is AccessViolationException ||
+				exception is OleDbException)
 			{
 				RollbackTransaction();
 
