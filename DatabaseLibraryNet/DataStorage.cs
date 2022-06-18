@@ -568,6 +568,34 @@ namespace DigitalZenWorks.Database.ToolKit
 			return dataTable;
 		}
 
+		/// <summary>
+		/// Get the last insert id.
+		/// </summary>
+		/// <returns>The last insert id.</returns>
+		/// <exception cref="NotImplementedException">Throws a not implemented
+		/// exception for databases that do not have this support.</exception>
+		public int GetLastInsertId()
+		{
+			int lastId = -1;
+			string statement = string.Empty;
+
+			switch (databaseType)
+			{
+				case DatabaseType.OleDb:
+					statement = "SELECT @@IDENTITY";
+					break;
+				case DatabaseType.SQLite:
+					statement = "SELECT LAST_INSERT_ROWID()";
+					break;
+				default:
+					throw new NotImplementedException();
+			}
+
+			lastId = ExecuteScalar(statement);
+
+			return lastId;
+		}
+
 		/////////////////////////////////////////////////////////////////////
 		/// Method <c>Insert.</c>
 		/// <summary>
@@ -607,7 +635,7 @@ namespace DigitalZenWorks.Database.ToolKit
 				ExecuteNonQuery(sql, values);
 
 				// get id of effected row
-				returnCode = ExecuteScalar("SELECT @@IDENTITY");
+				returnCode = GetLastInsertId();
 
 				if (true == finishTransaction)
 				{
@@ -708,10 +736,8 @@ namespace DigitalZenWorks.Database.ToolKit
 
 				string sql =
 					"INSERT INTO Contacts (Notes) VALUES ('testing')";
-				string sql2 = "SELECT @@IDENTITY";
 
 				commandObject1 = new OleDbCommand(sql, oleDbConnection);
-				commandObject2 = new OleDbCommand(sql2, oleDbConnection);
 
 				oleDbConnection.Open();
 
@@ -722,7 +748,7 @@ namespace DigitalZenWorks.Database.ToolKit
 					returnCode = (int)result;
 				}
 
-				returnCode = (int)commandObject2.ExecuteScalar();
+				returnCode = GetLastInsertId();
 			}
 			catch (Exception exception)
 			{
