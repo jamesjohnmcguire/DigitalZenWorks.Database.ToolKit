@@ -346,10 +346,7 @@ namespace DigitalZenWorks.Database.ToolKit
 				{
 					int rowsEffected = command.ExecuteNonQuery();
 
-					if (rowsEffected > 0)
-					{
-						returnCode = true;
-					}
+					returnCode = true;
 				}
 
 				if (null == databaseTransaction)
