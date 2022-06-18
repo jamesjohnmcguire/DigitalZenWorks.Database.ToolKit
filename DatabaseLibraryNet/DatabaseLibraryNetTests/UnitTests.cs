@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.OleDb;
+using System.Data.SQLite;
 using System.Globalization;
 using System.IO;
 using System.Reflection;
@@ -44,6 +45,8 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 			string provider = "Microsoft.ACE.OLEDB.12.0";
 
 			dataSource = GetTestDatabasePath();
+
+			SQLiteConnection.CreateFile(dataSource);
 
 			string connectionString = string.Format(
 				CultureInfo.InvariantCulture,
@@ -107,6 +110,23 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 			bool AlwaysTrue = true;
 
 			Assert.IsTrue(AlwaysTrue);
+		}
+
+		/////////////////////////////////////////////////////////////////////
+		/// Method <c>CreateTableTest</c>
+		/// <summary>
+		/// Create table test
+		/// </summary>
+		/////////////////////////////////////////////////////////////////////
+		[Test, Order(1)]
+		public void CreateTableTest()
+		{
+			string statement = "CREATE TABLE TestTable " +
+				"(id INTEGER PRIMARY KEY, description VARCHAR(64))";
+
+			bool result = database.ExecuteNonQuery(statement);
+
+			Assert.IsTrue(result);
 		}
 
 		/////////////////////////////////////////////////////////////////////
@@ -301,15 +321,13 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 
 		private static string GetTestDatabasePath()
 		{
-			Assembly assembly = Assembly.GetExecutingAssembly();
-			string codeBase = assembly.CodeBase;
+			string fileName = Path.GetTempFileName();
 
-			UriBuilder uri = new UriBuilder(codeBase);
-			string path = Uri.UnescapeDataString(uri.Path);
-			string applicationPath = Path.GetDirectoryName(path);
-			applicationPath = applicationPath + "\\";
+			// A 0 byte sized file is created.  Need to remove it.
+			File.Delete(fileName);
+			string databasePath = Path.ChangeExtension(fileName, ".accdb");
 
-			string databasePath = applicationPath + "TestDb.accdb";
+			DatabaseUtilities.CreateAccessDatabaseFile(databasePath);
 
 			return databasePath;
 		}
