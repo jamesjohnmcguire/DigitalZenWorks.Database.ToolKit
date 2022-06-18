@@ -490,9 +490,11 @@ namespace DigitalZenWorks.Database.ToolKit
 								break;
 						}
 
-						dataAdapter.SelectCommand = command;
-
-						dataAdapter.Fill(dataSet);
+						if (dataAdapter != null)
+						{
+							dataAdapter.SelectCommand = command;
+							dataAdapter.Fill(dataSet);
+						}
 
 						Log.Info(
 							CultureInfo.InvariantCulture,
