@@ -358,6 +358,32 @@ namespace DigitalZenWorks.Database.ToolKit
 			return returnCode;
 		}
 
+		/// <summary>
+		/// Execture a data reader.
+		/// </summary>
+		/// <remarks>Caller is responsible for disposing returned
+		/// object.</remarks>
+		/// <param name="statement">the SQL statement to execute.</param>
+		/// <returns>A data reader.</returns>
+		[System.Diagnostics.CodeAnalysis.SuppressMessage(
+			"StyleCop.CSharp.NamingRules",
+			"SA1305:Field names should not use Hungarian notation",
+			Justification = "It isn't hungarian notation.")]
+		public DbDataReader ExecuteReader(string statement)
+		{
+			DbDataReader dbDataReader = null;
+
+			using (DbCommand command = GetCommandObject(statement, null))
+			{
+				if (null != command)
+				{
+					dbDataReader = command.ExecuteReader();
+				}
+			}
+
+			return dbDataReader;
+		}
+
 		/////////////////////////////////////////////////////////////////////
 		/// Method <c>GetDataField.</c>
 		/// <summary>
