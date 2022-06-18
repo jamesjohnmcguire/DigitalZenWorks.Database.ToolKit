@@ -479,14 +479,17 @@ namespace DigitalZenWorks.Database.ToolKit
 					{
 						switch (databaseType)
 						{
+							case DatabaseType.MySql:
+								dataAdapter = new MySqlDataAdapter();
+								break;
 							case DatabaseType.OleDb:
 								dataAdapter = new OleDbDataAdapter();
 								break;
+							case DatabaseType.SQLite:
+								dataAdapter = new SQLiteDataAdapter();
+								break;
 							case DatabaseType.SqlServer:
 								dataAdapter = new SqlDataAdapter();
-								break;
-							case DatabaseType.MySql:
-								dataAdapter = new MySqlDataAdapter();
 								break;
 						}
 
