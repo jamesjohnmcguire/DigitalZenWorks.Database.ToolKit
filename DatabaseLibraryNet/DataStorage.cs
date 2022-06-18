@@ -1044,6 +1044,7 @@ namespace DigitalZenWorks.Database.ToolKit
 						case DatabaseType.SQLite:
 							sqliteConnection =
 								new SQLiteConnection(connectionText);
+							connection = sqliteConnection;
 							break;
 					}
 				}
