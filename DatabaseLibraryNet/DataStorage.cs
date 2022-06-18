@@ -434,7 +434,7 @@ namespace DigitalZenWorks.Database.ToolKit
 
 			DataTable dataTable = GetDataTable(sql, values);
 
-			if (dataTable.Rows.Count > 0)
+			if (dataTable != null && dataTable.Rows.Count > 0)
 			{
 				row = dataTable.Rows[0];
 			}
