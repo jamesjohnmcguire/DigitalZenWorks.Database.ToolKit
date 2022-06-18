@@ -500,6 +500,20 @@ namespace DigitalZenWorks.Database.ToolKit
 					}
 				}
 			}
+			catch (NullReferenceException exception)
+			{
+				RollbackTransaction();
+
+				string message = StringTable.GetString(
+					"EXCEPTION", CultureInfo.InvariantCulture);
+				Log.Error(CultureInfo.InvariantCulture, m => m(
+					message + exception));
+
+				message = StringTable.GetString(
+					"COMMAND", CultureInfo.InvariantCulture);
+				Log.Error(CultureInfo.InvariantCulture, m => m(
+					message + sql));
+			}
 			catch (Exception exception)
 			{
 				RollbackTransaction();
