@@ -56,13 +56,13 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 		}
 
 		/////////////////////////////////////////////////////////////////////
-		/// Method <c>Teardown</c>
+		/// Method <c>OneTimeTearDown</c>
 		/// <summary>
-		/// function that is called just after each test method is called.
+		/// function that is called when all tests are completed.
 		/// </summary>
 		/////////////////////////////////////////////////////////////////////
-		[TearDown]
-		public void Teardown()
+		[OneTimeTearDown]
+		public void OneTimeTearDown()
 		{
 			if (database != null)
 			{
@@ -138,26 +138,26 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 		/// Test to see if test db exists
 		/// </summary>
 		/////////////////////////////////////////////////////////////////////
-		[Test]
-		public void DatabaseCanOpen()
-		{
-			string provider = "Microsoft.ACE.OLEDB.12.0";
+		//[Test]
+		//public void DatabaseCanOpen()
+		//{
+		//	string provider = "Microsoft.ACE.OLEDB.12.0";
 
-			string connectionString = string.Format(
-				CultureInfo.InvariantCulture,
-				"provider={0}; Data Source={1}",
-				provider,
-				dataSource);
-			using (OleDbConnection oleDbConnection =
-				new OleDbConnection(connectionString))
-			{
-				oleDbConnection.Open();
-				oleDbConnection.Close();
-			}
+		//	string connectionString = string.Format(
+		//		CultureInfo.InvariantCulture,
+		//		"provider={0}; Data Source={1}",
+		//		provider,
+		//		dataSource);
+		//	using (OleDbConnection oleDbConnection =
+		//		new OleDbConnection(connectionString))
+		//	{
+		//		oleDbConnection.Open();
+		//		oleDbConnection.Close();
+		//	}
 
-			// assuming no exceptions
-			Assert.IsTrue(File.Exists(dataSource));
-		}
+		//	// assuming no exceptions
+		//	Assert.IsTrue(File.Exists(dataSource));
+		//}
 
 		/////////////////////////////////////////////////////////////////////
 		/// Method <c>VerifyTestSourceExists</c>
