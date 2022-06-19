@@ -928,15 +928,17 @@ namespace DigitalZenWorks.Database.ToolKit
 				}
 				else
 				{
+					object keyPairValue = valuePair.Value;
+
 					if (databaseType == DatabaseType.SQLite)
 					{
 						SQLiteParameter parameter = new SQLiteParameter(
-							DbType.String, valuePair.Value);
+							DbType.String, keyPairValue);
 						parameters.Add(parameter);
 					}
 					else
 					{
-						parameters.Add(valuePair.Value);
+						parameters.Add(keyPairValue);
 					}
 				}
 			}
