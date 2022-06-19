@@ -853,35 +853,6 @@ namespace DigitalZenWorks.Database.ToolKit
 			}
 		}
 
-		private DbParameterCollection AddParameters(
-			DbCommand command, IDictionary<string, object> values)
-		{
-			DbParameterCollection parameters = command.Parameters;
-
-			foreach (KeyValuePair<string, object> valuePair in values)
-			{
-				if (null == valuePair.Value)
-				{
-					parameters.Add(DBNull.Value);
-				}
-				else
-				{
-					if (databaseType == DatabaseType.SQLite)
-					{
-						SQLiteParameter parameter = new SQLiteParameter(
-							DbType.String, valuePair.Value);
-						parameters.Add(parameter);
-					}
-					else
-					{
-						parameters.Add(valuePair.Value);
-					}
-				}
-			}
-
-			return parameters;
-		}
-
 		private static OleDbParameterCollection AddParameters(
 			OleDbCommand command, IDictionary<string, object> values)
 		{
@@ -959,6 +930,35 @@ namespace DigitalZenWorks.Database.ToolKit
 		private static string GetSingularPascalName(string columnName)
 		{
 			return GeneralUtilities.ConvertToPascalCaseFromKnr(columnName);
+		}
+
+		private DbParameterCollection AddParameters(
+			DbCommand command, IDictionary<string, object> values)
+		{
+			DbParameterCollection parameters = command.Parameters;
+
+			foreach (KeyValuePair<string, object> valuePair in values)
+			{
+				if (null == valuePair.Value)
+				{
+					parameters.Add(DBNull.Value);
+				}
+				else
+				{
+					if (databaseType == DatabaseType.SQLite)
+					{
+						SQLiteParameter parameter = new SQLiteParameter(
+							DbType.String, valuePair.Value);
+						parameters.Add(parameter);
+					}
+					else
+					{
+						parameters.Add(valuePair.Value);
+					}
+				}
+			}
+
+			return parameters;
 		}
 
 		private string CreateConnectionString(
