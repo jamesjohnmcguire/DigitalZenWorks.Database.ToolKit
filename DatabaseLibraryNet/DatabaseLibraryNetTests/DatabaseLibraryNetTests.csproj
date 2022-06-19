@@ -5,6 +5,7 @@
 		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
 		<AssemblyName>DigitalZenWorks.Common.DatabaseLibary.Tests</AssemblyName>
 		<CodeAnalysisRuleSet>..\CodeAnalysis.ruleset</CodeAnalysisRuleSet>
+		<EnableNETAnalyzers>true</EnableNETAnalyzers>
 		<IsTestProject>true</IsTestProject>
 		<OutputPath>$(SolutionDir)\Bin\$(Configuration)\$(Platform)</OutputPath>
 		<RootNamespace>DigitalZenWorks.Common.DatabaseLibary.Tests</RootNamespace>
