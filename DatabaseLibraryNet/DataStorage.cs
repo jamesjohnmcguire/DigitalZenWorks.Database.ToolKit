@@ -139,8 +139,7 @@ namespace DigitalZenWorks.Database.ToolKit
 					}
 					else
 					{
-						// tables = connection.GetSchema("TABLE");
-						tables = connection.GetSchema();
+						tables = connection.GetSchema("Tables");
 					}
 				}
 
