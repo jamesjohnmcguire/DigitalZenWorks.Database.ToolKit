@@ -343,9 +343,18 @@ namespace DigitalZenWorks.Database.ToolKit
 			{
 				if (null != command)
 				{
-					int rowsEffected = command.ExecuteNonQuery();
+					try
+					{
+						int rowsEffected = command.ExecuteNonQuery();
 
-					returnCode = true;
+						returnCode = true;
+					}
+					catch (Exception exception)
+					{
+						Log.Error(exception.ToString());
+
+						throw;
+					}
 				}
 
 				if (null == databaseTransaction)
