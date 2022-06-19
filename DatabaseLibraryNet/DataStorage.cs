@@ -993,17 +993,17 @@ namespace DigitalZenWorks.Database.ToolKit
 				{
 					switch (databaseType)
 					{
-						case DatabaseType.OleDb:
-							command = new OleDbCommand();
-							break;
-						case DatabaseType.SqlServer:
-							command = new SqlCommand();
-							break;
 						case DatabaseType.MySql:
 							command = new MySqlCommand();
 							break;
+						case DatabaseType.OleDb:
+							command = new OleDbCommand();
+							break;
 						case DatabaseType.SQLite:
 							command = new SQLiteCommand();
+							break;
+						case DatabaseType.SqlServer:
+							command = new SqlCommand();
 							break;
 					}
 
@@ -1014,9 +1014,9 @@ namespace DigitalZenWorks.Database.ToolKit
 							case DatabaseType.OleDb:
 								AddParameters((OleDbCommand)command, values);
 								break;
-							case DatabaseType.SqlServer:
 							case DatabaseType.MySql:
 							case DatabaseType.SQLite:
+							case DatabaseType.SqlServer:
 								AddParameters(command, values);
 								break;
 						}
@@ -1070,25 +1070,25 @@ namespace DigitalZenWorks.Database.ToolKit
 				{
 					switch (databaseType)
 					{
+						case DatabaseType.MySql:
+							mySqlConnection =
+								new MySqlConnection(connectionText);
+							connection = mySqlConnection;
+							break;
 						case DatabaseType.OleDb:
 							// Two statements help in debugging problems
 							oleDbConnection =
 								new OleDbConnection(connectionText);
 							connection = oleDbConnection;
 							break;
-						case DatabaseType.SqlServer:
-							connection =
-								new SqlConnection(connectionText);
-							break;
-						case DatabaseType.MySql:
-							mySqlConnection =
-								new MySqlConnection(connectionText);
-							connection = mySqlConnection;
-							break;
 						case DatabaseType.SQLite:
 							sqliteConnection =
 								new SQLiteConnection(connectionText);
 							connection = sqliteConnection;
+							break;
+						case DatabaseType.SqlServer:
+							connection =
+								new SqlConnection(connectionText);
 							break;
 					}
 				}
