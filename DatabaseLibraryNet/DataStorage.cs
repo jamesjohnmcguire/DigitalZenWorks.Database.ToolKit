@@ -603,8 +603,7 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// exception for databases that do not have this support.</exception>
 		public int GetLastInsertId()
 		{
-			int lastId = -1;
-			string statement = string.Empty;
+			string statement;
 
 			switch (databaseType)
 			{
@@ -619,7 +618,7 @@ namespace DigitalZenWorks.Database.ToolKit
 					throw new NotImplementedException();
 			}
 
-			lastId = ExecuteScalar(statement);
+			int lastId = ExecuteScalar(statement);
 
 			return lastId;
 		}
@@ -959,30 +958,6 @@ namespace DigitalZenWorks.Database.ToolKit
 			}
 
 			return parameters;
-		}
-
-		private string CreateConnectionString(
-			string provider, string dataSource, string catalog)
-		{
-			string connectionString = null;
-
-			if (null != provider)
-			{
-				connectionString = "provider=" + provider;
-			}
-
-			if (null != dataSource)
-			{
-				connectionString += "; Data Source=" + dataSource;
-			}
-
-			if (null != catalog)
-			{
-				connectionString +=
-					"; Integrated Security=SSPI; Initial catalog=" + catalog;
-			}
-
-			return connectionString;
 		}
 
 		/////////////////////////////////////////////////////////////////////
