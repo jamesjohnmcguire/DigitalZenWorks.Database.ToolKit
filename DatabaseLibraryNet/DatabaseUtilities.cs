@@ -116,16 +116,40 @@ namespace DigitalZenWorks.Database.ToolKit
 		{
 			bool returnCode = false;
 
-			// Open the database
-			string provider = "Microsoft.ACE.OLEDB.12.0";
-			string connectionString = string.Format(
-				CultureInfo.InvariantCulture,
-				"provider={0}; Data Source={1}",
-				provider,
-				databaseFile);
+			DatabaseType databaseType = DatabaseType.Unknown;
+			string connectionString = null;
+			string extension = Path.GetExtension(databaseFile);
 
+			if (extension.Equals(".mdb", StringComparison.OrdinalIgnoreCase) ||
+				extension.Equals(".accdb", StringComparison.OrdinalIgnoreCase))
+			{
+				string provider = "Microsoft.ACE.OLEDB.12.0";
+				connectionString = string.Format(
+					CultureInfo.InvariantCulture,
+					"provider={0}; Data Source={1}",
+					provider,
+					databaseFile);
+
+				databaseType = DatabaseType.OleDb;
+			}
+			else if (extension.Equals(".db", StringComparison.OrdinalIgnoreCase) ||
+				extension.Equals(".sqlite", StringComparison.OrdinalIgnoreCase))
+			{
+				connectionString = string.Format(
+					CultureInfo.InvariantCulture,
+					"Data Source = {0}; Version = 3;",
+					databaseFile);
+
+				databaseType = DatabaseType.SQLite;
+			}
+			else
+			{
+				throw new NotImplementedException();
+			}
+
+			// Open the database
 			using (DataStorage database =
-				new DataStorage(DatabaseType.OleDb, connectionString))
+				new DataStorage(databaseType, connectionString))
 			{
 				// Get all the table names
 				DataTable tableNames = database.SchemaTable;
@@ -135,20 +159,27 @@ namespace DigitalZenWorks.Database.ToolKit
 					// for each table, select all the data
 					foreach (DataRow table in tableNames.Rows)
 					{
-						string tableName = table["TABLE_NAME"].ToString();
-						string csvFile = csvPath + tableName + ".csv";
-
-						// Create the CSV file to which data will be exported.
-						using (StreamWriter file =
-							new StreamWriter(csvFile, false))
+						try
 						{
-							// export the table
-							string sqlQuery = "SELECT * FROM " +
-								table["TABLE_NAME"].ToString();
-							DataTable tableData =
-								database.GetDataTable(sqlQuery);
+							var objectName = table["TABLE_NAME"];
+							string tableName = objectName.ToString();
+							string csvFile = csvPath + tableName + ".csv";
 
-							ExportDataTableToCsv(tableData, file);
+							// Create the CSV file.
+							using (StreamWriter file =
+								new StreamWriter(csvFile, false))
+							{
+								// export the table
+								string sqlQuery = "SELECT * FROM " + tableName;
+								DataTable tableData =
+									database.GetDataTable(sqlQuery);
+
+								ExportDataTableToCsv(tableData, file);
+							}
+						}
+						catch (Exception exception)
+						{
+							Log.Error(exception.ToString());
 						}
 					}
 				}
