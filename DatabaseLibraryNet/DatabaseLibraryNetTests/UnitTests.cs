@@ -264,7 +264,8 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 
 			string csvFile = tempPath + "TestTable.csv";
 
-			Assert.IsTrue(File.Exists(csvFile));
+			bool exists = File.Exists(csvFile);
+			Assert.IsTrue(exists);
 		}
 
 		/////////////////////////////////////////////////////////////////////////
