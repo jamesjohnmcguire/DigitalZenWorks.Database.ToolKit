@@ -83,22 +83,6 @@ namespace DigitalZenWorks.Database.ToolKit
 			{
 				connectionText =
 					ConfigurationManager.ConnectionStrings[0].ConnectionString;
-
-				// OleDbConnection is default
-				databaseType = DatabaseType.OleDb;
-			}
-			else
-			{
-				if (Environment.Is64BitProcess)
-				{
-					connectionText = "Provider=Microsoft.ACE.OLEDB.12.0;" +
-						"Data Source=TimeTracker.accdb";
-				}
-				else
-				{
-					connectionText = "Provider=Microsoft.Jet.OLEDB.4.0;" +
-						"Data Source=TimeTracker.accdb";
-				}
 			}
 		}
 
@@ -109,8 +93,8 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// <param name="connectionString">The connection string.</param>
 		public DataStorage(DatabaseType databaseType, string connectionString)
 		{
-			connectionText = connectionString;
 			this.databaseType = databaseType;
+			connectionText = connectionString;
 		}
 
 		/////////////////////////////////////////////////////////////////////
