@@ -844,7 +844,7 @@ namespace DigitalZenWorks.Database.ToolKit
 			}
 		}
 
-		private static DbParameterCollection AddParameters(
+		private DbParameterCollection AddParameters(
 			DbCommand command, IDictionary<string, object> values)
 		{
 			DbParameterCollection parameters = command.Parameters;
@@ -857,7 +857,16 @@ namespace DigitalZenWorks.Database.ToolKit
 				}
 				else
 				{
-					parameters.Add(valuePair.Value);
+					if (databaseType == DatabaseType.SQLite)
+					{
+						SQLiteParameter parameter = new SQLiteParameter(
+							DbType.String, valuePair.Value);
+						parameters.Add(parameter);
+					}
+					else
+					{
+						parameters.Add(valuePair.Value);
+					}
 				}
 			}
 
