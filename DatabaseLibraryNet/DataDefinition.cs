@@ -255,10 +255,11 @@ namespace DigitalZenWorks.Database.ToolKit
 
 			if (!string.IsNullOrWhiteSpace(tableDefinitionsFile))
 			{
-				string[] stringSeparators = new string[] { "\r\n\r\n" };
+				string[] stringSeparators =
+					new string[] { "\n\n", "\r\n\r\n" };
 				queries = tableDefinitionsFile.Split(
 					stringSeparators,
-					32000,
+					64000,
 					StringSplitOptions.RemoveEmptyEntries);
 			}
 
