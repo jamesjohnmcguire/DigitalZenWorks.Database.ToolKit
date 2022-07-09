@@ -22,16 +22,8 @@ namespace DigitalZenWorks.Database.ToolKit
 	public class DataObjectsBase
 		: IDisposable
 	{
-		/////////////////////////////////////////////////////////////////////
-		/// <summary>
-		/// Represents a provider type for a connection string.
-		/// </summary>
-		/////////////////////////////////////////////////////////////////////
-		private const string Provider = "Microsoft.ACE.OLEDB.12.0";
-
-		private DataStorage database = null;
-
-		private string tableName = null;
+		private DataStorage database;
+		private string tableName;
 
 		/////////////////////////////////////////////////////////////////////
 		/// <summary>
@@ -64,7 +56,7 @@ namespace DigitalZenWorks.Database.ToolKit
 			string connectionString = string.Format(
 				CultureInfo.InvariantCulture,
 				"provider={0}; Data Source={1}",
-				Provider,
+				"Microsoft.ACE.OLEDB.12.0",
 				dataSource);
 
 			database = new DataStorage(DatabaseType.OleDb, connectionString);
@@ -79,23 +71,9 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// <param name="dataSource">The data source to use.</param>
 		/////////////////////////////////////////////////////////////////////
 		public DataObjectsBase(string tableName, string dataSource)
+			: this(dataSource)
 		{
 			this.tableName = tableName;
-
-			if (!File.Exists(dataSource))
-			{
-				dataSource = Environment.GetFolderPath(
-					Environment.SpecialFolder.LocalApplicationData) +
-					"\\" + dataSource;
-			}
-
-			string connectionString = string.Format(
-				CultureInfo.InvariantCulture,
-				"provider={0}; Data Source={1}",
-				Provider,
-				dataSource);
-
-			database = new DataStorage(DatabaseType.OleDb, connectionString);
 		}
 
 		/////////////////////////////////////////////////////////////////////
