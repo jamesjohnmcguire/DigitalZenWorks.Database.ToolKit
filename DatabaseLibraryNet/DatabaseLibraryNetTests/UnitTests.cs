@@ -69,6 +69,8 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 				database.CommitTransaction();
 				database.Shutdown();
 			}
+
+			File.Delete(dataSource);
 		}
 
 		/// <summary>
