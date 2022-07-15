@@ -11,8 +11,6 @@ namespace DigitalZenWorks.Database.ToolKit
 	/// <summary>
 	/// Generic column types
 	/// Represents an enumeration of column types.
-	///
-	/// TODO: Update to be less Access and more generic.
 	/// </summary>
 	public enum ColumnType
 	{

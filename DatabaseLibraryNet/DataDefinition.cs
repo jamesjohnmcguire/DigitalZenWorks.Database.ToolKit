@@ -292,7 +292,7 @@ namespace DigitalZenWorks.Database.ToolKit
 		}
 
 		/// <summary>
-		/// Creates a mdb file with the given schema.
+		/// Creates a file with the given schema.
 		/// </summary>
 		/// <param name="schemaFile">The schema file.</param>
 		/// <param name="databaseFile">The database file.</param>
@@ -305,13 +305,6 @@ namespace DigitalZenWorks.Database.ToolKit
 			{
 				if (File.Exists(schemaFile))
 				{
-					string provider = "Microsoft.ACE.OLEDB.12.0";
-					string connectionString = string.Format(
-						CultureInfo.InvariantCulture,
-						"provider={0}; Data Source={1}",
-						provider,
-						databaseFile);
-
 					string fileContents = File.ReadAllText(schemaFile);
 
 					string[] stringSeparators = new string[] { "\r\n\r\n" };
@@ -320,44 +313,24 @@ namespace DigitalZenWorks.Database.ToolKit
 						32000,
 						StringSplitOptions.RemoveEmptyEntries);
 
-					using (DataStorage database = new DataStorage(
-						DatabaseType.OleDb, connectionString))
+					string extension = Path.GetExtension(databaseFile);
+
+					if (extension.Equals(
+							".mdb", StringComparison.OrdinalIgnoreCase) ||
+						extension.Equals(
+							".accdb", StringComparison.OrdinalIgnoreCase))
 					{
-						foreach (string sqlQuery in queries)
-						{
-							try
-							{
-								Log.Info(CultureInfo.InvariantCulture, m => m(
-								StringTable.GetString(
-									"COMMAND", CultureInfo.InvariantCulture) +
-									sqlQuery));
-
-								database.ExecuteNonQuery(sqlQuery);
-							}
-							catch (Exception exception) when
-								(exception is ArgumentNullException ||
-								exception is OutOfMemoryException ||
-								exception is System.Data.OleDb.OleDbException)
-							{
-								Log.Error(CultureInfo.InvariantCulture, m => m(
-									StringTable.GetString(
-										"EXCEPTION",
-										CultureInfo.InvariantCulture) +
-										exception));
-							}
-							catch (Exception exception)
-							{
-								Log.Error(CultureInfo.InvariantCulture, m => m(
-									StringTable.GetString(
-										"EXCEPTION",
-										CultureInfo.InvariantCulture) +
-										exception));
-
-								throw;
-							}
-						}
-
-						successCode = true;
+						string provider = "Microsoft.ACE.OLEDB.12.0";
+						string connectionString = string.Format(
+							CultureInfo.InvariantCulture,
+							"provider={0}; Data Source={1}",
+							provider,
+							databaseFile);
+						successCode = ImportSchemaMdb(queries, databaseFile);
+					}
+					else
+					{
+						throw new NotImplementedException();
 					}
 				}
 			}
@@ -425,6 +398,44 @@ namespace DigitalZenWorks.Database.ToolKit
 			}
 
 			return found;
+		}
+
+		private static void ExecuteQueries(
+			DataStorage database, string[] queries)
+		{
+			foreach (string sqlQuery in queries)
+			{
+				try
+				{
+					string command = StringTable.GetString(
+						"COMMAND", CultureInfo.InvariantCulture);
+					string message = command + sqlQuery;
+					Log.Info(message);
+
+					database.ExecuteNonQuery(sqlQuery);
+				}
+				catch (Exception exception) when
+					(exception is ArgumentNullException ||
+					exception is OutOfMemoryException ||
+					exception is System.Data.OleDb.OleDbException)
+				{
+					string command = StringTable.GetString(
+						"EXCEPTION", CultureInfo.InvariantCulture);
+					string message = command + exception;
+
+					Log.Error(message);
+				}
+				catch (Exception exception)
+				{
+					string command = StringTable.GetString(
+						"EXCEPTION", CultureInfo.InvariantCulture);
+					string message = command + exception;
+
+					Log.Error(message);
+
+					throw;
+				}
+			}
 		}
 
 		private static Column FormatColumnFromDataRow(DataRow row)
@@ -623,6 +634,28 @@ namespace DigitalZenWorks.Database.ToolKit
 			}
 
 			return tables;
+		}
+
+		private static bool ImportSchemaMdb(
+			string[] queries, string databaseFile)
+		{
+			bool successCode = false;
+
+			string provider = "Microsoft.ACE.OLEDB.12.0";
+			string connectionString = string.Format(
+				CultureInfo.InvariantCulture,
+				"provider={0}; Data Source={1}",
+				provider,
+				databaseFile);
+
+			using (DataStorage database = new DataStorage(
+					DatabaseType.OleDb, connectionString))
+			{
+				ExecuteQueries(database, queries);
+				successCode = true;
+			}
+
+			return successCode;
 		}
 
 		// Return an array list in the order that the tables need to be added

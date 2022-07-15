@@ -132,8 +132,10 @@ namespace DigitalZenWorks.Database.ToolKit
 
 				databaseType = DatabaseType.OleDb;
 			}
-			else if (extension.Equals(".db", StringComparison.OrdinalIgnoreCase) ||
-				extension.Equals(".sqlite", StringComparison.OrdinalIgnoreCase))
+			else if (extension.Equals(
+					".db", StringComparison.OrdinalIgnoreCase) ||
+				extension.Equals(
+					".sqlite", StringComparison.OrdinalIgnoreCase))
 			{
 				connectionString = string.Format(
 					CultureInfo.InvariantCulture,
