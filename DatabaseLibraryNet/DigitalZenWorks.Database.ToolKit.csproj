@@ -3,19 +3,37 @@
 	<PropertyGroup>
 		<AnalysisMode>AllEnabledByDefault</AnalysisMode>
 		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-		<AssemblyTitle>DigitalZenWorks.Database.ToolKit</AssemblyTitle>
+		<AssemblyName>DigitalZenWorks.Database.ToolKit</AssemblyName>
 		<AssemblyOriginatorKeyFile>DatabaseLibraryNet.snk</AssemblyOriginatorKeyFile>
+		<AssemblyTitle>DigitalZenWorks.Database.ToolKit</AssemblyTitle>
+		<AssemblyVersion>1.0.0.0</AssemblyVersion>
+		<Authors>James John McGuire</Authors>
 		<CodeAnalysisRuleSet>CodeAnalysis.ruleset</CodeAnalysisRuleSet>
-		<Company>James John McGuire</Company>
+		<Company>Digital Zen Works</Company>
 		<Copyright>Copyright © 2006 - 2022</Copyright>
+		<Description>
+			This client library provides common database functionality.
+		</Description>
 		<EnableNETAnalyzers>true</EnableNETAnalyzers>
+		<FileVersion>1.1.50.0</FileVersion>
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 		<LangVersion>Latest</LangVersion>
 		<NeutralLanguage>en</NeutralLanguage>
 		<NoWarn>NU1605;NU1701</NoWarn>
 		<OutputPath>$(SolutionDir)\Bin\$(Configuration)\$(Platform)</OutputPath>
-		<RootNamespace>DigitalZenWorks.Database.ToolKit</RootNamespace>
+		<PackageId>DigitalZenWorks.Database.ToolKit</PackageId>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<PackageTags>Digital Zen Works;Database</PackageTags>
 		<SignAssembly>true</SignAssembly>
+		<Version>1.1.50</Version>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)'=='Debug'">
+		<TargetFramework>net6.0</TargetFramework>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)'=='Release'">
 		<TargetFramework>netstandard2.0</TargetFramework>
 	</PropertyGroup>
 
@@ -45,9 +63,17 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <AdditionalFiles Include="stylecop.json" />
-	  <CodeAnalysisDictionary Include="CodeAnalysis.ruleset" />
+		<None Include="..\LICENSE">
+			<Pack>True</Pack>
+			<PackagePath>\</PackagePath>
+		</None>
+		<None Include="..\README.md">
+			<Pack>True</Pack>
+			<PackagePath>\</PackagePath>
+		</None>
+		<CodeAnalysisDictionary Include="CodeAnalysis.ruleset" />
 		<None Include="DatabaseLibraryNet.snk" />
+		<AdditionalFiles Include="stylecop.json" />
 		<EmbeddedResource Include="template.accdb">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</EmbeddedResource>
