@@ -9,7 +9,7 @@
 		<IsTestProject>true</IsTestProject>
 		<OutputPath>$(SolutionDir)\Bin\$(Configuration)\$(Platform)</OutputPath>
 		<RootNamespace>DigitalZenWorks.Common.DatabaseLibary.Tests</RootNamespace>
-		<TargetFramework>netcoreapp3.1</TargetFramework>
+		<TargetFramework>net6.0</TargetFramework>
 	</PropertyGroup>
 
   <ItemGroup>
