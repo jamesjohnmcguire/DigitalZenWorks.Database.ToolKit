@@ -116,8 +116,8 @@ namespace DigitalZenWorks.Database.ToolKit
 		{
 			bool returnCode = false;
 
-			DatabaseType databaseType = DatabaseType.Unknown;
-			string connectionString = null;
+			DatabaseType databaseType;
+			string connectionString;
 			string extension = Path.GetExtension(databaseFile);
 
 			if (extension.Equals(".mdb", StringComparison.OrdinalIgnoreCase) ||
@@ -180,6 +180,8 @@ namespace DigitalZenWorks.Database.ToolKit
 						catch (Exception exception)
 						{
 							Log.Error(exception.ToString());
+
+							throw;
 						}
 					}
 				}

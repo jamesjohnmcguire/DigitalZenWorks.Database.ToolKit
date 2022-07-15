@@ -6,6 +6,8 @@
 
 namespace DigitalZenWorks.Database.ToolKit
 {
+#pragma warning disable CA1720
+
 	/// <summary>
 	/// Generic column types
 	/// Represents an enumeration of column types.
@@ -460,4 +462,5 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// </summary>
 		YesNo
 	}
+#pragma warning restore CA1720
 }

@@ -9,6 +9,7 @@ using DigitalZenWorks.Common.Utilities;
 using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Configuration;
 using System.Data;
 using System.Data.Common;
@@ -54,16 +55,16 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// <summary>
 		/// Database Connection Object.
 		/// </summary>
-		private DbConnection connection = null;
+		private DbConnection connection;
 
 		/// <summary>
 		/// Ole Database Connection Object.
 		/// </summary>
-		private OleDbConnection oleDbConnection = null;
+		private OleDbConnection oleDbConnection;
 
-		private MySqlConnection mySqlConnection = null;
+		private MySqlConnection mySqlConnection;
 
-		private SQLiteConnection sqliteConnection = null;
+		private SQLiteConnection sqliteConnection;
 
 		// transactions
 		/// <summary>
@@ -156,9 +157,9 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// <typeparam name="TItem">The type of item.</typeparam>
 		/// <param name="dataTable">The data table to convert.</param>
 		/// <returns>Returns a list of items from the data table.</returns>
-		public static List<TItem> ConvertDataTable<TItem>(DataTable dataTable)
+		public static Collection<TItem> ConvertDataTable<TItem>(DataTable dataTable)
 		{
-			List<TItem> list = new List<TItem>();
+			Collection<TItem> list = new Collection<TItem>();
 
 			if (dataTable != null)
 			{
@@ -739,7 +740,6 @@ namespace DigitalZenWorks.Database.ToolKit
 		{
 			int returnCode = -1;
 			OleDbCommand commandObject1 = null;
-			OleDbCommand commandObject2 = null;
 
 			try
 			{
@@ -780,12 +780,6 @@ namespace DigitalZenWorks.Database.ToolKit
 				{
 					commandObject1.Dispose();
 					commandObject1 = null;
-				}
-
-				if (commandObject2 != null)
-				{
-					commandObject2.Dispose();
-					commandObject2 = null;
 				}
 			}
 

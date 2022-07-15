@@ -1,21 +1,17 @@
 ﻿/////////////////////////////////////////////////////////////////////////////
-// <copyright file="IDatabaseCollection.cs" company="James John McGuire">
+// <copyright file="IDatabaseSet.cs" company="James John McGuire">
 // Copyright © 2006 - 2022 James John McGuire. All Rights Reserved.
 // </copyright>
 /////////////////////////////////////////////////////////////////////////////
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DigitalZenWorks.Database.ToolKit
 {
 	/// <summary>
 	/// Database collection interface.
 	/// </summary>
-	public interface IDatabaseCollection : IDisposable
+	public interface IDatabaseSet : IDisposable
 	{
 		/// <summary>
 		/// Get id from name method.

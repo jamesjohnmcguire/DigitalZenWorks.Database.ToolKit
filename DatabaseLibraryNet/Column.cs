@@ -16,10 +16,10 @@ namespace DigitalZenWorks.Database.ToolKit
 		private string defaultValue = string.Empty;
 		private int length = 255;
 		private string name = string.Empty;
-		private bool nullable = false;
+		private bool nullable;
 		private int position = 1;
 		private ColumnType type = ColumnType.Number;
-		private bool unique = false;
+		private bool unique;
 
 		/////////////////////////////////////////////////////////////////////
 		/// <summary>
