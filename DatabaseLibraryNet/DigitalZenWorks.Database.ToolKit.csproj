@@ -15,7 +15,7 @@
 			This client library provides common database functionality.
 		</Description>
 		<EnableNETAnalyzers>true</EnableNETAnalyzers>
-		<FileVersion>1.1.50.0</FileVersion>
+		<FileVersion>1.1.51.0</FileVersion>
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 		<LangVersion>Latest</LangVersion>
@@ -27,7 +27,7 @@
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<PackageTags>Digital Zen Works;Database</PackageTags>
 		<SignAssembly>true</SignAssembly>
-		<Version>1.1.50</Version>
+		<Version>1.1.51</Version>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)'=='Debug'">
