@@ -16,7 +16,7 @@ GOTO end
 msbuild -property:Configuration=Release;OutputPath=Bin\Release\Library;Platform="Any CPU" -restore -target:rebuild DigitalZenWorks.Database.ToolKit.csproj
 msbuild -property:Configuration=Release;OutputPath=Bin\Release\Library;Platform="Any CPU" -restore -target:pack DigitalZenWorks.Database.ToolKit.csproj
 
-cd ToolKit.Library\Bin\Release\Library
+cd Bin\Release\Library
 nuget push DigitalZenWorks.Database.ToolKit.%2.nupkg %3 -Source https://api.nuget.org/v3/index.json
 GOTO end
 
