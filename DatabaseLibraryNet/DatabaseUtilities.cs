@@ -167,17 +167,18 @@ namespace DigitalZenWorks.Database.ToolKit
 							string tableName = objectName.ToString();
 							string csvFile = csvPath + tableName + ".csv";
 
-							// Create the CSV file.
-							using (StreamWriter file =
-								new StreamWriter(csvFile, false))
-							{
-								// export the table
-								string sqlQuery = "SELECT * FROM " + tableName;
-								DataTable tableData =
-									database.GetDataTable(sqlQuery);
+#pragma warning disable CA2000
 
-								ExportDataTableToCsv(tableData, file);
-							}
+							// Create the CSV file.
+							using StreamWriter file = new (csvFile, false);
+
+							// export the table
+							string sqlQuery = "SELECT * FROM " + tableName;
+							DataTable tableData =
+								database.GetDataTable(sqlQuery);
+
+							ExportDataTableToCsv(tableData, file);
+#pragma warning restore CA2000
 						}
 						catch (Exception exception)
 						{
