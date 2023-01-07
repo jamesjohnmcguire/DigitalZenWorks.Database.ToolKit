@@ -116,7 +116,8 @@ namespace DigitalZenWorks.Database.ToolKit
 
 				if (true == returnCode)
 				{
-					if (DatabaseType.OleDb == databaseType)
+					if (DatabaseType.OleDb == databaseType &&
+						OperatingSystem.IsWindows())
 					{
 						tables = oleDbConnection.GetOleDbSchemaTable(
 							System.Data.OleDb.OleDbSchemaGuid.Tables,
@@ -476,7 +477,16 @@ namespace DigitalZenWorks.Database.ToolKit
 								dataAdapter = new MySqlDataAdapter();
 								break;
 							case DatabaseType.OleDb:
-								dataAdapter = new OleDbDataAdapter();
+								if (OperatingSystem.IsWindows())
+								{
+									dataAdapter = new OleDbDataAdapter();
+								}
+								else
+								{
+									throw new NotSupportedException(
+										"OleDb is only available on Windows.");
+								}
+
 								break;
 							case DatabaseType.SQLite:
 								dataAdapter = new SQLiteDataAdapter();
@@ -730,62 +740,6 @@ namespace DigitalZenWorks.Database.ToolKit
 			return ExecuteNonQuery(sql, values);
 		}
 
-		/////////////////////////////////////////////////////////////////////
-		/// <summary>
-		/// Temp test method.
-		/// </summary>
-		/// <returns>A value indicating success or not.</returns>
-		/////////////////////////////////////////////////////////////////////
-		public int Test()
-		{
-			int returnCode = -1;
-			OleDbCommand commandObject1 = null;
-
-			try
-			{
-				Initialize();
-
-				string sql =
-					"INSERT INTO Contacts (Notes) VALUES ('testing')";
-
-				commandObject1 = new OleDbCommand(sql, oleDbConnection);
-
-				oleDbConnection.Open();
-
-				object result = commandObject1.ExecuteScalar();
-
-				if (null != result)
-				{
-					returnCode = (int)result;
-				}
-
-				returnCode = GetLastInsertId();
-			}
-			catch (Exception exception)
-			{
-				RollbackTransaction();
-
-				Log.Error(CultureInfo.InvariantCulture, m => m(
-					StringTable.GetString(
-						"EXCEPTION",
-						CultureInfo.InvariantCulture) + exception));
-
-				throw;
-			}
-			finally
-			{
-				Close();
-
-				if (commandObject1 != null)
-				{
-					commandObject1.Dispose();
-					commandObject1 = null;
-				}
-			}
-
-			return returnCode;
-		}
-
 		/// <summary>
 		/// Dispose.
 		/// </summary>
@@ -795,11 +749,14 @@ namespace DigitalZenWorks.Database.ToolKit
 		{
 			if (disposing)
 			{
-				if (null != oleDbConnection)
+				if (OperatingSystem.IsWindows())
 				{
-					oleDbConnection.Close();
-					oleDbConnection.Dispose();
-					oleDbConnection = null;
+					if (null != oleDbConnection)
+					{
+						oleDbConnection.Close();
+						oleDbConnection.Dispose();
+						oleDbConnection = null;
+					}
 				}
 
 				if (null != mySqlConnection)
@@ -830,6 +787,7 @@ namespace DigitalZenWorks.Database.ToolKit
 			}
 		}
 
+		[System.Runtime.Versioning.SupportedOSPlatform("windows")]
 		private static OleDbParameterCollection AddParameters(
 			OleDbCommand command, IDictionary<string, object> values)
 		{
@@ -993,7 +951,16 @@ namespace DigitalZenWorks.Database.ToolKit
 							command = new MySqlCommand();
 							break;
 						case DatabaseType.OleDb:
-							command = new OleDbCommand();
+							if (OperatingSystem.IsWindows())
+							{
+								command = new OleDbCommand();
+							}
+							else
+							{
+								throw new NotSupportedException(
+									"OleDb is only available on Windows.");
+							}
+
 							break;
 						case DatabaseType.SQLite:
 							command = new SQLiteCommand();
@@ -1072,10 +1039,19 @@ namespace DigitalZenWorks.Database.ToolKit
 							connection = mySqlConnection;
 							break;
 						case DatabaseType.OleDb:
-							// Two statements help in debugging problems
-							oleDbConnection =
-								new OleDbConnection(connectionText);
-							connection = oleDbConnection;
+							if (OperatingSystem.IsWindows())
+							{
+								// Two statements help in debugging problems
+								oleDbConnection =
+									new OleDbConnection(connectionText);
+								connection = oleDbConnection;
+							}
+							else
+							{
+								throw new NotSupportedException(
+									"OleDb is only available on Windows.");
+							}
+
 							break;
 						case DatabaseType.SQLite:
 							sqliteConnection =

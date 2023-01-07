@@ -16,6 +16,7 @@ namespace DigitalZenWorks.Database.ToolKit
 	/// Represents an OleDbSchema object.
 	/// </summary>
 	/////////////////////////////////////////////////////////////////////////
+	[System.Runtime.Versioning.SupportedOSPlatform("windows")]
 	public class OleDbSchema : IDisposable
 	{
 		/////////////////////////////////////////////////////////////////////
