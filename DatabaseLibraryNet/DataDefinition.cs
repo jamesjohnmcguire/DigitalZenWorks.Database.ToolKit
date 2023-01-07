@@ -44,6 +44,7 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// <param name="databaseFile">The database file to use.</param>
 		/// <param name="schemaFile">The schema file to export to.</param>
 		/////////////////////////////////////////////////////////////////////
+		[System.Runtime.Versioning.SupportedOSPlatform("windows")]
 		public static bool ExportSchema(string databaseFile, string schemaFile)
 		{
 			bool successCode = false;
@@ -221,6 +222,7 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// <param name="oleDbSchema">The OLE database schema.</param>
 		/// <param name="tableName">The table name.</param>
 		/// <returns>A list of relationships.</returns>
+		[System.Runtime.Versioning.SupportedOSPlatform("windows")]
 		public static ArrayList GetRelationships(
 			OleDbSchema oleDbSchema, string tableName)
 		{
@@ -372,7 +374,7 @@ namespace DigitalZenWorks.Database.ToolKit
 
 			if (!string.IsNullOrWhiteSpace(field))
 			{
-				if (field.Contains("Time") || field.Contains("time"))
+				if (field.Contains("time", StringComparison.OrdinalIgnoreCase))
 				{
 					returnCode = true;
 				}
@@ -389,7 +391,8 @@ namespace DigitalZenWorks.Database.ToolKit
 		{
 			bool found = false;
 
-			if (column.ToUpperInvariant().Contains(nameCheck) ||
+			if (column.ToUpperInvariant().Contains(
+					nameCheck, StringComparison.OrdinalIgnoreCase) ||
 				column.ToUpperInvariant().Equals(
 					nameCheck, StringComparison.Ordinal))
 			{
@@ -557,6 +560,7 @@ namespace DigitalZenWorks.Database.ToolKit
 			return relationship;
 		}
 
+		[System.Runtime.Versioning.SupportedOSPlatform("windows")]
 		private static Hashtable GetSchema(string databaseFile)
 		{
 			Hashtable tables = null;
