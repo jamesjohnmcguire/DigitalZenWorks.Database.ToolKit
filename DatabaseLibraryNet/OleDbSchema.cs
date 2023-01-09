@@ -7,6 +7,7 @@
 using System;
 using System.Data;
 using System.Data.OleDb;
+using System.Runtime.Versioning;
 
 namespace DigitalZenWorks.Database.ToolKit
 {
@@ -16,7 +17,9 @@ namespace DigitalZenWorks.Database.ToolKit
 	/// Represents an OleDbSchema object.
 	/// </summary>
 	/////////////////////////////////////////////////////////////////////////
-	[System.Runtime.Versioning.SupportedOSPlatform("windows")]
+#if NET5_0_OR_GREATER
+	[SupportedOSPlatform("windows")]
+#endif
 	public class OleDbSchema : IDisposable
 	{
 		/////////////////////////////////////////////////////////////////////

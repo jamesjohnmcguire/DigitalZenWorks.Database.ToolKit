@@ -13,6 +13,7 @@ using System.Globalization;
 using System.IO;
 using System.Reflection;
 using System.Resources;
+using System.Runtime.Versioning;
 
 namespace DigitalZenWorks.Database.ToolKit
 {
@@ -44,7 +45,9 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// <param name="databaseFile">The database file to use.</param>
 		/// <param name="schemaFile">The schema file to export to.</param>
 		/////////////////////////////////////////////////////////////////////
-		[System.Runtime.Versioning.SupportedOSPlatform("windows")]
+#if NET5_0_OR_GREATER
+		[SupportedOSPlatform("windows")]
+#endif
 		public static bool ExportSchema(string databaseFile, string schemaFile)
 		{
 			bool successCode = false;
@@ -222,7 +225,9 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// <param name="oleDbSchema">The OLE database schema.</param>
 		/// <param name="tableName">The table name.</param>
 		/// <returns>A list of relationships.</returns>
-		[System.Runtime.Versioning.SupportedOSPlatform("windows")]
+#if NET5_0_OR_GREATER
+		[SupportedOSPlatform("windows")]
+#endif
 		public static ArrayList GetRelationships(
 			OleDbSchema oleDbSchema, string tableName)
 		{
@@ -374,7 +379,11 @@ namespace DigitalZenWorks.Database.ToolKit
 
 			if (!string.IsNullOrWhiteSpace(field))
 			{
+#if NETSTANDARD2_1_OR_GREATER || NET5_0_OR_GREATER
 				if (field.Contains("time", StringComparison.OrdinalIgnoreCase))
+#else
+				if (field.Contains("time"))
+#endif
 				{
 					returnCode = true;
 				}
@@ -391,10 +400,16 @@ namespace DigitalZenWorks.Database.ToolKit
 		{
 			bool found = false;
 
+#if NETSTANDARD2_1_OR_GREATER || NET5_0_OR_GREATER
 			if (column.ToUpperInvariant().Contains(
 					nameCheck, StringComparison.OrdinalIgnoreCase) ||
 				column.ToUpperInvariant().Equals(
 					nameCheck, StringComparison.Ordinal))
+#else
+			if (column.ToUpperInvariant().Contains(nameCheck) ||
+				column.ToUpperInvariant().Equals(
+					nameCheck, StringComparison.Ordinal))
+#endif
 			{
 				columnTypeOut = columnType;
 				found = true;
@@ -560,7 +575,9 @@ namespace DigitalZenWorks.Database.ToolKit
 			return relationship;
 		}
 
-		[System.Runtime.Versioning.SupportedOSPlatform("windows")]
+#if NET5_0_OR_GREATER
+		[SupportedOSPlatform("windows")]
+#endif
 		private static Hashtable GetSchema(string databaseFile)
 		{
 			Hashtable tables = null;

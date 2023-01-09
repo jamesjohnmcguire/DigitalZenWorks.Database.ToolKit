@@ -19,6 +19,7 @@ using System.Data.SQLite;
 using System.Globalization;
 using System.Reflection;
 using System.Resources;
+using System.Runtime.Versioning;
 
 namespace DigitalZenWorks.Database.ToolKit
 {
@@ -116,8 +117,12 @@ namespace DigitalZenWorks.Database.ToolKit
 
 				if (true == returnCode)
 				{
+#if NET5_0_OR_GREATER
 					if (DatabaseType.OleDb == databaseType &&
 						OperatingSystem.IsWindows())
+#else
+					if (DatabaseType.OleDb == databaseType)
+#endif
 					{
 						tables = oleDbConnection.GetOleDbSchemaTable(
 							System.Data.OleDb.OleDbSchemaGuid.Tables,
@@ -477,6 +482,7 @@ namespace DigitalZenWorks.Database.ToolKit
 								dataAdapter = new MySqlDataAdapter();
 								break;
 							case DatabaseType.OleDb:
+#if NET5_0_OR_GREATER
 								if (OperatingSystem.IsWindows())
 								{
 									dataAdapter = new OleDbDataAdapter();
@@ -486,6 +492,9 @@ namespace DigitalZenWorks.Database.ToolKit
 									throw new NotSupportedException(
 										"OleDb is only available on Windows.");
 								}
+#else
+								dataAdapter = new OleDbDataAdapter();
+#endif
 
 								break;
 							case DatabaseType.SQLite:
@@ -749,6 +758,7 @@ namespace DigitalZenWorks.Database.ToolKit
 		{
 			if (disposing)
 			{
+#if NET5_0_OR_GREATER
 				if (OperatingSystem.IsWindows())
 				{
 					if (null != oleDbConnection)
@@ -758,6 +768,14 @@ namespace DigitalZenWorks.Database.ToolKit
 						oleDbConnection = null;
 					}
 				}
+#else
+				if (null != oleDbConnection)
+				{
+					oleDbConnection.Close();
+					oleDbConnection.Dispose();
+					oleDbConnection = null;
+				}
+#endif
 
 				if (null != mySqlConnection)
 				{
@@ -787,7 +805,9 @@ namespace DigitalZenWorks.Database.ToolKit
 			}
 		}
 
-		[System.Runtime.Versioning.SupportedOSPlatform("windows")]
+#if NET5_0_OR_GREATER
+		[SupportedOSPlatform("windows")]
+#endif
 		private static OleDbParameterCollection AddParameters(
 			OleDbCommand command, IDictionary<string, object> values)
 		{
@@ -951,6 +971,7 @@ namespace DigitalZenWorks.Database.ToolKit
 							command = new MySqlCommand();
 							break;
 						case DatabaseType.OleDb:
+#if NET5_0_OR_GREATER
 							if (OperatingSystem.IsWindows())
 							{
 								command = new OleDbCommand();
@@ -960,6 +981,9 @@ namespace DigitalZenWorks.Database.ToolKit
 								throw new NotSupportedException(
 									"OleDb is only available on Windows.");
 							}
+#else
+							command = new OleDbCommand();
+#endif
 
 							break;
 						case DatabaseType.SQLite:
@@ -1039,6 +1063,7 @@ namespace DigitalZenWorks.Database.ToolKit
 							connection = mySqlConnection;
 							break;
 						case DatabaseType.OleDb:
+#if NET5_0_OR_GREATER
 							if (OperatingSystem.IsWindows())
 							{
 								// Two statements help in debugging problems
@@ -1051,6 +1076,12 @@ namespace DigitalZenWorks.Database.ToolKit
 								throw new NotSupportedException(
 									"OleDb is only available on Windows.");
 							}
+#else
+							// Two statements help in debugging problems
+							oleDbConnection =
+								new OleDbConnection(connectionText);
+							connection = oleDbConnection;
+#endif
 
 							break;
 						case DatabaseType.SQLite:
