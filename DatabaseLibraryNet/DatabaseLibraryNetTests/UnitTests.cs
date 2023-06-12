@@ -301,15 +301,13 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 
 		private static string GetTestDatabasePath()
 		{
-			Assembly assembly = Assembly.GetExecutingAssembly();
-			string codeBase = assembly.CodeBase;
+			string fileName = Path.GetTempFileName();
 
-			UriBuilder uri = new UriBuilder(codeBase);
-			string path = Uri.UnescapeDataString(uri.Path);
-			string applicationPath = Path.GetDirectoryName(path);
-			applicationPath = applicationPath + "\\";
+			// A 0 byte sized file is created.  Need to remove it.
+			File.Delete(fileName);
+			string databasePath = Path.ChangeExtension(fileName, ".accdb");
 
-			string databasePath = applicationPath + "TestDb.accdb";
+			DatabaseUtilities.CreateAccessDatabaseFile(databasePath);
 
 			return databasePath;
 		}
