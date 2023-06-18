@@ -201,6 +201,8 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 
 			DataSet dataSet = database.GetDataSet(query);
 
+			Assert.IsNotNull(dataSet);
+
 			// No exceptions found
 			Assert.GreaterOrEqual(dataSet.Tables.Count, 0);
 		}
@@ -221,6 +223,8 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 							@"('" + Description + "')";
 
 			int rowId = database.Insert(SqlQueryCommand);
+
+			Assert.GreaterOrEqual(rowId, 1);
 
 			VerifyRowExists(rowId, true);
 		}
