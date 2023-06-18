@@ -252,6 +252,7 @@ namespace DigitalZenWorks.Database.ToolKit
 			if (null != databaseTransaction)
 			{
 				databaseTransaction.Commit();
+				databaseTransaction.Dispose();
 
 				databaseTransaction = null;
 			}
