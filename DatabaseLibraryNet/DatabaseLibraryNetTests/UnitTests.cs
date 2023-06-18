@@ -129,7 +129,7 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 			statement = "SELECT name FROM sqlite_master " +
 				"WHERE type = 'table' AND name = 'TestTable';";
 
-			DbDataReader dbDataReader = database.ExecuteReader(statement);
+			using DbDataReader dbDataReader = database.ExecuteReader(statement);
 
 			Assert.IsTrue(dbDataReader.HasRows);
 		}
