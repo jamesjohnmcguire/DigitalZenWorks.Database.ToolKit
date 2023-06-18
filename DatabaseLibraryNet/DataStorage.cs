@@ -591,7 +591,7 @@ namespace DigitalZenWorks.Database.ToolKit
 
 			using (DataSet dataSet = GetDataSet(sql, values))
 			{
-				if (dataSet.Tables.Count > 0)
+				if (dataSet != null && dataSet.Tables.Count > 0)
 				{
 					dataTable = dataSet.Tables[0];
 				}
