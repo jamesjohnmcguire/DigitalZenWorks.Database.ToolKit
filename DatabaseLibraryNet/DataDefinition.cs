@@ -31,8 +31,7 @@ namespace DigitalZenWorks.Database.ToolKit
 		private static readonly ILog Log = LogManager.GetLogger(
 			System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-		private static readonly ResourceManager StringTable = new
-			ResourceManager(
+		private static readonly ResourceManager StringTable = new (
 			"DigitalZenWorks.Database.ToolKit.Resources",
 			Assembly.GetExecutingAssembly());
 
@@ -102,7 +101,7 @@ namespace DigitalZenWorks.Database.ToolKit
 				int splitIndex = dataDefinition.IndexOf(
 					"(",
 					StringComparison.Ordinal) + 1;
-				columnsInfo = dataDefinition.Substring(splitIndex);
+				columnsInfo = dataDefinition[splitIndex..];
 			}
 
 			return columnsInfo;
@@ -458,7 +457,7 @@ namespace DigitalZenWorks.Database.ToolKit
 
 		private static Column FormatColumnFromDataRow(DataRow row)
 		{
-			Column column = new Column();
+			Column column = new ();
 			column.Name = row["COLUMN_NAME"].ToString();
 
 			switch ((int)row["DATA_TYPE"])
@@ -538,7 +537,7 @@ namespace DigitalZenWorks.Database.ToolKit
 		private static ForeignKey GetForeignKeyRelationship(
 			Relationship relationship)
 		{
-			ForeignKey foreignKey = new ForeignKey(
+			ForeignKey foreignKey = new (
 				relationship.Name,
 				relationship.ChildTableCol,
 				relationship.ParentTable,
@@ -551,7 +550,7 @@ namespace DigitalZenWorks.Database.ToolKit
 
 		private static Relationship GetRelationship(DataRow foreignKey)
 		{
-			Relationship relationship = new Relationship();
+			Relationship relationship = new ();
 			relationship.Name = foreignKey["FK_NAME"].ToString();
 			relationship.ParentTable =
 				foreignKey["PK_TABLE_NAME"].ToString();
@@ -582,10 +581,10 @@ namespace DigitalZenWorks.Database.ToolKit
 		{
 			Hashtable tables = null;
 
-			using (OleDbSchema oleDbSchema = new OleDbSchema(databaseFile))
+			using (OleDbSchema oleDbSchema = new (databaseFile))
 			{
 				tables = new System.Collections.Hashtable();
-				ArrayList relationships = new System.Collections.ArrayList();
+				ArrayList relationships = new ();
 
 				DataTable tableNames = oleDbSchema.TableNames;
 
@@ -593,7 +592,7 @@ namespace DigitalZenWorks.Database.ToolKit
 				{
 					string tableName = row["TABLE_NAME"].ToString();
 
-					Table table = new Table(tableName);
+					Table table = new (tableName);
 
 					Log.Info(
 						CultureInfo.InvariantCulture,
@@ -669,8 +668,8 @@ namespace DigitalZenWorks.Database.ToolKit
 				provider,
 				databaseFile);
 
-			using (DataStorage database = new DataStorage(
-					DatabaseType.OleDb, connectionString))
+			using (DataStorage database =
+				new (DatabaseType.OleDb, connectionString))
 			{
 				ExecuteQueries(database, queries);
 				successCode = true;
@@ -683,8 +682,8 @@ namespace DigitalZenWorks.Database.ToolKit
 		// to take dependencies into account
 		private static ArrayList OrderTable(Hashtable hashTable)
 		{
-			Hashtable list = new Hashtable();
-			ArrayList dependencies = new ArrayList();
+			Hashtable list = new ();
+			ArrayList dependencies = new ();
 
 			foreach (DictionaryEntry entry in hashTable)
 			{
@@ -710,7 +709,7 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// <returns>A sorted arraylist.</returns>
 		private static ArrayList TopologicalSort(Hashtable table)
 		{
-			ArrayList sortedList = new ArrayList();
+			ArrayList sortedList = new ();
 			object key;
 			ArrayList dependencies;
 
@@ -892,8 +891,7 @@ namespace DigitalZenWorks.Database.ToolKit
 				Environment.NewLine);
 
 			// Sort Columns into ordinal positions
-			System.Collections.SortedList columns =
-				new System.Collections.SortedList();
+			System.Collections.SortedList columns = new ();
 
 			foreach (DictionaryEntry entry in table.Columns)
 			{
