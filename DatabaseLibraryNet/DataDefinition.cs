@@ -101,7 +101,11 @@ namespace DigitalZenWorks.Database.ToolKit
 				int splitIndex = dataDefinition.IndexOf(
 					"(",
 					StringComparison.Ordinal) + 1;
+#if NETCOREAPP1_0_OR_GREATER
 				columnsInfo = dataDefinition[splitIndex..];
+#else
+				columnsInfo = dataDefinition.Substring(splitIndex);
+#endif
 			}
 
 			return columnsInfo;
