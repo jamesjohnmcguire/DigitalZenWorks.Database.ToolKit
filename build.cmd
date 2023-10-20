@@ -8,7 +8,7 @@ CD DatabaseLibraryNet
 IF "%1"=="publish" GOTO publish
 
 :default
-dotnet build
+dotnet build --configuration Release
 
 GOTO end
 
@@ -17,9 +17,10 @@ GOTO end
 if "%~2"=="" GOTO error1
 if "%~3"=="" GOTO error2
 
-dotnet build --configuration Release --output Bin\Release\Library
+msbuild -property:Configuration=Release -restore -target:rebuild;pack DigitalZenWorks.Database.ToolKit.csproj
 
-cd Bin\Release\Library
+CD bin\Release
+
 nuget push DigitalZenWorks.Database.ToolKit.%2.nupkg %3 -Source https://api.nuget.org/v3/index.json
 GOTO end
 
