@@ -128,7 +128,7 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 		{
 			bool AlwaysTrue = true;
 
-			Assert.IsTrue(AlwaysTrue);
+			Assert.That(AlwaysTrue, Is.True);
 		}
 
 		/////////////////////////////////////////////////////////////////////
@@ -150,7 +150,7 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 
 			using DbDataReader dbDataReader = database.ExecuteReader(statement);
 
-			Assert.IsTrue(dbDataReader.HasRows);
+			Assert.That(dbDataReader.HasRows, Is.True);
 		}
 
 		/////////////////////////////////////////////////////////////////////
@@ -189,7 +189,7 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 		[Test]
 		public void VerifyTestSourceExists()
 		{
-			Assert.IsTrue(File.Exists(dataSource));
+			Assert.That(File.Exists(dataSource), Is.True);
 		}
 
 		/////////////////////////////////////////////////////////////////////
@@ -204,7 +204,7 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 			bool canQuery = database.CanQuery();
 
 			// No exceptions found
-			Assert.IsTrue(canQuery);
+			Assert.That(canQuery, Is.True);
 		}
 
 		/////////////////////////////////////////////////////////////////////
@@ -220,10 +220,10 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 
 			DataSet dataSet = database.GetDataSet(query);
 
-			Assert.IsNotNull(dataSet);
+			Assert.That(dataSet, Is.Not.Null);
 
 			// No exceptions found
-			Assert.GreaterOrEqual(dataSet.Tables.Count, 0);
+			Assert.That(dataSet.Tables.Count, Is.GreaterThanOrEqualTo(0));
 		}
 
 		/////////////////////////////////////////////////////////////////////////
@@ -243,7 +243,7 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 
 			int rowId = database.Insert(SqlQueryCommand);
 
-			Assert.GreaterOrEqual(rowId, 1);
+			Assert.That(rowId, Is.GreaterThanOrEqualTo(1));
 
 			VerifyRowExists(rowId, true);
 		}
@@ -269,7 +269,7 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 
 			bool Result = database.Delete(query);
 
-			Assert.IsTrue(Result);
+			Assert.That(Result, Is.True);
 
 			VerifyRowExists(rowId, false);
 		}
@@ -290,7 +290,7 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 			string csvFile = tempPath + "TestTable.csv";
 
 			bool exists = File.Exists(csvFile);
-			Assert.IsTrue(exists);
+			Assert.That(exists, Is.True);
 		}
 
 		/////////////////////////////////////////////////////////////////////////
@@ -304,7 +304,7 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 		{
 			DataTable table = database.SchemaTable;
 
-			Assert.NotNull(table);
+			Assert.That(table, Is.Not.Null);
 		}
 
 		/////////////////////////////////////////////////////////////////////////
@@ -324,7 +324,7 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 
 			bool result = database.Update(query);
 
-			Assert.True(result);
+			Assert.That(result, Is.True);
 		}
 
 		/////////////////////////////////////////////////////////////////////////
@@ -345,7 +345,7 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 
 			bool result = database.Update(query, parameters);
 
-			Assert.True(result);
+			Assert.That(result, Is.True);
 		}
 
 		private static string GetTestDatabasePath()
@@ -367,11 +367,11 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 
 			if (true == shouldExist)
 			{
-				Assert.NotNull(tempDataRow);
+				Assert.That(tempDataRow, Is.Not.Null);
 			}
 			else
 			{
-				Assert.IsNull(tempDataRow);
+				Assert.That(tempDataRow, Is.Null);
 			}
 		}
 	}	// end class
