@@ -9,7 +9,7 @@
 		<Authors>James John McGuire</Authors>
 		<CodeAnalysisRuleSet>CodeAnalysis.ruleset</CodeAnalysisRuleSet>
 		<Company>Digital Zen Works</Company>
-		<Copyright>Copyright © 2006 - 2023</Copyright>
+		<Copyright>Copyright © 2006 - 2024</Copyright>
 		<Description>
 			This client library provides common database functionality.
 		</Description>
