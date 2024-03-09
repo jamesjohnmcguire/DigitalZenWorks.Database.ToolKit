@@ -39,8 +39,7 @@ namespace DigitalZenWorks.Database.ToolKit
 			System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
 		private static readonly ResourceManager StringTable = new
-			ResourceManager(
-			"DigitalZenWorks.Database.ToolKit.Resources",
+			("DigitalZenWorks.Database.ToolKit.Resources",
 			Assembly.GetExecutingAssembly());
 
 		/// <summary>
@@ -165,7 +164,7 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// <returns>Returns a list of items from the data table.</returns>
 		public static Collection<TItem> ConvertDataTable<TItem>(DataTable dataTable)
 		{
-			Collection<TItem> list = new Collection<TItem>();
+			Collection<TItem> list = new ();
 
 			if (dataTable != null)
 			{
