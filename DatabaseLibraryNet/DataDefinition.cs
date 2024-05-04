@@ -120,7 +120,7 @@ namespace DigitalZenWorks.Database.ToolKit
 			string column)
 		{
 			string[] columnTypeComareKeys =
-			{
+			[
 				"AUTONUMBER", "IDENTITY",
 				"AUTOINCREMENT", "BIGINT", "LONGVARBINARY", "LONGVARCHAR",
 				"VARBINARY", "VARCHAR", "BINARY", "BIT", "LONGBLOB",
@@ -134,10 +134,10 @@ namespace DigitalZenWorks.Database.ToolKit
 				"OLEOBJECT", "OLE", "REAL", "SET", "SINGLE", "SQLVARIANT",
 				"STRING", "TABLE", "TINYTEXT", "TEXT", "TIMESTAMP", "TIME",
 				"UNIQUEIDENTIFIER", "XML", "YEAR", "YESNO"
-			};
+			];
 
 			ColumnType[] types =
-			{
+			[
 				ColumnType.AutoNumber, ColumnType.Identity,
 				ColumnType.Identity, ColumnType.BigInt,
 				ColumnType.LongVarBinary, ColumnType.LongVarChar,
@@ -162,7 +162,7 @@ namespace DigitalZenWorks.Database.ToolKit
 				ColumnType.Text, ColumnType.Timestamp, ColumnType.Time,
 				ColumnType.UniqueIdentifier, ColumnType.Xml, ColumnType.Year,
 				ColumnType.Boolean
-			};
+			];
 
 			ColumnType columnType = ColumnType.Other;
 
@@ -239,7 +239,7 @@ namespace DigitalZenWorks.Database.ToolKit
 			if ((null != oleDbSchema) &&
 				(!string.IsNullOrWhiteSpace(tableName)))
 			{
-				relationships = new System.Collections.ArrayList();
+				relationships = [];
 
 				DataTable foreignKeyTable = oleDbSchema.GetForeignKeys(tableName);
 
@@ -265,8 +265,7 @@ namespace DigitalZenWorks.Database.ToolKit
 
 			if (!string.IsNullOrWhiteSpace(tableDefinitionsFile))
 			{
-				string[] stringSeparators =
-					new string[] { "\n\n", "\r\n\r\n" };
+				string[] stringSeparators = ["\n\n", "\r\n\r\n"];
 				queries = tableDefinitionsFile.Split(
 					stringSeparators,
 					64000,
@@ -287,10 +286,10 @@ namespace DigitalZenWorks.Database.ToolKit
 
 			if (!string.IsNullOrWhiteSpace(dataDefinition))
 			{
-				string[] tableParts = dataDefinition.Split(new char[] { '(' });
+				char separators = '(';
+				string[] tableParts = dataDefinition.Split(separators);
 
-				string[] tableNameParts =
-					tableParts[0].Split(new char[] { '[', ']', '`' });
+				string[] tableNameParts = tableParts[0].Split(['[', ']', '`']);
 
 				if (tableNameParts.Length > 1)
 				{
@@ -317,7 +316,7 @@ namespace DigitalZenWorks.Database.ToolKit
 				{
 					string fileContents = File.ReadAllText(schemaFile);
 
-					string[] stringSeparators = new string[] { "\r\n\r\n" };
+					string[] stringSeparators = ["\r\n\r\n"];
 					string[] queries = fileContents.Split(
 						stringSeparators,
 						32000,
@@ -587,8 +586,8 @@ namespace DigitalZenWorks.Database.ToolKit
 
 			using (OleDbSchema oleDbSchema = new (databaseFile))
 			{
-				tables = new System.Collections.Hashtable();
-				ArrayList relationships = new ();
+				tables = [];
+				ArrayList relationships = [];
 
 				DataTable tableNames = oleDbSchema.TableNames;
 
@@ -686,8 +685,8 @@ namespace DigitalZenWorks.Database.ToolKit
 		// to take dependencies into account
 		private static ArrayList OrderTable(Hashtable hashTable)
 		{
-			Hashtable list = new ();
-			ArrayList dependencies = new ();
+			Hashtable list = [];
+			ArrayList dependencies = [];
 
 			foreach (DictionaryEntry entry in hashTable)
 			{
@@ -713,7 +712,7 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// <returns>A sorted arraylist.</returns>
 		private static ArrayList TopologicalSort(Hashtable table)
 		{
-			ArrayList sortedList = new ();
+			ArrayList sortedList = [];
 			object key;
 			ArrayList dependencies;
 
@@ -895,7 +894,7 @@ namespace DigitalZenWorks.Database.ToolKit
 				Environment.NewLine);
 
 			// Sort Columns into ordinal positions
-			System.Collections.SortedList columns = new ();
+			System.Collections.SortedList columns = [];
 
 			foreach (DictionaryEntry entry in table.Columns)
 			{
