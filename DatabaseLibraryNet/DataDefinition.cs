@@ -98,9 +98,17 @@ namespace DigitalZenWorks.Database.ToolKit
 
 			if (!string.IsNullOrWhiteSpace(dataDefinition))
 			{
+#if NETCOREAPP1_0_OR_GREATER
+				char check = '(';
+#else
+				string check = "(";
+#endif
+
 				int splitIndex = dataDefinition.IndexOf(
-					"(",
-					StringComparison.Ordinal) + 1;
+					check,
+					StringComparison.Ordinal);
+
+				splitIndex++;
 #if NETCOREAPP1_0_OR_GREATER
 				columnsInfo = dataDefinition[splitIndex..];
 #else
