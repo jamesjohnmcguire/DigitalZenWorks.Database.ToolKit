@@ -62,6 +62,14 @@ namespace DigitalZenWorks.Database.ToolKit
 			Position = position;
 		}
 
+		/// <summary>
+		/// Gets or sets a value indicating whether this column supports
+		/// automatic date time setting.
+		/// </summary>
+		/// <value>A value indicating whether this column supports automatic
+		/// date time setting or not.</value>
+		public bool AutomaticDateTime { get; set; }
+
 		/////////////////////////////////////////////////////////////////////
 		/// <summary>
 		/// Gets or sets the type of the column.
