@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-// Copyright © 2006 - 2024 by James John McGuire
+// Copyright @ 2006 - 2024 by James John McGuire
 // All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
@@ -339,7 +339,7 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 			string description = "Unit Test - Time: " + DateTime.Now;
 			string query = "UPDATE TestTable SET [Description] = ?";
 
-			IDictionary<string, object> parameters =
+			Dictionary<string, object> parameters =
 				new Dictionary<string, object>();
 			parameters.Add("[Description]", description);
 
