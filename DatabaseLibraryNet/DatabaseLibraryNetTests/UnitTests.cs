@@ -339,8 +339,7 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 			string description = "Unit Test - Time: " + DateTime.Now;
 			string query = "UPDATE TestTable SET [Description] = ?";
 
-			Dictionary<string, object> parameters =
-				new Dictionary<string, object>();
+			Dictionary<string, object> parameters = new ();
 			parameters.Add("[Description]", description);
 
 			bool result = database.Update(query, parameters);
