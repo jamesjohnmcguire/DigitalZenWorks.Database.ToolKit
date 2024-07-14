@@ -884,7 +884,9 @@ namespace DigitalZenWorks.Database.ToolKit
 
 		private static string GetSingularPascalName(string columnName)
 		{
-			return GeneralUtilities.ConvertToPascalCaseFromKnr(columnName);
+			string result = TextCase.ConvertToPascalCaseFromKnr(columnName);
+
+			return result;
 		}
 
 		private DbParameterCollection AddParameters(
