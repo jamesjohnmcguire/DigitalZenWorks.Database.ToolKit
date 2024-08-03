@@ -19,8 +19,7 @@ namespace DigitalZenWorks.Database.ToolKit
 	/// Base class for database collection classes.
 	/// </summary>
 	/////////////////////////////////////////////////////////////////////////
-	public class DataObjectsBase
-		: IDisposable
+	public class DataObjectsBase : IDisposable
 	{
 		private readonly string databaseFilePath;
 
@@ -61,7 +60,7 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// <param name="dataSource">The data source to use.</param>
 		/////////////////////////////////////////////////////////////////////
 		[Obsolete("DataObjectsBase(string) is deprecated, " +
-			"please use DataObjectsBase(DatabaseType string) instead.")]
+			"please use DataObjectsBase(DatabaseType, string) instead.")]
 		public DataObjectsBase(string dataSource)
 		{
 			if (!File.Exists(dataSource))
@@ -128,8 +127,29 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// <param name="tableName">The table name to use.</param>
 		/// <param name="dataSource">The data source to use.</param>
 		/////////////////////////////////////////////////////////////////////
+		[Obsolete("DataObjectsBase(string, string) is deprecated, " +
+			"please use DataObjectsBase(DatabaseType, string, string) " +
+			"instead.")]
 		public DataObjectsBase(string tableName, string dataSource)
 			: this(dataSource)
+		{
+			this.tableName = tableName;
+		}
+
+		/////////////////////////////////////////////////////////////////////
+		/// <summary>
+		/// Initializes a new instance of the <see cref="DataObjectsBase"/>
+		/// class.
+		/// </summary>
+		/// <param name="databaseType">The database type.</param>
+		/// <param name="databaseFilePath">The database file path.</param>
+		/// <param name="tableName">The table name to use.</param>
+		/////////////////////////////////////////////////////////////////////
+		public DataObjectsBase(
+			DatabaseType databaseType,
+			string databaseFilePath,
+			string tableName)
+			: this(databaseType, databaseFilePath)
 		{
 			this.tableName = tableName;
 		}
