@@ -1,0 +1,23 @@
+﻿/////////////////////////////////////////////////////////////////////////////
+// <copyright file="IDataStorage.cs" company="James John McGuire">
+// Copyright © 2006 - 2024 James John McGuire. All Rights Reserved.
+// </copyright>
+/////////////////////////////////////////////////////////////////////////////
+
+using System;
+
+namespace DigitalZenWorks.Database.ToolKit
+{
+	/// <summary>
+	/// Database collection interface.
+	/// </summary>
+	public interface IDataStorage : IDisposable
+	{
+		/// <summary>
+		/// Get id from name method.
+		/// </summary>
+		/// <param name="name">The name of item.</param>
+		/// <returns>The id of the record.</returns>
+		int GetIdFromName(string name);
+	}
+}
