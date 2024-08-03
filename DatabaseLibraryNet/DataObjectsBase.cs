@@ -22,6 +22,8 @@ namespace DigitalZenWorks.Database.ToolKit
 	public class DataObjectsBase
 		: IDisposable
 	{
+		private readonly string databaseFilePath;
+
 		private DataStorage database;
 		private string tableName;
 
@@ -37,6 +39,20 @@ namespace DigitalZenWorks.Database.ToolKit
 			this.database = database;
 		}
 
+		// Future Use.
+		///////////////////////////////////////////////////////////////////////
+		///// <summary>
+		///// Initializes a new instance of the <see cref="DataObjectsBase"/>
+		///// class.
+		///// </summary>
+		///// <param name="connectionString">The connection string to
+		///// use.</param>
+		///////////////////////////////////////////////////////////////////////
+		// public DataObjectsBase(string connectionString)
+		// {
+		// database = new DataStorage(connectionString);
+		// }
+
 		/////////////////////////////////////////////////////////////////////
 		/// <summary>
 		/// Initializes a new instance of the <see cref="DataObjectsBase"/>
@@ -44,6 +60,8 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// </summary>
 		/// <param name="dataSource">The data source to use.</param>
 		/////////////////////////////////////////////////////////////////////
+		[Obsolete("DataObjectsBase(string) is deprecated, " +
+			"please use DataObjectsBase(DatabaseType string) instead.")]
 		public DataObjectsBase(string dataSource)
 		{
 			if (!File.Exists(dataSource))
@@ -60,6 +78,46 @@ namespace DigitalZenWorks.Database.ToolKit
 				dataSource);
 
 			database = new DataStorage(DatabaseType.OleDb, connectionString);
+		}
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="DataObjectsBase"/>
+		/// class.
+		/// </summary>
+		/// <param name="databaseType">The database type.</param>
+		/// <param name="databaseFilePath">The database file path.</param>
+		public DataObjectsBase(
+			DatabaseType databaseType, string databaseFilePath)
+		{
+			string connectionString = null;
+
+			if (!File.Exists(databaseFilePath))
+			{
+				databaseFilePath = Environment.GetFolderPath(
+					Environment.SpecialFolder.ApplicationData) +
+					"\\" + databaseFilePath;
+			}
+
+			this.databaseFilePath = databaseFilePath;
+
+			switch (databaseType)
+			{
+				case DatabaseType.OleDb:
+					connectionString = string.Format(
+						CultureInfo.InvariantCulture,
+						"provider={0}; Data Source={1}",
+						"Microsoft.ACE.OLEDB.12.0",
+						databaseFilePath);
+					break;
+				case DatabaseType.SQLite:
+					connectionString = string.Format(
+						CultureInfo.InvariantCulture,
+						"Data Source={0};Version=3;",
+						databaseFilePath);
+					break;
+			}
+
+			database = new DataStorage(databaseType, connectionString);
 		}
 
 		/////////////////////////////////////////////////////////////////////
@@ -96,6 +154,15 @@ namespace DigitalZenWorks.Database.ToolKit
 			database = new DataStorage(databaseType, connectionString);
 		}
 
+		/// <summary>
+		/// Gets the database file path.
+		/// </summary>
+		/// <value>Represents the database file path.</value>
+		public string DatabaseFilePath
+		{
+			get { return databaseFilePath; }
+		}
+
 		/////////////////////////////////////////////////////////////////////
 		/// <summary>
 		/// Gets the core database object.
@@ -103,7 +170,7 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// <value>Represents the core database object.</value>
 		/////////////////////////////////////////////////////////////////////
 		[CLSCompliantAttribute(false)]
-		protected DataStorage Database
+		public DataStorage Database
 		{
 			get { return database; }
 		}

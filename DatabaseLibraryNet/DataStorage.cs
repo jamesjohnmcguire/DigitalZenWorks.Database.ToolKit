@@ -90,6 +90,15 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// <summary>
 		/// Initializes a new instance of the <see cref="DataStorage"/> class.
 		/// </summary>
+		/// <param name="connectionString">The connection string.</param>
+		public DataStorage(string connectionString)
+		{
+			connectionText = connectionString;
+		}
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="DataStorage"/> class.
+		/// </summary>
 		/// <param name="databaseType">The database type.</param>
 		/// <param name="connectionString">The connection string.</param>
 		public DataStorage(DatabaseType databaseType, string connectionString)
