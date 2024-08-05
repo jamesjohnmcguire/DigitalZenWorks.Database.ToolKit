@@ -30,7 +30,7 @@ namespace DigitalZenWorks.Database.ToolKit
 	/// transport.
 	/// </summary>
 	/////////////////////////////////////////////////////////////////////////
-	public class DataStorage : IDisposable
+	public class DataStorage : IDataStorage
 	{
 		/// <summary>
 		/// Diagnostics object.
@@ -171,7 +171,7 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// <typeparam name="TItem">The type of item.</typeparam>
 		/// <param name="dataTable">The data table to convert.</param>
 		/// <returns>Returns a list of items from the data table.</returns>
-		public static Collection<TItem> ConvertDataTable<TItem>(DataTable dataTable)
+		public Collection<TItem> ConvertDataTable<TItem>(DataTable dataTable)
 		{
 			Collection<TItem> list = new ();
 
