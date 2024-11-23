@@ -26,6 +26,8 @@ namespace DigitalZenWorks.Database.ToolKit
 		private DataStorage database;
 		private string tableName;
 
+		private DatabaseType databaseType;
+
 		/////////////////////////////////////////////////////////////////////
 		/// <summary>
 		/// Initializes a new instance of the <see cref="DataObjectsBase"/>
@@ -88,6 +90,8 @@ namespace DigitalZenWorks.Database.ToolKit
 		public DataObjectsBase(
 			DatabaseType databaseType, string databaseFilePath)
 		{
+			this.databaseType = databaseType;
+
 			string connectionString = null;
 
 			if (!File.Exists(databaseFilePath))
@@ -194,6 +198,12 @@ namespace DigitalZenWorks.Database.ToolKit
 		{
 			get { return database; }
 		}
+
+		/// <summary>
+		/// Gets the database type.
+		/// </summary>
+		/// <value>The database type.</value>
+		public DatabaseType DatabaseType => databaseType;
 
 		/////////////////////////////////////////////////////////////////////
 		/// <summary>
