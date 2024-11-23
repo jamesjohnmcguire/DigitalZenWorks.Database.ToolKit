@@ -226,17 +226,20 @@ namespace DigitalZenWorks.Database.ToolKit
 			{
 				bool returnCode = Initialize();
 
-				if (true == returnCode)
+				if (returnCode == true)
 				{
 					databaseTransaction = connection.BeginTransaction();
 				}
 			}
 			catch (Exception exception)
 			{
-				Log.Error(CultureInfo.InvariantCulture, m => m(
-					StringTable.GetString(
+				string prefix = StringTable.GetString(
 						"EXCEPTION",
-						CultureInfo.InvariantCulture) + exception));
+						CultureInfo.InvariantCulture);
+				string message = prefix + exception.ToString();
+
+				Log.Error(message);
+
 				throw;
 			}
 		}
@@ -1104,6 +1107,10 @@ namespace DigitalZenWorks.Database.ToolKit
 							connection =
 								new SqlConnection(connectionText);
 							break;
+						case DatabaseType.Unknown:
+							break;
+						case DatabaseType.Oracle:
+							break;
 					}
 				}
 
@@ -1115,25 +1122,17 @@ namespace DigitalZenWorks.Database.ToolKit
 
 				returnValue = true;
 			}
-			catch (Exception exception) when
-				(exception is AccessViolationException ||
-				exception is OleDbException)
-			{
-				RollbackTransaction();
-
-				Log.Error(CultureInfo.InvariantCulture, m => m(
-					StringTable.GetString(
-						"EXCEPTION",
-						CultureInfo.InvariantCulture) + exception));
-			}
 			catch (Exception exception)
 			{
 				RollbackTransaction();
 
-				Log.Error(CultureInfo.InvariantCulture, m => m(
-					StringTable.GetString(
-						"EXCEPTION",
-						CultureInfo.InvariantCulture) + exception));
+				string prefix = StringTable.GetString(
+					"EXCEPTION",
+					CultureInfo.InvariantCulture);
+
+				string message = prefix + exception.ToString();
+
+				Log.Error(message);
 
 				throw;
 			}
