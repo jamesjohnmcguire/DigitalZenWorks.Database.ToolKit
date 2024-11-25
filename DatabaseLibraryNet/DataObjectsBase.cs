@@ -113,9 +113,11 @@ namespace DigitalZenWorks.Database.ToolKit
 						databaseFilePath);
 					break;
 				case DatabaseType.SQLite:
+					string connectionBase = "Data Source={0};Version=3;" +
+						"DateTimeFormat=InvariantCulture";
 					connectionString = string.Format(
 						CultureInfo.InvariantCulture,
-						"Data Source={0};Version=3;",
+						connectionBase,
 						databaseFilePath);
 					break;
 			}
