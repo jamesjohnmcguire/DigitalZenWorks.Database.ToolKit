@@ -13,14 +13,6 @@ namespace DigitalZenWorks.Database.ToolKit
 	/////////////////////////////////////////////////////////////////////////
 	public class Column
 	{
-		private string defaultValue = string.Empty;
-		private int length = 255;
-		private string name = string.Empty;
-		private bool nullable;
-		private int position = 1;
-		private ColumnType type = ColumnType.Number;
-		private bool unique;
-
 		/////////////////////////////////////////////////////////////////////
 		/// <summary>
 		/// Initializes a new instance of the <see cref="Column"/> class.
@@ -78,11 +70,7 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// The type of the column.
 		/// </value>
 		/////////////////////////////////////////////////////////////////////
-		public ColumnType ColumnType
-		{
-			get { return type; }
-			set { type = value; }
-		}
+		public ColumnType ColumnType { get; set; }
 
 		/////////////////////////////////////////////////////////////////////
 		/// <summary>
@@ -92,11 +80,7 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// Represents the default value of the column.
 		/// </value>
 		/////////////////////////////////////////////////////////////////////
-		public string DefaultValue
-		{
-			get { return defaultValue; }
-			set { defaultValue = value; }
-		}
+		public string DefaultValue { get; set; }
 
 		/////////////////////////////////////////////////////////////////////
 		/// <summary>
@@ -116,11 +100,7 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// The length of the column.
 		/// </value>
 		/////////////////////////////////////////////////////////////////////
-		public int Length
-		{
-			get { return length; }
-			set { length = value; }
-		}
+		public int Length { get; set; }
 
 		/////////////////////////////////////////////////////////////////////
 		/// <summary>
@@ -150,11 +130,7 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// The name of the column.
 		/// </value>
 		/////////////////////////////////////////////////////////////////////
-		public string Name
-		{
-			get { return name; }
-			set { name = value; }
-		}
+		public string Name { get; set; }
 
 		/////////////////////////////////////////////////////////////////////
 		/// <summary>
@@ -164,11 +140,7 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// A value indicating whether represents whether the column can have a null value.
 		/// </value>
 		/////////////////////////////////////////////////////////////////////
-		public bool Nullable
-		{
-			get { return nullable; }
-			set { nullable = value; }
-		}
+		public bool Nullable { get; set; }
 
 		/////////////////////////////////////////////////////////////////////
 		/// <summary>
@@ -178,11 +150,7 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// Represents the position of the column.
 		/// </value>
 		/////////////////////////////////////////////////////////////////////
-		public int Position
-		{
-			get { return position; }
-			set { position = value; }
-		}
+		public int Position { get; set; }
 
 		/////////////////////////////////////////////////////////////////////
 		/// <summary>
@@ -202,10 +170,6 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// A value indicating whether represents whether the column requires unique values.
 		/// </value>
 		/////////////////////////////////////////////////////////////////////
-		public bool Unique
-		{
-			get { return unique; }
-			set { unique = value; }
-		}
+		public bool Unique { get; set; }
 	}
 }

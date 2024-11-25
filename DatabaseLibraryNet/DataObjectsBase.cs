@@ -21,13 +21,6 @@ namespace DigitalZenWorks.Database.ToolKit
 	/////////////////////////////////////////////////////////////////////////
 	public class DataObjectsBase : IDisposable
 	{
-		private readonly string databaseFilePath;
-
-		private DataStorage database;
-		private string tableName;
-
-		private DatabaseType databaseType;
-
 		/////////////////////////////////////////////////////////////////////
 		/// <summary>
 		/// Initializes a new instance of the <see cref="DataObjectsBase"/>
@@ -37,7 +30,7 @@ namespace DigitalZenWorks.Database.ToolKit
 		/////////////////////////////////////////////////////////////////////
 		public DataObjectsBase(DataStorage database)
 		{
-			this.database = database;
+			this.Database = database;
 		}
 
 		// Future Use.
@@ -78,7 +71,7 @@ namespace DigitalZenWorks.Database.ToolKit
 				"Microsoft.ACE.OLEDB.12.0",
 				dataSource);
 
-			database = new DataStorage(DatabaseType.OleDb, connectionString);
+			Database = new DataStorage(DatabaseType.OleDb, connectionString);
 		}
 
 		/// <summary>
@@ -90,7 +83,7 @@ namespace DigitalZenWorks.Database.ToolKit
 		public DataObjectsBase(
 			DatabaseType databaseType, string databaseFilePath)
 		{
-			this.databaseType = databaseType;
+			this.DatabaseType = databaseType;
 
 			string connectionString = null;
 
@@ -101,7 +94,7 @@ namespace DigitalZenWorks.Database.ToolKit
 					"\\" + databaseFilePath;
 			}
 
-			this.databaseFilePath = databaseFilePath;
+			this.DatabaseFilePath = databaseFilePath;
 
 			switch (databaseType)
 			{
@@ -120,9 +113,19 @@ namespace DigitalZenWorks.Database.ToolKit
 						connectionBase,
 						databaseFilePath);
 					break;
+				case DatabaseType.Unknown:
+					break;
+				case DatabaseType.SqlServer:
+					break;
+				case DatabaseType.Oracle:
+					break;
+				case DatabaseType.MySql:
+					break;
+				default:
+					break;
 			}
 
-			database = new DataStorage(databaseType, connectionString);
+			Database = new DataStorage(databaseType, connectionString);
 		}
 
 		/////////////////////////////////////////////////////////////////////
@@ -139,7 +142,7 @@ namespace DigitalZenWorks.Database.ToolKit
 		public DataObjectsBase(string tableName, string dataSource)
 			: this(dataSource)
 		{
-			this.tableName = tableName;
+			this.TableName = tableName;
 		}
 
 		/////////////////////////////////////////////////////////////////////
@@ -157,7 +160,7 @@ namespace DigitalZenWorks.Database.ToolKit
 			string tableName)
 			: this(databaseType, databaseFilePath)
 		{
-			this.tableName = tableName;
+			this.TableName = tableName;
 		}
 
 		/////////////////////////////////////////////////////////////////////
@@ -175,19 +178,16 @@ namespace DigitalZenWorks.Database.ToolKit
 			DatabaseType databaseType,
 			string connectionString)
 		{
-			this.tableName = tableName;
+			this.TableName = tableName;
 
-			database = new DataStorage(databaseType, connectionString);
+			Database = new DataStorage(databaseType, connectionString);
 		}
 
 		/// <summary>
 		/// Gets the database file path.
 		/// </summary>
 		/// <value>Represents the database file path.</value>
-		public string DatabaseFilePath
-		{
-			get { return databaseFilePath; }
-		}
+		public string DatabaseFilePath { get; }
 
 		/////////////////////////////////////////////////////////////////////
 		/// <summary>
@@ -196,16 +196,13 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// <value>Represents the core database object.</value>
 		/////////////////////////////////////////////////////////////////////
 		[CLSCompliantAttribute(false)]
-		public DataStorage Database
-		{
-			get { return database; }
-		}
+		public DataStorage Database { get; private set; }
 
 		/// <summary>
 		/// Gets the database type.
 		/// </summary>
 		/// <value>The database type.</value>
-		public DatabaseType DatabaseType => databaseType;
+		public DatabaseType DatabaseType { get; }
 
 		/////////////////////////////////////////////////////////////////////
 		/// <summary>
@@ -215,11 +212,7 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// <value>Contains the name of the primary database table associated
 		/// with this collection.</value>
 		/////////////////////////////////////////////////////////////////////
-		protected string TableName
-		{
-			get { return tableName; }
-			set { tableName = value; }
-		}
+		protected string TableName { get; set; }
 
 		/////////////////////////////////////////////////////////////////////
 		/// <summary>
@@ -252,7 +245,7 @@ namespace DigitalZenWorks.Database.ToolKit
 				idColumn,
 				id);
 
-			returnCode = database.Delete(sql);
+			returnCode = Database.Delete(sql);
 
 			return returnCode;
 		}
@@ -272,7 +265,7 @@ namespace DigitalZenWorks.Database.ToolKit
 				@"SELECT * FROM {0} ORDER BY id",
 				table);
 
-			tableList = database.GetDataTable(sql);
+			tableList = Database.GetDataTable(sql);
 
 			return tableList;
 		}
@@ -295,14 +288,14 @@ namespace DigitalZenWorks.Database.ToolKit
 				table,
 				where);
 
-			dataRow = database.GetDataRow(sql);
+			dataRow = Database.GetDataRow(sql);
 
 			return dataRow;
 		}
 
 		/////////////////////////////////////////////////////////////////////
 		/// <summary>
-		/// Represents the Category record identified by the where clause
+		/// Represents the Category record identified by the where clause.
 		/// </summary>
 		/// <param name="tableName">The table name.</param>
 		/// <param name="where">The where clause.</param>
@@ -380,10 +373,10 @@ namespace DigitalZenWorks.Database.ToolKit
 		{
 			if (disposing)
 			{
-				if (null != database)
+				if (null != Database)
 				{
-					database.Close();
-					database = null;
+					Database.Close();
+					Database = null;
 				}
 			}
 		}
