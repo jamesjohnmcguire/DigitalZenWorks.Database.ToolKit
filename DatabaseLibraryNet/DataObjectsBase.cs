@@ -298,6 +298,37 @@ namespace DigitalZenWorks.Database.ToolKit
 
 		/////////////////////////////////////////////////////////////////////
 		/// <summary>
+		/// Represents the Category record identified by the where clause
+		/// </summary>
+		/// <param name="tableName">The table name.</param>
+		/// <param name="where">The where clause.</param>
+		/// <param name="orderBy">The order by clause.</param>
+		/// <param name="limit">The limit clause.</param>
+		/// <returns>A DataTable Object.</returns>
+		/////////////////////////////////////////////////////////////////////
+		public DataTable GetBy(
+			string tableName, string where, string orderBy, string limit)
+		{
+			string statement =
+				"SELECT * FROM " + tableName + " WHERE " + where;
+
+			if (!string.IsNullOrWhiteSpace(orderBy))
+			{
+				statement += " ORDER BY " + orderBy;
+			}
+
+			if (!string.IsNullOrWhiteSpace(limit))
+			{
+				statement += " LIMIT " + limit;
+			}
+
+			DataTable table = Database.GetDataTable(statement);
+
+			return table;
+		}
+
+		/////////////////////////////////////////////////////////////////////
+		/// <summary>
 		/// Gets the id of the record identified by the where clause.
 		/// </summary>
 		/// <param name="table">The name of the table.</param>
