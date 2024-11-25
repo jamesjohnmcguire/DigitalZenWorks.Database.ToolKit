@@ -234,18 +234,20 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// <summary>
 		/// Deletes the record identified by Id.
 		/// </summary>
-		/// <param name="table">The name of the table.</param>
+		/// <param name="tableName">The name of the table.</param>
+		/// <param name="idColumn">The name of the primay key column.</param>
 		/// <param name="id">The id of item.</param>
 		/// <returns>A value indicating success or not.</returns>
 		/////////////////////////////////////////////////////////////////////
-		public bool Delete(string table, int id)
+		public bool Delete(string tableName, string idColumn, int id)
 		{
 			bool returnCode;
 
 			string sql = string.Format(
 				CultureInfo.InvariantCulture,
-				@"DELETE FROM {0} WHERE id ='{1}'",
-				table,
+				@"DELETE FROM {0} WHERE {1} ='{2}'",
+				tableName,
+				idColumn,
 				id);
 
 			returnCode = database.Delete(sql);
