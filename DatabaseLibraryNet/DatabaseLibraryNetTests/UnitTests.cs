@@ -47,9 +47,12 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 
 			SQLiteConnection.CreateFile(dataSource);
 
+			string connectionBase = "Data Source={0};Version=3;" +
+				"DateTimeFormat=InvariantCulture";
+
 			string connectionString = string.Format(
 				CultureInfo.InvariantCulture,
-				"Data Source = {0}; Version = 3;",
+				connectionBase,
 				dataSource);
 
 			database = new DataStorage(DatabaseType.SQLite, connectionString);

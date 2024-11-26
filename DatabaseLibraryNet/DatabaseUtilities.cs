@@ -137,9 +137,12 @@ namespace DigitalZenWorks.Database.ToolKit
 				extension.Equals(
 					".sqlite", StringComparison.OrdinalIgnoreCase))
 			{
+				string connectionBase = "Data Source={0};Version=3;" +
+					"DateTimeFormat=InvariantCulture";
+
 				connectionString = string.Format(
 					CultureInfo.InvariantCulture,
-					"Data Source = {0}; Version = 3;",
+					connectionBase,
 					databaseFile);
 
 				databaseType = DatabaseType.SQLite;
