@@ -360,10 +360,6 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// object.</remarks>
 		/// <param name="statement">the SQL statement to execute.</param>
 		/// <returns>A data reader.</returns>
-		[System.Diagnostics.CodeAnalysis.SuppressMessage(
-			"StyleCop.CSharp.NamingRules",
-			"SA1305:Field names should not use Hungarian notation",
-			Justification = "It isn't hungarian notation.")]
 		public DbDataReader ExecuteReader(string statement)
 		{
 			DbDataReader dbDataReader = null;
@@ -469,7 +465,7 @@ namespace DigitalZenWorks.Database.ToolKit
 				dataSet.Locale = CultureInfo.InvariantCulture;
 
 				using DbCommand command = GetCommandObject(sql, values);
-			
+
 				if (null != command)
 				{
 					switch (databaseType)
@@ -674,7 +670,12 @@ namespace DigitalZenWorks.Database.ToolKit
 				}
 
 				// execute non query
-				ExecuteNonQuery(sql, values);
+				bool result = ExecuteNonQuery(sql, values);
+
+				if (result == false)
+				{
+					Log.Warn("ExecuteNonQuery returns false");
+				}
 
 				// get id of effected row
 				returnCode = GetLastInsertId();
@@ -827,14 +828,20 @@ namespace DigitalZenWorks.Database.ToolKit
 			foreach (KeyValuePair<string, object> valuePair in values)
 			{
 				string name = "@" + valuePair.Key;
+				OleDbParameter parameter;
 
 				if (null == valuePair.Value)
 				{
-					parameters.AddWithValue(name, DBNull.Value);
+					parameter = parameters.AddWithValue(name, DBNull.Value);
 				}
 				else
 				{
-					parameters.AddWithValue(name, valuePair.Value);
+					parameter = parameters.AddWithValue(name, valuePair.Value);
+				}
+
+				if (parameter == null)
+				{
+					Log.Warn("Parameters.AddWithValue returns null");
 				}
 			}
 
@@ -907,9 +914,11 @@ namespace DigitalZenWorks.Database.ToolKit
 
 			foreach (KeyValuePair<string, object> valuePair in values)
 			{
+				int result;
+
 				if (null == valuePair.Value)
 				{
-					parameters.Add(DBNull.Value);
+					result = parameters.Add(DBNull.Value);
 				}
 				else
 				{
@@ -919,12 +928,17 @@ namespace DigitalZenWorks.Database.ToolKit
 					{
 						SQLiteParameter parameter =
 							new (DbType.String, keyPairValue);
-						parameters.Add(parameter);
+						result = parameters.Add(parameter);
 					}
 					else
 					{
-						parameters.Add(keyPairValue);
+						result = parameters.Add(keyPairValue);
 					}
+				}
+
+				if (result == 0)
+				{
+					Log.Warn("DbParameterCollection.Add returns 0");
 				}
 			}
 
@@ -963,10 +977,6 @@ namespace DigitalZenWorks.Database.ToolKit
 			return result;
 		}
 
-		[System.Diagnostics.CodeAnalysis.SuppressMessage(
-			"Microsoft.Security",
-			"CA2100:Review SQL queries for security vulnerabilities",
-			Justification = "This is a generic function.  Evaluations should be done higher up the chain.")]
 		private DbCommand GetCommandObject(
 			string sql, IDictionary<string, object> values)
 		{
