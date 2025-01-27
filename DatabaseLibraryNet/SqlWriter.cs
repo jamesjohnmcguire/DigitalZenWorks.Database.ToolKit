@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace DigitalZenWorks.Database.ToolKit
 {
@@ -194,6 +195,10 @@ namespace DigitalZenWorks.Database.ToolKit
 				if (dataItem != null)
 				{
 					dataItem = dataItem.Trim();
+
+					// Replace extra spaces.
+					dataItem = Regex.Replace(dataItem, @"\s+", " ");
+
 					dataItem = GetEscapedValue(dataItem);
 				}
 
