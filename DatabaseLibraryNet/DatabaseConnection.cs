@@ -11,5 +11,17 @@ namespace DigitalZenWorks.Database.ToolKit
 	/// </summary>
 	public class DatabaseConnection
 	{
+		private string connectionString;
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="DatabaseConnection"/>
+		/// class.
+		/// </summary>
+		/// <param name="connectionString">The connection string
+		/// to use.</param>
+		public DatabaseConnection(string connectionString)
+		{
+			this.connectionString = connectionString;
+		}
 	}
 }
