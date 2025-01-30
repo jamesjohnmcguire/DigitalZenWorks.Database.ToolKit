@@ -5,7 +5,7 @@ VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DigitalZenWorks.Database.ToolKit", "DatabaseLibraryNet\DigitalZenWorks.Database.ToolKit.csproj", "{85E5483F-F90E-44CC-A91E-1FD3D6528EDF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DatabaseLibraryNetTests", "DatabaseLibraryNet\DatabaseLibraryNetTests\DatabaseLibraryNetTests.csproj", "{D610395E-80A1-42B1-B232-5E564B9599FB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DatabaseLibraryNetTests", "DatabaseLibraryNetTests\DatabaseLibraryNetTests.csproj", "{D610395E-80A1-42B1-B232-5E564B9599FB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
