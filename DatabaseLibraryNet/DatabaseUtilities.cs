@@ -1,6 +1,6 @@
 ﻿/////////////////////////////////////////////////////////////////////////////
 // <copyright file="DatabaseUtilities.cs" company="James John McGuire">
-// Copyright © 2006 - 2022 James John McGuire. All Rights Reserved.
+// Copyright © 2006 - 2025 James John McGuire. All Rights Reserved.
 // </copyright>
 /////////////////////////////////////////////////////////////////////////////
 
@@ -116,16 +116,45 @@ namespace DigitalZenWorks.Database.ToolKit
 		{
 			bool returnCode = false;
 
-			// Open the database
-			string provider = "Microsoft.ACE.OLEDB.12.0";
-			string connectionString = string.Format(
-				CultureInfo.InvariantCulture,
-				"provider={0}; Data Source={1}",
-				provider,
-				databaseFile);
+			DatabaseType databaseType;
+			string connectionString;
+			string extension = Path.GetExtension(databaseFile);
 
+			if (extension.Equals(".mdb", StringComparison.OrdinalIgnoreCase) ||
+				extension.Equals(".accdb", StringComparison.OrdinalIgnoreCase))
+			{
+				string provider = "Microsoft.ACE.OLEDB.12.0";
+				connectionString = string.Format(
+					CultureInfo.InvariantCulture,
+					"provider={0}; Data Source={1}",
+					provider,
+					databaseFile);
+
+				databaseType = DatabaseType.OleDb;
+			}
+			else if (extension.Equals(
+					".db", StringComparison.OrdinalIgnoreCase) ||
+				extension.Equals(
+					".sqlite", StringComparison.OrdinalIgnoreCase))
+			{
+				string connectionBase = "Data Source={0};Version=3;" +
+					"DateTimeFormat=InvariantCulture";
+
+				connectionString = string.Format(
+					CultureInfo.InvariantCulture,
+					connectionBase,
+					databaseFile);
+
+				databaseType = DatabaseType.SQLite;
+			}
+			else
+			{
+				throw new NotImplementedException();
+			}
+
+			// Open the database
 			using (DataStorage database =
-				new DataStorage(DatabaseType.OleDb, connectionString))
+				new DataStorage(databaseType, connectionString))
 			{
 				// Get all the table names
 				DataTable tableNames = database.SchemaTable;
@@ -135,20 +164,38 @@ namespace DigitalZenWorks.Database.ToolKit
 					// for each table, select all the data
 					foreach (DataRow table in tableNames.Rows)
 					{
-						string tableName = table["TABLE_NAME"].ToString();
-						string csvFile = csvPath + tableName + ".csv";
-
-						// Create the CSV file to which data will be exported.
-						using (StreamWriter file =
-							new StreamWriter(csvFile, false))
+						try
 						{
+							var objectName = table["TABLE_NAME"];
+							string tableName = objectName.ToString();
+							string csvFile = csvPath + tableName + ".csv";
+
+							// Create the CSV file.
+							using StreamWriter file = new (csvFile, false);
+
 							// export the table
-							string sqlQuery = "SELECT * FROM " +
-								table["TABLE_NAME"].ToString();
+							string sqlQuery = "SELECT * FROM " + tableName;
 							DataTable tableData =
 								database.GetDataTable(sqlQuery);
 
 							ExportDataTableToCsv(tableData, file);
+						}
+						catch (Exception exception) when
+							(exception is ArgumentException ||
+							exception is ArgumentNullException ||
+							exception is DirectoryNotFoundException ||
+							exception is IOException ||
+							exception is PathTooLongException ||
+							exception is SecurityException ||
+							exception is UnauthorizedAccessException)
+						{
+							Log.Error(exception.ToString());
+						}
+						catch (Exception exception)
+						{
+							Log.Error(exception.ToString());
+
+							throw;
 						}
 					}
 				}
@@ -157,35 +204,6 @@ namespace DigitalZenWorks.Database.ToolKit
 			}
 
 			return returnCode;
-		}
-
-		/// <summary>
-		/// Makes a privileged connection string.
-		/// </summary>
-		/// <param name="databaseFile">The database file to use.</param>
-		/// <returns>The completed connection string.</returns>
-		public static string MakePrivilegedConnectString(string databaseFile)
-		{
-			string provider = "Microsoft.ACE.OLEDB.12.0";
-
-			string connectionString = "Provider=" + provider +
-				@";Password="""";User ID=Admin;" + "Data Source=" +
-				databaseFile + @";Mode=Share Deny None;" +
-				@"Extended Properties="""";" +
-				@"Jet OLEDB:System database="""";" +
-				@"Jet OLEDB:Registry Path="""";" +
-				@"Jet OLEDB:Database Password="""";Jet OLEDB:Engine Type=5;" +
-				@"Jet OLEDB:Database Locking Mode=1;" +
-				@"Jet OLEDB:Global Partial Bulk Ops=2;" +
-				@"Jet OLEDB:Global Bulk Transactions=1;" +
-				@"Jet OLEDB:New Database Password="""";" +
-				@"Jet OLEDB:Create System Database=False;" +
-				@"Jet OLEDB:Encrypt Database=False;" +
-				@"Jet OLEDB:Don't Copy Locale on Compact=False;" +
-				@"Jet OLEDB:Compact Without Replica Repair=False;" +
-				@"Jet OLEDB:SFP=False";
-
-			return connectionString;
 		}
 	}
 }

@@ -1,16 +1,16 @@
 ﻿/////////////////////////////////////////////////////////////////////////////
 // <copyright file="ColumnType.cs" company="James John McGuire">
-// Copyright © 2006 - 2022 James John McGuire. All Rights Reserved.
+// Copyright © 2006 - 2025 James John McGuire. All Rights Reserved.
 // </copyright>
 /////////////////////////////////////////////////////////////////////////////
 
 namespace DigitalZenWorks.Database.ToolKit
 {
+#pragma warning disable CA1720
+
 	/// <summary>
 	/// Generic column types
 	/// Represents an enumeration of column types.
-	///
-	/// TODO: Update to be less Access and more generic.
 	/// </summary>
 	public enum ColumnType
 	{
@@ -460,4 +460,5 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// </summary>
 		YesNo
 	}
+#pragma warning restore CA1720
 }

@@ -1,6 +1,6 @@
 ﻿/////////////////////////////////////////////////////////////////////////////
 // <copyright file="DataObjectsBase.cs" company="James John McGuire">
-// Copyright © 2006 - 2022 James John McGuire. All Rights Reserved.
+// Copyright © 2006 - 2025 James John McGuire. All Rights Reserved.
 // </copyright>
 /////////////////////////////////////////////////////////////////////////////
 
@@ -19,20 +19,8 @@ namespace DigitalZenWorks.Database.ToolKit
 	/// Base class for database collection classes.
 	/// </summary>
 	/////////////////////////////////////////////////////////////////////////
-	public class DataObjectsBase
-		: IDisposable
+	public class DataObjectsBase : IDisposable
 	{
-		/////////////////////////////////////////////////////////////////////
-		/// <summary>
-		/// Represents a provider type for a connection string.
-		/// </summary>
-		/////////////////////////////////////////////////////////////////////
-		private const string Provider = "Microsoft.ACE.OLEDB.12.0";
-
-		private DataStorage database = null;
-
-		private string tableName = null;
-
 		/////////////////////////////////////////////////////////////////////
 		/// <summary>
 		/// Initializes a new instance of the <see cref="DataObjectsBase"/>
@@ -42,8 +30,22 @@ namespace DigitalZenWorks.Database.ToolKit
 		/////////////////////////////////////////////////////////////////////
 		public DataObjectsBase(DataStorage database)
 		{
-			this.database = database;
+			this.Database = database;
 		}
+
+		// Future Use.
+		///////////////////////////////////////////////////////////////////////
+		///// <summary>
+		///// Initializes a new instance of the <see cref="DataObjectsBase"/>
+		///// class.
+		///// </summary>
+		///// <param name="connectionString">The connection string to
+		///// use.</param>
+		///////////////////////////////////////////////////////////////////////
+		// public DataObjectsBase(string connectionString)
+		// {
+		// database = new DataStorage(connectionString);
+		// }
 
 		/////////////////////////////////////////////////////////////////////
 		/// <summary>
@@ -52,6 +54,8 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// </summary>
 		/// <param name="dataSource">The data source to use.</param>
 		/////////////////////////////////////////////////////////////////////
+		[Obsolete("DataObjectsBase(string) is deprecated, " +
+			"please use DataObjectsBase(DatabaseType, string) instead.")]
 		public DataObjectsBase(string dataSource)
 		{
 			if (!File.Exists(dataSource))
@@ -64,10 +68,64 @@ namespace DigitalZenWorks.Database.ToolKit
 			string connectionString = string.Format(
 				CultureInfo.InvariantCulture,
 				"provider={0}; Data Source={1}",
-				Provider,
+				"Microsoft.ACE.OLEDB.12.0",
 				dataSource);
 
-			database = new DataStorage(DatabaseType.OleDb, connectionString);
+			Database = new DataStorage(DatabaseType.OleDb, connectionString);
+		}
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="DataObjectsBase"/>
+		/// class.
+		/// </summary>
+		/// <param name="databaseType">The database type.</param>
+		/// <param name="databaseFilePath">The database file path.</param>
+		public DataObjectsBase(
+			DatabaseType databaseType, string databaseFilePath)
+		{
+			this.DatabaseType = databaseType;
+
+			string connectionString = null;
+
+			if (!File.Exists(databaseFilePath))
+			{
+				databaseFilePath = Environment.GetFolderPath(
+					Environment.SpecialFolder.ApplicationData) +
+					"\\" + databaseFilePath;
+			}
+
+			this.DatabaseFilePath = databaseFilePath;
+
+			switch (databaseType)
+			{
+				case DatabaseType.OleDb:
+					connectionString = string.Format(
+						CultureInfo.InvariantCulture,
+						"provider={0}; Data Source={1}",
+						"Microsoft.ACE.OLEDB.12.0",
+						databaseFilePath);
+					break;
+				case DatabaseType.SQLite:
+					string connectionBase = "Data Source={0};Version=3;" +
+						"DateTimeFormat=InvariantCulture";
+					connectionString = string.Format(
+						CultureInfo.InvariantCulture,
+						connectionBase,
+						databaseFilePath);
+					break;
+				case DatabaseType.Unknown:
+					break;
+				case DatabaseType.SqlServer:
+					break;
+				case DatabaseType.Oracle:
+					break;
+				case DatabaseType.MySql:
+					break;
+				default:
+					break;
+			}
+
+			Database = new DataStorage(databaseType, connectionString);
 		}
 
 		/////////////////////////////////////////////////////////////////////
@@ -78,24 +136,31 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// <param name="tableName">The table name to use.</param>
 		/// <param name="dataSource">The data source to use.</param>
 		/////////////////////////////////////////////////////////////////////
+		[Obsolete("DataObjectsBase(string, string) is deprecated, " +
+			"please use DataObjectsBase(DatabaseType, string, string) " +
+			"instead.")]
 		public DataObjectsBase(string tableName, string dataSource)
+			: this(dataSource)
 		{
-			this.tableName = tableName;
+			this.TableName = tableName;
+		}
 
-			if (!File.Exists(dataSource))
-			{
-				dataSource = Environment.GetFolderPath(
-					Environment.SpecialFolder.LocalApplicationData) +
-					"\\" + dataSource;
-			}
-
-			string connectionString = string.Format(
-				CultureInfo.InvariantCulture,
-				"provider={0}; Data Source={1}",
-				Provider,
-				dataSource);
-
-			database = new DataStorage(DatabaseType.OleDb, connectionString);
+		/////////////////////////////////////////////////////////////////////
+		/// <summary>
+		/// Initializes a new instance of the <see cref="DataObjectsBase"/>
+		/// class.
+		/// </summary>
+		/// <param name="databaseType">The database type.</param>
+		/// <param name="databaseFilePath">The database file path.</param>
+		/// <param name="tableName">The table name to use.</param>
+		/////////////////////////////////////////////////////////////////////
+		public DataObjectsBase(
+			DatabaseType databaseType,
+			string databaseFilePath,
+			string tableName)
+			: this(databaseType, databaseFilePath)
+		{
+			this.TableName = tableName;
 		}
 
 		/////////////////////////////////////////////////////////////////////
@@ -113,10 +178,16 @@ namespace DigitalZenWorks.Database.ToolKit
 			DatabaseType databaseType,
 			string connectionString)
 		{
-			this.tableName = tableName;
+			this.TableName = tableName;
 
-			database = new DataStorage(databaseType, connectionString);
+			Database = new DataStorage(databaseType, connectionString);
 		}
+
+		/// <summary>
+		/// Gets the database file path.
+		/// </summary>
+		/// <value>Represents the database file path.</value>
+		public string DatabaseFilePath { get; }
 
 		/////////////////////////////////////////////////////////////////////
 		/// <summary>
@@ -125,10 +196,13 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// <value>Represents the core database object.</value>
 		/////////////////////////////////////////////////////////////////////
 		[CLSCompliantAttribute(false)]
-		protected DataStorage Database
-		{
-			get { return database; }
-		}
+		public DataStorage Database { get; private set; }
+
+		/// <summary>
+		/// Gets the database type.
+		/// </summary>
+		/// <value>The database type.</value>
+		public DatabaseType DatabaseType { get; }
 
 		/////////////////////////////////////////////////////////////////////
 		/// <summary>
@@ -138,11 +212,7 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// <value>Contains the name of the primary database table associated
 		/// with this collection.</value>
 		/////////////////////////////////////////////////////////////////////
-		protected string TableName
-		{
-			get { return tableName; }
-			set { tableName = value; }
-		}
+		protected string TableName { get; set; }
 
 		/////////////////////////////////////////////////////////////////////
 		/// <summary>
@@ -159,21 +229,23 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// <summary>
 		/// Deletes the record identified by Id.
 		/// </summary>
-		/// <param name="table">The name of the table.</param>
+		/// <param name="tableName">The name of the table.</param>
+		/// <param name="idColumn">The name of the primay key column.</param>
 		/// <param name="id">The id of item.</param>
 		/// <returns>A value indicating success or not.</returns>
 		/////////////////////////////////////////////////////////////////////
-		public bool Delete(string table, int id)
+		public bool Delete(string tableName, string idColumn, int id)
 		{
 			bool returnCode;
 
 			string sql = string.Format(
 				CultureInfo.InvariantCulture,
-				@"DELETE FROM {0} WHERE id ='{1}'",
-				table,
+				@"DELETE FROM {0} WHERE {1} ='{2}'",
+				tableName,
+				idColumn,
 				id);
 
-			returnCode = database.Delete(sql);
+			returnCode = Database.Delete(sql);
 
 			return returnCode;
 		}
@@ -193,7 +265,7 @@ namespace DigitalZenWorks.Database.ToolKit
 				@"SELECT * FROM {0} ORDER BY id",
 				table);
 
-			tableList = database.GetDataTable(sql);
+			tableList = Database.GetDataTable(sql);
 
 			return tableList;
 		}
@@ -216,9 +288,40 @@ namespace DigitalZenWorks.Database.ToolKit
 				table,
 				where);
 
-			dataRow = database.GetDataRow(sql);
+			dataRow = Database.GetDataRow(sql);
 
 			return dataRow;
+		}
+
+		/////////////////////////////////////////////////////////////////////
+		/// <summary>
+		/// Represents the Category record identified by the where clause.
+		/// </summary>
+		/// <param name="tableName">The table name.</param>
+		/// <param name="where">The where clause.</param>
+		/// <param name="orderBy">The order by clause.</param>
+		/// <param name="limit">The limit clause.</param>
+		/// <returns>A DataTable Object.</returns>
+		/////////////////////////////////////////////////////////////////////
+		public DataTable GetBy(
+			string tableName, string where, string orderBy, string limit)
+		{
+			string statement =
+				"SELECT * FROM " + tableName + " WHERE " + where;
+
+			if (!string.IsNullOrWhiteSpace(orderBy))
+			{
+				statement += " ORDER BY " + orderBy;
+			}
+
+			if (!string.IsNullOrWhiteSpace(limit))
+			{
+				statement += " LIMIT " + limit;
+			}
+
+			DataTable table = Database.GetDataTable(statement);
+
+			return table;
 		}
 
 		/////////////////////////////////////////////////////////////////////
@@ -270,10 +373,10 @@ namespace DigitalZenWorks.Database.ToolKit
 		{
 			if (disposing)
 			{
-				if (null != database)
+				if (null != Database)
 				{
-					database.Close();
-					database = null;
+					Database.Close();
+					Database = null;
 				}
 			}
 		}

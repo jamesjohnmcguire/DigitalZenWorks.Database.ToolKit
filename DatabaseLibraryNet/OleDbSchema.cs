@@ -1,12 +1,14 @@
 ﻿/////////////////////////////////////////////////////////////////////////////
 // <copyright file="OleDbSchema.cs" company="James John McGuire">
-// Copyright © 2006 - 2022 James John McGuire. All Rights Reserved.
+// Copyright © 2006 - 2025 James John McGuire. All Rights Reserved.
 // </copyright>
 /////////////////////////////////////////////////////////////////////////////
 
 using System;
 using System.Data;
 using System.Data.OleDb;
+using System.Globalization;
+using System.Runtime.Versioning;
 
 namespace DigitalZenWorks.Database.ToolKit
 {
@@ -16,6 +18,9 @@ namespace DigitalZenWorks.Database.ToolKit
 	/// Represents an OleDbSchema object.
 	/// </summary>
 	/////////////////////////////////////////////////////////////////////////
+#if NET5_0_OR_GREATER
+	[SupportedOSPlatform("windows")]
+#endif
 	public class OleDbSchema : IDisposable
 	{
 		/////////////////////////////////////////////////////////////////////
@@ -33,8 +38,27 @@ namespace DigitalZenWorks.Database.ToolKit
 		/////////////////////////////////////////////////////////////////////
 		public OleDbSchema(string databaseFile)
 		{
-			string connectionString =
-				DatabaseUtilities.MakePrivilegedConnectString(databaseFile);
+			string baseFormat = "Provider=Microsoft.ACE.OLEDB.12.0" +
+				@";Password="""";User ID=Admin;" + "Data Source={0}" +
+				";Mode=Share Deny None;" +
+				@"Extended Properties="""";" +
+				@"Jet OLEDB:System database="""";" +
+				@"Jet OLEDB:Registry Path="""";" +
+				@"Jet OLEDB:Database Password="""";Jet OLEDB:Engine Type=5;" +
+				@"Jet OLEDB:New Database Password="""";" +
+				"Jet OLEDB:Database Locking Mode=1;" +
+				"Jet OLEDB:Global Partial Bulk Ops=2;" +
+				"Jet OLEDB:Global Bulk Transactions=1;" +
+				"Jet OLEDB:Create System Database=False;" +
+				"Jet OLEDB:Encrypt Database=False;" +
+				"Jet OLEDB:Don't Copy Locale on Compact=False;" +
+				"Jet OLEDB:Compact Without Replica Repair=False;" +
+				"Jet OLEDB:SFP=False";
+
+			string connectionString = string.Format(
+				CultureInfo.InvariantCulture,
+				baseFormat,
+				databaseFile);
 
 			oleDbConnection = new OleDbConnection(connectionString);
 		}

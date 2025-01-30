@@ -1,23 +1,25 @@
 ﻿/////////////////////////////////////////////////////////////////////////////
 // <copyright file="DataStorage.cs" company="James John McGuire">
-// Copyright © 2006 - 2022 James John McGuire. All Rights Reserved.
+// Copyright © 2006 - 2025 James John McGuire. All Rights Reserved.
 // </copyright>
 /////////////////////////////////////////////////////////////////////////////
 
 using Common.Logging;
 using DigitalZenWorks.Common.Utilities;
+using Microsoft.Data.SqlClient;
 using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Configuration;
 using System.Data;
 using System.Data.Common;
 using System.Data.OleDb;
-using System.Data.SqlClient;
 using System.Data.SQLite;
 using System.Globalization;
 using System.Reflection;
 using System.Resources;
+using System.Runtime.Versioning;
 
 namespace DigitalZenWorks.Database.ToolKit
 {
@@ -28,7 +30,7 @@ namespace DigitalZenWorks.Database.ToolKit
 	/// transport.
 	/// </summary>
 	/////////////////////////////////////////////////////////////////////////
-	public class DataStorage : IDisposable
+	public class DataStorage : IDataStorage
 	{
 		/// <summary>
 		/// Diagnostics object.
@@ -37,8 +39,7 @@ namespace DigitalZenWorks.Database.ToolKit
 			System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
 		private static readonly ResourceManager StringTable = new
-			ResourceManager(
-			"DigitalZenWorks.Database.ToolKit.Resources",
+			("DigitalZenWorks.Database.ToolKit.Resources",
 			Assembly.GetExecutingAssembly());
 
 		/// <summary>
@@ -52,26 +53,19 @@ namespace DigitalZenWorks.Database.ToolKit
 		private readonly string connectionText = string.Empty;
 
 		/// <summary>
-		/// Database Connection Object.
-		/// </summary>
-		private DbConnection connection = null;
-
-		/// <summary>
 		/// Ole Database Connection Object.
 		/// </summary>
-		private OleDbConnection oleDbConnection = null;
+		private OleDbConnection oleDbConnection;
 
-		private MySqlConnection mySqlConnection = null;
+		private MySqlConnection mySqlConnection;
 
-		private SQLiteConnection sqliteConnection = null;
+		private SQLiteConnection sqliteConnection;
 
 		// transactions
 		/// <summary>
 		/// transaction object.
 		/// </summary>
 		private DbTransaction databaseTransaction;
-
-		private int timeOut = 30;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="DataStorage"/> class.
@@ -83,23 +77,16 @@ namespace DigitalZenWorks.Database.ToolKit
 			{
 				connectionText =
 					ConfigurationManager.ConnectionStrings[0].ConnectionString;
+			}
+		}
 
-				// OleDbConnection is default
-				databaseType = DatabaseType.OleDb;
-			}
-			else
-			{
-				if (Environment.Is64BitProcess)
-				{
-					connectionText = "Provider=Microsoft.ACE.OLEDB.12.0;" +
-						"Data Source=TimeTracker.accdb";
-				}
-				else
-				{
-					connectionText = "Provider=Microsoft.Jet.OLEDB.4.0;" +
-						"Data Source=TimeTracker.accdb";
-				}
-			}
+		/// <summary>
+		/// Initializes a new instance of the <see cref="DataStorage"/> class.
+		/// </summary>
+		/// <param name="connectionString">The connection string.</param>
+		public DataStorage(string connectionString)
+		{
+			connectionText = connectionString;
 		}
 
 		/// <summary>
@@ -109,8 +96,8 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// <param name="connectionString">The connection string.</param>
 		public DataStorage(DatabaseType databaseType, string connectionString)
 		{
-			connectionText = connectionString;
 			this.databaseType = databaseType;
+			connectionText = connectionString;
 		}
 
 		/////////////////////////////////////////////////////////////////////
@@ -129,18 +116,22 @@ namespace DigitalZenWorks.Database.ToolKit
 
 				bool returnCode = Initialize();
 
-				if (true == returnCode)
+				if (returnCode == true)
 				{
+#if NET5_0_OR_GREATER
+					if (DatabaseType.OleDb == databaseType &&
+						OperatingSystem.IsWindows())
+#else
 					if (DatabaseType.OleDb == databaseType)
+#endif
 					{
 						tables = oleDbConnection.GetOleDbSchemaTable(
 							System.Data.OleDb.OleDbSchemaGuid.Tables,
-							new object[] { null, null, null, "TABLE" });
+							[null, null, null, "TABLE"]);
 					}
 					else
 					{
-						// tables = connection.GetSchema("TABLE");
-						tables = connection.GetSchema();
+						tables = Connection.GetSchema("Tables");
 					}
 				}
 
@@ -154,7 +145,7 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// <value>
 		/// The time out value.
 		/// </value>
-		public int TimeOut { get { return timeOut; } set { timeOut = value; } }
+		public int TimeOut { get; set; } = 30;
 
 		/// <summary>
 		/// Gets the database connection object.
@@ -162,10 +153,7 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// <value>
 		/// The database connection object.
 		/// </value>
-		public DbConnection Connection
-		{
-			get { return connection; }
-		}
+		public DbConnection Connection { get; private set; }
 
 		/// <summary>
 		/// Converts a data table to a list.
@@ -173,9 +161,9 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// <typeparam name="TItem">The type of item.</typeparam>
 		/// <param name="dataTable">The data table to convert.</param>
 		/// <returns>Returns a list of items from the data table.</returns>
-		public static List<TItem> ConvertDataTable<TItem>(DataTable dataTable)
+		public Collection<TItem> ConvertDataTable<TItem>(DataTable dataTable)
 		{
-			List<TItem> list = new List<TItem>();
+			Collection<TItem> list = [];
 
 			if (dataTable != null)
 			{
@@ -228,17 +216,20 @@ namespace DigitalZenWorks.Database.ToolKit
 			{
 				bool returnCode = Initialize();
 
-				if (true == returnCode)
+				if (returnCode == true)
 				{
-					databaseTransaction = connection.BeginTransaction();
+					databaseTransaction = Connection.BeginTransaction();
 				}
 			}
 			catch (Exception exception)
 			{
-				Log.Error(CultureInfo.InvariantCulture, m => m(
-					StringTable.GetString(
+				string prefix = StringTable.GetString(
 						"EXCEPTION",
-						CultureInfo.InvariantCulture) + exception));
+						CultureInfo.InvariantCulture);
+				string message = prefix + exception.ToString();
+
+				Log.Error(message);
+
 				throw;
 			}
 		}
@@ -248,10 +239,7 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// </summary>
 		public void CloseTransaction()
 		{
-			if (null != databaseTransaction)
-			{
-				databaseTransaction.Connection.Close();
-			}
+			databaseTransaction?.Connection.Close();
 		}
 
 		/// <summary>
@@ -262,6 +250,7 @@ namespace DigitalZenWorks.Database.ToolKit
 			if (null != databaseTransaction)
 			{
 				databaseTransaction.Commit();
+				databaseTransaction.Dispose();
 
 				databaseTransaction = null;
 			}
@@ -272,10 +261,7 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// </summary>
 		public void RollbackTransaction()
 		{
-			if (null != databaseTransaction)
-			{
-				databaseTransaction.Rollback();
-			}
+			databaseTransaction?.Rollback();
 		}
 
 		/////////////////////////////////////////////////////////////////////
@@ -344,11 +330,17 @@ namespace DigitalZenWorks.Database.ToolKit
 			{
 				if (null != command)
 				{
-					int rowsEffected = command.ExecuteNonQuery();
-
-					if (rowsEffected > 0)
+					try
 					{
+						int rowsEffected = command.ExecuteNonQuery();
+
 						returnCode = true;
+					}
+					catch (Exception exception)
+					{
+						Log.Error(exception.ToString());
+
+						throw;
 					}
 				}
 
@@ -359,6 +351,28 @@ namespace DigitalZenWorks.Database.ToolKit
 			}
 
 			return returnCode;
+		}
+
+		/// <summary>
+		/// Execture a data reader.
+		/// </summary>
+		/// <remarks>Caller is responsible for disposing returned
+		/// object.</remarks>
+		/// <param name="statement">the SQL statement to execute.</param>
+		/// <returns>A data reader.</returns>
+		public DbDataReader ExecuteReader(string statement)
+		{
+			DbDataReader dbDataReader = null;
+
+			using (DbCommand command = GetCommandObject(statement, null))
+			{
+				if (null != command)
+				{
+					dbDataReader = command.ExecuteReader();
+				}
+			}
+
+			return dbDataReader;
 		}
 
 		/////////////////////////////////////////////////////////////////////
@@ -411,7 +425,7 @@ namespace DigitalZenWorks.Database.ToolKit
 
 			DataTable dataTable = GetDataTable(sql, values);
 
-			if (dataTable.Rows.Count > 0)
+			if (dataTable != null && dataTable.Rows.Count > 0)
 			{
 				row = dataTable.Rows[0];
 			}
@@ -450,32 +464,69 @@ namespace DigitalZenWorks.Database.ToolKit
 				dataSet = new DataSet();
 				dataSet.Locale = CultureInfo.InvariantCulture;
 
-				using (DbCommand command = GetCommandObject(sql, values))
+				using DbCommand command = GetCommandObject(sql, values);
+
+				if (null != command)
 				{
-					if (null != command)
+					switch (databaseType)
 					{
-						switch (databaseType)
-						{
-							case DatabaseType.OleDb:
+						case DatabaseType.MySql:
+							dataAdapter = new MySqlDataAdapter();
+							break;
+						case DatabaseType.OleDb:
+#if NET5_0_OR_GREATER
+							if (OperatingSystem.IsWindows())
+							{
 								dataAdapter = new OleDbDataAdapter();
-								break;
-							case DatabaseType.SqlServer:
-								dataAdapter = new SqlDataAdapter();
-								break;
-							case DatabaseType.MySql:
-								dataAdapter = new MySqlDataAdapter();
-								break;
-						}
+							}
+							else
+							{
+								throw new NotSupportedException(
+									"OleDb is only available on Windows.");
+							}
+#else
+								dataAdapter = new OleDbDataAdapter();
+#endif
 
-						dataAdapter.SelectCommand = command;
-
-						dataAdapter.Fill(dataSet);
-
-						Log.Info(
-							CultureInfo.InvariantCulture,
-							m => m("OK - getDataSet - Query: {0}", sql));
+							break;
+						case DatabaseType.SQLite:
+							dataAdapter = new SQLiteDataAdapter();
+							break;
+						case DatabaseType.SqlServer:
+							dataAdapter = new SqlDataAdapter();
+							break;
+						case DatabaseType.Unknown:
+							break;
+						case DatabaseType.Oracle:
+							break;
+						default:
+							break;
 					}
+
+					if (dataAdapter != null)
+					{
+						dataAdapter.SelectCommand = command;
+						dataAdapter.Fill(dataSet);
+					}
+
+					Log.Info(
+						CultureInfo.InvariantCulture,
+						m => m("OK - getDataSet - Query: {0}", sql));
 				}
+			}
+			catch (NullReferenceException exception)
+			{
+				RollbackTransaction();
+
+				string message = StringTable.GetString(
+					"EXCEPTION", CultureInfo.InvariantCulture);
+				Log.Error(CultureInfo.InvariantCulture, m => m(
+					message + exception));
+
+				message = StringTable.GetString(
+					"COMMAND", CultureInfo.InvariantCulture);
+				Log.Error(CultureInfo.InvariantCulture, m => m(
+					message + sql));
 			}
 			catch (Exception exception)
 			{
@@ -536,13 +587,51 @@ namespace DigitalZenWorks.Database.ToolKit
 
 			using (DataSet dataSet = GetDataSet(sql, values))
 			{
-				if (dataSet.Tables.Count > 0)
+				if (dataSet != null && dataSet.Tables.Count > 0)
 				{
 					dataTable = dataSet.Tables[0];
 				}
 			}
 
 			return dataTable;
+		}
+
+		/// <summary>
+		/// Get the last insert id.
+		/// </summary>
+		/// <returns>The last insert id.</returns>
+		/// <exception cref="NotImplementedException">Throws a not implemented
+		/// exception for databases that do not have this support.</exception>
+		public int GetLastInsertId()
+		{
+			int lastId = -1;
+			string statement = null;
+
+			switch (databaseType)
+			{
+				case DatabaseType.OleDb:
+				case DatabaseType.SqlServer:
+					statement = "SELECT @@IDENTITY";
+					break;
+				case DatabaseType.SQLite:
+					statement = "SELECT LAST_INSERT_ROWID()";
+					break;
+				case DatabaseType.Unknown:
+					break;
+				case DatabaseType.Oracle:
+					break;
+				case DatabaseType.MySql:
+					break;
+				default:
+					throw new NotImplementedException();
+			}
+
+			if (statement != null)
+			{
+				lastId = ExecuteScalar(statement);
+			}
+
+			return lastId;
 		}
 
 		/////////////////////////////////////////////////////////////////////
@@ -581,10 +670,15 @@ namespace DigitalZenWorks.Database.ToolKit
 				}
 
 				// execute non query
-				ExecuteNonQuery(sql, values);
+				bool result = ExecuteNonQuery(sql, values);
+
+				if (result == false)
+				{
+					Log.Warn("ExecuteNonQuery returns false");
+				}
 
 				// get id of effected row
-				returnCode = ExecuteScalar("SELECT @@IDENTITY");
+				returnCode = GetLastInsertId();
 
 				if (true == finishTransaction)
 				{
@@ -622,8 +716,8 @@ namespace DigitalZenWorks.Database.ToolKit
 		{
 			bool connected = false;
 
-			if ((null != connection) &&
-				(connection.State == ConnectionState.Open))
+			if ((null != Connection) &&
+				(Connection.State == ConnectionState.Open))
 			{
 				connected = true;
 			}
@@ -667,71 +761,6 @@ namespace DigitalZenWorks.Database.ToolKit
 			return ExecuteNonQuery(sql, values);
 		}
 
-		/////////////////////////////////////////////////////////////////////
-		/// <summary>
-		/// Temp test method.
-		/// </summary>
-		/// <returns>A value indicating success or not.</returns>
-		/////////////////////////////////////////////////////////////////////
-		public int Test()
-		{
-			int returnCode = -1;
-			OleDbCommand commandObject1 = null;
-			OleDbCommand commandObject2 = null;
-
-			try
-			{
-				Initialize();
-
-				string sql =
-					"INSERT INTO Contacts (Notes) VALUES ('testing')";
-				string sql2 = "SELECT @@IDENTITY";
-
-				commandObject1 = new OleDbCommand(sql, oleDbConnection);
-				commandObject2 = new OleDbCommand(sql2, oleDbConnection);
-
-				oleDbConnection.Open();
-
-				object result = commandObject1.ExecuteScalar();
-
-				if (null != result)
-				{
-					returnCode = (int)result;
-				}
-
-				returnCode = (int)commandObject2.ExecuteScalar();
-			}
-			catch (Exception exception)
-			{
-				RollbackTransaction();
-
-				Log.Error(CultureInfo.InvariantCulture, m => m(
-					StringTable.GetString(
-						"EXCEPTION",
-						CultureInfo.InvariantCulture) + exception));
-
-				throw;
-			}
-			finally
-			{
-				Close();
-
-				if (commandObject1 != null)
-				{
-					commandObject1.Dispose();
-					commandObject1 = null;
-				}
-
-				if (commandObject2 != null)
-				{
-					commandObject2.Dispose();
-					commandObject2 = null;
-				}
-			}
-
-			return returnCode;
-		}
-
 		/// <summary>
 		/// Dispose.
 		/// </summary>
@@ -741,12 +770,24 @@ namespace DigitalZenWorks.Database.ToolKit
 		{
 			if (disposing)
 			{
+#if NET5_0_OR_GREATER
+				if (OperatingSystem.IsWindows())
+				{
+					if (null != oleDbConnection)
+					{
+						oleDbConnection.Close();
+						oleDbConnection.Dispose();
+						oleDbConnection = null;
+					}
+				}
+#else
 				if (null != oleDbConnection)
 				{
 					oleDbConnection.Close();
 					oleDbConnection.Dispose();
 					oleDbConnection = null;
 				}
+#endif
 
 				if (null != mySqlConnection)
 				{
@@ -768,35 +809,17 @@ namespace DigitalZenWorks.Database.ToolKit
 					databaseTransaction = null;
 				}
 
-				if (null != connection)
+				if (null != Connection)
 				{
-					connection.Close();
-					connection.Dispose();
-					connection = null;
+					Connection.Dispose();
+					Connection = null;
 				}
 			}
 		}
 
-		private static DbParameterCollection AddParameters(
-			DbCommand command, IDictionary<string, object> values)
-		{
-			DbParameterCollection parameters = command.Parameters;
-
-			foreach (KeyValuePair<string, object> valuePair in values)
-			{
-				if (null == valuePair.Value)
-				{
-					parameters.Add(DBNull.Value);
-				}
-				else
-				{
-					parameters.Add(valuePair.Value);
-				}
-			}
-
-			return parameters;
-		}
-
+#if NET5_0_OR_GREATER
+		[SupportedOSPlatform("windows")]
+#endif
 		private static OleDbParameterCollection AddParameters(
 			OleDbCommand command, IDictionary<string, object> values)
 		{
@@ -805,14 +828,20 @@ namespace DigitalZenWorks.Database.ToolKit
 			foreach (KeyValuePair<string, object> valuePair in values)
 			{
 				string name = "@" + valuePair.Key;
+				OleDbParameter parameter;
 
 				if (null == valuePair.Value)
 				{
-					parameters.AddWithValue(name, DBNull.Value);
+					parameter = parameters.AddWithValue(name, DBNull.Value);
 				}
 				else
 				{
-					parameters.AddWithValue(name, valuePair.Value);
+					parameter = parameters.AddWithValue(name, valuePair.Value);
+				}
+
+				if (parameter == null)
+				{
+					Log.Warn("Parameters.AddWithValue returns null");
 				}
 			}
 
@@ -848,7 +877,7 @@ namespace DigitalZenWorks.Database.ToolKit
 								column.DataType.Name,
 								StringComparison.Ordinal))
 							{
-								var columnValue = Convert.ChangeType(
+								object columnValue = Convert.ChangeType(
 									dataRow[column.ColumnName],
 									propertyDetails.PropertyType,
 									CultureInfo.InvariantCulture);
@@ -873,31 +902,47 @@ namespace DigitalZenWorks.Database.ToolKit
 
 		private static string GetSingularPascalName(string columnName)
 		{
-			return GeneralUtilities.ConvertToPascalCaseFromKnr(columnName);
+			string result = TextCase.ConvertToPascalCaseFromKnr(columnName);
+
+			return result;
 		}
 
-		private string CreateConnectionString(
-			string provider, string dataSource, string catalog)
+		private DbParameterCollection AddParameters(
+			DbCommand command, IDictionary<string, object> values)
 		{
-			string connectionString = null;
+			DbParameterCollection parameters = command.Parameters;
 
-			if (null != provider)
+			foreach (KeyValuePair<string, object> valuePair in values)
 			{
-				connectionString = "provider=" + provider;
+				int result;
+
+				if (null == valuePair.Value)
+				{
+					result = parameters.Add(DBNull.Value);
+				}
+				else
+				{
+					object keyPairValue = valuePair.Value;
+
+					if (databaseType == DatabaseType.SQLite)
+					{
+						SQLiteParameter parameter =
+							new (DbType.String, keyPairValue);
+						result = parameters.Add(parameter);
+					}
+					else
+					{
+						result = parameters.Add(keyPairValue);
+					}
+				}
+
+				if (result == 0)
+				{
+					Log.Warn("DbParameterCollection.Add returns 0");
+				}
 			}
 
-			if (null != dataSource)
-			{
-				connectionString += "; Data Source=" + dataSource;
-			}
-
-			if (null != catalog)
-			{
-				connectionString +=
-					"; Integrated Security=SSPI; Initial catalog=" + catalog;
-			}
-
-			return connectionString;
+			return parameters;
 		}
 
 		/////////////////////////////////////////////////////////////////////
@@ -932,10 +977,6 @@ namespace DigitalZenWorks.Database.ToolKit
 			return result;
 		}
 
-		[System.Diagnostics.CodeAnalysis.SuppressMessage(
-			"Microsoft.Security",
-			"CA2100:Review SQL queries for security vulnerabilities",
-			Justification = "This is a generic function.  Evaluations should be done higher up the chain.")]
 		private DbCommand GetCommandObject(
 			string sql, IDictionary<string, object> values)
 		{
@@ -949,17 +990,36 @@ namespace DigitalZenWorks.Database.ToolKit
 				{
 					switch (databaseType)
 					{
+						case DatabaseType.MySql:
+							command = new MySqlCommand();
+							break;
 						case DatabaseType.OleDb:
+#if NET5_0_OR_GREATER
+							if (OperatingSystem.IsWindows())
+							{
+								command = new OleDbCommand();
+							}
+							else
+							{
+								throw new NotSupportedException(
+									"OleDb is only available on Windows.");
+							}
+#else
 							command = new OleDbCommand();
+#endif
+
+							break;
+						case DatabaseType.SQLite:
+							command = new SQLiteCommand();
 							break;
 						case DatabaseType.SqlServer:
 							command = new SqlCommand();
 							break;
-						case DatabaseType.MySql:
-							command = new MySqlCommand();
+						case DatabaseType.Unknown:
 							break;
-						case DatabaseType.SQLite:
-							command = new SQLiteCommand();
+						case DatabaseType.Oracle:
+							break;
+						default:
 							break;
 					}
 
@@ -970,18 +1030,24 @@ namespace DigitalZenWorks.Database.ToolKit
 							case DatabaseType.OleDb:
 								AddParameters((OleDbCommand)command, values);
 								break;
-							case DatabaseType.SqlServer:
 							case DatabaseType.MySql:
 							case DatabaseType.SQLite:
+							case DatabaseType.SqlServer:
 								AddParameters(command, values);
+								break;
+							case DatabaseType.Unknown:
+								break;
+							case DatabaseType.Oracle:
+								break;
+							default:
 								break;
 						}
 					}
 
 					command.Transaction = databaseTransaction;
-					command.Connection = connection;
+					command.Connection = Connection;
 					command.CommandText = sql;
-					command.CommandTimeout = timeOut;
+					command.CommandTimeout = TimeOut;
 				}
 			}
 			catch (Exception exception)
@@ -1014,68 +1080,82 @@ namespace DigitalZenWorks.Database.ToolKit
 			{
 				if (true == forceReset)
 				{
-					if ((null != connection) &&
-						(connection.State == ConnectionState.Open))
+					if ((null != Connection) &&
+						(Connection.State == ConnectionState.Open))
 					{
-						connection.Dispose();
-						connection = null;
+						Connection.Dispose();
+						Connection = null;
 					}
 				}
 
-				if (null == connection)
+				if (null == Connection)
 				{
 					switch (databaseType)
 					{
+						case DatabaseType.MySql:
+							mySqlConnection =
+								new MySqlConnection(connectionText);
+							Connection = mySqlConnection;
+							break;
 						case DatabaseType.OleDb:
+#if NET5_0_OR_GREATER
+							if (OperatingSystem.IsWindows())
+							{
+								// Two statements help in debugging problems
+								oleDbConnection =
+									new OleDbConnection(connectionText);
+								Connection = oleDbConnection;
+							}
+							else
+							{
+								throw new NotSupportedException(
+									"OleDb is only available on Windows.");
+							}
+#else
 							// Two statements help in debugging problems
 							oleDbConnection =
 								new OleDbConnection(connectionText);
 							connection = oleDbConnection;
-							break;
-						case DatabaseType.SqlServer:
-							connection =
-								new SqlConnection(connectionText);
-							break;
-						case DatabaseType.MySql:
-							mySqlConnection =
-								new MySqlConnection(connectionText);
-							connection = mySqlConnection;
+#endif
+
 							break;
 						case DatabaseType.SQLite:
 							sqliteConnection =
 								new SQLiteConnection(connectionText);
+							Connection = sqliteConnection;
+							break;
+						case DatabaseType.SqlServer:
+							Connection =
+								new SqlConnection(connectionText);
+							break;
+						case DatabaseType.Unknown:
+							break;
+						case DatabaseType.Oracle:
+							break;
+						default:
 							break;
 					}
 				}
 
-				if ((null != connection) &&
-					(connection.State != ConnectionState.Open))
+				if ((null != Connection) &&
+					(Connection.State != ConnectionState.Open))
 				{
-					connection.Open();
-					connection.Close();
-					Dispose(true);
-					connection = null;
+					Connection.Open();
 				}
 
 				returnValue = true;
-			}
-			catch (AccessViolationException exception)
-			{
-				RollbackTransaction();
-
-				Log.Error(CultureInfo.InvariantCulture, m => m(
-					StringTable.GetString(
-						"EXCEPTION",
-						CultureInfo.InvariantCulture) + exception));
 			}
 			catch (Exception exception)
 			{
 				RollbackTransaction();
 
-				Log.Error(CultureInfo.InvariantCulture, m => m(
-					StringTable.GetString(
-						"EXCEPTION",
-						CultureInfo.InvariantCulture) + exception));
+				string prefix = StringTable.GetString(
+					"EXCEPTION",
+					CultureInfo.InvariantCulture);
+
+				string message = prefix + exception.ToString();
+
+				Log.Error(message);
 
 				throw;
 			}

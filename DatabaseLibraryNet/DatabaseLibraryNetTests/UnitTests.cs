@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-// Copyright © 2006 - 2022 by James John McGuire
+// Copyright @ 2006 - 2025 by James John McGuire
 // All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
@@ -8,7 +8,9 @@ using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.Common;
 using System.Data.OleDb;
+using System.Data.SQLite;
 using System.Globalization;
 using System.IO;
 using System.Reflection;
@@ -41,32 +43,55 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 		[OneTimeSetUp]
 		public void OneTimeSetUp()
 		{
-			string provider = "Microsoft.ACE.OLEDB.12.0";
-
 			dataSource = GetTestDatabasePath();
+
+			SQLiteConnection.CreateFile(dataSource);
+
+			string connectionBase = "Data Source={0};Version=3;" +
+				"DateTimeFormat=InvariantCulture";
 
 			string connectionString = string.Format(
 				CultureInfo.InvariantCulture,
-				"provider={0}; Data Source={1}",
-				provider,
+				connectionBase,
 				dataSource);
 
-			database = new DataStorage(DatabaseType.OleDb, connectionString);
+			database = new DataStorage(DatabaseType.SQLite, connectionString);
 		}
 
 		/////////////////////////////////////////////////////////////////////
-		/// Method <c>Teardown</c>
+		/// Method <c>OneTimeTearDown</c>
 		/// <summary>
-		/// function that is called just after each test method is called.
+		/// function that is called when all tests are completed.
 		/// </summary>
 		/////////////////////////////////////////////////////////////////////
-		[TearDown]
-		public void Teardown()
+		[OneTimeTearDown]
+		public void OneTimeTearDown()
 		{
 			if (database != null)
 			{
 				database.CommitTransaction();
 				database.Shutdown();
+			}
+
+			File.Delete(dataSource);
+		}
+
+		[TearDown]
+		public void TearDown()
+		{
+			if (database != null)
+			{
+				if (database.Connection != null)
+				{
+					ConnectionState state = database.Connection.State;
+
+					if (state == ConnectionState.Open)
+					{
+						database.Connection.Close();
+					}
+				}
+
+				database.Close();
 			}
 		}
 
@@ -106,7 +131,29 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 		{
 			bool AlwaysTrue = true;
 
-			Assert.IsTrue(AlwaysTrue);
+			Assert.That(AlwaysTrue, Is.True);
+		}
+
+		/////////////////////////////////////////////////////////////////////
+		/// Method <c>CreateTableTest</c>
+		/// <summary>
+		/// Create table test
+		/// </summary>
+		/////////////////////////////////////////////////////////////////////
+		[Test, Order(1)]
+		public void CreateTableTest()
+		{
+			string statement = "CREATE TABLE TestTable " +
+				"(id INTEGER PRIMARY KEY, description VARCHAR(64))";
+
+			bool result = database.ExecuteNonQuery(statement);
+
+			statement = "SELECT name FROM sqlite_master " +
+				"WHERE type = 'table' AND name = 'TestTable';";
+
+			using DbDataReader dbDataReader = database.ExecuteReader(statement);
+
+			Assert.That(dbDataReader.HasRows, Is.True);
 		}
 
 		/////////////////////////////////////////////////////////////////////
@@ -115,26 +162,26 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 		/// Test to see if test db exists
 		/// </summary>
 		/////////////////////////////////////////////////////////////////////
-		[Test]
-		public void DatabaseCanOpen()
-		{
-			string provider = "Microsoft.ACE.OLEDB.12.0";
+		//[Test]
+		//public void DatabaseCanOpen()
+		//{
+		//	string provider = "Microsoft.ACE.OLEDB.12.0";
 
-			string connectionString = string.Format(
-				CultureInfo.InvariantCulture,
-				"provider={0}; Data Source={1}",
-				provider,
-				dataSource);
-			using (OleDbConnection oleDbConnection =
-				new OleDbConnection(connectionString))
-			{
-				oleDbConnection.Open();
-				oleDbConnection.Close();
-			}
+		//	string connectionString = string.Format(
+		//		CultureInfo.InvariantCulture,
+		//		"provider={0}; Data Source={1}",
+		//		provider,
+		//		dataSource);
+		//	using (OleDbConnection oleDbConnection =
+		//		new OleDbConnection(connectionString))
+		//	{
+		//		oleDbConnection.Open();
+		//		oleDbConnection.Close();
+		//	}
 
-			// assuming no exceptions
-			Assert.IsTrue(File.Exists(dataSource));
-		}
+		//	// assuming no exceptions
+		//	Assert.IsTrue(File.Exists(dataSource));
+		//}
 
 		/////////////////////////////////////////////////////////////////////
 		/// Method <c>VerifyTestSourceExists</c>
@@ -145,7 +192,7 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 		[Test]
 		public void VerifyTestSourceExists()
 		{
-			Assert.IsTrue(File.Exists(dataSource));
+			Assert.That(File.Exists(dataSource), Is.True);
 		}
 
 		/////////////////////////////////////////////////////////////////////
@@ -160,7 +207,7 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 			bool canQuery = database.CanQuery();
 
 			// No exceptions found
-			Assert.IsTrue(canQuery);
+			Assert.That(canQuery, Is.True);
 		}
 
 		/////////////////////////////////////////////////////////////////////
@@ -176,8 +223,10 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 
 			DataSet dataSet = database.GetDataSet(query);
 
+			Assert.That(dataSet, Is.Not.Null);
+
 			// No exceptions found
-			Assert.GreaterOrEqual(dataSet.Tables.Count, 0);
+			Assert.That(dataSet.Tables.Count, Is.GreaterThanOrEqualTo(0));
 		}
 
 		/////////////////////////////////////////////////////////////////////////
@@ -196,6 +245,8 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 							@"('" + Description + "')";
 
 			int rowId = database.Insert(SqlQueryCommand);
+
+			Assert.That(rowId, Is.GreaterThanOrEqualTo(1));
 
 			VerifyRowExists(rowId, true);
 		}
@@ -221,7 +272,7 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 
 			bool Result = database.Delete(query);
 
-			Assert.IsTrue(Result);
+			Assert.That(Result, Is.True);
 
 			VerifyRowExists(rowId, false);
 		}
@@ -241,7 +292,8 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 
 			string csvFile = tempPath + "TestTable.csv";
 
-			Assert.IsTrue(File.Exists(csvFile));
+			bool exists = File.Exists(csvFile);
+			Assert.That(exists, Is.True);
 		}
 
 		/////////////////////////////////////////////////////////////////////////
@@ -255,7 +307,7 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 		{
 			DataTable table = database.SchemaTable;
 
-			Assert.NotNull(table);
+			Assert.That(table, Is.Not.Null);
 		}
 
 		/////////////////////////////////////////////////////////////////////////
@@ -275,7 +327,7 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 
 			bool result = database.Update(query);
 
-			Assert.True(result);
+			Assert.That(result, Is.True);
 		}
 
 		/////////////////////////////////////////////////////////////////////////
@@ -290,13 +342,12 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 			string description = "Unit Test - Time: " + DateTime.Now;
 			string query = "UPDATE TestTable SET [Description] = ?";
 
-			IDictionary<string, object> parameters =
-				new Dictionary<string, object>();
+			Dictionary<string, object> parameters = new ();
 			parameters.Add("[Description]", description);
 
 			bool result = database.Update(query, parameters);
 
-			Assert.True(result);
+			Assert.That(result, Is.True);
 		}
 
 		private static string GetTestDatabasePath()
@@ -305,9 +356,7 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 
 			// A 0 byte sized file is created.  Need to remove it.
 			File.Delete(fileName);
-			string databasePath = Path.ChangeExtension(fileName, ".accdb");
-
-			DatabaseUtilities.CreateAccessDatabaseFile(databasePath);
+			string databasePath = Path.ChangeExtension(fileName, ".db");
 
 			return databasePath;
 		}
@@ -320,11 +369,11 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 
 			if (true == shouldExist)
 			{
-				Assert.NotNull(tempDataRow);
+				Assert.That(tempDataRow, Is.Not.Null);
 			}
 			else
 			{
-				Assert.IsNull(tempDataRow);
+				Assert.That(tempDataRow, Is.Null);
 			}
 		}
 	}	// end class

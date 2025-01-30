@@ -1,6 +1,6 @@
 ﻿/////////////////////////////////////////////////////////////////////////////
 // <copyright file="DataDefinition.cs" company="James John McGuire">
-// Copyright © 2006 - 2022 James John McGuire. All Rights Reserved.
+// Copyright © 2006 - 2025 James John McGuire. All Rights Reserved.
 // </copyright>
 /////////////////////////////////////////////////////////////////////////////
 
@@ -13,6 +13,7 @@ using System.Globalization;
 using System.IO;
 using System.Reflection;
 using System.Resources;
+using System.Runtime.Versioning;
 
 namespace DigitalZenWorks.Database.ToolKit
 {
@@ -30,8 +31,7 @@ namespace DigitalZenWorks.Database.ToolKit
 		private static readonly ILog Log = LogManager.GetLogger(
 			System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-		private static readonly ResourceManager StringTable = new
-			ResourceManager(
+		private static readonly ResourceManager StringTable = new (
 			"DigitalZenWorks.Database.ToolKit.Resources",
 			Assembly.GetExecutingAssembly());
 
@@ -44,6 +44,9 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// <param name="databaseFile">The database file to use.</param>
 		/// <param name="schemaFile">The schema file to export to.</param>
 		/////////////////////////////////////////////////////////////////////
+#if NET5_0_OR_GREATER
+		[SupportedOSPlatform("windows")]
+#endif
 		public static bool ExportSchema(string databaseFile, string schemaFile)
 		{
 			bool successCode = false;
@@ -95,10 +98,22 @@ namespace DigitalZenWorks.Database.ToolKit
 
 			if (!string.IsNullOrWhiteSpace(dataDefinition))
 			{
+#if NETCOREAPP1_0_OR_GREATER
+				char check = '(';
+#else
+				string check = "(";
+#endif
+
 				int splitIndex = dataDefinition.IndexOf(
-					"(",
-					StringComparison.Ordinal) + 1;
+					check,
+					StringComparison.Ordinal);
+
+				splitIndex++;
+#if NETCOREAPP1_0_OR_GREATER
+				columnsInfo = dataDefinition[splitIndex..];
+#else
 				columnsInfo = dataDefinition.Substring(splitIndex);
+#endif
 			}
 
 			return columnsInfo;
@@ -113,7 +128,7 @@ namespace DigitalZenWorks.Database.ToolKit
 			string column)
 		{
 			string[] columnTypeComareKeys =
-			{
+			[
 				"AUTONUMBER", "IDENTITY",
 				"AUTOINCREMENT", "BIGINT", "LONGVARBINARY", "LONGVARCHAR",
 				"VARBINARY", "VARCHAR", "BINARY", "BIT", "LONGBLOB",
@@ -127,10 +142,10 @@ namespace DigitalZenWorks.Database.ToolKit
 				"OLEOBJECT", "OLE", "REAL", "SET", "SINGLE", "SQLVARIANT",
 				"STRING", "TABLE", "TINYTEXT", "TEXT", "TIMESTAMP", "TIME",
 				"UNIQUEIDENTIFIER", "XML", "YEAR", "YESNO"
-			};
+			];
 
 			ColumnType[] types =
-			{
+			[
 				ColumnType.AutoNumber, ColumnType.Identity,
 				ColumnType.Identity, ColumnType.BigInt,
 				ColumnType.LongVarBinary, ColumnType.LongVarChar,
@@ -155,7 +170,7 @@ namespace DigitalZenWorks.Database.ToolKit
 				ColumnType.Text, ColumnType.Timestamp, ColumnType.Time,
 				ColumnType.UniqueIdentifier, ColumnType.Xml, ColumnType.Year,
 				ColumnType.Boolean
-			};
+			];
 
 			ColumnType columnType = ColumnType.Other;
 
@@ -221,6 +236,9 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// <param name="oleDbSchema">The OLE database schema.</param>
 		/// <param name="tableName">The table name.</param>
 		/// <returns>A list of relationships.</returns>
+#if NET5_0_OR_GREATER
+		[SupportedOSPlatform("windows")]
+#endif
 		public static ArrayList GetRelationships(
 			OleDbSchema oleDbSchema, string tableName)
 		{
@@ -229,7 +247,7 @@ namespace DigitalZenWorks.Database.ToolKit
 			if ((null != oleDbSchema) &&
 				(!string.IsNullOrWhiteSpace(tableName)))
 			{
-				relationships = new System.Collections.ArrayList();
+				relationships = [];
 
 				DataTable foreignKeyTable = oleDbSchema.GetForeignKeys(tableName);
 
@@ -255,10 +273,10 @@ namespace DigitalZenWorks.Database.ToolKit
 
 			if (!string.IsNullOrWhiteSpace(tableDefinitionsFile))
 			{
-				string[] stringSeparators = new string[] { "\r\n\r\n" };
+				string[] stringSeparators = ["\n\n", "\r\n\r\n"];
 				queries = tableDefinitionsFile.Split(
 					stringSeparators,
-					32000,
+					64000,
 					StringSplitOptions.RemoveEmptyEntries);
 			}
 
@@ -276,10 +294,10 @@ namespace DigitalZenWorks.Database.ToolKit
 
 			if (!string.IsNullOrWhiteSpace(dataDefinition))
 			{
-				string[] tableParts = dataDefinition.Split(new char[] { '(' });
+				char separators = '(';
+				string[] tableParts = dataDefinition.Split(separators);
 
-				string[] tableNameParts =
-					tableParts[0].Split(new char[] { '[', ']', '`' });
+				string[] tableNameParts = tableParts[0].Split(['[', ']', '`']);
 
 				if (tableNameParts.Length > 1)
 				{
@@ -291,7 +309,7 @@ namespace DigitalZenWorks.Database.ToolKit
 		}
 
 		/// <summary>
-		/// Creates a mdb file with the given schema.
+		/// Creates a file with the given schema.
 		/// </summary>
 		/// <param name="schemaFile">The schema file.</param>
 		/// <param name="databaseFile">The database file.</param>
@@ -304,59 +322,32 @@ namespace DigitalZenWorks.Database.ToolKit
 			{
 				if (File.Exists(schemaFile))
 				{
-					string provider = "Microsoft.ACE.OLEDB.12.0";
-					string connectionString = string.Format(
-						CultureInfo.InvariantCulture,
-						"provider={0}; Data Source={1}",
-						provider,
-						databaseFile);
-
 					string fileContents = File.ReadAllText(schemaFile);
 
-					string[] stringSeparators = new string[] { "\r\n\r\n" };
+					string[] stringSeparators = ["\r\n\r\n"];
 					string[] queries = fileContents.Split(
 						stringSeparators,
 						32000,
 						StringSplitOptions.RemoveEmptyEntries);
 
-					using (DataStorage database = new DataStorage(
-						DatabaseType.OleDb, connectionString))
+					string extension = Path.GetExtension(databaseFile);
+
+					if (extension.Equals(
+							".mdb", StringComparison.OrdinalIgnoreCase) ||
+						extension.Equals(
+							".accdb", StringComparison.OrdinalIgnoreCase))
 					{
-						foreach (string sqlQuery in queries)
-						{
-							try
-							{
-								Log.Info(CultureInfo.InvariantCulture, m => m(
-								StringTable.GetString(
-									"COMMAND", CultureInfo.InvariantCulture) +
-									sqlQuery));
-
-								database.ExecuteNonQuery(sqlQuery);
-							}
-							catch (Exception exception) when
-								(exception is ArgumentNullException ||
-								exception is OutOfMemoryException ||
-								exception is System.Data.OleDb.OleDbException)
-							{
-								Log.Error(CultureInfo.InvariantCulture, m => m(
-									StringTable.GetString(
-										"EXCEPTION",
-										CultureInfo.InvariantCulture) +
-										exception));
-							}
-							catch (Exception exception)
-							{
-								Log.Error(CultureInfo.InvariantCulture, m => m(
-									StringTable.GetString(
-										"EXCEPTION",
-										CultureInfo.InvariantCulture) +
-										exception));
-
-								throw;
-							}
-						}
-
-						successCode = true;
+						string provider = "Microsoft.ACE.OLEDB.12.0";
+						string connectionString = string.Format(
+							CultureInfo.InvariantCulture,
+							"provider={0}; Data Source={1}",
+							provider,
+							databaseFile);
+						successCode = ImportSchemaMdb(queries, databaseFile);
+					}
+					else
+					{
+						throw new NotImplementedException();
 					}
 				}
 			}
@@ -398,7 +389,11 @@ namespace DigitalZenWorks.Database.ToolKit
 
 			if (!string.IsNullOrWhiteSpace(field))
 			{
-				if (field.Contains("Time") || field.Contains("time"))
+#if NETSTANDARD2_1_OR_GREATER || NET5_0_OR_GREATER
+				if (field.Contains("time", StringComparison.OrdinalIgnoreCase))
+#else
+				if (field.Contains("time"))
+#endif
 				{
 					returnCode = true;
 				}
@@ -415,9 +410,16 @@ namespace DigitalZenWorks.Database.ToolKit
 		{
 			bool found = false;
 
+#if NETSTANDARD2_1_OR_GREATER || NET5_0_OR_GREATER
+			if (column.ToUpperInvariant().Contains(
+					nameCheck, StringComparison.OrdinalIgnoreCase) ||
+				column.ToUpperInvariant().Equals(
+					nameCheck, StringComparison.Ordinal))
+#else
 			if (column.ToUpperInvariant().Contains(nameCheck) ||
 				column.ToUpperInvariant().Equals(
 					nameCheck, StringComparison.Ordinal))
+#endif
 			{
 				columnTypeOut = columnType;
 				found = true;
@@ -426,9 +428,47 @@ namespace DigitalZenWorks.Database.ToolKit
 			return found;
 		}
 
+		private static void ExecuteQueries(
+			DataStorage database, string[] queries)
+		{
+			foreach (string sqlQuery in queries)
+			{
+				try
+				{
+					string command = StringTable.GetString(
+						"COMMAND", CultureInfo.InvariantCulture);
+					string message = command + sqlQuery;
+					Log.Info(message);
+
+					database.ExecuteNonQuery(sqlQuery);
+				}
+				catch (Exception exception) when
+					(exception is ArgumentNullException ||
+					exception is OutOfMemoryException ||
+					exception is System.Data.OleDb.OleDbException)
+				{
+					string command = StringTable.GetString(
+						"EXCEPTION", CultureInfo.InvariantCulture);
+					string message = command + exception;
+
+					Log.Error(message);
+				}
+				catch (Exception exception)
+				{
+					string command = StringTable.GetString(
+						"EXCEPTION", CultureInfo.InvariantCulture);
+					string message = command + exception;
+
+					Log.Error(message);
+
+					throw;
+				}
+			}
+		}
+
 		private static Column FormatColumnFromDataRow(DataRow row)
 		{
-			Column column = new Column();
+			Column column = new ();
 			column.Name = row["COLUMN_NAME"].ToString();
 
 			switch ((int)row["DATA_TYPE"])
@@ -508,7 +548,7 @@ namespace DigitalZenWorks.Database.ToolKit
 		private static ForeignKey GetForeignKeyRelationship(
 			Relationship relationship)
 		{
-			ForeignKey foreignKey = new ForeignKey(
+			ForeignKey foreignKey = new (
 				relationship.Name,
 				relationship.ChildTableCol,
 				relationship.ParentTable,
@@ -521,7 +561,7 @@ namespace DigitalZenWorks.Database.ToolKit
 
 		private static Relationship GetRelationship(DataRow foreignKey)
 		{
-			Relationship relationship = new Relationship();
+			Relationship relationship = new ();
 			relationship.Name = foreignKey["FK_NAME"].ToString();
 			relationship.ParentTable =
 				foreignKey["PK_TABLE_NAME"].ToString();
@@ -545,14 +585,17 @@ namespace DigitalZenWorks.Database.ToolKit
 			return relationship;
 		}
 
+#if NET5_0_OR_GREATER
+		[SupportedOSPlatform("windows")]
+#endif
 		private static Hashtable GetSchema(string databaseFile)
 		{
 			Hashtable tables = null;
 
-			using (OleDbSchema oleDbSchema = new OleDbSchema(databaseFile))
+			using (OleDbSchema oleDbSchema = new (databaseFile))
 			{
-				tables = new System.Collections.Hashtable();
-				ArrayList relationships = new System.Collections.ArrayList();
+				tables = [];
+				ArrayList relationships = [];
 
 				DataTable tableNames = oleDbSchema.TableNames;
 
@@ -560,7 +603,7 @@ namespace DigitalZenWorks.Database.ToolKit
 				{
 					string tableName = row["TABLE_NAME"].ToString();
 
-					Table table = new Table(tableName);
+					Table table = new (tableName);
 
 					Log.Info(
 						CultureInfo.InvariantCulture,
@@ -624,12 +667,34 @@ namespace DigitalZenWorks.Database.ToolKit
 			return tables;
 		}
 
+		private static bool ImportSchemaMdb(
+			string[] queries, string databaseFile)
+		{
+			bool successCode = false;
+
+			string provider = "Microsoft.ACE.OLEDB.12.0";
+			string connectionString = string.Format(
+				CultureInfo.InvariantCulture,
+				"provider={0}; Data Source={1}",
+				provider,
+				databaseFile);
+
+			using (DataStorage database =
+				new (DatabaseType.OleDb, connectionString))
+			{
+				ExecuteQueries(database, queries);
+				successCode = true;
+			}
+
+			return successCode;
+		}
+
 		// Return an array list in the order that the tables need to be added
 		// to take dependencies into account
 		private static ArrayList OrderTable(Hashtable hashTable)
 		{
-			Hashtable list = new Hashtable();
-			ArrayList dependencies = new ArrayList();
+			Hashtable list = [];
+			ArrayList dependencies = [];
 
 			foreach (DictionaryEntry entry in hashTable)
 			{
@@ -655,7 +720,7 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// <returns>A sorted arraylist.</returns>
 		private static ArrayList TopologicalSort(Hashtable table)
 		{
-			ArrayList sortedList = new ArrayList();
+			ArrayList sortedList = [];
 			object key;
 			ArrayList dependencies;
 
@@ -837,8 +902,7 @@ namespace DigitalZenWorks.Database.ToolKit
 				Environment.NewLine);
 
 			// Sort Columns into ordinal positions
-			System.Collections.SortedList columns =
-				new System.Collections.SortedList();
+			System.Collections.SortedList columns = [];
 
 			foreach (DictionaryEntry entry in table.Columns)
 			{
