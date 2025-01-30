@@ -252,7 +252,7 @@ namespace DigitalZenWorks.Database.ToolKit
 		{
 			if (buffers != null)
 			{
-				StringBuilder builder = new();
+				StringBuilder builder = new ();
 
 				foreach (IList<string> buffer in buffers)
 				{
