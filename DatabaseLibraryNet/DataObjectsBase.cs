@@ -380,5 +380,5 @@ namespace DigitalZenWorks.Database.ToolKit
 				}
 			}
 		}
-	} // End Class
-} // end Namespace
+	}
+}

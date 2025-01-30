@@ -376,6 +376,5 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 				Assert.That(tempDataRow, Is.Null);
 			}
 		}
-	}	// end class
-
-}	// end namespace
+	}
+}
