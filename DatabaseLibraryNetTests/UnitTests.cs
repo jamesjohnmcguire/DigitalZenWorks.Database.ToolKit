@@ -26,7 +26,7 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 	/// </summary>
 	/////////////////////////////////////////////////////////////////////////
 	[TestFixture]
-	public class TransactionUnitTests: IDisposable
+	internal class TransactionUnitTests : IDisposable
 	{
 		/// <summary>
 		/// database
