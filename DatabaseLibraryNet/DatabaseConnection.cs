@@ -4,7 +4,10 @@
 // </copyright>
 /////////////////////////////////////////////////////////////////////////////
 
+using Dapper;
+using MySql.Data.MySqlClient;
 using System;
+using System.Data;
 
 namespace DigitalZenWorks.Database.ToolKit
 {
@@ -13,7 +16,8 @@ namespace DigitalZenWorks.Database.ToolKit
 	/// </summary>
 	public class DatabaseConnection : IDisposable
 	{
-		private string connectionString;
+		private readonly string connectionString;
+		private IDbConnection databaseConnection;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="DatabaseConnection"/>
@@ -24,6 +28,7 @@ namespace DigitalZenWorks.Database.ToolKit
 		public DatabaseConnection(string connectionString)
 		{
 			this.connectionString = connectionString;
+			databaseConnection = new MySqlConnection(connectionString);
 		}
 
 		/// <summary>
@@ -44,6 +49,11 @@ namespace DigitalZenWorks.Database.ToolKit
 		{
 			if (disposing)
 			{
+				if (databaseConnection != null)
+				{
+					databaseConnection.Dispose();
+					databaseConnection = null;
+				}
 			}
 		}
 	}
