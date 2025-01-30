@@ -8,6 +8,7 @@ using Common.Logging;
 using DigitalZenWorks.Common.Utilities;
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Data;
 using System.Globalization;
 using System.IO;
@@ -591,11 +592,11 @@ namespace DigitalZenWorks.Database.ToolKit
 		private static Hashtable GetSchema(string databaseFile)
 		{
 			Hashtable tables = null;
+			List<Relationship> relationships = [];
 
 			using (OleDbSchema oleDbSchema = new (databaseFile))
 			{
 				tables = [];
-				ArrayList relationships = [];
 
 				DataTable tableNames = oleDbSchema.TableNames;
 
@@ -603,20 +604,7 @@ namespace DigitalZenWorks.Database.ToolKit
 				{
 					string tableName = row["TABLE_NAME"].ToString();
 
-					Table table = new (tableName);
-
-					Log.Info(
-						CultureInfo.InvariantCulture,
-						m => m("Getting Columns for " + tableName));
-					DataTable dataColumns =
-						oleDbSchema.GetTableColumns(tableName);
-
-					foreach (DataRow dataColumn in dataColumns.Rows)
-					{
-						Column column = FormatColumnFromDataRow(dataColumn);
-
-						table.AddColumn(column);
-					}
+					Table table = GetTable(oleDbSchema, tableName);
 
 					// Get primary key
 					DataTable primary_key_table =
@@ -665,6 +653,28 @@ namespace DigitalZenWorks.Database.ToolKit
 			}
 
 			return tables;
+		}
+
+#if NET5_0_OR_GREATER
+		[SupportedOSPlatform("windows")]
+#endif
+		private static Table GetTable(
+			OleDbSchema oleDbSchema, string tableName)
+		{
+			Table table = new (tableName);
+
+			Log.Info("Getting Columns for " + tableName);
+			DataTable dataColumns =
+				oleDbSchema.GetTableColumns(tableName);
+
+			foreach (DataRow dataColumn in dataColumns.Rows)
+			{
+				Column column = FormatColumnFromDataRow(dataColumn);
+
+				table.AddColumn(column);
+			}
+
+			return table;
 		}
 
 		private static bool ImportSchemaMdb(
