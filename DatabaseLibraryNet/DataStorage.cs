@@ -1162,5 +1162,5 @@ namespace DigitalZenWorks.Database.ToolKit
 
 			return returnValue;
 		}
-	} // end class
-} // end namespace
+	}
+}

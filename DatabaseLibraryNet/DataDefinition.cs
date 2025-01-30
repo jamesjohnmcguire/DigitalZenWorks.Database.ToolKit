@@ -989,5 +989,5 @@ namespace DigitalZenWorks.Database.ToolKit
 
 			return sql;
 		}
-	} // End class
-} // End Namespace
+	}
+}
