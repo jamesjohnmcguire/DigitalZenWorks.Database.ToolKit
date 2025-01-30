@@ -914,13 +914,13 @@ namespace DigitalZenWorks.Database.ToolKit
 			// Sort Columns into ordinal positions
 			System.Collections.SortedList columns = [];
 
-			foreach (DictionaryEntry entry in table.Columns)
+			foreach (KeyValuePair<string, Column> entry in table.Columns)
 			{
-				Column column = (Column)entry.Value;
+				Column column = entry.Value;
 				columns.Add(column.Position, column);
 			}
 
-			foreach (DictionaryEntry entry in columns)
+			foreach (KeyValuePair<string, Column> entry in columns)
 			{
 				sql += "\t" + WriteColumnSql((Column)entry.Value) + "," +
 					Environment.NewLine;
