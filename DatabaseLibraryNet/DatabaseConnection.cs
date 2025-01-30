@@ -7,7 +7,10 @@
 using Dapper;
 using MySql.Data.MySqlClient;
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Data;
+using System.Diagnostics.Metrics;
 
 namespace DigitalZenWorks.Database.ToolKit
 {
@@ -38,6 +41,20 @@ namespace DigitalZenWorks.Database.ToolKit
 		{
 			Dispose(true);
 			GC.SuppressFinalize(this);
+		}
+
+		/// <summary>
+		/// The query method.
+		/// </summary>
+		/// <typeparam name="T">The type of object to enumerate.</typeparam>
+		/// <param name="statement">The SQL statement to execute.</param>
+		/// <returns>A list of items.</returns>
+		public IEnumerable<T> Query<T>(
+		string statement)
+		{
+			IEnumerable<T> list = databaseConnection.Query<T>(statement);
+
+			return list;
 		}
 
 		/// <summary>
