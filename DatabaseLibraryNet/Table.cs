@@ -7,6 +7,7 @@
 using Common.Logging;
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Data;
 using System.Globalization;
 using System.Reflection;
@@ -32,8 +33,8 @@ namespace DigitalZenWorks.Database.ToolKit
 			"DigitalZenWorks.Database.ToolKit.Resources",
 			Assembly.GetExecutingAssembly());
 
-		private readonly Hashtable columns = new System.Collections.Hashtable();
-		private readonly ArrayList foreignKeys = new System.Collections.ArrayList();
+		private readonly Dictionary<string, Column> columns = [];
+		private readonly List<ForeignKey> foreignKeys = [];
 
 		private string name = string.Empty;
 		private string primaryKey = string.Empty;
@@ -67,7 +68,7 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// Represents the columns.
 		/// </value>
 		/////////////////////////////////////////////////////////////////////
-		public Hashtable Columns
+		public Dictionary<string, Column> Columns
 		{
 			get { return columns; }
 		}
@@ -80,7 +81,7 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// Represents the foreign keys.
 		/// </value>
 		/////////////////////////////////////////////////////////////////////
-		public ArrayList ForeignKeys
+		public List<ForeignKey> ForeignKeys
 		{
 			get { return foreignKeys; }
 		}
@@ -189,7 +190,7 @@ namespace DigitalZenWorks.Database.ToolKit
 				CultureInfo.InvariantCulture) + Name + Environment.NewLine;
 			Log.Info(CultureInfo.InvariantCulture, m => m(output));
 
-			foreach (DictionaryEntry column in Columns)
+			foreach (KeyValuePair<string, Column> column in Columns)
 			{
 				Log.Info(
 					CultureInfo.InvariantCulture,

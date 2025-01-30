@@ -6,8 +6,10 @@
 
 using Common.Logging;
 using DigitalZenWorks.Common.Utilities;
+using MySqlX.XDevAPI.Relational;
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Data;
 using System.Globalization;
 using System.IO;
@@ -585,17 +587,44 @@ namespace DigitalZenWorks.Database.ToolKit
 			return relationship;
 		}
 
+		/// <summary>
+		/// Gets a list of relationships.
+		/// </summary>
+		/// <param name="oleDbSchema">The OLE database schema.</param>
+		/// <param name="tableName">The table name.</param>
+		/// <returns>A list of relationships.</returns>
+#if NET5_0_OR_GREATER
+		[SupportedOSPlatform("windows")]
+#endif
+		private static List<Relationship> GetRelationships2(
+			OleDbSchema oleDbSchema, string tableName)
+		{
+			List<Relationship> relationships = [];
+
+			DataTable foreignKeyTable = oleDbSchema.GetForeignKeys(tableName);
+
+			foreach (DataRow foreignKey in foreignKeyTable.Rows)
+			{
+				Relationship relationship =
+					GetRelationship(foreignKey);
+
+				relationships.Add(relationship);
+			}
+
+			return relationships;
+		}
+
 #if NET5_0_OR_GREATER
 		[SupportedOSPlatform("windows")]
 #endif
 		private static Hashtable GetSchema(string databaseFile)
 		{
 			Hashtable tables = null;
+			List<Relationship> relationships = [];
 
 			using (OleDbSchema oleDbSchema = new (databaseFile))
 			{
 				tables = [];
-				ArrayList relationships = [];
 
 				DataTable tableNames = oleDbSchema.TableNames;
 
@@ -603,20 +632,7 @@ namespace DigitalZenWorks.Database.ToolKit
 				{
 					string tableName = row["TABLE_NAME"].ToString();
 
-					Table table = new (tableName);
-
-					Log.Info(
-						CultureInfo.InvariantCulture,
-						m => m("Getting Columns for " + tableName));
-					DataTable dataColumns =
-						oleDbSchema.GetTableColumns(tableName);
-
-					foreach (DataRow dataColumn in dataColumns.Rows)
-					{
-						Column column = FormatColumnFromDataRow(dataColumn);
-
-						table.AddColumn(column);
-					}
+					Table table = GetTable(oleDbSchema, tableName);
 
 					// Get primary key
 					DataTable primary_key_table =
@@ -628,26 +644,17 @@ namespace DigitalZenWorks.Database.ToolKit
 					}
 
 					// If PK is an integer change type to AutoNumber
-					if (!string.IsNullOrWhiteSpace(table.PrimaryKey))
+					Column primaryKey = SetPrimaryKeyType(table);
+
+					if (primaryKey != null)
 					{
-						if (((Column)table.Columns[table.PrimaryKey]).ColumnType ==
-							ColumnType.Number)
-						{
-							((Column)table.Columns[table.PrimaryKey]).ColumnType =
-								ColumnType.AutoNumber;
-						}
+						table.Columns[table.PrimaryKey] = primaryKey;
 					}
 
-					DataTable foreignKeyTable =
-						oleDbSchema.GetForeignKeys(tableName);
+					List<Relationship> newRelationships =
+						GetRelationships2(oleDbSchema, tableName);
 
-					foreach (DataRow foreignKey in foreignKeyTable.Rows)
-					{
-						Relationship relationship =
-							GetRelationship(foreignKey);
-
-						relationships.Add(relationship);
-					}
+					relationships = [.. relationships, .. newRelationships];
 
 					tables.Add(table.Name, table);
 				}
@@ -665,6 +672,28 @@ namespace DigitalZenWorks.Database.ToolKit
 			}
 
 			return tables;
+		}
+
+#if NET5_0_OR_GREATER
+		[SupportedOSPlatform("windows")]
+#endif
+		private static Table GetTable(
+			OleDbSchema oleDbSchema, string tableName)
+		{
+			Table table = new (tableName);
+
+			Log.Info("Getting Columns for " + tableName);
+			DataTable dataColumns =
+				oleDbSchema.GetTableColumns(tableName);
+
+			foreach (DataRow dataColumn in dataColumns.Rows)
+			{
+				Column column = FormatColumnFromDataRow(dataColumn);
+
+				table.AddColumn(column);
+			}
+
+			return table;
 		}
 
 		private static bool ImportSchemaMdb(
@@ -710,6 +739,25 @@ namespace DigitalZenWorks.Database.ToolKit
 			}
 
 			return TopologicalSort(list);
+		}
+
+		// If primary key is an integer, change type to AutoNumber.
+		private static Column SetPrimaryKeyType(Table table)
+		{
+			Column primaryKey = null;
+
+			string primaryKeyName = table.PrimaryKey;
+			if (!string.IsNullOrWhiteSpace(primaryKeyName))
+			{
+				primaryKey = table.Columns[primaryKeyName];
+
+				if (primaryKey.ColumnType == ColumnType.Number)
+				{
+					primaryKey.ColumnType = ColumnType.AutoNumber;
+				}
+			}
+
+			return primaryKey;
 		}
 
 		/// <summary>
@@ -904,13 +952,13 @@ namespace DigitalZenWorks.Database.ToolKit
 			// Sort Columns into ordinal positions
 			System.Collections.SortedList columns = [];
 
-			foreach (DictionaryEntry entry in table.Columns)
+			foreach (KeyValuePair<string, Column> entry in table.Columns)
 			{
-				Column column = (Column)entry.Value;
+				Column column = entry.Value;
 				columns.Add(column.Position, column);
 			}
 
-			foreach (DictionaryEntry entry in columns)
+			foreach (KeyValuePair<string, Column> entry in columns)
 			{
 				sql += "\t" + WriteColumnSql((Column)entry.Value) + "," +
 					Environment.NewLine;

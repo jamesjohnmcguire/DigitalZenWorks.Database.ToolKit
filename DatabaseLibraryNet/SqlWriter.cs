@@ -4,6 +4,8 @@
 // </copyright>
 /////////////////////////////////////////////////////////////////////////////
 
+#nullable enable
+
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -252,7 +254,7 @@ namespace DigitalZenWorks.Database.ToolKit
 		{
 			if (buffers != null)
 			{
-				StringBuilder builder = new();
+				StringBuilder builder = new ();
 
 				foreach (IList<string> buffer in buffers)
 				{
