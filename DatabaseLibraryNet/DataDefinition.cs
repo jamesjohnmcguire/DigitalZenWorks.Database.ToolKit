@@ -770,14 +770,14 @@ namespace DigitalZenWorks.Database.ToolKit
 		{
 			ArrayList sortedList = [];
 			object key;
-			ArrayList dependencies;
+			List<object> dependencies;
 
 			while (sortedList.Count < table.Count)
 			{
 				foreach (DictionaryEntry entry in table)
 				{
 					key = entry.Key;
-					dependencies = (ArrayList)entry.Value;
+					dependencies = (List<object>)entry.Value;
 
 					// No dependencies, add to start of table.
 					if (dependencies.Count == 0)
@@ -950,7 +950,7 @@ namespace DigitalZenWorks.Database.ToolKit
 				Environment.NewLine);
 
 			// Sort Columns into ordinal positions
-			System.Collections.SortedList columns = [];
+			SortedList<int, Column> columns = [];
 
 			foreach (KeyValuePair<string, Column> entry in table.Columns)
 			{
@@ -958,7 +958,7 @@ namespace DigitalZenWorks.Database.ToolKit
 				columns.Add(column.Position, column);
 			}
 
-			foreach (KeyValuePair<string, Column> entry in columns)
+			foreach (KeyValuePair<int, Column> entry in columns)
 			{
 				sql += "\t" + WriteColumnSql((Column)entry.Value) + "," +
 					Environment.NewLine;
