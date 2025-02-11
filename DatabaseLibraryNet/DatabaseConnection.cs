@@ -44,6 +44,19 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// <summary>
 		/// The query method.
 		/// </summary>
+		/// <param name="statement">The SQL statement to execute.</param>
+		/// <param name="item">The item.</param>
+		/// <returns>A list of items.</returns>
+		public int Execute(string statement, object? item)
+		{
+			int result = databaseConnection.Execute(statement, item);
+
+			return result;
+		}
+
+		/// <summary>
+		/// The query method.
+		/// </summary>
 		/// <typeparam name="T">The type of object to enumerate.</typeparam>
 		/// <param name="statement">The SQL statement to execute.</param>
 		/// <returns>A list of items.</returns>
