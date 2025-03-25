@@ -10,6 +10,7 @@ using MySqlX.XDevAPI.Relational;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Data;
 using System.Globalization;
 using System.IO;
@@ -230,6 +231,23 @@ namespace DigitalZenWorks.Database.ToolKit
 			}
 
 			return keys;
+		}
+
+		/// <summary>
+		/// Get ordered dependencies.
+		/// </summary>
+		/// <param name="tableDependencies">A dictionary of table
+		/// depdenencies.</param>
+		/// <returns>A list of ordered dependencies.</returns>
+		public static Collection<string> GetOrderedDependencies(
+			Dictionary<string, List<string>> tableDependencies)
+		{
+			List<string> dependenciesList = [];
+
+			Collection<string> dependencies =
+				new Collection<string>(dependenciesList);
+
+			return dependencies;
 		}
 
 		/// <summary>

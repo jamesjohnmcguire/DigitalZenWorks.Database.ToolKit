@@ -7,6 +7,7 @@ using DigitalZenWorks.Database.ToolKit;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Data;
 using System.Data.Common;
 using System.Data.OleDb;
@@ -197,6 +198,63 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 			//	// assuming no exceptions
 			//	Assert.IsTrue(File.Exists(dataSource));
 			Assert.Pass();
+		}
+
+		/////////////////////////////////////////////////////////////////////
+		/// <summary>
+		/// Dependencies order test.
+		/// </summary>
+		/////////////////////////////////////////////////////////////////////
+		[Test]
+		public void DependenciesOrder()
+		{
+			Dictionary<string, List<string>> tableDependencies = [];
+
+			List<string> dependencies = [];
+			tableDependencies.Add("Categories", dependencies);
+			tableDependencies.Add("Makers", dependencies);
+
+			dependencies = [];
+			dependencies.Add("Makers");
+			tableDependencies.Add("Series", dependencies);
+
+			dependencies = [];
+			dependencies.Add("Categories");
+			dependencies.Add("Makers");
+			tableDependencies.Add("Sections", dependencies);
+
+			dependencies = [];
+			dependencies.Add("Sections");
+			dependencies.Add("Series");
+			dependencies.Add("Makers");
+			tableDependencies.Add("ImportProducts", dependencies);
+
+			// Sort
+			Collection<string> orderedDependencies =
+				DataDefinition.GetOrderedDependencies(tableDependencies);
+
+			int tableCount = orderedDependencies.Count;
+			Assert.That(tableCount, Is.EqualTo(5));
+
+			string tableName = orderedDependencies[0];
+			orderedDependencies.RemoveAt(0);
+			Assert.That(tableName, Is.EqualTo("Categories"));
+
+			tableName = orderedDependencies[0];
+			orderedDependencies.RemoveAt(0);
+			Assert.That(tableName, Is.EqualTo("Makers"));
+
+			tableName = orderedDependencies[0];
+			orderedDependencies.RemoveAt(0);
+			Assert.That(tableName, Is.EqualTo("Series"));
+
+			tableName = orderedDependencies[0];
+			orderedDependencies.RemoveAt(0);
+			Assert.That(tableName, Is.EqualTo("Sections"));
+
+			tableName = orderedDependencies[0];
+			orderedDependencies.RemoveAt(0);
+			Assert.That(tableName, Is.EqualTo("ImportProducts"));
 		}
 
 		/////////////////////////////////////////////////////////////////////////
