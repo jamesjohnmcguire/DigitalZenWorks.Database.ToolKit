@@ -10,6 +10,7 @@ using MySqlX.XDevAPI.Relational;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Data;
 using System.Globalization;
 using System.IO;
@@ -230,6 +231,83 @@ namespace DigitalZenWorks.Database.ToolKit
 			}
 
 			return keys;
+		}
+
+		public static List<string> GetDependenciesNew(
+			string key,
+			Dictionary<string, List<string>> tableDependencies,
+			List<string> dependenciesNew,
+			List<string> currentList)
+		{
+			List<string> thisList = tableDependencies[key];
+
+			foreach (string dependency in thisList)
+			{
+				List<string> temp = tableDependencies[dependency];
+
+				//List<string> newList = GetDependenciesNew(
+				//	dependency, tableDependencies, temp, currentList);
+
+				//currentList = [..currentList, ..newList];
+				currentList = GetDependenciesNew(
+					dependency, tableDependencies, temp, currentList);
+
+				if (!currentList.Contains(dependency))
+				{
+					currentList.Add(dependency);
+				}
+			}
+
+			if (!currentList.Contains(key))
+			{
+				currentList.Add(key);
+			}
+
+			return currentList;
+		}
+
+		/// <summary>
+		/// Get ordered dependencies.
+		/// </summary>
+		/// <param name="tableDependencies">A dictionary of table
+		/// depdenencies.</param>
+		/// <returns>A list of ordered dependencies.</returns>
+		public static Collection<string> GetOrderedDependencies(
+			Dictionary<string, List<string>> tableDependencies)
+		{
+			List<string> dependenciesList = [];
+
+			if (null != tableDependencies)
+			{
+				foreach (KeyValuePair<string, List<string>> item in
+					tableDependencies)
+				{
+					var tester = tableDependencies[item.Key];
+
+					Collection<string> some =
+						GetOrderedDependencies(tableDependencies);
+
+					List<string> innerDependencies = item.Value;
+
+					foreach (string innerDependency in innerDependencies)
+					{
+						if (!dependenciesList.Contains(innerDependency))
+						{
+							dependenciesList.Add(innerDependency);
+						}
+					}
+
+					if (!dependenciesList.Contains(item.Key))
+					{
+						dependenciesList.Add(item.Key);
+					}
+				}
+			}
+
+			Collection<string> dependencies =
+				new Collection<string>(dependenciesList);
+
+			return dependencies;
 		}
 
 		/// <summary>

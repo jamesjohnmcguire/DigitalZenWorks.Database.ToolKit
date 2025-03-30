@@ -58,12 +58,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<Compile Remove="DatabaseLibraryNetTests\**" />
-		<EmbeddedResource Remove="DatabaseLibraryNetTests\**" />
-		<None Remove="DatabaseLibraryNetTests\**" />
-	</ItemGroup>
-
-	<ItemGroup>
 		<None Include="..\LICENSE">
 			<Pack>True</Pack>
 			<PackagePath>\</PackagePath>
