@@ -1,14 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<AnalysisMode>AllEnabledByDefault</AnalysisMode>
-		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-		<AssemblyName>DigitalZenWorks.Common.DatabaseLibary.Tests</AssemblyName>
+		<AnalysisMode>All</AnalysisMode>
 		<CodeAnalysisRuleSet>..\CodeAnalysis.ruleset</CodeAnalysisRuleSet>
 		<EnableNETAnalyzers>true</EnableNETAnalyzers>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 		<IsTestProject>true</IsTestProject>
-		<OutputPath>$(SolutionDir)\Bin\$(Configuration)\$(Platform)</OutputPath>
-		<RootNamespace>DigitalZenWorks.Common.DatabaseLibary.Tests</RootNamespace>
 		<TargetFramework>net9.0</TargetFramework>
 	</PropertyGroup>
 
@@ -33,8 +30,19 @@
 		<PackageReference Include="System.Data.SQLite.Core" Version="1.0.119" />
 	</ItemGroup>
 
+	<ItemGroup Condition="'$(Configuration)'=='Debug'">
+		<ProjectReference Include="../../UtilitiesNet/UtilitiesNetLibrary/DigitalZenWorks.Common.Utilities.csproj" />
+	</ItemGroup>
+	<ItemGroup Condition="'$(Configuration)'=='Release'">
+		<PackageReference Include="DigitalZenWorks.Common.Utilities" Version="1.4.75" />
+	</ItemGroup>
+
 	<ItemGroup>
 		<ProjectReference Include="../DatabaseLibraryNet/DigitalZenWorks.Database.ToolKit.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<EmbeddedResource Include="test.mdb" />
 	</ItemGroup>
 
 </Project>
