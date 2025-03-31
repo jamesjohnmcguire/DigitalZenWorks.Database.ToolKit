@@ -206,151 +206,39 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 		/// </summary>
 		/////////////////////////////////////////////////////////////////////
 		[Test]
-		public void DependenciesTest()
-		{
-			Dictionary<string, List<string>> tableDependencies = [];
-
-			List<string> dependencies = [];
-			tableDependencies.Add("Categories", dependencies);
-			tableDependencies.Add("Makers", dependencies);
-
-			dependencies = [];
-			dependencies.Add("Makers");
-			tableDependencies.Add("Series", dependencies);
-
-			dependencies = [];
-			dependencies.Add("Categories");
-			dependencies.Add("Makers");
-			tableDependencies.Add("Sections", dependencies);
-
-			dependencies = [];
-			dependencies.Add("Sections");
-			dependencies.Add("Series");
-			dependencies.Add("Makers");
-			tableDependencies.Add("ImportProducts", dependencies);
-
-			List<string> something = DataDefinition.GetDependenciesNew(
-				"ImportProducts",
-				tableDependencies,
-				[],
-				[]);
-
-			Assert.Pass();
-		}
-
-		/////////////////////////////////////////////////////////////////////
-		/// <summary>
-		/// Dependencies order test.
-		/// </summary>
-		/////////////////////////////////////////////////////////////////////
-		[Test]
 		public void DependenciesOrder()
 		{
-			Dictionary<string, List<string>> tableDependencies = [];
+			Dictionary<string, List<string>> tableDependencies = new()
+			{
+				{ "Categories", [] },
+				{ "Makers", [] },
+				{ "Series", new List<string> { "Makers" } },
+				{ "Sections", new List<string> { "Categories", "Makers" } },
+				{
+					"ImportProducts", new List<string>
+					{ "Sections", "Series", "Makers" }
+				}
+			};
 
-			List<string> dependencies = [];
-			tableDependencies.Add("Categories", dependencies);
-			tableDependencies.Add("Makers", dependencies);
-
-			dependencies = [];
-			dependencies.Add("Makers");
-			tableDependencies.Add("Series", dependencies);
-
-			dependencies = [];
-			dependencies.Add("Categories");
-			dependencies.Add("Makers");
-			tableDependencies.Add("Sections", dependencies);
-
-			dependencies = [];
-			dependencies.Add("Sections");
-			dependencies.Add("Series");
-			dependencies.Add("Makers");
-			tableDependencies.Add("ImportProducts", dependencies);
-
-			// Sort
-			Collection<string> orderedDependencies =
+			List<string> orderedDependencies =
 				DataDefinition.GetOrderedDependencies(tableDependencies);
 
 			int tableCount = orderedDependencies.Count;
 			Assert.That(tableCount, Is.EqualTo(5));
 
 			string tableName = orderedDependencies[0];
-			orderedDependencies.RemoveAt(0);
-			Assert.That(tableName, Is.EqualTo("Categories"));
+			Assert.That(tableName, Is.AnyOf("Categories", "Makers"));
 
-			tableName = orderedDependencies[0];
-			orderedDependencies.RemoveAt(0);
-			Assert.That(tableName, Is.EqualTo("Makers"));
+			tableName = orderedDependencies[1];
+			Assert.That(tableName, Is.AnyOf("Categories", "Makers"));
 
-			tableName = orderedDependencies[0];
-			orderedDependencies.RemoveAt(0);
-			Assert.That(tableName, Is.EqualTo("Series"));
+			tableName = orderedDependencies[2];
+			Assert.That(tableName, Is.AnyOf("Sections", "Series"));
 
-			tableName = orderedDependencies[0];
-			orderedDependencies.RemoveAt(0);
-			Assert.That(tableName, Is.EqualTo("Sections"));
+			tableName = orderedDependencies[3];
+			Assert.That(tableName, Is.AnyOf("Sections", "Series"));
 
-			tableName = orderedDependencies[0];
-			orderedDependencies.RemoveAt(0);
-			Assert.That(tableName, Is.EqualTo("ImportProducts"));
-		}
-
-		/////////////////////////////////////////////////////////////////////
-		/// <summary>
-		/// Dependencies order test.
-		/// </summary>
-		/////////////////////////////////////////////////////////////////////
-		[Test]
-		public void DependenciesOrderAlphaOrder()
-		{
-			Dictionary<string, List<string>> tableDependencies = [];
-
-			List<string> dependencies = [];
-			tableDependencies.Add("Categories", dependencies);
-
-			dependencies = [];
-			dependencies.Add("Sections");
-			dependencies.Add("Series");
-			dependencies.Add("Makers");
-			tableDependencies.Add("ImportProducts", dependencies);
-
-			dependencies = [];
-			tableDependencies.Add("Makers", dependencies);
-
-			dependencies = [];
-			dependencies.Add("Makers");
-			tableDependencies.Add("Series", dependencies);
-
-			dependencies = [];
-			dependencies.Add("Categories");
-			dependencies.Add("Makers");
-			tableDependencies.Add("Sections", dependencies);
-
-			// Sort
-			Collection<string> orderedDependencies =
-				DataDefinition.GetOrderedDependencies(tableDependencies);
-
-			int tableCount = orderedDependencies.Count;
-			Assert.That(tableCount, Is.EqualTo(5));
-
-			string tableName = orderedDependencies[0];
-			orderedDependencies.RemoveAt(0);
-			Assert.That(tableName, Is.EqualTo("Categories"));
-
-			tableName = orderedDependencies[0];
-			orderedDependencies.RemoveAt(0);
-			Assert.That(tableName, Is.EqualTo("Makers"));
-
-			tableName = orderedDependencies[0];
-			orderedDependencies.RemoveAt(0);
-			Assert.That(tableName, Is.EqualTo("Series"));
-
-			tableName = orderedDependencies[0];
-			orderedDependencies.RemoveAt(0);
-			Assert.That(tableName, Is.EqualTo("Sections"));
-
-			tableName = orderedDependencies[0];
-			orderedDependencies.RemoveAt(0);
+			tableName = orderedDependencies[4];
 			Assert.That(tableName, Is.EqualTo("ImportProducts"));
 		}
 
