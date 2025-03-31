@@ -5,12 +5,9 @@
 /////////////////////////////////////////////////////////////////////////////
 
 using Common.Logging;
-using DigitalZenWorks.Common.Utilities;
-using MySqlX.XDevAPI.Relational;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Data;
 using System.Globalization;
 using System.IO;
@@ -299,6 +296,66 @@ namespace DigitalZenWorks.Database.ToolKit
 			}
 
 			return relationships;
+		}
+
+#if NET5_0_OR_GREATER
+		[SupportedOSPlatform("windows")]
+#endif
+		public static Hashtable GetSchema(string databaseFile)
+		{
+			Hashtable tables = null;
+			List<Relationship> relationships = [];
+
+			using (OleDbSchema oleDbSchema = new(databaseFile))
+			{
+				tables = [];
+
+				DataTable tableNames = oleDbSchema.TableNames;
+
+				foreach (DataRow row in tableNames.Rows)
+				{
+					string tableName = row["TABLE_NAME"].ToString();
+
+					Table table = GetTable(oleDbSchema, tableName);
+
+					// Get primary key
+					DataTable primary_key_table =
+						oleDbSchema.GetPrimaryKeys(tableName);
+
+					foreach (DataRow pkrow in primary_key_table.Rows)
+					{
+						table.PrimaryKey = pkrow["COLUMN_NAME"].ToString();
+					}
+
+					// If PK is an integer change type to AutoNumber
+					Column primaryKey = SetPrimaryKeyType(table);
+
+					if (primaryKey != null)
+					{
+						table.Columns[table.PrimaryKey] = primaryKey;
+					}
+
+					List<Relationship> newRelationships =
+						GetRelationships2(oleDbSchema, tableName);
+
+					relationships = [.. relationships, .. newRelationships];
+
+					tables.Add(table.Name, table);
+				}
+
+				// Add foreign keys to table, using relationships
+				foreach (Relationship relationship in relationships)
+				{
+					string name = relationship.ChildTable;
+
+					ForeignKey foreignKey =
+						GetForeignKeyRelationship(relationship);
+
+					((Table)tables[name]).ForeignKeys.Add(foreignKey);
+				}
+			}
+
+			return tables;
 		}
 
 		/// <summary>
@@ -681,66 +738,6 @@ namespace DigitalZenWorks.Database.ToolKit
 			}
 
 			return relationships;
-		}
-
-#if NET5_0_OR_GREATER
-		[SupportedOSPlatform("windows")]
-#endif
-		private static Hashtable GetSchema(string databaseFile)
-		{
-			Hashtable tables = null;
-			List<Relationship> relationships = [];
-
-			using (OleDbSchema oleDbSchema = new (databaseFile))
-			{
-				tables = [];
-
-				DataTable tableNames = oleDbSchema.TableNames;
-
-				foreach (DataRow row in tableNames.Rows)
-				{
-					string tableName = row["TABLE_NAME"].ToString();
-
-					Table table = GetTable(oleDbSchema, tableName);
-
-					// Get primary key
-					DataTable primary_key_table =
-						oleDbSchema.GetPrimaryKeys(tableName);
-
-					foreach (DataRow pkrow in primary_key_table.Rows)
-					{
-						table.PrimaryKey = pkrow["COLUMN_NAME"].ToString();
-					}
-
-					// If PK is an integer change type to AutoNumber
-					Column primaryKey = SetPrimaryKeyType(table);
-
-					if (primaryKey != null)
-					{
-						table.Columns[table.PrimaryKey] = primaryKey;
-					}
-
-					List<Relationship> newRelationships =
-						GetRelationships2(oleDbSchema, tableName);
-
-					relationships = [.. relationships, .. newRelationships];
-
-					tables.Add(table.Name, table);
-				}
-
-				// Add foreign keys to table, using relationships
-				foreach (Relationship relationship in relationships)
-				{
-					string name = relationship.ChildTable;
-
-					ForeignKey foreignKey =
-						GetForeignKeyRelationship(relationship);
-
-					((Table)tables[name]).ForeignKeys.Add(foreignKey);
-				}
-			}
-
-			return tables;
 		}
 
 #if NET5_0_OR_GREATER
