@@ -82,7 +82,7 @@ namespace DigitalZenWorks.Database.ToolKit
 			if (primaryKeyPairs != null && keyPairs != null)
 			{
 				string pairs = string.Empty;
-				string where = " WHERE ";
+				string where = "WHERE ";
 
 				int count = keyPairs.Count;
 
@@ -107,12 +107,14 @@ namespace DigitalZenWorks.Database.ToolKit
 					KeyValuePair<string, string> keyPair =
 						primaryKeyPairs[index];
 
-					string pair = keyPair.Key + " = " + keyPair.Value;
+					string pair = string.Empty;
 
 					if (index > 0)
 					{
 						pair += " AND ";
 					}
+
+					pair += keyPair.Key + " = " + keyPair.Value;
 
 					where += pair;
 				}
