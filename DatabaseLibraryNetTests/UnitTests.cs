@@ -3,18 +3,17 @@
 // All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-using DigitalZenWorks.Database.ToolKit;
+using DigitalZenWorks.Common.Utilities;
 using NUnit.Framework;
 using System;
+using System.Collections;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Data;
 using System.Data.Common;
-using System.Data.OleDb;
 using System.Data.SQLite;
 using System.Globalization;
 using System.IO;
-using System.Reflection;
+using System.Runtime.Versioning;
 
 [assembly: CLSCompliant(true)]
 
@@ -287,6 +286,49 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 			Assert.That(exists, Is.True);
 		}
 
+		/////////////////////////////////////////////////////////////////////
+		/// <summary>
+		/// Get schema test.
+		/// </summary>
+		/////////////////////////////////////////////////////////////////////
+		[SupportedOSPlatform("windows")]
+		[Test]
+		public static void GetSchema()
+		{
+			string databaseFile = GetTestMdbFile();
+
+			Hashtable tables = DataDefinition.GetSchema(databaseFile);
+
+			int count = tables.Count;
+
+			Assert.That(count, Is.EqualTo(2));
+
+			int index = 0;
+			string expected = null;
+
+			foreach (System.Collections.DictionaryEntry entry in tables)
+			{
+				object key = entry.Key;
+				object value = entry.Value;
+				string name = key.ToString();
+				DigitalZenWorks.Database.ToolKit.Table table = (Table)value;
+
+				if (index == 0)
+				{
+					expected = "AddressesTest2";
+				}
+				else
+				{
+					expected = "AddressesTest";
+				}
+
+				Assert.That(name, Is.EqualTo(expected));
+				Assert.That(table.Name, Is.EqualTo(expected));
+
+				index++;
+			}
+		}
+
 		/////////////////////////////////////////////////////////////////////////
 		/// Method <c>Insert</c>
 		/// <summary>
@@ -392,6 +434,28 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 		public void VerifyTestSourceExists()
 		{
 			Assert.That(File.Exists(dataSource), Is.True);
+		}
+
+		private static string GetTestMdbFile()
+		{
+			string resource =
+				"DigitalZenWorks.Database.ToolKit.Tests.test.mdb";
+
+			string fileName = Path.GetTempFileName();
+
+			// A 0 byte sized file is created.  Need to remove it.
+			File.Delete(fileName);
+			string filePath = Path.ChangeExtension(fileName, "mdb");
+
+			bool result = FileUtils.CreateFileFromEmbeddedResource(
+				resource, filePath);
+
+			Assert.That(result, Is.True);
+
+			result = File.Exists(filePath);
+			Assert.That(result, Is.True);
+
+			return filePath;
 		}
 
 		private static string GetTestDatabasePath()
