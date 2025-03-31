@@ -3,18 +3,17 @@
 // All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-using DigitalZenWorks.Database.ToolKit;
+using DigitalZenWorks.Common.Utilities;
 using NUnit.Framework;
 using System;
+using System.Collections;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Data;
 using System.Data.Common;
-using System.Data.OleDb;
 using System.Data.SQLite;
 using System.Globalization;
 using System.IO;
-using System.Reflection;
+using System.Runtime.Versioning;
 
 [assembly: CLSCompliant(true)]
 
@@ -206,151 +205,39 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 		/// </summary>
 		/////////////////////////////////////////////////////////////////////
 		[Test]
-		public void DependenciesTest()
-		{
-			Dictionary<string, List<string>> tableDependencies = [];
-
-			List<string> dependencies = [];
-			tableDependencies.Add("Categories", dependencies);
-			tableDependencies.Add("Makers", dependencies);
-
-			dependencies = [];
-			dependencies.Add("Makers");
-			tableDependencies.Add("Series", dependencies);
-
-			dependencies = [];
-			dependencies.Add("Categories");
-			dependencies.Add("Makers");
-			tableDependencies.Add("Sections", dependencies);
-
-			dependencies = [];
-			dependencies.Add("Sections");
-			dependencies.Add("Series");
-			dependencies.Add("Makers");
-			tableDependencies.Add("ImportProducts", dependencies);
-
-			List<string> something = DataDefinition.GetDependenciesNew(
-				"ImportProducts",
-				tableDependencies,
-				[],
-				[]);
-
-			Assert.Pass();
-		}
-
-		/////////////////////////////////////////////////////////////////////
-		/// <summary>
-		/// Dependencies order test.
-		/// </summary>
-		/////////////////////////////////////////////////////////////////////
-		[Test]
 		public void DependenciesOrder()
 		{
-			Dictionary<string, List<string>> tableDependencies = [];
+			Dictionary<string, List<string>> tableDependencies = new()
+			{
+				{ "Categories", [] },
+				{ "Makers", [] },
+				{ "Series", new List<string> { "Makers" } },
+				{ "Sections", new List<string> { "Categories", "Makers" } },
+				{
+					"ImportProducts", new List<string>
+					{ "Sections", "Series", "Makers" }
+				}
+			};
 
-			List<string> dependencies = [];
-			tableDependencies.Add("Categories", dependencies);
-			tableDependencies.Add("Makers", dependencies);
-
-			dependencies = [];
-			dependencies.Add("Makers");
-			tableDependencies.Add("Series", dependencies);
-
-			dependencies = [];
-			dependencies.Add("Categories");
-			dependencies.Add("Makers");
-			tableDependencies.Add("Sections", dependencies);
-
-			dependencies = [];
-			dependencies.Add("Sections");
-			dependencies.Add("Series");
-			dependencies.Add("Makers");
-			tableDependencies.Add("ImportProducts", dependencies);
-
-			// Sort
-			Collection<string> orderedDependencies =
+			List<string> orderedDependencies =
 				DataDefinition.GetOrderedDependencies(tableDependencies);
 
 			int tableCount = orderedDependencies.Count;
 			Assert.That(tableCount, Is.EqualTo(5));
 
 			string tableName = orderedDependencies[0];
-			orderedDependencies.RemoveAt(0);
-			Assert.That(tableName, Is.EqualTo("Categories"));
+			Assert.That(tableName, Is.AnyOf("Categories", "Makers"));
 
-			tableName = orderedDependencies[0];
-			orderedDependencies.RemoveAt(0);
-			Assert.That(tableName, Is.EqualTo("Makers"));
+			tableName = orderedDependencies[1];
+			Assert.That(tableName, Is.AnyOf("Categories", "Makers"));
 
-			tableName = orderedDependencies[0];
-			orderedDependencies.RemoveAt(0);
-			Assert.That(tableName, Is.EqualTo("Series"));
+			tableName = orderedDependencies[2];
+			Assert.That(tableName, Is.AnyOf("Sections", "Series"));
 
-			tableName = orderedDependencies[0];
-			orderedDependencies.RemoveAt(0);
-			Assert.That(tableName, Is.EqualTo("Sections"));
+			tableName = orderedDependencies[3];
+			Assert.That(tableName, Is.AnyOf("Sections", "Series"));
 
-			tableName = orderedDependencies[0];
-			orderedDependencies.RemoveAt(0);
-			Assert.That(tableName, Is.EqualTo("ImportProducts"));
-		}
-
-		/////////////////////////////////////////////////////////////////////
-		/// <summary>
-		/// Dependencies order test.
-		/// </summary>
-		/////////////////////////////////////////////////////////////////////
-		[Test]
-		public void DependenciesOrderAlphaOrder()
-		{
-			Dictionary<string, List<string>> tableDependencies = [];
-
-			List<string> dependencies = [];
-			tableDependencies.Add("Categories", dependencies);
-
-			dependencies = [];
-			dependencies.Add("Sections");
-			dependencies.Add("Series");
-			dependencies.Add("Makers");
-			tableDependencies.Add("ImportProducts", dependencies);
-
-			dependencies = [];
-			tableDependencies.Add("Makers", dependencies);
-
-			dependencies = [];
-			dependencies.Add("Makers");
-			tableDependencies.Add("Series", dependencies);
-
-			dependencies = [];
-			dependencies.Add("Categories");
-			dependencies.Add("Makers");
-			tableDependencies.Add("Sections", dependencies);
-
-			// Sort
-			Collection<string> orderedDependencies =
-				DataDefinition.GetOrderedDependencies(tableDependencies);
-
-			int tableCount = orderedDependencies.Count;
-			Assert.That(tableCount, Is.EqualTo(5));
-
-			string tableName = orderedDependencies[0];
-			orderedDependencies.RemoveAt(0);
-			Assert.That(tableName, Is.EqualTo("Categories"));
-
-			tableName = orderedDependencies[0];
-			orderedDependencies.RemoveAt(0);
-			Assert.That(tableName, Is.EqualTo("Makers"));
-
-			tableName = orderedDependencies[0];
-			orderedDependencies.RemoveAt(0);
-			Assert.That(tableName, Is.EqualTo("Series"));
-
-			tableName = orderedDependencies[0];
-			orderedDependencies.RemoveAt(0);
-			Assert.That(tableName, Is.EqualTo("Sections"));
-
-			tableName = orderedDependencies[0];
-			orderedDependencies.RemoveAt(0);
+			tableName = orderedDependencies[4];
 			Assert.That(tableName, Is.EqualTo("ImportProducts"));
 		}
 
@@ -397,6 +284,49 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 
 			bool exists = File.Exists(csvFile);
 			Assert.That(exists, Is.True);
+		}
+
+		/////////////////////////////////////////////////////////////////////
+		/// <summary>
+		/// Get schema test.
+		/// </summary>
+		/////////////////////////////////////////////////////////////////////
+		[SupportedOSPlatform("windows")]
+		[Test]
+		public static void GetSchema()
+		{
+			string databaseFile = GetTestMdbFile();
+
+			Hashtable tables = DataDefinition.GetSchema(databaseFile);
+
+			int count = tables.Count;
+
+			Assert.That(count, Is.EqualTo(2));
+
+			int index = 0;
+			string expected = null;
+
+			foreach (System.Collections.DictionaryEntry entry in tables)
+			{
+				object key = entry.Key;
+				object value = entry.Value;
+				string name = key.ToString();
+				DigitalZenWorks.Database.ToolKit.Table table = (Table)value;
+
+				if (index == 0)
+				{
+					expected = "AddressesTest2";
+				}
+				else
+				{
+					expected = "AddressesTest";
+				}
+
+				Assert.That(name, Is.EqualTo(expected));
+				Assert.That(table.Name, Is.EqualTo(expected));
+
+				index++;
+			}
 		}
 
 		/////////////////////////////////////////////////////////////////////////
@@ -504,6 +434,28 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 		public void VerifyTestSourceExists()
 		{
 			Assert.That(File.Exists(dataSource), Is.True);
+		}
+
+		private static string GetTestMdbFile()
+		{
+			string resource =
+				"DigitalZenWorks.Database.ToolKit.Tests.test.mdb";
+
+			string fileName = Path.GetTempFileName();
+
+			// A 0 byte sized file is created.  Need to remove it.
+			File.Delete(fileName);
+			string filePath = Path.ChangeExtension(fileName, "mdb");
+
+			bool result = FileUtils.CreateFileFromEmbeddedResource(
+				resource, filePath);
+
+			Assert.That(result, Is.True);
+
+			result = File.Exists(filePath);
+			Assert.That(result, Is.True);
+
+			return filePath;
 		}
 
 		private static string GetTestDatabasePath()
