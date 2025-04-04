@@ -306,53 +306,54 @@ namespace DigitalZenWorks.Database.ToolKit
 			Hashtable tables = null;
 			List<Relationship> relationships = [];
 
-			using (OleDbSchema oleDbSchema = new(databaseFile))
+			using OleDbSchema oleDbSchema = new (databaseFile);
+
+			tables = [];
+
+			DataTable tableNames = oleDbSchema.TableNames;
+
+			foreach (DataRow row in tableNames.Rows)
 			{
-				tables = [];
+				object nameRaw = row["TABLE_NAME"];
+				string tableName = nameRaw.ToString();
 
-				DataTable tableNames = oleDbSchema.TableNames;
+				Table table = GetTable(oleDbSchema, tableName);
 
-				foreach (DataRow row in tableNames.Rows)
+				// Get primary key
+				DataTable primary_key_table =
+					oleDbSchema.GetPrimaryKeys(tableName);
+
+				foreach (DataRow pkrow in primary_key_table.Rows)
 				{
-					string tableName = row["TABLE_NAME"].ToString();
-
-					Table table = GetTable(oleDbSchema, tableName);
-
-					// Get primary key
-					DataTable primary_key_table =
-						oleDbSchema.GetPrimaryKeys(tableName);
-
-					foreach (DataRow pkrow in primary_key_table.Rows)
-					{
-						table.PrimaryKey = pkrow["COLUMN_NAME"].ToString();
-					}
-
-					// If PK is an integer change type to AutoNumber
-					Column primaryKey = SetPrimaryKeyType(table);
-
-					if (primaryKey != null)
-					{
-						table.Columns[table.PrimaryKey] = primaryKey;
-					}
-
-					List<Relationship> newRelationships =
-						GetRelationships2(oleDbSchema, tableName);
-
-					relationships = [.. relationships, .. newRelationships];
-
-					tables.Add(table.Name, table);
+					nameRaw = pkrow["COLUMN_NAME"];
+					table.PrimaryKey = nameRaw.ToString();
 				}
 
-				// Add foreign keys to table, using relationships
-				foreach (Relationship relationship in relationships)
+				// If PK is an integer change type to AutoNumber
+				Column primaryKey = SetPrimaryKeyType(table);
+
+				if (primaryKey != null)
 				{
-					string name = relationship.ChildTable;
-
-					ForeignKey foreignKey =
-						GetForeignKeyRelationship(relationship);
-
-					((Table)tables[name]).ForeignKeys.Add(foreignKey);
+					table.Columns[table.PrimaryKey] = primaryKey;
 				}
+
+				List<Relationship> newRelationships =
+					GetRelationships2(oleDbSchema, tableName);
+
+				relationships = [.. relationships, .. newRelationships];
+
+				tables.Add(table.Name, table);
+			}
+
+			// Add foreign keys to table, using relationships
+			foreach (Relationship relationship in relationships)
+			{
+				string name = relationship.ChildTable;
+
+				ForeignKey foreignKey =
+					GetForeignKeyRelationship(relationship);
+
+				((Table)tables[name]).ForeignKeys.Add(foreignKey);
 			}
 
 			return tables;
