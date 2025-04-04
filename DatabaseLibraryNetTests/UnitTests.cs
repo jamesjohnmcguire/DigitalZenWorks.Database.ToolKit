@@ -317,6 +317,29 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 		}
 
 		/////////////////////////////////////////////////////////////////////////
+		/// Method <c>GetTableColumns</c>
+		/// <summary>
+		/// GetTableColumns test.
+		/// </summary>
+		/////////////////////////////////////////////////////////////////////////
+		[SupportedOSPlatform("windows")]
+		[Test]
+		public void GetTableColumns()
+		{
+			string tableName = "AddressTest";
+			string databaseFile = GetTestMdbFile();
+
+			using OleDbSchema oleDbSchema = new(databaseFile);
+
+			DataTable table = oleDbSchema.GetTableColumns(tableName);
+
+			Assert.That(table, Is.Not.Null);
+
+			string name = table.TableName;
+			Assert.That(name, Is.EqualTo("Columns"));
+		}
+
+		/////////////////////////////////////////////////////////////////////////
 		/// Method <c>Insert</c>
 		/// <summary>
 		/// Insert Test
