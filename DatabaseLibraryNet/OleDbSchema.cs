@@ -168,9 +168,10 @@ namespace DigitalZenWorks.Database.ToolKit
 		{
 			oleDbConnection.Open();
 
+			object[] testTable = new object[] { null, null, tableName };
+
 			DataTable schemaTable = oleDbConnection.GetOleDbSchemaTable(
-				System.Data.OleDb.OleDbSchemaGuid.Columns,
-				new object[] { null, null, tableName });
+				OleDbSchemaGuid.Columns, testTable);
 
 			oleDbConnection.Close();
 
