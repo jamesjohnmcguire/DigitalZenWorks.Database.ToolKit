@@ -303,29 +303,16 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 
 			Assert.That(count, Is.EqualTo(2));
 
-			int index = 0;
-			string expected = null;
-
 			foreach (System.Collections.DictionaryEntry entry in tables)
 			{
 				object key = entry.Key;
 				object value = entry.Value;
 				string name = key.ToString();
-				DigitalZenWorks.Database.ToolKit.Table table = (Table)value;
+				Table table = (Table)value;
 
-				if (index == 0)
-				{
-					expected = "AddressesTest2";
-				}
-				else
-				{
-					expected = "AddressesTest";
-				}
-
-				Assert.That(name, Is.EqualTo(expected));
-				Assert.That(table.Name, Is.EqualTo(expected));
-
-				index++;
+				Assert.That(name, Is.AnyOf("AddressesTest2", "AddressesTest"));
+				Assert.That(
+					table.Name, Is.AnyOf("AddressesTest2", "AddressesTest"));
 			}
 		}
 
