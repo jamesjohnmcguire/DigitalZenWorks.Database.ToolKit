@@ -5,8 +5,6 @@
 /////////////////////////////////////////////////////////////////////////////
 
 using Common.Logging;
-using DigitalZenWorks.Common.Utilities;
-using MySqlX.XDevAPI.Relational;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -233,6 +231,43 @@ namespace DigitalZenWorks.Database.ToolKit
 		}
 
 		/// <summary>
+		/// Get ordered dependencies.
+		/// </summary>
+		/// <param name="tableDependencies">A dictionary of table
+		/// depdenencies.</param>
+		/// <returns>A list of ordered dependencies.</returns>
+		public static List<string> GetOrderedDependencies(
+			Dictionary<string, List<string>> tableDependencies)
+		{
+			List<string> orderedDependencies = [];
+
+			// Tracks previously processed nodes.
+			HashSet<string> visited = [];
+
+			// Tracks nodes in the current recursion stack
+			// (for cycle detection).
+			HashSet<string> visiting = [];
+
+			if (tableDependencies != null)
+			{
+				foreach (string key in tableDependencies.Keys)
+				{
+					if (!visited.Contains(key))
+					{
+						GetDependenciesRecursive(
+							key,
+							tableDependencies,
+							orderedDependencies,
+							visited,
+							visiting);
+					}
+				}
+			}
+
+			return orderedDependencies;
+		}
+
+		/// <summary>
 		/// Gets a list of relationships.
 		/// </summary>
 		/// <param name="oleDbSchema">The OLE database schema.</param>
@@ -261,6 +296,66 @@ namespace DigitalZenWorks.Database.ToolKit
 			}
 
 			return relationships;
+		}
+
+#if NET5_0_OR_GREATER
+		[SupportedOSPlatform("windows")]
+#endif
+		public static Hashtable GetSchema(string databaseFile)
+		{
+			Hashtable tables = null;
+			List<Relationship> relationships = [];
+
+			using (OleDbSchema oleDbSchema = new(databaseFile))
+			{
+				tables = [];
+
+				DataTable tableNames = oleDbSchema.TableNames;
+
+				foreach (DataRow row in tableNames.Rows)
+				{
+					string tableName = row["TABLE_NAME"].ToString();
+
+					Table table = GetTable(oleDbSchema, tableName);
+
+					// Get primary key
+					DataTable primary_key_table =
+						oleDbSchema.GetPrimaryKeys(tableName);
+
+					foreach (DataRow pkrow in primary_key_table.Rows)
+					{
+						table.PrimaryKey = pkrow["COLUMN_NAME"].ToString();
+					}
+
+					// If PK is an integer change type to AutoNumber
+					Column primaryKey = SetPrimaryKeyType(table);
+
+					if (primaryKey != null)
+					{
+						table.Columns[table.PrimaryKey] = primaryKey;
+					}
+
+					List<Relationship> newRelationships =
+						GetRelationships2(oleDbSchema, tableName);
+
+					relationships = [.. relationships, .. newRelationships];
+
+					tables.Add(table.Name, table);
+				}
+
+				// Add foreign keys to table, using relationships
+				foreach (Relationship relationship in relationships)
+				{
+					string name = relationship.ChildTable;
+
+					ForeignKey foreignKey =
+						GetForeignKeyRelationship(relationship);
+
+					((Table)tables[name]).ForeignKeys.Add(foreignKey);
+				}
+			}
+
+			return tables;
 		}
 
 		/// <summary>
@@ -547,6 +642,37 @@ namespace DigitalZenWorks.Database.ToolKit
 			return column;
 		}
 
+		private static void GetDependenciesRecursive(
+			string key,
+			Dictionary<string, List<string>> tableDependencies,
+			List<string> orderedDependencies,
+			HashSet<string> visited,
+			HashSet<string> visiting)
+		{
+			if (!visited.Contains(key) && !visiting.Contains(key))
+			{
+				visiting.Add(key);
+
+				if (tableDependencies.TryGetValue(
+					key, out List<string> value))
+				{
+					foreach (string dependency in value)
+					{
+						GetDependenciesRecursive(
+							dependency,
+							tableDependencies,
+							orderedDependencies,
+							visited,
+							visiting);
+					}
+				}
+
+				visiting.Remove(key); // Done visiting
+				visited.Add(key);     // Mark as processed
+				orderedDependencies.Add(key); // Add to result (postorder)
+			}
+		}
+
 		private static ForeignKey GetForeignKeyRelationship(
 			Relationship relationship)
 		{
@@ -612,66 +738,6 @@ namespace DigitalZenWorks.Database.ToolKit
 			}
 
 			return relationships;
-		}
-
-#if NET5_0_OR_GREATER
-		[SupportedOSPlatform("windows")]
-#endif
-		private static Hashtable GetSchema(string databaseFile)
-		{
-			Hashtable tables = null;
-			List<Relationship> relationships = [];
-
-			using (OleDbSchema oleDbSchema = new (databaseFile))
-			{
-				tables = [];
-
-				DataTable tableNames = oleDbSchema.TableNames;
-
-				foreach (DataRow row in tableNames.Rows)
-				{
-					string tableName = row["TABLE_NAME"].ToString();
-
-					Table table = GetTable(oleDbSchema, tableName);
-
-					// Get primary key
-					DataTable primary_key_table =
-						oleDbSchema.GetPrimaryKeys(tableName);
-
-					foreach (DataRow pkrow in primary_key_table.Rows)
-					{
-						table.PrimaryKey = pkrow["COLUMN_NAME"].ToString();
-					}
-
-					// If PK is an integer change type to AutoNumber
-					Column primaryKey = SetPrimaryKeyType(table);
-
-					if (primaryKey != null)
-					{
-						table.Columns[table.PrimaryKey] = primaryKey;
-					}
-
-					List<Relationship> newRelationships =
-						GetRelationships2(oleDbSchema, tableName);
-
-					relationships = [.. relationships, .. newRelationships];
-
-					tables.Add(table.Name, table);
-				}
-
-				// Add foreign keys to table, using relationships
-				foreach (Relationship relationship in relationships)
-				{
-					string name = relationship.ChildTable;
-
-					ForeignKey foreignKey =
-						GetForeignKeyRelationship(relationship);
-
-					((Table)tables[name]).ForeignKeys.Add(foreignKey);
-				}
-			}
-
-			return tables;
 		}
 
 #if NET5_0_OR_GREATER

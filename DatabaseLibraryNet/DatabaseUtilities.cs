@@ -81,16 +81,7 @@ namespace DigitalZenWorks.Database.ToolKit
 				{
 					for (int index = 0; index < columnCount; index++)
 					{
-						file.Write("\"");
-						if (!row.IsNull(index))
-						{
-							file.Write(row[index].ToString());
-						}
-
-						if (index < columnCount - 1)
-						{
-							file.Write("\", ");
-						}
+						WriteColumnToCsvFile(row, file, columnCount, index);
 					}
 
 					file.Write(file.NewLine);
@@ -168,16 +159,16 @@ namespace DigitalZenWorks.Database.ToolKit
 						{
 							var objectName = table["TABLE_NAME"];
 							string tableName = objectName.ToString();
-							string csvFile = csvPath + tableName + ".csv";
-
-							// Create the CSV file.
-							using StreamWriter file = new (csvFile, false);
 
 							// export the table
 							string sqlQuery = "SELECT * FROM " + tableName;
 							DataTable tableData =
 								database.GetDataTable(sqlQuery);
 
+							string csvFile = csvPath + tableName + ".csv";
+
+							// Create the CSV file.
+							using StreamWriter file = new (csvFile, false);
 							ExportDataTableToCsv(tableData, file);
 						}
 						catch (Exception exception) when
@@ -204,6 +195,21 @@ namespace DigitalZenWorks.Database.ToolKit
 			}
 
 			return returnCode;
+		}
+
+		private static void WriteColumnToCsvFile(
+			DataRow row, TextWriter file, int columnCount, int index)
+		{
+			file.Write("\"");
+			if (!row.IsNull(index))
+			{
+				file.Write(row[index].ToString());
+			}
+
+			if (index < columnCount - 1)
+			{
+				file.Write("\", ");
+			}
 		}
 	}
 }

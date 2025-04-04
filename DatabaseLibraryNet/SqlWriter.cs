@@ -65,6 +65,70 @@ namespace DigitalZenWorks.Database.ToolKit
 		}
 
 		/// <summary>
+		/// Create Insert Statement.
+		/// </summary>
+		/// <param name="tableName">The table name.</param>
+		/// <param name="primaryKeyPairs">The set of primary
+		/// key pairs.</param>
+		/// <param name="keyPairs">The set of key pairs.</param>
+		/// <returns>A SQL insert statement.</returns>
+		public static string? CreateUpdateStatement(
+			string tableName,
+			IList<KeyValuePair<string, string>> primaryKeyPairs,
+			IList<KeyValuePair<string, string>> keyPairs)
+		{
+			string? statement = null;
+
+			if (primaryKeyPairs != null && keyPairs != null)
+			{
+				string pairs = string.Empty;
+				string where = " WHERE ";
+
+				int count = keyPairs.Count;
+
+				for (int index = 0; index < count; index++)
+				{
+					KeyValuePair<string, string> keyPair = keyPairs[index];
+
+					string pair = keyPair.Key + " = " + keyPair.Value;
+
+					if (index < count - 1)
+					{
+						pair += ", ";
+					}
+
+					pairs += pair;
+				}
+
+				count = primaryKeyPairs.Count;
+
+				for (int index = 0; index < count; index++)
+				{
+					KeyValuePair<string, string> keyPair =
+						primaryKeyPairs[index];
+
+					string pair = keyPair.Key + " = " + keyPair.Value;
+
+					if (index > 0)
+					{
+						pair += " AND ";
+					}
+
+					where += pair;
+				}
+
+				statement = string.Format(
+					CultureInfo.InvariantCulture,
+					"UPDATE {0} {1} {2};",
+					tableName,
+					pairs,
+					where);
+			}
+
+			return statement;
+		}
+
+		/// <summary>
 		/// Get OA date.
 		/// </summary>
 		/// <param name="rawValue">The raw value to check.</param>

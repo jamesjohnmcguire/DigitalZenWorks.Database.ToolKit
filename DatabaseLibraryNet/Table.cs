@@ -8,6 +8,7 @@ using Common.Logging;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Data;
 using System.Globalization;
 using System.Reflection;
@@ -29,12 +30,11 @@ namespace DigitalZenWorks.Database.ToolKit
 			System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
 		private static readonly ResourceManager StringTable = new
-			ResourceManager(
-			"DigitalZenWorks.Database.ToolKit.Resources",
+			("DigitalZenWorks.Database.ToolKit.Resources",
 			Assembly.GetExecutingAssembly());
 
 		private readonly Dictionary<string, Column> columns = [];
-		private readonly List<ForeignKey> foreignKeys = [];
+		private readonly Collection<ForeignKey> foreignKeys = [];
 
 		private string name = string.Empty;
 		private string primaryKey = string.Empty;
@@ -81,7 +81,7 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// Represents the foreign keys.
 		/// </value>
 		/////////////////////////////////////////////////////////////////////
-		public List<ForeignKey> ForeignKeys
+		public Collection<ForeignKey> ForeignKeys
 		{
 			get { return foreignKeys; }
 		}

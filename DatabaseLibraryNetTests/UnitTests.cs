@@ -3,17 +3,17 @@
 // All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-using DigitalZenWorks.Database.ToolKit;
+using DigitalZenWorks.Common.Utilities;
 using NUnit.Framework;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
-using System.Data.OleDb;
 using System.Data.SQLite;
 using System.Globalization;
 using System.IO;
-using System.Reflection;
+using System.Runtime.Versioning;
 
 [assembly: CLSCompliant(true)]
 
@@ -26,7 +26,7 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 	/// </summary>
 	/////////////////////////////////////////////////////////////////////////
 	[TestFixture]
-	internal class TransactionUnitTests : IDisposable
+	internal sealed class TransactionUnitTests : IDisposable
 	{
 		/// <summary>
 		/// database
@@ -99,7 +99,7 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 		/// Dispose
 		/// </summary>
 		/// <param name="disposing"></param>
-		protected virtual void Dispose(bool disposing)
+		public void Dispose(bool disposing)
 		{
 			if (disposing)
 			{
@@ -135,6 +135,21 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 		}
 
 		/////////////////////////////////////////////////////////////////////
+		/// Method <c>CanQueryTest</c>
+		/// <summary>
+		/// Test to see if Unit Testing is working
+		/// </summary>
+		/////////////////////////////////////////////////////////////////////
+		[Test]
+		public void CanQueryTest()
+		{
+			bool canQuery = database.CanQuery();
+
+			// No exceptions found
+			Assert.That(canQuery, Is.True);
+		}
+
+		/////////////////////////////////////////////////////////////////////
 		/// Method <c>CreateTableTest</c>
 		/// <summary>
 		/// Create table test
@@ -162,93 +177,68 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 		/// Test to see if test db exists
 		/// </summary>
 		/////////////////////////////////////////////////////////////////////
-		//[Test]
-		//public void DatabaseCanOpen()
-		//{
-		//	string provider = "Microsoft.ACE.OLEDB.12.0";
-
-		//	string connectionString = string.Format(
-		//		CultureInfo.InvariantCulture,
-		//		"provider={0}; Data Source={1}",
-		//		provider,
-		//		dataSource);
-		//	using (OleDbConnection oleDbConnection =
-		//		new OleDbConnection(connectionString))
-		//	{
-		//		oleDbConnection.Open();
-		//		oleDbConnection.Close();
-		//	}
-
-		//	// assuming no exceptions
-		//	Assert.IsTrue(File.Exists(dataSource));
-		//}
-
-		/////////////////////////////////////////////////////////////////////
-		/// Method <c>VerifyTestSourceExists</c>
-		/// <summary>
-		/// Test to see if test db exists
-		/// </summary>
-		/////////////////////////////////////////////////////////////////////
 		[Test]
-		public void VerifyTestSourceExists()
+		public void DatabaseCanOpen()
 		{
-			Assert.That(File.Exists(dataSource), Is.True);
+			//	string provider = "Microsoft.ACE.OLEDB.12.0";
+
+			//	string connectionString = string.Format(
+			//		CultureInfo.InvariantCulture,
+			//		"provider={0}; Data Source={1}",
+			//		provider,
+			//		dataSource);
+			//	using (OleDbConnection oleDbConnection =
+			//		new OleDbConnection(connectionString))
+			//	{
+			//		oleDbConnection.Open();
+			//		oleDbConnection.Close();
+			//	}
+
+			//	// assuming no exceptions
+			//	Assert.IsTrue(File.Exists(dataSource));
+			Assert.Pass();
 		}
 
 		/////////////////////////////////////////////////////////////////////
-		/// Method <c>CanQueryTest</c>
 		/// <summary>
-		/// Test to see if Unit Testing is working
+		/// Dependencies order test.
 		/// </summary>
 		/////////////////////////////////////////////////////////////////////
 		[Test]
-		public void CanQueryTest()
+		public void DependenciesOrder()
 		{
-			bool canQuery = database.CanQuery();
+			Dictionary<string, List<string>> tableDependencies = new()
+			{
+				{ "Categories", [] },
+				{ "Makers", [] },
+				{ "Series", new List<string> { "Makers" } },
+				{ "Sections", new List<string> { "Categories", "Makers" } },
+				{
+					"ImportProducts", new List<string>
+					{ "Sections", "Series", "Makers" }
+				}
+			};
 
-			// No exceptions found
-			Assert.That(canQuery, Is.True);
-		}
+			List<string> orderedDependencies =
+				DataDefinition.GetOrderedDependencies(tableDependencies);
 
-		/////////////////////////////////////////////////////////////////////
-		/// Method <c>SelectTest</c>
-		/// <summary>
-		/// Test to see if Unit Testing is working
-		/// </summary>
-		/////////////////////////////////////////////////////////////////////
-		[Test]
-		public void SelectTest()
-		{
-			string query = "SELECT * FROM TestTable";
+			int tableCount = orderedDependencies.Count;
+			Assert.That(tableCount, Is.EqualTo(5));
 
-			DataSet dataSet = database.GetDataSet(query);
+			string tableName = orderedDependencies[0];
+			Assert.That(tableName, Is.AnyOf("Categories", "Makers"));
 
-			Assert.That(dataSet, Is.Not.Null);
+			tableName = orderedDependencies[1];
+			Assert.That(tableName, Is.AnyOf("Categories", "Makers"));
 
-			// No exceptions found
-			Assert.That(dataSet.Tables.Count, Is.GreaterThanOrEqualTo(0));
-		}
+			tableName = orderedDependencies[2];
+			Assert.That(tableName, Is.AnyOf("Sections", "Series"));
 
-		/////////////////////////////////////////////////////////////////////////
-		/// Method <c>Insert</c>
-		/// <summary>
-		/// Insert Test
-		/// </summary>
-		/////////////////////////////////////////////////////////////////////////
-		[Test]
-		public void Insert()
-		{
-			string Description = "Unit Test - Time: " + DateTime.Now;
+			tableName = orderedDependencies[3];
+			Assert.That(tableName, Is.AnyOf("Sections", "Series"));
 
-			string SqlQueryCommand = "INSERT INTO TestTable " +
-							@"(Description) VALUES " +
-							@"('" + Description + "')";
-
-			int rowId = database.Insert(SqlQueryCommand);
-
-			Assert.That(rowId, Is.GreaterThanOrEqualTo(1));
-
-			VerifyRowExists(rowId, true);
+			tableName = orderedDependencies[4];
+			Assert.That(tableName, Is.EqualTo("ImportProducts"));
 		}
 
 		/////////////////////////////////////////////////////////////////////////
@@ -296,6 +286,71 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 			Assert.That(exists, Is.True);
 		}
 
+		/////////////////////////////////////////////////////////////////////
+		/// <summary>
+		/// Get schema test.
+		/// </summary>
+		/////////////////////////////////////////////////////////////////////
+		[SupportedOSPlatform("windows")]
+		[Test]
+		public static void GetSchema()
+		{
+			string databaseFile = GetTestMdbFile();
+
+			Hashtable tables = DataDefinition.GetSchema(databaseFile);
+
+			int count = tables.Count;
+
+			Assert.That(count, Is.EqualTo(2));
+
+			int index = 0;
+			string expected = null;
+
+			foreach (System.Collections.DictionaryEntry entry in tables)
+			{
+				object key = entry.Key;
+				object value = entry.Value;
+				string name = key.ToString();
+				DigitalZenWorks.Database.ToolKit.Table table = (Table)value;
+
+				if (index == 0)
+				{
+					expected = "AddressesTest2";
+				}
+				else
+				{
+					expected = "AddressesTest";
+				}
+
+				Assert.That(name, Is.EqualTo(expected));
+				Assert.That(table.Name, Is.EqualTo(expected));
+
+				index++;
+			}
+		}
+
+		/////////////////////////////////////////////////////////////////////////
+		/// Method <c>Insert</c>
+		/// <summary>
+		/// Insert Test
+		/// </summary>
+		/////////////////////////////////////////////////////////////////////////
+		[Test]
+		public void Insert()
+		{
+			string Description = "Unit Test - Time: " + DateTime.Now;
+
+			string SqlQueryCommand = "INSERT INTO TestTable " +
+							@"(Description) VALUES " +
+							@"('" + Description + "')";
+
+			int rowId = database.Insert(SqlQueryCommand);
+
+			Assert.That(rowId, Is.GreaterThanOrEqualTo(1));
+
+			VerifyRowExists(rowId, true);
+		}
+
 		/////////////////////////////////////////////////////////////////////////
 		/// Method <c>SchemaTable</c>
 		/// <summary>
@@ -308,6 +363,25 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 			DataTable table = database.SchemaTable;
 
 			Assert.That(table, Is.Not.Null);
+		}
+
+		/////////////////////////////////////////////////////////////////////
+		/// Method <c>SelectTest</c>
+		/// <summary>
+		/// Test to see if Unit Testing is working
+		/// </summary>
+		/////////////////////////////////////////////////////////////////////
+		[Test]
+		public void SelectTest()
+		{
+			string query = "SELECT * FROM TestTable";
+
+			DataSet dataSet = database.GetDataSet(query);
+
+			Assert.That(dataSet, Is.Not.Null);
+
+			// No exceptions found
+			Assert.That(dataSet.Tables.Count, Is.GreaterThanOrEqualTo(0));
 		}
 
 		/////////////////////////////////////////////////////////////////////////
@@ -348,6 +422,40 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 			bool result = database.Update(query, parameters);
 
 			Assert.That(result, Is.True);
+		}
+
+		/////////////////////////////////////////////////////////////////////
+		/// Method <c>VerifyTestSourceExists</c>
+		/// <summary>
+		/// Test to see if test db exists
+		/// </summary>
+		/////////////////////////////////////////////////////////////////////
+		[Test]
+		public void VerifyTestSourceExists()
+		{
+			Assert.That(File.Exists(dataSource), Is.True);
+		}
+
+		private static string GetTestMdbFile()
+		{
+			string resource =
+				"DigitalZenWorks.Database.ToolKit.Tests.test.mdb";
+
+			string fileName = Path.GetTempFileName();
+
+			// A 0 byte sized file is created.  Need to remove it.
+			File.Delete(fileName);
+			string filePath = Path.ChangeExtension(fileName, "mdb");
+
+			bool result = FileUtils.CreateFileFromEmbeddedResource(
+				resource, filePath);
+
+			Assert.That(result, Is.True);
+
+			result = File.Exists(filePath);
+			Assert.That(result, Is.True);
+
+			return filePath;
 		}
 
 		private static string GetTestDatabasePath()

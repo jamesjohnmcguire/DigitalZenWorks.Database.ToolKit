@@ -41,7 +41,7 @@
 		<PackageReference Include="Common.Logging" Version="3.4.1" />
 		<PackageReference Include="Common.Logging.Core" Version="3.4.1" />
 		<PackageReference Include="Dapper" Version="2.1.66" />
-		<PackageReference Include="DigitalZenWorks.Common.Utilities" Version="1.4.74" />
+		<PackageReference Include="DigitalZenWorks.Common.Utilities" Version="1.4.75" />
 		<PackageReference Include="Microsoft.Data.SqlClient" Version="6.0.1" />
 		<PackageReference Include="Microsoft.DotNet.Analyzers.Compatibility" Version="0.2.12-alpha">
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -52,15 +52,9 @@
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
-		<PackageReference Include="System.Data.OleDb" Version="9.0.2" />
+		<PackageReference Include="System.Data.OleDb" Version="9.0.3" />
 		<PackageReference Include="System.Data.SqlClient" Version="4.9.0" />
 		<PackageReference Include="System.Data.SQLite.Core" Version="1.0.119" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<Compile Remove="DatabaseLibraryNetTests\**" />
-		<EmbeddedResource Remove="DatabaseLibraryNetTests\**" />
-		<None Remove="DatabaseLibraryNetTests\**" />
 	</ItemGroup>
 
 	<ItemGroup>
