@@ -69,30 +69,11 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 		{
 			if (database != null)
 			{
-				database.CommitTransaction();
+				database.Close();
 				database.Shutdown();
 			}
 
 			File.Delete(dataSource);
-		}
-
-		[TearDown]
-		public void TearDown()
-		{
-			if (database != null)
-			{
-				if (database.Connection != null)
-				{
-					ConnectionState state = database.Connection.State;
-
-					if (state == ConnectionState.Open)
-					{
-						database.Connection.Close();
-					}
-				}
-
-				database.Close();
-			}
 		}
 
 		/// <summary>
