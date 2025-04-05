@@ -6,6 +6,7 @@
 using DigitalZenWorks.Common.Utilities;
 using NUnit.Framework;
 using System.Collections;
+using System.Collections.Generic;
 using System.Data;
 using System.Data.SQLite;
 using System.Globalization;
@@ -21,6 +22,61 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 	[TestFixture]
 	internal sealed class OleDbTests
 	{
+		/// <summary>
+		/// Get relationships test.
+		/// </summary>
+		[Test]
+		public static void GetRelationships()
+		{
+			string dependentTableName = "AddressesTest";
+			string databaseFile = GetTestMdbFile();
+
+			using OleDbSchema oleDbSchema = new(databaseFile);
+
+			ArrayList relationships = DataDefinition.GetRelationships(
+				oleDbSchema, dependentTableName);
+
+			int count = relationships.Count;
+
+			Assert.That(count, Is.EqualTo(1));
+
+			Relationship relationship = (Relationship)relationships[0];
+
+			string name = relationship.ParentTable;
+			Assert.That(name, Is.EqualTo("AddressesTest"));
+
+			name = relationship.ChildTable;
+			Assert.That(name, Is.EqualTo("AddressesTest2"));
+		}
+
+		/// <summary>
+		/// Get relationships test.
+		/// </summary>
+		[Test]
+		public static void GetRelationships2()
+		{
+			string dependentTableName = "AddressesTest";
+			string databaseFile = GetTestMdbFile();
+
+			using OleDbSchema oleDbSchema = new(databaseFile);
+
+			List<Relationship> relationships =
+				DataDefinition.GetRelationshipsNew(
+					oleDbSchema, dependentTableName);
+
+			int count = relationships.Count;
+
+			Assert.That(count, Is.EqualTo(1));
+
+			Relationship relationship = relationships[0];
+
+			string name = relationship.ParentTable;
+			Assert.That(name, Is.EqualTo("AddressesTest"));
+
+			name = relationship.ChildTable;
+			Assert.That(name, Is.EqualTo("AddressesTest2"));
+		}
+
 		/// <summary>
 		/// Get schema test.
 		/// </summary>
