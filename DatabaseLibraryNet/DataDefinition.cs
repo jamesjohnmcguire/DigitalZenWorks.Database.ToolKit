@@ -317,25 +317,7 @@ namespace DigitalZenWorks.Database.ToolKit
 				object nameRaw = row["TABLE_NAME"];
 				string tableName = nameRaw.ToString();
 
-				Table table = GetTable(oleDbSchema, tableName);
-
-				// Get primary key
-				DataTable primary_key_table =
-					oleDbSchema.GetPrimaryKeys(tableName);
-
-				foreach (DataRow pkrow in primary_key_table.Rows)
-				{
-					nameRaw = pkrow["COLUMN_NAME"];
-					table.PrimaryKey = nameRaw.ToString();
-				}
-
-				// If PK is an integer change type to AutoNumber
-				Column primaryKey = SetPrimaryKeyType(table);
-
-				if (primaryKey != null)
-				{
-					table.Columns[table.PrimaryKey] = primaryKey;
-				}
+				Table table = SetPrimaryKey(oleDbSchema, row);
 
 				List<Relationship> newRelationships =
 					GetRelationships2(oleDbSchema, tableName);
@@ -808,6 +790,37 @@ namespace DigitalZenWorks.Database.ToolKit
 			}
 
 			return TopologicalSort(list);
+		}
+
+#if NET5_0_OR_GREATER
+		[SupportedOSPlatform("windows")]
+#endif
+		private static Table SetPrimaryKey(
+			OleDbSchema oleDbSchema, DataRow row)
+		{
+			object nameRaw = row["TABLE_NAME"];
+			string tableName = nameRaw.ToString();
+
+			Table table = GetTable(oleDbSchema, tableName);
+
+			DataTable primaryKeys =
+				oleDbSchema.GetPrimaryKeys(tableName);
+
+			// TODO: This assumes only a single primary key.  Need to
+			// compensate for composite primary keys.
+			DataRow primaryKeyRow = primaryKeys.Rows[0];
+			nameRaw = primaryKeyRow["COLUMN_NAME"];
+			table.PrimaryKey = nameRaw.ToString();
+
+			// If PK is an integer change type to AutoNumber
+			Column primaryKey = SetPrimaryKeyType(table);
+
+			if (primaryKey != null)
+			{
+				table.Columns[table.PrimaryKey] = primaryKey;
+			}
+
+			return table;
 		}
 
 		// If primary key is an integer, change type to AutoNumber.
