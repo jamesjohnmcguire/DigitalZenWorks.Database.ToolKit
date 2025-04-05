@@ -298,6 +298,33 @@ namespace DigitalZenWorks.Database.ToolKit
 			return relationships;
 		}
 
+		/// <summary>
+		/// Gets a list of relationships.
+		/// </summary>
+		/// <param name="oleDbSchema">The OLE database schema.</param>
+		/// <param name="tableName">The table name.</param>
+		/// <returns>A list of relationships.</returns>
+#if NET5_0_OR_GREATER
+		[SupportedOSPlatform("windows")]
+#endif
+		public static List<Relationship> GetRelationshipsNew(
+			OleDbSchema oleDbSchema, string tableName)
+		{
+			List<Relationship> relationships = [];
+
+			DataTable foreignKeyTable = oleDbSchema.GetForeignKeys(tableName);
+
+			foreach (DataRow foreignKey in foreignKeyTable.Rows)
+			{
+				Relationship relationship =
+					GetRelationship(foreignKey);
+
+				relationships.Add(relationship);
+			}
+
+			return relationships;
+		}
+
 #if NET5_0_OR_GREATER
 		[SupportedOSPlatform("windows")]
 #endif
@@ -320,7 +347,7 @@ namespace DigitalZenWorks.Database.ToolKit
 				Table table = SetPrimaryKey(oleDbSchema, row);
 
 				List<Relationship> newRelationships =
-					GetRelationships2(oleDbSchema, tableName);
+					GetRelationshipsNew(oleDbSchema, tableName);
 
 				relationships = [.. relationships, .. newRelationships];
 
@@ -696,33 +723,6 @@ namespace DigitalZenWorks.Database.ToolKit
 			}
 
 			return relationship;
-		}
-
-		/// <summary>
-		/// Gets a list of relationships.
-		/// </summary>
-		/// <param name="oleDbSchema">The OLE database schema.</param>
-		/// <param name="tableName">The table name.</param>
-		/// <returns>A list of relationships.</returns>
-#if NET5_0_OR_GREATER
-		[SupportedOSPlatform("windows")]
-#endif
-		private static List<Relationship> GetRelationships2(
-			OleDbSchema oleDbSchema, string tableName)
-		{
-			List<Relationship> relationships = [];
-
-			DataTable foreignKeyTable = oleDbSchema.GetForeignKeys(tableName);
-
-			foreach (DataRow foreignKey in foreignKeyTable.Rows)
-			{
-				Relationship relationship =
-					GetRelationship(foreignKey);
-
-				relationships.Add(relationship);
-			}
-
-			return relationships;
 		}
 
 #if NET5_0_OR_GREATER
