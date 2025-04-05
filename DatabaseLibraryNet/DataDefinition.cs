@@ -356,6 +356,37 @@ namespace DigitalZenWorks.Database.ToolKit
 			return tables;
 		}
 
+#if NET5_0_OR_GREATER
+		[SupportedOSPlatform("windows")]
+#endif
+		public static List<Table> GetSchemaNew(string databaseFile)
+		{
+			List<Table> tables = [];
+
+			using OleDbSchema oleDbSchema = new (databaseFile);
+
+			tables = [];
+
+			DataTable tableNames = oleDbSchema.TableNames;
+
+			foreach (DataRow row in tableNames.Rows)
+			{
+				object nameRaw = row["TABLE_NAME"];
+				string tableName = nameRaw.ToString();
+
+				Table table = SetPrimaryKey(oleDbSchema, row);
+
+				List<Relationship> relationships =
+					GetRelationshipsNew(oleDbSchema, tableName);
+
+				table = SetForeignKeys(table, relationships);
+
+				tables.Add(table);
+			}
+
+			return tables;
+		}
+
 		/// <summary>
 		/// GetTableDefinitions - returns an array of table definitions.
 		/// </summary>

@@ -105,6 +105,27 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 		}
 
 		/// <summary>
+		/// Get schema test.
+		/// </summary>
+		[Test]
+		public static void GetSchemaNew()
+		{
+			string databaseFile = GetTestMdbFile();
+
+			List<Table> tables = DataDefinition.GetSchemaNew(databaseFile);
+
+			int count = tables.Count;
+
+			Assert.That(count, Is.EqualTo(2));
+
+			foreach (Table table in tables)
+			{
+				Assert.That(
+					table.Name, Is.AnyOf("AddressesTest2", "AddressesTest"));
+			}
+		}
+
+		/// <summary>
 		/// GetTableColumns test.
 		/// </summary>
 		[Test]
