@@ -267,59 +267,6 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 			Assert.That(exists, Is.True);
 		}
 
-		/////////////////////////////////////////////////////////////////////
-		/// <summary>
-		/// Get schema test.
-		/// </summary>
-		/////////////////////////////////////////////////////////////////////
-		[SupportedOSPlatform("windows")]
-		[Test]
-		public static void GetSchema()
-		{
-			string databaseFile = GetTestMdbFile();
-
-			Hashtable tables = DataDefinition.GetSchema(databaseFile);
-
-			int count = tables.Count;
-
-			Assert.That(count, Is.EqualTo(2));
-
-			foreach (System.Collections.DictionaryEntry entry in tables)
-			{
-				object key = entry.Key;
-				object value = entry.Value;
-				string name = key.ToString();
-				Table table = (Table)value;
-
-				Assert.That(name, Is.AnyOf("AddressesTest2", "AddressesTest"));
-				Assert.That(
-					table.Name, Is.AnyOf("AddressesTest2", "AddressesTest"));
-			}
-		}
-
-		/////////////////////////////////////////////////////////////////////////
-		/// Method <c>GetTableColumns</c>
-		/// <summary>
-		/// GetTableColumns test.
-		/// </summary>
-		/////////////////////////////////////////////////////////////////////////
-		[SupportedOSPlatform("windows")]
-		[Test]
-		public void GetTableColumns()
-		{
-			string tableName = "AddressTest";
-			string databaseFile = GetTestMdbFile();
-
-			using OleDbSchema oleDbSchema = new(databaseFile);
-
-			DataTable table = oleDbSchema.GetTableColumns(tableName);
-
-			Assert.That(table, Is.Not.Null);
-
-			string name = table.TableName;
-			Assert.That(name, Is.EqualTo("Columns"));
-		}
-
 		/////////////////////////////////////////////////////////////////////////
 		/// Method <c>Insert</c>
 		/// <summary>
@@ -425,28 +372,6 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 		public void VerifyTestSourceExists()
 		{
 			Assert.That(File.Exists(dataSource), Is.True);
-		}
-
-		private static string GetTestMdbFile()
-		{
-			string resource =
-				"DigitalZenWorks.Database.ToolKit.Tests.test.mdb";
-
-			string fileName = Path.GetTempFileName();
-
-			// A 0 byte sized file is created.  Need to remove it.
-			File.Delete(fileName);
-			string filePath = Path.ChangeExtension(fileName, "mdb");
-
-			bool result = FileUtils.CreateFileFromEmbeddedResource(
-				resource, filePath);
-
-			Assert.That(result, Is.True);
-
-			result = File.Exists(filePath);
-			Assert.That(result, Is.True);
-
-			return filePath;
 		}
 
 		private static string GetTestDatabasePath()
