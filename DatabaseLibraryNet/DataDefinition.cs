@@ -331,7 +331,6 @@ namespace DigitalZenWorks.Database.ToolKit
 		public static Hashtable GetSchema(string databaseFile)
 		{
 			Hashtable tables = null;
-			List<Relationship> relationships = [];
 
 			using OleDbSchema oleDbSchema = new (databaseFile);
 
@@ -346,25 +345,12 @@ namespace DigitalZenWorks.Database.ToolKit
 
 				Table table = SetPrimaryKey(oleDbSchema, row);
 
-				List<Relationship> newRelationships =
+				List<Relationship> relationships =
 					GetRelationshipsNew(oleDbSchema, tableName);
 
-				relationships = [.. relationships, .. newRelationships];
+				table = SetForeignKeys(table, relationships);
 
 				tables.Add(table.Name, table);
-			}
-
-			// Add foreign keys to table, using relationships
-			foreach (Relationship relationship in relationships)
-			{
-				string name = relationship.ChildTable;
-
-				ForeignKey foreignKey =
-					GetForeignKeyRelationship(relationship);
-
-				Table table = (Table)tables[name];
-
-				table.ForeignKeys.Add(foreignKey);
 			}
 
 			return tables;
@@ -840,6 +826,25 @@ namespace DigitalZenWorks.Database.ToolKit
 			}
 
 			return primaryKey;
+		}
+
+#if NET5_0_OR_GREATER
+		[SupportedOSPlatform("windows")]
+#endif
+		private static Table SetForeignKeys(
+			Table table, List<Relationship> relationships)
+		{
+			table.ForeignKeys.Clear();
+
+			foreach (Relationship relationship in relationships)
+			{
+				ForeignKey foreignKey =
+					GetForeignKeyRelationship(relationship);
+
+				table.ForeignKeys.Add(foreignKey);
+			}
+
+			return table;
 		}
 
 		/// <summary>
