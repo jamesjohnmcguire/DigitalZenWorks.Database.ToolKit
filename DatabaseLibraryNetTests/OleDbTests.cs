@@ -21,11 +21,9 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 	[TestFixture]
 	internal sealed class OleDbTests
 	{
-		/////////////////////////////////////////////////////////////////////
 		/// <summary>
 		/// Get schema test.
 		/// </summary>
-		/////////////////////////////////////////////////////////////////////
 		[Test]
 		public static void GetSchema()
 		{
@@ -50,12 +48,9 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 			}
 		}
 
-		/////////////////////////////////////////////////////////////////////////
-		/// Method <c>GetTableColumns</c>
 		/// <summary>
 		/// GetTableColumns test.
 		/// </summary>
-		/////////////////////////////////////////////////////////////////////////
 		[Test]
 		public void GetTableColumns()
 		{

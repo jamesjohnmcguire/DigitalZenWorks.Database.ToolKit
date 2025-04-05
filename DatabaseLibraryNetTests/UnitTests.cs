@@ -19,12 +19,9 @@ using System.Runtime.Versioning;
 
 namespace DigitalZenWorks.Database.ToolKit.Tests
 {
-	/////////////////////////////////////////////////////////////////////////
-	/// Class <c>UnitTests</c>
 	/// <summary>
 	/// Database Unit Testing Class
 	/// </summary>
-	/////////////////////////////////////////////////////////////////////////
 	[TestFixture]
 	internal sealed class TransactionUnitTests : IDisposable
 	{
@@ -34,12 +31,9 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 		private DataStorage database;
 		private string dataSource;
 
-		/////////////////////////////////////////////////////////////////////
-		/// Method <c>OneTimeSetUp</c>
 		/// <summary>
 		/// One time set up method.
 		/// </summary>
-		/////////////////////////////////////////////////////////////////////
 		[OneTimeSetUp]
 		public void OneTimeSetUp()
 		{
@@ -58,12 +52,9 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 			database = new DataStorage(DatabaseType.SQLite, connectionString);
 		}
 
-		/////////////////////////////////////////////////////////////////////
-		/// Method <c>OneTimeTearDown</c>
 		/// <summary>
 		/// function that is called when all tests are completed.
 		/// </summary>
-		/////////////////////////////////////////////////////////////////////
 		[OneTimeTearDown]
 		public void OneTimeTearDown()
 		{
@@ -101,12 +92,9 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 			GC.SuppressFinalize(this);
 		}
 
-		/////////////////////////////////////////////////////////////////////
-		/// Method <c>BasicTest</c>
 		/// <summary>
 		/// Test to see if Unit Testing is working
 		/// </summary>
-		/////////////////////////////////////////////////////////////////////
 		[Test]
 		public static void BasicTest()
 		{
@@ -115,12 +103,9 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 			Assert.That(AlwaysTrue, Is.True);
 		}
 
-		/////////////////////////////////////////////////////////////////////
-		/// Method <c>CanQueryTest</c>
 		/// <summary>
 		/// Test to see if Unit Testing is working
 		/// </summary>
-		/////////////////////////////////////////////////////////////////////
 		[Test]
 		public void CanQueryTest()
 		{
@@ -130,12 +115,9 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 			Assert.That(canQuery, Is.True);
 		}
 
-		/////////////////////////////////////////////////////////////////////
-		/// Method <c>CreateTableTest</c>
 		/// <summary>
 		/// Create table test
 		/// </summary>
-		/////////////////////////////////////////////////////////////////////
 		[Test, Order(1)]
 		public void CreateTableTest()
 		{
@@ -152,12 +134,9 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 			Assert.That(dbDataReader.HasRows, Is.True);
 		}
 
-		/////////////////////////////////////////////////////////////////////
-		/// Method <c>DatabaseCanOpen</c>
 		/// <summary>
 		/// Test to see if test db exists
 		/// </summary>
-		/////////////////////////////////////////////////////////////////////
 		[Test]
 		public void DatabaseCanOpen()
 		{
@@ -180,11 +159,9 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 			Assert.Pass();
 		}
 
-		/////////////////////////////////////////////////////////////////////
 		/// <summary>
 		/// Dependencies order test.
 		/// </summary>
-		/////////////////////////////////////////////////////////////////////
 		[Test]
 		public void DependenciesOrder()
 		{
@@ -222,12 +199,9 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 			Assert.That(tableName, Is.EqualTo("ImportProducts"));
 		}
 
-		/////////////////////////////////////////////////////////////////////////
-		/// Method <c>Delete</c>
 		/// <summary>
 		/// Delete Test
 		/// </summary>
-		/////////////////////////////////////////////////////////////////////////
 		[Test]
 		public void Delete()
 		{
@@ -248,12 +222,9 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 			VerifyRowExists(rowId, false);
 		}
 
-		/////////////////////////////////////////////////////////////////////////
-		/// Method <c>ExportToCsv</c>
 		/// <summary>
 		/// Export to CSV Test
 		/// </summary>
-		/////////////////////////////////////////////////////////////////////////
 		[Test]
 		public void ExportToCsv()
 		{
@@ -267,12 +238,9 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 			Assert.That(exists, Is.True);
 		}
 
-		/////////////////////////////////////////////////////////////////////////
-		/// Method <c>Insert</c>
 		/// <summary>
 		/// Insert Test
 		/// </summary>
-		/////////////////////////////////////////////////////////////////////////
 		[Test]
 		public void Insert()
 		{
@@ -289,12 +257,9 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 			VerifyRowExists(rowId, true);
 		}
 
-		/////////////////////////////////////////////////////////////////////////
-		/// Method <c>SchemaTable</c>
 		/// <summary>
 		/// Delete Test
 		/// </summary>
-		/////////////////////////////////////////////////////////////////////////
 		[Test]
 		public void SchemaTable()
 		{
@@ -303,12 +268,9 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 			Assert.That(table, Is.Not.Null);
 		}
 
-		/////////////////////////////////////////////////////////////////////
-		/// Method <c>SelectTest</c>
 		/// <summary>
 		/// Test to see if Unit Testing is working
 		/// </summary>
-		/////////////////////////////////////////////////////////////////////
 		[Test]
 		public void SelectTest()
 		{
@@ -322,12 +284,9 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 			Assert.That(dataSet.Tables.Count, Is.GreaterThanOrEqualTo(0));
 		}
 
-		/////////////////////////////////////////////////////////////////////////
-		/// Method <c>Update</c>
 		/// <summary>
 		/// Update Test
 		/// </summary>
-		/////////////////////////////////////////////////////////////////////////
 		[Test]
 		public void Update()
 		{
@@ -342,12 +301,9 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 			Assert.That(result, Is.True);
 		}
 
-		/////////////////////////////////////////////////////////////////////////
-		/// Method <c>UpdateWithParameters</c>
 		/// <summary>
 		/// Update with Parameters Test
 		/// </summary>
-		/////////////////////////////////////////////////////////////////////////
 		[Test]
 		public void UpdateWithParameters()
 		{
@@ -362,12 +318,9 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 			Assert.That(result, Is.True);
 		}
 
-		/////////////////////////////////////////////////////////////////////
-		/// Method <c>VerifyTestSourceExists</c>
 		/// <summary>
 		/// Test to see if test db exists
 		/// </summary>
-		/////////////////////////////////////////////////////////////////////
 		[Test]
 		public void VerifyTestSourceExists()
 		{
