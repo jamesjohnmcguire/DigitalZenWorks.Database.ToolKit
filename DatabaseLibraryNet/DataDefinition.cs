@@ -353,7 +353,9 @@ namespace DigitalZenWorks.Database.ToolKit
 				ForeignKey foreignKey =
 					GetForeignKeyRelationship(relationship);
 
-				((Table)tables[name]).ForeignKeys.Add(foreignKey);
+				Table table = (Table)tables[name];
+
+				table.ForeignKeys.Add(foreignKey);
 			}
 
 			return tables;
