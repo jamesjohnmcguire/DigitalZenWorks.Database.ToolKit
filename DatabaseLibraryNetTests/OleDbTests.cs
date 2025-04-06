@@ -182,8 +182,27 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 			int count = sortedList.Count;
 			Assert.That(count, Is.EqualTo(5));
 
+			object table = sortedList[0];
+			string tableName = table.ToString();
+			Assert.That(tableName, Is.AnyOf("Categories", "Makers"));
+
+			table = sortedList[1];
+			tableName = table.ToString();
+			Assert.That(tableName, Is.AnyOf("Categories", "Makers"));
+
+			table = sortedList[2];
+			tableName = table.ToString();
+			Assert.That(tableName, Is.AnyOf("Sections", "Series"));
+
+			table = sortedList[3];
+			tableName = table.ToString();
+			Assert.That(tableName, Is.AnyOf("Sections", "Series"));
+
+			table = sortedList[4];
+			tableName = table.ToString();
+			Assert.That(tableName, Is.EqualTo("ImportProducts"));
 		}
-		
+
 		private static string GetTestMdbFile()
 		{
 			string resource =
