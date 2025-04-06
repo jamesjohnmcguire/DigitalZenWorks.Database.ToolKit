@@ -43,6 +43,7 @@
 
 	<ItemGroup>
 		<EmbeddedResource Include="test.mdb" />
+		<EmbeddedResource Include="Products.Test.accdb" />
 	</ItemGroup>
 
 </Project>
