@@ -538,14 +538,14 @@ namespace DigitalZenWorks.Database.ToolKit
 		{
 			ArrayList sortedList = [];
 			object key;
-			List<object> dependencies;
+			ArrayList dependencies;
 
 			while (sortedList.Count < table.Count)
 			{
 				foreach (DictionaryEntry entry in table)
 				{
 					key = entry.Key;
-					dependencies = (List<object>)entry.Value;
+					dependencies = (ArrayList)entry.Value;
 
 					// No dependencies, add to start of table.
 					if (dependencies.Count == 0)
