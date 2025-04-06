@@ -115,7 +115,6 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 			List<Table> tables = DataDefinition.GetSchemaNew(databaseFile);
 
 			int count = tables.Count;
-
 			Assert.That(count, Is.EqualTo(2));
 
 			foreach (Table table in tables)
@@ -144,6 +143,47 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 			Assert.That(name, Is.EqualTo("Columns"));
 		}
 
+		/// <summary>
+		/// Topological sort test.
+		/// </summary>
+		[Test]
+		public void TopologicalSort()
+		{
+			Hashtable list = [];
+			ArrayList dependencies = [];
+
+			ArrayList tableDependencies = new ArrayList(dependencies);
+			list.Add("Categories", tableDependencies);
+
+			tableDependencies = new ArrayList(dependencies);
+			list.Add("Makers", tableDependencies);
+
+			dependencies.Add("Makers");
+			tableDependencies = new ArrayList(dependencies);
+			list.Add("Series", tableDependencies);
+
+			dependencies.Clear();
+			dependencies.Add("Categories");
+			dependencies.Add("Makers");
+
+			tableDependencies = new ArrayList(dependencies);
+			list.Add("Sections", tableDependencies);
+
+			dependencies.Clear();
+			dependencies.Add("Makers");
+			dependencies.Add("Series");
+			dependencies.Add("Sections");
+
+			tableDependencies = new ArrayList(dependencies);
+			list.Add("ImportProducts", tableDependencies);
+
+			ArrayList sortedList = DataDefinition.TopologicalSort(list);
+
+			int count = sortedList.Count;
+			Assert.That(count, Is.EqualTo(5));
+
+		}
+		
 		private static string GetTestMdbFile()
 		{
 			string resource =
