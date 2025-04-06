@@ -8,8 +8,6 @@ using NUnit.Framework;
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.SQLite;
-using System.Globalization;
 using System.IO;
 using System.Runtime.Versioning;
 
@@ -150,6 +148,22 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 				Assert.That(
 					table.Name, Is.AnyOf("AddressesTest2", "AddressesTest"));
 			}
+
+			object tester = "AddressesTest";
+			bool result = tables.ContainsKey(tester);
+			Assert.That(result, Is.True);
+
+			tester = "AddressesTest2";
+			result = tables.ContainsKey(tester);
+			Assert.That(result, Is.True);
+
+			Table tableItem = (Table)tables["AddressesTest"];
+			count = tableItem.ForeignKeys.Count;
+			Assert.That(count, Is.EqualTo(0));
+
+			tableItem = (Table)tables["AddressesTest2"];
+			count = tableItem.ForeignKeys.Count;
+			Assert.That(count, Is.EqualTo(1));
 		}
 
 		/// <summary>
