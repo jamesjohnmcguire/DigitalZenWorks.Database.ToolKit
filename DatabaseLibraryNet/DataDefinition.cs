@@ -528,6 +528,79 @@ namespace DigitalZenWorks.Database.ToolKit
 			return returnCode;
 		}
 
+		/// <summary>
+		/// Performs a topological sort on a list with dependencies.
+		/// </summary>
+		/// <param name="table">A table to be sorted with the structure
+		/// Object name, ArrayList dependencies.</param>
+		/// <returns>A sorted arraylist.</returns>
+		public static ArrayList TopologicalSort(Hashtable table)
+		{
+			ArrayList sortedList = [];
+			object key;
+			List<object> dependencies;
+
+			while (sortedList.Count < table.Count)
+			{
+				foreach (DictionaryEntry entry in table)
+				{
+					key = entry.Key;
+					dependencies = (List<object>)entry.Value;
+
+					// No dependencies, add to start of table.
+					if (dependencies.Count == 0)
+					{
+						if (!sortedList.Contains(key))
+						{
+							Log.Info(
+								CultureInfo.InvariantCulture,
+								m => m("Adding: (ND) " + key.ToString()));
+							sortedList.Insert(0, key);
+						}
+
+						continue;
+					}
+
+					bool allDependenciesExist = false;
+					int lastDependency = 0;
+
+					foreach (object dependency in dependencies)
+					{
+						if (sortedList.Contains(dependency))
+						{
+							allDependenciesExist = true;
+							if (sortedList.IndexOf(dependency) >
+								lastDependency)
+							{
+								lastDependency =
+									sortedList.IndexOf(dependency);
+							}
+						}
+						else
+						{
+							allDependenciesExist = false;
+							break;
+						}
+					}
+
+					// All dependencies have been added, add object at
+					// location of last dependency.
+					if (allDependenciesExist)
+					{
+						if (!sortedList.Contains(key))
+						{
+							Log.Info(
+								CultureInfo.InvariantCulture,
+								m => m("Adding: (D) " + key.ToString()));
+							sortedList.Add(key);
+						}
+					}
+				}
+			}
+
+			return sortedList;
+		}
+
 		private static bool CompareColumnType(
 			string column,
 			string nameCheck,
@@ -876,79 +949,6 @@ namespace DigitalZenWorks.Database.ToolKit
 			}
 
 			return table;
-		}
-
-		/// <summary>
-		/// Performs a topological sort on a list with dependencies.
-		/// </summary>
-		/// <param name="table">A table to be sorted with the structure
-		/// Object name, ArrayList dependencies.</param>
-		/// <returns>A sorted arraylist.</returns>
-		private static ArrayList TopologicalSort(Hashtable table)
-		{
-			ArrayList sortedList = [];
-			object key;
-			List<object> dependencies;
-
-			while (sortedList.Count < table.Count)
-			{
-				foreach (DictionaryEntry entry in table)
-				{
-					key = entry.Key;
-					dependencies = (List<object>)entry.Value;
-
-					// No dependencies, add to start of table.
-					if (dependencies.Count == 0)
-					{
-						if (!sortedList.Contains(key))
-						{
-							Log.Info(
-								CultureInfo.InvariantCulture,
-								m => m("Adding: (ND) " + key.ToString()));
-							sortedList.Insert(0, key);
-						}
-
-						continue;
-					}
-
-					bool allDependenciesExist = false;
-					int lastDependency = 0;
-
-					foreach (object dependency in dependencies)
-					{
-						if (sortedList.Contains(dependency))
-						{
-							allDependenciesExist = true;
-							if (sortedList.IndexOf(dependency) >
-								lastDependency)
-							{
-								lastDependency =
-									sortedList.IndexOf(dependency);
-							}
-						}
-						else
-						{
-							allDependenciesExist = false;
-							break;
-						}
-					}
-
-					// All dependencies have been added, add object at
-					// location of last dependency.
-					if (allDependenciesExist)
-					{
-						if (!sortedList.Contains(key))
-						{
-							Log.Info(
-								CultureInfo.InvariantCulture,
-								m => m("Adding: (D) " + key.ToString()));
-							sortedList.Add(key);
-						}
-					}
-				}
-			}
-
-			return sortedList;
 		}
 
 		// Write the SQL for a column
