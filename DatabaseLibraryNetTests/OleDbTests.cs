@@ -100,6 +100,22 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 				Assert.That(
 					table.Name, Is.AnyOf("AddressesTest2", "AddressesTest"));
 			}
+
+			object tester = "AddressesTest";
+			bool result = tables.ContainsKey(tester);
+			Assert.That(result, Is.True);
+
+			tester = "AddressesTest2";
+			result = tables.ContainsKey(tester);
+			Assert.That(result, Is.True);
+
+			Table tableItem = (Table)tables["AddressesTest"];
+			count = tableItem.ForeignKeys.Count;
+			Assert.That(count, Is.EqualTo(0));
+
+			tableItem = (Table)tables["AddressesTest2"];
+			count = tableItem.ForeignKeys.Count;
+			Assert.That(count, Is.EqualTo(1));
 		}
 
 		/// <summary>
@@ -120,6 +136,18 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 				Assert.That(
 					table.Name, Is.AnyOf("AddressesTest2", "AddressesTest"));
 			}
+
+			Table tableItem = tables[0];
+			Assert.That(tableItem.Name, Is.EqualTo("AddressesTest"));
+
+			count = tableItem.ForeignKeys.Count;
+			Assert.That(count, Is.EqualTo(0));
+
+			tableItem = tables[1];
+			Assert.That(tableItem.Name, Is.EqualTo("AddressesTest2"));
+
+			count = tableItem.ForeignKeys.Count;
+			Assert.That(count, Is.EqualTo(1));
 		}
 
 		/// <summary>
