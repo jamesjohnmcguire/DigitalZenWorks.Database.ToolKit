@@ -125,6 +125,34 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 		}
 
 		/// <summary>
+		/// Get schema test.
+		/// </summary>
+		[Test]
+		public static void GetSchemaPrevious()
+		{
+			string databaseFile = GetTestMdbFile();
+
+			Hashtable tables =
+				DataDefinition.GetSchemaPrevious(databaseFile);
+
+			int count = tables.Count;
+
+			Assert.That(count, Is.EqualTo(2));
+
+			foreach (System.Collections.DictionaryEntry entry in tables)
+			{
+				object key = entry.Key;
+				object value = entry.Value;
+				string name = key.ToString();
+				Table table = (Table)value;
+
+				Assert.That(name, Is.AnyOf("AddressesTest2", "AddressesTest"));
+				Assert.That(
+					table.Name, Is.AnyOf("AddressesTest2", "AddressesTest"));
+			}
+		}
+
+		/// <summary>
 		/// GetTableColumns test.
 		/// </summary>
 		[Test]
@@ -141,6 +169,22 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 
 			string name = table.TableName;
 			Assert.That(name, Is.EqualTo("Columns"));
+		}
+
+		/// <summary>
+		/// Order table test.
+		/// </summary>
+		[Test]
+		public void OrderTable()
+		{
+			string databaseFile = GetTestMdbFile();
+
+			Hashtable tables =
+				DataDefinition.GetSchemaPrevious(databaseFile);
+
+			ArrayList list = DataDefinition.OrderTable(tables);
+
+			Assert.Pass();
 		}
 
 		/// <summary>

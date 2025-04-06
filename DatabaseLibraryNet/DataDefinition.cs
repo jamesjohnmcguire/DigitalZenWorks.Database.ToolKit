@@ -387,6 +387,88 @@ namespace DigitalZenWorks.Database.ToolKit
 			return tables;
 		}
 
+#if NET5_0_OR_GREATER
+		[SupportedOSPlatform("windows")]
+#endif
+		public static Hashtable GetSchemaPrevious(string databaseFile)
+		{
+			Hashtable tables = null;
+
+			using (OleDbSchema oleDbSchema = new(databaseFile))
+			{
+				tables = [];
+				ArrayList relationships = [];
+
+				DataTable tableNames = oleDbSchema.TableNames;
+
+				foreach (DataRow row in tableNames.Rows)
+				{
+					string tableName = row["TABLE_NAME"].ToString();
+
+					Table table = new(tableName);
+
+					Log.Info(
+						CultureInfo.InvariantCulture,
+						m => m("Getting Columns for " + tableName));
+					DataTable dataColumns =
+						oleDbSchema.GetTableColumns(tableName);
+
+					foreach (DataRow dataColumn in dataColumns.Rows)
+					{
+						Column column = FormatColumnFromDataRow(dataColumn);
+
+						table.AddColumn(column);
+					}
+
+					// Get primary key
+					DataTable primary_key_table =
+						oleDbSchema.GetPrimaryKeys(tableName);
+
+					foreach (DataRow pkrow in primary_key_table.Rows)
+					{
+						table.PrimaryKey = pkrow["COLUMN_NAME"].ToString();
+					}
+
+					// If PK is an integer change type to AutoNumber
+					if (!string.IsNullOrWhiteSpace(table.PrimaryKey))
+					{
+						if (((Column)table.Columns[table.PrimaryKey]).ColumnType ==
+							ColumnType.Number)
+						{
+							((Column)table.Columns[table.PrimaryKey]).ColumnType =
+								ColumnType.AutoNumber;
+						}
+					}
+
+					DataTable foreignKeyTable =
+						oleDbSchema.GetForeignKeys(tableName);
+
+					foreach (DataRow foreignKey in foreignKeyTable.Rows)
+					{
+						Relationship relationship =
+							GetRelationship(foreignKey);
+
+						relationships.Add(relationship);
+					}
+
+					tables.Add(table.Name, table);
+				}
+
+				// Add foreign keys to table, using relationships
+				foreach (Relationship relationship in relationships)
+				{
+					string name = relationship.ChildTable;
+
+					ForeignKey foreignKey =
+						GetForeignKeyRelationship(relationship);
+
+					((Table)tables[name]).ForeignKeys.Add(foreignKey);
+				}
+			}
+
+			return tables;
+		}
+
 		/// <summary>
 		/// GetTableDefinitions - returns an array of table definitions.
 		/// </summary>
