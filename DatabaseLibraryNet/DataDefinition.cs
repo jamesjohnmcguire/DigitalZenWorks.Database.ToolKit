@@ -528,6 +528,29 @@ namespace DigitalZenWorks.Database.ToolKit
 			return returnCode;
 		}
 
+		// Return an array list in the order that the tables need to be added
+		// to take dependencies into account
+		public static ArrayList OrderTable(Hashtable hashTable)
+		{
+			Hashtable list = [];
+			ArrayList dependencies = [];
+
+			foreach (DictionaryEntry entry in hashTable)
+			{
+				string name = (string)entry.Key;
+				Table table = (Table)entry.Value;
+				foreach (ForeignKey foreignKeys in table.ForeignKeys)
+				{
+					dependencies.Add(foreignKeys.ParentTable);
+				}
+
+				list.Add(name, new ArrayList(dependencies));
+				dependencies.Clear();
+			}
+
+			return TopologicalSort(list);
+		}
+
 		/// <summary>
 		/// Performs a topological sort on a list with dependencies.
 		/// </summary>
@@ -857,29 +880,6 @@ namespace DigitalZenWorks.Database.ToolKit
 			}
 
 			return successCode;
-		}
-
-		// Return an array list in the order that the tables need to be added
-		// to take dependencies into account
-		private static ArrayList OrderTable(Hashtable hashTable)
-		{
-			Hashtable list = [];
-			ArrayList dependencies = [];
-
-			foreach (DictionaryEntry entry in hashTable)
-			{
-				string name = (string)entry.Key;
-				Table table = (Table)entry.Value;
-				foreach (ForeignKey foreignKeys in table.ForeignKeys)
-				{
-					dependencies.Add(foreignKeys.ParentTable);
-				}
-
-				list.Add(name, new ArrayList(dependencies));
-				dependencies.Clear();
-			}
-
-			return TopologicalSort(list);
 		}
 
 #if NET5_0_OR_GREATER
