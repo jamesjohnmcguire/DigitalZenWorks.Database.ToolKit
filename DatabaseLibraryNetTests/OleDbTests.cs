@@ -26,7 +26,7 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 		[Test]
 		public static void GetRelationships()
 		{
-			string dependentTableName = "AddressesTest";
+			string dependentTableName = "Addresses";
 			string databaseFile = GetTestMdbFile();
 
 			using OleDbSchema oleDbSchema = new(databaseFile);
@@ -41,10 +41,10 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 			Relationship relationship = (Relationship)relationships[0];
 
 			string name = relationship.ParentTable;
-			Assert.That(name, Is.EqualTo("AddressesTest"));
+			Assert.That(name, Is.EqualTo("Addresses"));
 
 			name = relationship.ChildTable;
-			Assert.That(name, Is.EqualTo("AddressesTest2"));
+			Assert.That(name, Is.EqualTo("Contacts"));
 		}
 
 		/// <summary>
@@ -53,7 +53,7 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 		[Test]
 		public static void GetRelationships2()
 		{
-			string dependentTableName = "AddressesTest";
+			string dependentTableName = "Addresses";
 			string databaseFile = GetTestMdbFile();
 
 			using OleDbSchema oleDbSchema = new(databaseFile);
@@ -69,10 +69,10 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 			Relationship relationship = relationships[0];
 
 			string name = relationship.ParentTable;
-			Assert.That(name, Is.EqualTo("AddressesTest"));
+			Assert.That(name, Is.EqualTo("Addresses"));
 
 			name = relationship.ChildTable;
-			Assert.That(name, Is.EqualTo("AddressesTest2"));
+			Assert.That(name, Is.EqualTo("Contacts"));
 		}
 
 		/// <summary>
@@ -87,7 +87,7 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 
 			int count = tables.Count;
 
-			Assert.That(count, Is.EqualTo(2));
+			Assert.That(count, Is.EqualTo(7));
 
 			foreach (System.Collections.DictionaryEntry entry in tables)
 			{
@@ -96,24 +96,25 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 				string name = key.ToString();
 				Table table = (Table)value;
 
-				Assert.That(name, Is.AnyOf("AddressesTest2", "AddressesTest"));
-				Assert.That(
-					table.Name, Is.AnyOf("AddressesTest2", "AddressesTest"));
+				Assert.That(name, Is.AnyOf("Addresses", "Categories",
+					"Contacts", "Makers", "Products", "Sections", "Series"));
+				Assert.That(table.Name, Is.AnyOf("Addresses", "Categories",
+					"Contacts", "Makers", "Products", "Sections", "Series"));
 			}
 
-			object tester = "AddressesTest";
+			object tester = "Addresses";
 			bool result = tables.ContainsKey(tester);
 			Assert.That(result, Is.True);
 
-			tester = "AddressesTest2";
+			tester = "Contacts";
 			result = tables.ContainsKey(tester);
 			Assert.That(result, Is.True);
 
-			Table tableItem = (Table)tables["AddressesTest"];
+			Table tableItem = (Table)tables["Addresses"];
 			count = tableItem.ForeignKeys.Count;
 			Assert.That(count, Is.EqualTo(0));
 
-			tableItem = (Table)tables["AddressesTest2"];
+			tableItem = (Table)tables["Contacts"];
 			count = tableItem.ForeignKeys.Count;
 			Assert.That(count, Is.EqualTo(1));
 		}
@@ -129,22 +130,22 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 			List<Table> tables = DataDefinition.GetSchemaNew(databaseFile);
 
 			int count = tables.Count;
-			Assert.That(count, Is.EqualTo(2));
+			Assert.That(count, Is.EqualTo(7));
 
 			foreach (Table table in tables)
 			{
-				Assert.That(
-					table.Name, Is.AnyOf("AddressesTest2", "AddressesTest"));
+				Assert.That(table.Name, Is.AnyOf("Addresses", "Categories",
+					"Contacts", "Makers", "Products", "Sections", "Series"));
 			}
 
 			Table tableItem = tables[0];
-			Assert.That(tableItem.Name, Is.EqualTo("AddressesTest"));
+			Assert.That(tableItem.Name, Is.EqualTo("Addresses"));
 
 			count = tableItem.ForeignKeys.Count;
 			Assert.That(count, Is.EqualTo(0));
 
-			tableItem = tables[1];
-			Assert.That(tableItem.Name, Is.EqualTo("AddressesTest2"));
+			tableItem = tables[2];
+			Assert.That(tableItem.Name, Is.EqualTo("Contacts"));
 
 			count = tableItem.ForeignKeys.Count;
 			Assert.That(count, Is.EqualTo(1));
@@ -163,7 +164,7 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 
 			int count = tables.Count;
 
-			Assert.That(count, Is.EqualTo(2));
+			Assert.That(count, Is.EqualTo(7));
 
 			foreach (System.Collections.DictionaryEntry entry in tables)
 			{
@@ -172,24 +173,25 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 				string name = key.ToString();
 				Table table = (Table)value;
 
-				Assert.That(name, Is.AnyOf("AddressesTest2", "AddressesTest"));
-				Assert.That(
-					table.Name, Is.AnyOf("AddressesTest2", "AddressesTest"));
+				Assert.That(name, Is.AnyOf("Addresses", "Categories",
+					"Contacts", "Makers", "Products", "Sections", "Series"));
+				Assert.That(table.Name, Is.AnyOf("Addresses", "Categories",
+					"Contacts", "Makers", "Products", "Sections", "Series"));
 			}
 
-			object tester = "AddressesTest";
+			object tester = "Addresses";
 			bool result = tables.ContainsKey(tester);
 			Assert.That(result, Is.True);
 
-			tester = "AddressesTest2";
+			tester = "Contacts";
 			result = tables.ContainsKey(tester);
 			Assert.That(result, Is.True);
 
-			Table tableItem = (Table)tables["AddressesTest"];
+			Table tableItem = (Table)tables["Addresses"];
 			count = tableItem.ForeignKeys.Count;
 			Assert.That(count, Is.EqualTo(0));
 
-			tableItem = (Table)tables["AddressesTest2"];
+			tableItem = (Table)tables["Contacts"];
 			count = tableItem.ForeignKeys.Count;
 			Assert.That(count, Is.EqualTo(1));
 		}
@@ -292,13 +294,13 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 		private static string GetTestMdbFile()
 		{
 			string resource =
-				"DigitalZenWorks.Database.ToolKit.Tests.test.mdb";
+				"DigitalZenWorks.Database.ToolKit.Tests.Products.Test.accdb";
 
 			string fileName = Path.GetTempFileName();
 
 			// A 0 byte sized file is created.  Need to remove it.
 			File.Delete(fileName);
-			string filePath = Path.ChangeExtension(fileName, "mdb");
+			string filePath = Path.ChangeExtension(fileName, "accdb");
 
 			bool result = FileUtils.CreateFileFromEmbeddedResource(
 				resource, filePath);
