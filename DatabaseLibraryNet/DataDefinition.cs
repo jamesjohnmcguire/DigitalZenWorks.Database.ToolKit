@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Resources;
 using System.Runtime.Versioning;
@@ -330,11 +331,10 @@ namespace DigitalZenWorks.Database.ToolKit
 #endif
 		public static Hashtable GetSchema(string databaseFile)
 		{
-			Hashtable tables = null;
+			Hashtable tables = [];
+			List<Relationship> relationships = [];
 
 			using OleDbSchema oleDbSchema = new (databaseFile);
-
-			tables = [];
 
 			DataTable tableNames = oleDbSchema.TableNames;
 
@@ -345,12 +345,24 @@ namespace DigitalZenWorks.Database.ToolKit
 
 				Table table = SetPrimaryKey(oleDbSchema, row);
 
-				List<Relationship> relationships =
+				List<Relationship> newRelationships =
 					GetRelationshipsNew(oleDbSchema, tableName);
-
-				table = SetForeignKeys(table, relationships);
+				relationships = [.. relationships, .. newRelationships];
 
 				tables.Add(table.Name, table);
+			}
+
+			// Add foreign keys to table, using relationships
+			foreach (Relationship relationship in relationships)
+			{
+				string name = relationship.ChildTable;
+
+				ForeignKey foreignKey =
+					GetForeignKeyRelationship(relationship);
+
+				Table table = (Table)tables[name];
+
+				table.ForeignKeys.Add(foreignKey);
 			}
 
 			return tables;
@@ -362,11 +374,10 @@ namespace DigitalZenWorks.Database.ToolKit
 		public static List<Table> GetSchemaNew(string databaseFile)
 		{
 			List<Table> tables = [];
+			Dictionary<string, Table> tableDictionary = [];
+			List<Relationship> relationships = [];
 
 			using OleDbSchema oleDbSchema = new (databaseFile);
-
-			tables = [];
-
 			DataTable tableNames = oleDbSchema.TableNames;
 
 			foreach (DataRow row in tableNames.Rows)
@@ -376,13 +387,27 @@ namespace DigitalZenWorks.Database.ToolKit
 
 				Table table = SetPrimaryKey(oleDbSchema, row);
 
-				List<Relationship> relationships =
+				List<Relationship> newRelationships =
 					GetRelationshipsNew(oleDbSchema, tableName);
+				relationships = [.. relationships, .. newRelationships];
 
-				table = SetForeignKeys(table, relationships);
-
-				tables.Add(table);
+				tableDictionary.Add(tableName, table);
 			}
+
+			// Add foreign keys to table, using relationships
+			foreach (Relationship relationship in relationships)
+			{
+				string name = relationship.ChildTable;
+
+				ForeignKey foreignKey =
+					GetForeignKeyRelationship(relationship);
+
+				Table table = tableDictionary[name];
+
+				table.ForeignKeys.Add(foreignKey);
+			}
+
+			tables = tableDictionary.Values.ToList();
 
 			return tables;
 		}
