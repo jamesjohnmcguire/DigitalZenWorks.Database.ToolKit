@@ -15,6 +15,7 @@ using System.Linq;
 using System.Reflection;
 using System.Resources;
 using System.Runtime.Versioning;
+using System.Xml;
 
 namespace DigitalZenWorks.Database.ToolKit
 {
@@ -656,6 +657,38 @@ namespace DigitalZenWorks.Database.ToolKit
 			}
 
 			return TopologicalSort(list);
+		}
+
+		// Return an array list in the order that the tables need to be added
+		// to take dependencies into account
+		public static List<string> OrderTableNew(
+			List<Table> tables)
+		{
+			List<string> orderedTables = [];
+
+			if (tables != null)
+			{
+				List<string> dependenciesNew = [];
+				Dictionary<string, List<string>> tableDependencies = [];
+
+				foreach (Table table in tables)
+				{
+					string name = table.Name;
+
+					foreach (ForeignKey foreignKeys in table.ForeignKeys)
+					{
+						dependenciesNew.Add(foreignKeys.ParentTable);
+					}
+
+					tableDependencies.Add(name, dependenciesNew);
+
+					dependenciesNew.Clear();
+				}
+
+				orderedTables = GetOrderedDependencies(tableDependencies);
+			}
+
+			return orderedTables;
 		}
 
 		/// <summary>

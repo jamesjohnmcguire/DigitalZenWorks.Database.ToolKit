@@ -257,6 +257,22 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 		}
 
 		/// <summary>
+		/// Order table test.
+		/// </summary>
+		[Test]
+		public void OrderTableNew()
+		{
+			string databaseFile = GetTestMdbFile();
+
+			List<Table> tables =
+				DataDefinition.GetSchemaNew(databaseFile);
+
+			List<string> list = DataDefinition.OrderTableNew(tables);
+
+			Assert.Pass();
+		}
+
+		/// <summary>
 		/// Topological sort test.
 		/// </summary>
 		[Test]
@@ -265,12 +281,15 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 			Hashtable list = [];
 			ArrayList dependencies = [];
 
+			dependencies.Add("Categories");
 			ArrayList tableDependencies = new ArrayList(dependencies);
 			list.Add("Categories", tableDependencies);
 
+			dependencies.Clear();
 			tableDependencies = new ArrayList(dependencies);
 			list.Add("Makers", tableDependencies);
 
+			dependencies.Clear();
 			dependencies.Add("Makers");
 			tableDependencies = new ArrayList(dependencies);
 			list.Add("Series", tableDependencies);
