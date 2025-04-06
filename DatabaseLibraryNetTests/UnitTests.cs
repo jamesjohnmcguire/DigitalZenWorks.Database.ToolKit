@@ -142,7 +142,7 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 		{
 			Dictionary<string, List<string>> tableDependencies = new()
 			{
-				{ "Categories", [] },
+				{ "Categories", new List<string> { "Categories" } },
 				{ "Makers", [] },
 				{ "Series", new List<string> { "Makers" } },
 				{ "Sections", new List<string> { "Categories", "Makers" } },

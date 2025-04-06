@@ -227,7 +227,7 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 		[Test]
 		public void GetTableColumns()
 		{
-			string tableName = "AddressTest";
+			string tableName = "Addresses";
 			string databaseFile = GetTestMdbFile();
 
 			using OleDbSchema oleDbSchema = new(databaseFile);
