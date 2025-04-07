@@ -288,9 +288,28 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 			List<Table> tables =
 				DataDefinition.GetSchemaNew(databaseFile);
 
-			List<string> list = DataDefinition.OrderTableNew(tables);
+			List<string> orderedList = DataDefinition.OrderTableNew(tables);
 
-			Assert.Pass();
+			string tableName = orderedList[0];
+			Assert.That(tableName, Is.EqualTo("Addresses"));
+
+			tableName = orderedList[1];
+			Assert.That(tableName, Is.EqualTo("Categories"));
+
+			tableName = orderedList[2];
+			Assert.That(tableName, Is.EqualTo("Contacts"));
+
+			tableName = orderedList[3];
+			Assert.That(tableName, Is.EqualTo("Makers"));
+
+			tableName = orderedList[4];
+			Assert.That(tableName, Is.EqualTo("Sections"));
+
+			tableName = orderedList[5];
+			Assert.That(tableName, Is.EqualTo("Series"));
+
+			tableName = orderedList[6];
+			Assert.That(tableName, Is.EqualTo("Products"));
 		}
 
 		/// <summary>
