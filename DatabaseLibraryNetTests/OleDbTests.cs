@@ -46,6 +46,27 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 		}
 
 		/// <summary>
+		/// Export schema test.
+		/// </summary>
+		[Test]
+		public static void ExportSchemaNew()
+		{
+			string databaseFile = GetTestMdbFile();
+			string schemaFile = databaseFile + ".sql";
+
+			bool result =
+				DataDefinition.ExportSchemaNew(databaseFile, schemaFile);
+
+			Assert.That(result, Is.True);
+
+			string compareSqlFile = GetTestSqlFile();
+			string compareText = File.ReadAllText(compareSqlFile);
+
+			string text = File.ReadAllText(schemaFile);
+			Assert.That(text, Is.EqualTo(compareText));
+		}
+
+		/// <summary>
 		/// Get relationships test.
 		/// </summary>
 		[Test]
