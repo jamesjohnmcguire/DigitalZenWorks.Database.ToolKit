@@ -6,11 +6,11 @@
 
 using Common.Logging;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Resources;
 using System.Runtime.Versioning;
@@ -47,22 +47,30 @@ namespace DigitalZenWorks.Database.ToolKit
 #if NET5_0_OR_GREATER
 		[SupportedOSPlatform("windows")]
 #endif
-		public static bool ExportSchema(string databaseFile, string schemaFile)
+		public static bool ExportSchema(
+			string databaseFile, string schemaFile)
 		{
 			bool successCode = false;
 
 			try
 			{
-				Hashtable tables = GetSchema(databaseFile);
+				List<Table> tables = GetSchema(databaseFile);
 
 				string schemaText = string.Empty;
 
-				ArrayList list = OrderTable(tables);
+				List<string> list = OrderTable(tables);
 
-				foreach (string table in list)
+				foreach (string tableName in list)
 				{
-					schemaText += WriteSql((Table)tables[table]) +
-						Environment.NewLine;
+					foreach (Table table in tables)
+					{
+						if (table.Name == tableName)
+						{
+							schemaText += WriteSql(table) +
+								Environment.NewLine;
+							break;
+						}
+					}
 				}
 
 				File.WriteAllText(schemaFile, schemaText);
@@ -276,84 +284,69 @@ namespace DigitalZenWorks.Database.ToolKit
 #if NET5_0_OR_GREATER
 		[SupportedOSPlatform("windows")]
 #endif
-		public static ArrayList GetRelationships(
+		public static List<Relationship> GetRelationships(
 			OleDbSchema oleDbSchema, string tableName)
 		{
-			ArrayList relationships = null;
+			List<Relationship> relationships = [];
 
-			if ((null != oleDbSchema) &&
-				(!string.IsNullOrWhiteSpace(tableName)))
+			DataTable foreignKeyTable = oleDbSchema.GetForeignKeys(tableName);
+
+			foreach (DataRow foreignKey in foreignKeyTable.Rows)
 			{
-				relationships = [];
+				Relationship relationship =
+					GetRelationship(foreignKey);
 
-				DataTable foreignKeyTable = oleDbSchema.GetForeignKeys(tableName);
-
-				foreach (DataRow foreignKey in foreignKeyTable.Rows)
-				{
-					Relationship relationship = GetRelationship(foreignKey);
-					relationships.Add(relationship);
-				}
+				relationships.Add(relationship);
 			}
 
 			return relationships;
 		}
 
+		/// <summary>
+		/// Get schema.
+		/// </summary>
+		/// <param name="databaseFile">The database file.</param>
+		/// <returns>The schema of the dabase file.</returns>
 #if NET5_0_OR_GREATER
 		[SupportedOSPlatform("windows")]
 #endif
-		public static Hashtable GetSchema(string databaseFile)
+		public static List<Table> GetSchema(string databaseFile)
 		{
-			Hashtable tables = null;
+			List<Table> tables = [];
+			Dictionary<string, Table> tableDictionary = [];
 			List<Relationship> relationships = [];
 
-			using (OleDbSchema oleDbSchema = new(databaseFile))
+			using OleDbSchema oleDbSchema = new (databaseFile);
+			DataTable tableNames = oleDbSchema.TableNames;
+
+			foreach (DataRow row in tableNames.Rows)
 			{
-				tables = [];
+				object nameRaw = row["TABLE_NAME"];
+				string tableName = nameRaw.ToString();
 
-				DataTable tableNames = oleDbSchema.TableNames;
+				Table table = SetPrimaryKey(oleDbSchema, row);
 
-				foreach (DataRow row in tableNames.Rows)
-				{
-					string tableName = row["TABLE_NAME"].ToString();
+				List<Relationship> newRelationships =
+					GetRelationships(oleDbSchema, tableName);
+				relationships = [.. relationships, .. newRelationships];
 
-					Table table = GetTable(oleDbSchema, tableName);
-
-					// Get primary key
-					DataTable primary_key_table =
-						oleDbSchema.GetPrimaryKeys(tableName);
-
-					foreach (DataRow pkrow in primary_key_table.Rows)
-					{
-						table.PrimaryKey = pkrow["COLUMN_NAME"].ToString();
-					}
-
-					// If PK is an integer change type to AutoNumber
-					Column primaryKey = SetPrimaryKeyType(table);
-
-					if (primaryKey != null)
-					{
-						table.Columns[table.PrimaryKey] = primaryKey;
-					}
-
-					List<Relationship> newRelationships =
-						GetRelationships2(oleDbSchema, tableName);
-
-					relationships = [.. relationships, .. newRelationships];
-
-					tables.Add(table.Name, table);
-				}
-
-				// Add foreign keys to table, using relationships
-				foreach (Relationship relationship in relationships)
-				{
-					string name = relationship.ChildTable;
-
-					ForeignKey foreignKey =
-						GetForeignKeyRelationship(relationship);
-
-					((Table)tables[name]).ForeignKeys.Add(foreignKey);
-				}
+				tableDictionary.Add(tableName, table);
 			}
+
+			// Add foreign keys to table, using relationships
+			foreach (Relationship relationship in relationships)
+			{
+				string name = relationship.ChildTable;
+
+				ForeignKey foreignKey =
+					GetForeignKeyRelationship(relationship);
+
+				Table table = tableDictionary[name];
+
+				table.ForeignKeys.Add(foreignKey);
+			}
+
+			tables = tableDictionary.Values.ToList();
 
 			return tables;
 		}
@@ -497,6 +490,41 @@ namespace DigitalZenWorks.Database.ToolKit
 			}
 
 			return returnCode;
+		}
+
+		/// <summary>
+		/// Order table.
+		/// </summary>
+		/// <param name="tables">The list of tables to order.</param>
+		/// <returns>The ordered list of of tables.</returns>
+		/// <remarks>This orders the list taking dependencies into
+		/// account.</remarks>
+		public static List<string> OrderTable(
+			List<Table> tables)
+		{
+			List<string> orderedTables = [];
+
+			if (tables != null)
+			{
+				Dictionary<string, List<string>> tableDependencies = [];
+
+				foreach (Table table in tables)
+				{
+					List<string> dependencies = [];
+					string name = table.Name;
+
+					foreach (ForeignKey foreignKeys in table.ForeignKeys)
+					{
+						dependencies.Add(foreignKeys.ParentTable);
+					}
+
+					tableDependencies.Add(name, dependencies);
+				}
+
+				orderedTables = GetOrderedDependencies(tableDependencies);
+			}
+
+			return orderedTables;
 		}
 
 		private static bool CompareColumnType(
@@ -713,33 +741,6 @@ namespace DigitalZenWorks.Database.ToolKit
 			return relationship;
 		}
 
-		/// <summary>
-		/// Gets a list of relationships.
-		/// </summary>
-		/// <param name="oleDbSchema">The OLE database schema.</param>
-		/// <param name="tableName">The table name.</param>
-		/// <returns>A list of relationships.</returns>
-#if NET5_0_OR_GREATER
-		[SupportedOSPlatform("windows")]
-#endif
-		private static List<Relationship> GetRelationships2(
-			OleDbSchema oleDbSchema, string tableName)
-		{
-			List<Relationship> relationships = [];
-
-			DataTable foreignKeyTable = oleDbSchema.GetForeignKeys(tableName);
-
-			foreach (DataRow foreignKey in foreignKeyTable.Rows)
-			{
-				Relationship relationship =
-					GetRelationship(foreignKey);
-
-				relationships.Add(relationship);
-			}
-
-			return relationships;
-		}
-
 #if NET5_0_OR_GREATER
 		[SupportedOSPlatform("windows")]
 #endif
@@ -784,27 +785,35 @@ namespace DigitalZenWorks.Database.ToolKit
 			return successCode;
 		}
 
-		// Return an array list in the order that the tables need to be added
-		// to take dependencies into account
-		private static ArrayList OrderTable(Hashtable hashTable)
+#if NET5_0_OR_GREATER
+		[SupportedOSPlatform("windows")]
+#endif
+		private static Table SetPrimaryKey(
+			OleDbSchema oleDbSchema, DataRow row)
 		{
-			Hashtable list = [];
-			ArrayList dependencies = [];
+			object nameRaw = row["TABLE_NAME"];
+			string tableName = nameRaw.ToString();
 
-			foreach (DictionaryEntry entry in hashTable)
+			Table table = GetTable(oleDbSchema, tableName);
+
+			DataTable primaryKeys =
+				oleDbSchema.GetPrimaryKeys(tableName);
+
+			// TODO: This assumes only a single primary key.  Need to
+			// compensate for composite primary keys.
+			DataRow primaryKeyRow = primaryKeys.Rows[0];
+			nameRaw = primaryKeyRow["COLUMN_NAME"];
+			table.PrimaryKey = nameRaw.ToString();
+
+			// If PK is an integer change type to AutoNumber
+			Column primaryKey = SetPrimaryKeyType(table);
+
+			if (primaryKey != null)
 			{
-				string name = (string)entry.Key;
-				Table table = (Table)entry.Value;
-				foreach (ForeignKey foreignKeys in table.ForeignKeys)
-				{
-					dependencies.Add(foreignKeys.ParentTable);
-				}
-
-				list.Add(name, new ArrayList(dependencies));
-				dependencies.Clear();
+				table.Columns[table.PrimaryKey] = primaryKey;
 			}
 
-			return TopologicalSort(list);
+			return table;
 		}
 
 		// If primary key is an integer, change type to AutoNumber.
@@ -826,77 +835,23 @@ namespace DigitalZenWorks.Database.ToolKit
 			return primaryKey;
 		}
 
-		/// <summary>
-		/// Performs a topological sort on a list with dependencies.
-		/// </summary>
-		/// <param name="table">A table to be sorted with the structure
-		/// Object name, ArrayList dependencies.</param>
-		/// <returns>A sorted arraylist.</returns>
-		private static ArrayList TopologicalSort(Hashtable table)
+#if NET5_0_OR_GREATER
+		[SupportedOSPlatform("windows")]
+#endif
+		private static Table SetForeignKeys(
+			Table table, List<Relationship> relationships)
 		{
-			ArrayList sortedList = [];
-			object key;
-			List<object> dependencies;
+			table.ForeignKeys.Clear();
 
-			while (sortedList.Count < table.Count)
+			foreach (Relationship relationship in relationships)
 			{
-				foreach (DictionaryEntry entry in table)
-				{
-					key = entry.Key;
-					dependencies = (List<object>)entry.Value;
+				ForeignKey foreignKey =
+					GetForeignKeyRelationship(relationship);
 
-					// No dependencies, add to start of table.
-					if (dependencies.Count == 0)
-					{
-						if (!sortedList.Contains(key))
-						{
-							Log.Info(
-								CultureInfo.InvariantCulture,
-								m => m("Adding: (ND) " + key.ToString()));
-							sortedList.Insert(0, key);
-						}
-
-						continue;
-					}
-
-					bool allDependenciesExist = false;
-					int lastDependency = 0;
-
-					foreach (object dependency in dependencies)
-					{
-						if (sortedList.Contains(dependency))
-						{
-							allDependenciesExist = true;
-							if (sortedList.IndexOf(dependency) >
-								lastDependency)
-							{
-								lastDependency =
-									sortedList.IndexOf(dependency);
-							}
-						}
-						else
-						{
-							allDependenciesExist = false;
-							break;
-						}
-					}
-
-					// All dependencies have been added, add object at
-					// location of last dependency.
-					if (allDependenciesExist)
-					{
-						if (!sortedList.Contains(key))
-						{
-							Log.Info(
-								CultureInfo.InvariantCulture,
-								m => m("Adding: (D) " + key.ToString()));
-							sortedList.Add(key);
-						}
-					}
-				}
+				table.ForeignKeys.Add(foreignKey);
 			}
 
-			return sortedList;
+			return table;
 		}
 
 		// Write the SQL for a column

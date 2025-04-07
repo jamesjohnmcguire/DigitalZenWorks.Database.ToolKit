@@ -78,9 +78,11 @@ namespace DigitalZenWorks.Database.ToolKit
 			{
 				oleDbConnection.Open();
 
+				object[] testTable =
+					new object[] { null, null, null, "TABLE" };
+
 				DataTable schemaTable = oleDbConnection.GetOleDbSchemaTable(
-					System.Data.OleDb.OleDbSchemaGuid.Tables,
-					new object[] { null, null, null, "TABLE" });
+					OleDbSchemaGuid.Tables, testTable);
 
 				oleDbConnection.Close();
 
@@ -108,9 +110,11 @@ namespace DigitalZenWorks.Database.ToolKit
 		{
 			oleDbConnection.Open();
 
+			object[] testTable =
+				new object[] { null, null, tableName, null, null, null };
+
 			DataTable schemaTable = oleDbConnection.GetOleDbSchemaTable(
-				System.Data.OleDb.OleDbSchemaGuid.Constraint_Column_Usage,
-				new object[] { null, null, tableName, null, null, null });
+				OleDbSchemaGuid.Constraint_Column_Usage, testTable);
 
 			oleDbConnection.Close();
 
@@ -128,9 +132,10 @@ namespace DigitalZenWorks.Database.ToolKit
 		{
 			oleDbConnection.Open();
 
+			object[] testTable = new object[] { null, null, tableName };
+
 			DataTable schemaTable = oleDbConnection.GetOleDbSchemaTable(
-				System.Data.OleDb.OleDbSchemaGuid.Foreign_Keys,
-				new object[] { null, null, tableName });
+				OleDbSchemaGuid.Foreign_Keys, testTable);
 
 			oleDbConnection.Close();
 
@@ -148,9 +153,10 @@ namespace DigitalZenWorks.Database.ToolKit
 		{
 			oleDbConnection.Open();
 
+			object[] testTable = new object[] { null, null, tableName };
+
 			DataTable schemaTable = oleDbConnection.GetOleDbSchemaTable(
-				System.Data.OleDb.OleDbSchemaGuid.Primary_Keys,
-				new object[] { null, null, tableName });
+				OleDbSchemaGuid.Primary_Keys, testTable);
 
 			oleDbConnection.Close();
 
@@ -168,9 +174,10 @@ namespace DigitalZenWorks.Database.ToolKit
 		{
 			oleDbConnection.Open();
 
+			object[] testTable = new object[] { null, null, tableName };
+
 			DataTable schemaTable = oleDbConnection.GetOleDbSchemaTable(
-				System.Data.OleDb.OleDbSchemaGuid.Columns,
-				new object[] { null, null, tableName });
+				OleDbSchemaGuid.Columns, testTable);
 
 			oleDbConnection.Close();
 
@@ -188,9 +195,11 @@ namespace DigitalZenWorks.Database.ToolKit
 		{
 			oleDbConnection.Open();
 
+			object[] testTable =
+				new object[] { null, null, null, null, null, tableName };
+
 			DataTable schemaTable = oleDbConnection.GetOleDbSchemaTable(
-				System.Data.OleDb.OleDbSchemaGuid.Table_Constraints,
-				new object[] { null, null, null, null, null, tableName });
+				OleDbSchemaGuid.Table_Constraints, testTable);
 
 			oleDbConnection.Close();
 

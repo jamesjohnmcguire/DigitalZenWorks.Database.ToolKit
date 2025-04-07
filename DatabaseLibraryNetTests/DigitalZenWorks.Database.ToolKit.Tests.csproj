@@ -42,6 +42,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<EmbeddedResource Include="Products.Test.accdb" />
+		<EmbeddedResource Include="Products.Test.sql" />
 		<EmbeddedResource Include="test.mdb" />
 	</ItemGroup>
 
