@@ -6,7 +6,6 @@
 
 using Common.Logging;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Globalization;
@@ -15,7 +14,6 @@ using System.Linq;
 using System.Reflection;
 using System.Resources;
 using System.Runtime.Versioning;
-using System.Xml;
 
 namespace DigitalZenWorks.Database.ToolKit
 {
@@ -49,70 +47,18 @@ namespace DigitalZenWorks.Database.ToolKit
 #if NET5_0_OR_GREATER
 		[SupportedOSPlatform("windows")]
 #endif
-		public static bool ExportSchema(string databaseFile, string schemaFile)
-		{
-			bool successCode = false;
-
-			try
-			{
-				Hashtable tables = GetSchema(databaseFile);
-
-				string schemaText = string.Empty;
-
-				ArrayList list = OrderTable(tables);
-
-				foreach (string table in list)
-				{
-					schemaText += WriteSql((Table)tables[table]) +
-						Environment.NewLine;
-				}
-
-				File.WriteAllText(schemaFile, schemaText);
-
-				successCode = true;
-			}
-			catch (Exception exception) when
-				(exception is ArgumentNullException ||
-				exception is ArgumentException ||
-				exception is InvalidOperationException)
-			{
-				Log.Error(CultureInfo.InvariantCulture, m => m(
-					StringTable.GetString(
-						"EXCEPTION", CultureInfo.InvariantCulture) +
-						exception));
-			}
-			catch
-			{
-				throw;
-			}
-
-			return successCode;
-		}
-
-		/////////////////////////////////////////////////////////////////////
-		/// Method <c>ExportSchema.</c>
-		/// <summary>
-		/// Export all tables to similarly named csv files.
-		/// </summary>
-		/// <returns>A values indicating success or not.</returns>
-		/// <param name="databaseFile">The database file to use.</param>
-		/// <param name="schemaFile">The schema file to export to.</param>
-		/////////////////////////////////////////////////////////////////////
-#if NET5_0_OR_GREATER
-		[SupportedOSPlatform("windows")]
-#endif
-		public static bool ExportSchemaNew(
+		public static bool ExportSchema(
 			string databaseFile, string schemaFile)
 		{
 			bool successCode = false;
 
 			try
 			{
-				List<Table> tables = GetSchemaNew(databaseFile);
+				List<Table> tables = GetSchema(databaseFile);
 
 				string schemaText = string.Empty;
 
-				List<string> list = OrderTableNew(tables);
+				List<string> list = OrderTable(tables);
 
 				foreach (string tableName in list)
 				{
@@ -338,38 +284,7 @@ namespace DigitalZenWorks.Database.ToolKit
 #if NET5_0_OR_GREATER
 		[SupportedOSPlatform("windows")]
 #endif
-		public static ArrayList GetRelationships(
-			OleDbSchema oleDbSchema, string tableName)
-		{
-			ArrayList relationships = null;
-
-			if ((null != oleDbSchema) &&
-				(!string.IsNullOrWhiteSpace(tableName)))
-			{
-				relationships = [];
-
-				DataTable foreignKeyTable = oleDbSchema.GetForeignKeys(tableName);
-
-				foreach (DataRow foreignKey in foreignKeyTable.Rows)
-				{
-					Relationship relationship = GetRelationship(foreignKey);
-					relationships.Add(relationship);
-				}
-			}
-
-			return relationships;
-		}
-
-		/// <summary>
-		/// Gets a list of relationships.
-		/// </summary>
-		/// <param name="oleDbSchema">The OLE database schema.</param>
-		/// <param name="tableName">The table name.</param>
-		/// <returns>A list of relationships.</returns>
-#if NET5_0_OR_GREATER
-		[SupportedOSPlatform("windows")]
-#endif
-		public static List<Relationship> GetRelationshipsNew(
+		public static List<Relationship> GetRelationships(
 			OleDbSchema oleDbSchema, string tableName)
 		{
 			List<Relationship> relationships = [];
@@ -387,52 +302,15 @@ namespace DigitalZenWorks.Database.ToolKit
 			return relationships;
 		}
 
+		/// <summary>
+		/// Get schema.
+		/// </summary>
+		/// <param name="databaseFile">The database file.</param>
+		/// <returns>The schema of the dabase file.</returns>
 #if NET5_0_OR_GREATER
 		[SupportedOSPlatform("windows")]
 #endif
-		public static Hashtable GetSchema(string databaseFile)
-		{
-			Hashtable tables = [];
-			List<Relationship> relationships = [];
-
-			using OleDbSchema oleDbSchema = new (databaseFile);
-
-			DataTable tableNames = oleDbSchema.TableNames;
-
-			foreach (DataRow row in tableNames.Rows)
-			{
-				object nameRaw = row["TABLE_NAME"];
-				string tableName = nameRaw.ToString();
-
-				Table table = SetPrimaryKey(oleDbSchema, row);
-
-				List<Relationship> newRelationships =
-					GetRelationshipsNew(oleDbSchema, tableName);
-				relationships = [.. relationships, .. newRelationships];
-
-				tables.Add(table.Name, table);
-			}
-
-			// Add foreign keys to table, using relationships
-			foreach (Relationship relationship in relationships)
-			{
-				string name = relationship.ChildTable;
-
-				ForeignKey foreignKey =
-					GetForeignKeyRelationship(relationship);
-
-				Table table = (Table)tables[name];
-
-				table.ForeignKeys.Add(foreignKey);
-			}
-
-			return tables;
-		}
-
-#if NET5_0_OR_GREATER
-		[SupportedOSPlatform("windows")]
-#endif
-		public static List<Table> GetSchemaNew(string databaseFile)
+		public static List<Table> GetSchema(string databaseFile)
 		{
 			List<Table> tables = [];
 			Dictionary<string, Table> tableDictionary = [];
@@ -449,7 +327,7 @@ namespace DigitalZenWorks.Database.ToolKit
 				Table table = SetPrimaryKey(oleDbSchema, row);
 
 				List<Relationship> newRelationships =
-					GetRelationshipsNew(oleDbSchema, tableName);
+					GetRelationships(oleDbSchema, tableName);
 				relationships = [.. relationships, .. newRelationships];
 
 				tableDictionary.Add(tableName, table);
@@ -469,88 +347,6 @@ namespace DigitalZenWorks.Database.ToolKit
 			}
 
 			tables = tableDictionary.Values.ToList();
-
-			return tables;
-		}
-
-#if NET5_0_OR_GREATER
-		[SupportedOSPlatform("windows")]
-#endif
-		public static Hashtable GetSchemaPrevious(string databaseFile)
-		{
-			Hashtable tables = null;
-
-			using (OleDbSchema oleDbSchema = new(databaseFile))
-			{
-				tables = [];
-				ArrayList relationships = [];
-
-				DataTable tableNames = oleDbSchema.TableNames;
-
-				foreach (DataRow row in tableNames.Rows)
-				{
-					string tableName = row["TABLE_NAME"].ToString();
-
-					Table table = new(tableName);
-
-					Log.Info(
-						CultureInfo.InvariantCulture,
-						m => m("Getting Columns for " + tableName));
-					DataTable dataColumns =
-						oleDbSchema.GetTableColumns(tableName);
-
-					foreach (DataRow dataColumn in dataColumns.Rows)
-					{
-						Column column = FormatColumnFromDataRow(dataColumn);
-
-						table.AddColumn(column);
-					}
-
-					// Get primary key
-					DataTable primary_key_table =
-						oleDbSchema.GetPrimaryKeys(tableName);
-
-					foreach (DataRow pkrow in primary_key_table.Rows)
-					{
-						table.PrimaryKey = pkrow["COLUMN_NAME"].ToString();
-					}
-
-					// If PK is an integer change type to AutoNumber
-					if (!string.IsNullOrWhiteSpace(table.PrimaryKey))
-					{
-						if (((Column)table.Columns[table.PrimaryKey]).ColumnType ==
-							ColumnType.Number)
-						{
-							((Column)table.Columns[table.PrimaryKey]).ColumnType =
-								ColumnType.AutoNumber;
-						}
-					}
-
-					DataTable foreignKeyTable =
-						oleDbSchema.GetForeignKeys(tableName);
-
-					foreach (DataRow foreignKey in foreignKeyTable.Rows)
-					{
-						Relationship relationship =
-							GetRelationship(foreignKey);
-
-						relationships.Add(relationship);
-					}
-
-					tables.Add(table.Name, table);
-				}
-
-				// Add foreign keys to table, using relationships
-				foreach (Relationship relationship in relationships)
-				{
-					string name = relationship.ChildTable;
-
-					ForeignKey foreignKey =
-						GetForeignKeyRelationship(relationship);
-
-					((Table)tables[name]).ForeignKeys.Add(foreignKey);
-				}
-			}
 
 			return tables;
 		}
@@ -696,32 +492,14 @@ namespace DigitalZenWorks.Database.ToolKit
 			return returnCode;
 		}
 
-		// Return an array list in the order that the tables need to be added
-		// to take dependencies into account
-		public static ArrayList OrderTable(Hashtable hashTable)
-		{
-			Hashtable list = [];
-			ArrayList dependencies = [];
-
-			foreach (DictionaryEntry entry in hashTable)
-			{
-				string name = (string)entry.Key;
-				Table table = (Table)entry.Value;
-				foreach (ForeignKey foreignKeys in table.ForeignKeys)
-				{
-					dependencies.Add(foreignKeys.ParentTable);
-				}
-
-				list.Add(name, new ArrayList(dependencies));
-				dependencies.Clear();
-			}
-
-			return TopologicalSort(list);
-		}
-
-		// Return an array list in the order that the tables need to be added
-		// to take dependencies into account
-		public static List<string> OrderTableNew(
+		/// <summary>
+		/// Order table.
+		/// </summary>
+		/// <param name="tables">The list of tables to order.</param>
+		/// <returns>The ordered list of of tables.</returns>
+		/// <remarks>This orders the list taking dependencies into
+		/// account.</remarks>
+		public static List<string> OrderTable(
 			List<Table> tables)
 		{
 			List<string> orderedTables = [];
@@ -747,79 +525,6 @@ namespace DigitalZenWorks.Database.ToolKit
 			}
 
 			return orderedTables;
-		}
-
-		/// <summary>
-		/// Performs a topological sort on a list with dependencies.
-		/// </summary>
-		/// <param name="table">A table to be sorted with the structure
-		/// Object name, ArrayList dependencies.</param>
-		/// <returns>A sorted arraylist.</returns>
-		public static ArrayList TopologicalSort(Hashtable table)
-		{
-			ArrayList sortedList = [];
-			object key;
-			ArrayList dependencies;
-
-			while (sortedList.Count < table.Count)
-			{
-				foreach (DictionaryEntry entry in table)
-				{
-					key = entry.Key;
-					dependencies = (ArrayList)entry.Value;
-
-					// No dependencies, add to start of table.
-					if (dependencies.Count == 0)
-					{
-						if (!sortedList.Contains(key))
-						{
-							Log.Info(
-								CultureInfo.InvariantCulture,
-								m => m("Adding: (ND) " + key.ToString()));
-							sortedList.Insert(0, key);
-						}
-
-						continue;
-					}
-
-					bool allDependenciesExist = false;
-					int lastDependency = 0;
-
-					foreach (object dependency in dependencies)
-					{
-						if (sortedList.Contains(dependency))
-						{
-							allDependenciesExist = true;
-							if (sortedList.IndexOf(dependency) >
-								lastDependency)
-							{
-								lastDependency =
-									sortedList.IndexOf(dependency);
-							}
-						}
-						else
-						{
-							allDependenciesExist = false;
-							break;
-						}
-					}
-
-					// All dependencies have been added, add object at
-					// location of last dependency.
-					if (allDependenciesExist)
-					{
-						if (!sortedList.Contains(key))
-						{
-							Log.Info(
-								CultureInfo.InvariantCulture,
-								m => m("Adding: (D) " + key.ToString()));
-							sortedList.Add(key);
-						}
-					}
-				}
-			}
-
-			return sortedList;
 		}
 
 		private static bool CompareColumnType(

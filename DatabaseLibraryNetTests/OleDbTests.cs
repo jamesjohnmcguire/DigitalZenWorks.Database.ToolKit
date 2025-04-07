@@ -30,7 +30,7 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 			string schemaFile = databaseFile + ".sql";
 
 			bool result =
-				DataDefinition.ExportSchemaNew(databaseFile, schemaFile);
+				DataDefinition.ExportSchema(databaseFile, schemaFile);
 
 			Assert.That(result, Is.True);
 
@@ -52,35 +52,8 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 
 			using OleDbSchema oleDbSchema = new(databaseFile);
 
-			ArrayList relationships = DataDefinition.GetRelationships(
-				oleDbSchema, dependentTableName);
-
-			int count = relationships.Count;
-
-			Assert.That(count, Is.EqualTo(1));
-
-			Relationship relationship = (Relationship)relationships[0];
-
-			string name = relationship.ParentTable;
-			Assert.That(name, Is.EqualTo("Addresses"));
-
-			name = relationship.ChildTable;
-			Assert.That(name, Is.EqualTo("Contacts"));
-		}
-
-		/// <summary>
-		/// Get relationships test.
-		/// </summary>
-		[Test]
-		public static void GetRelationships2()
-		{
-			string dependentTableName = "Addresses";
-			string databaseFile = GetTestMdbFile();
-
-			using OleDbSchema oleDbSchema = new(databaseFile);
-
 			List<Relationship> relationships =
-				DataDefinition.GetRelationshipsNew(
+				DataDefinition.GetRelationships(
 					oleDbSchema, dependentTableName);
 
 			int count = relationships.Count;
@@ -100,55 +73,11 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 		/// Get schema test.
 		/// </summary>
 		[Test]
-		public static void GetSchema()
-		{
-			string databaseFile = GetTestMdbFile();
-
-			Hashtable tables = DataDefinition.GetSchema(databaseFile);
-
-			int count = tables.Count;
-
-			Assert.That(count, Is.EqualTo(7));
-
-			foreach (System.Collections.DictionaryEntry entry in tables)
-			{
-				object key = entry.Key;
-				object value = entry.Value;
-				string name = key.ToString();
-				Table table = (Table)value;
-
-				Assert.That(name, Is.AnyOf("Addresses", "Categories",
-					"Contacts", "Makers", "Products", "Sections", "Series"));
-				Assert.That(table.Name, Is.AnyOf("Addresses", "Categories",
-					"Contacts", "Makers", "Products", "Sections", "Series"));
-			}
-
-			object tester = "Addresses";
-			bool result = tables.ContainsKey(tester);
-			Assert.That(result, Is.True);
-
-			tester = "Contacts";
-			result = tables.ContainsKey(tester);
-			Assert.That(result, Is.True);
-
-			Table tableItem = (Table)tables["Addresses"];
-			count = tableItem.ForeignKeys.Count;
-			Assert.That(count, Is.EqualTo(0));
-
-			tableItem = (Table)tables["Contacts"];
-			count = tableItem.ForeignKeys.Count;
-			Assert.That(count, Is.EqualTo(1));
-		}
-
-		/// <summary>
-		/// Get schema test.
-		/// </summary>
-		[Test]
 		public static void GetSchemaNew()
 		{
 			string databaseFile = GetTestMdbFile();
 
-			List<Table> tables = DataDefinition.GetSchemaNew(databaseFile);
+			List<Table> tables = DataDefinition.GetSchema(databaseFile);
 
 			int count = tables.Count;
 			Assert.That(count, Is.EqualTo(7));
@@ -168,51 +97,6 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 			tableItem = tables[2];
 			Assert.That(tableItem.Name, Is.EqualTo("Contacts"));
 
-			count = tableItem.ForeignKeys.Count;
-			Assert.That(count, Is.EqualTo(1));
-		}
-
-		/// <summary>
-		/// Get schema test.
-		/// </summary>
-		[Test]
-		public static void GetSchemaPrevious()
-		{
-			string databaseFile = GetTestMdbFile();
-
-			Hashtable tables =
-				DataDefinition.GetSchemaPrevious(databaseFile);
-
-			int count = tables.Count;
-
-			Assert.That(count, Is.EqualTo(7));
-
-			foreach (System.Collections.DictionaryEntry entry in tables)
-			{
-				object key = entry.Key;
-				object value = entry.Value;
-				string name = key.ToString();
-				Table table = (Table)value;
-
-				Assert.That(name, Is.AnyOf("Addresses", "Categories",
-					"Contacts", "Makers", "Products", "Sections", "Series"));
-				Assert.That(table.Name, Is.AnyOf("Addresses", "Categories",
-					"Contacts", "Makers", "Products", "Sections", "Series"));
-			}
-
-			object tester = "Addresses";
-			bool result = tables.ContainsKey(tester);
-			Assert.That(result, Is.True);
-
-			tester = "Contacts";
-			result = tables.ContainsKey(tester);
-			Assert.That(result, Is.True);
-
-			Table tableItem = (Table)tables["Addresses"];
-			count = tableItem.ForeignKeys.Count;
-			Assert.That(count, Is.EqualTo(0));
-
-			tableItem = (Table)tables["Contacts"];
 			count = tableItem.ForeignKeys.Count;
 			Assert.That(count, Is.EqualTo(1));
 		}
@@ -240,30 +124,14 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 		/// Order table test.
 		/// </summary>
 		[Test]
-		public void OrderTable()
-		{
-			string databaseFile = GetTestMdbFile();
-
-			Hashtable tables =
-				DataDefinition.GetSchemaPrevious(databaseFile);
-
-			ArrayList list = DataDefinition.OrderTable(tables);
-
-			Assert.Pass();
-		}
-
-		/// <summary>
-		/// Order table test.
-		/// </summary>
-		[Test]
 		public void OrderTableNew()
 		{
 			string databaseFile = GetTestMdbFile();
 
 			List<Table> tables =
-				DataDefinition.GetSchemaNew(databaseFile);
+				DataDefinition.GetSchema(databaseFile);
 
-			List<string> orderedList = DataDefinition.OrderTableNew(tables);
+			List<string> orderedList = DataDefinition.OrderTable(tables);
 
 			string tableName = orderedList[0];
 			Assert.That(tableName, Is.EqualTo("Addresses"));
@@ -285,69 +153,6 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 
 			tableName = orderedList[6];
 			Assert.That(tableName, Is.EqualTo("Products"));
-		}
-
-		/// <summary>
-		/// Topological sort test.
-		/// </summary>
-		[Test]
-		public void TopologicalSort()
-		{
-			Hashtable list = [];
-			ArrayList dependencies = [];
-
-			dependencies.Add("Categories");
-			ArrayList tableDependencies = new ArrayList(dependencies);
-			list.Add("Categories", tableDependencies);
-
-			dependencies.Clear();
-			tableDependencies = new ArrayList(dependencies);
-			list.Add("Makers", tableDependencies);
-
-			dependencies.Clear();
-			dependencies.Add("Makers");
-			tableDependencies = new ArrayList(dependencies);
-			list.Add("Series", tableDependencies);
-
-			dependencies.Clear();
-			dependencies.Add("Categories");
-			dependencies.Add("Makers");
-
-			tableDependencies = new ArrayList(dependencies);
-			list.Add("Sections", tableDependencies);
-
-			dependencies.Clear();
-			dependencies.Add("Makers");
-			dependencies.Add("Series");
-			dependencies.Add("Sections");
-
-			tableDependencies = new ArrayList(dependencies);
-			list.Add("ImportProducts", tableDependencies);
-
-			ArrayList sortedList = DataDefinition.TopologicalSort(list);
-
-			int count = sortedList.Count;
-			Assert.That(count, Is.EqualTo(5));
-
-			object table = sortedList[0];
-			string tableName = table.ToString();
-			Assert.That(tableName, Is.AnyOf("Categories", "Makers"));
-
-			table = sortedList[1];
-			tableName = table.ToString();
-			Assert.That(tableName, Is.AnyOf("Categories", "Makers"));
-
-			table = sortedList[2];
-			tableName = table.ToString();
-			Assert.That(tableName, Is.AnyOf("Sections", "Series"));
-
-			table = sortedList[3];
-			tableName = table.ToString();
-			Assert.That(tableName, Is.AnyOf("Sections", "Series"));
-
-			table = sortedList[4];
-			tableName = table.ToString();
-			Assert.That(tableName, Is.EqualTo("ImportProducts"));
 		}
 
 		private static string GetEmbeddedResourceFile(
