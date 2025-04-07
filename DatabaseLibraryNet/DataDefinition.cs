@@ -728,21 +728,19 @@ namespace DigitalZenWorks.Database.ToolKit
 
 			if (tables != null)
 			{
-				List<string> dependenciesNew = [];
 				Dictionary<string, List<string>> tableDependencies = [];
 
 				foreach (Table table in tables)
 				{
+					List<string> dependencies = [];
 					string name = table.Name;
 
 					foreach (ForeignKey foreignKeys in table.ForeignKeys)
 					{
-						dependenciesNew.Add(foreignKeys.ParentTable);
+						dependencies.Add(foreignKeys.ParentTable);
 					}
 
-					tableDependencies.Add(name, dependenciesNew);
-
-					dependenciesNew.Clear();
+					tableDependencies.Add(name, dependencies);
 				}
 
 				orderedTables = GetOrderedDependencies(tableDependencies);
