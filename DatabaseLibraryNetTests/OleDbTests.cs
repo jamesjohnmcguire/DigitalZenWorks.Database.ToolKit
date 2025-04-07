@@ -335,16 +335,14 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 			Assert.That(tableName, Is.EqualTo("ImportProducts"));
 		}
 
-		private static string GetTestMdbFile()
+		private static string GetEmbeddedResourceFile(
+			string resource, string extension)
 		{
-			string resource =
-				"DigitalZenWorks.Database.ToolKit.Tests.Products.Test.accdb";
-
 			string fileName = Path.GetTempFileName();
 
 			// A 0 byte sized file is created.  Need to remove it.
 			File.Delete(fileName);
-			string filePath = Path.ChangeExtension(fileName, "accdb");
+			string filePath = Path.ChangeExtension(fileName, extension);
 
 			bool result = FileUtils.CreateFileFromEmbeddedResource(
 				resource, filePath);
@@ -353,6 +351,26 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 
 			result = File.Exists(filePath);
 			Assert.That(result, Is.True);
+
+			return filePath;
+		}
+
+		private static string GetTestMdbFile()
+		{
+			string resource =
+				"DigitalZenWorks.Database.ToolKit.Tests.Products.Test.accdb";
+
+			string filePath = GetEmbeddedResourceFile(resource, "accdb");
+
+			return filePath;
+		}
+
+		private static string GetTestSqlFile()
+		{
+			string resource =
+				"DigitalZenWorks.Database.ToolKit.Tests.Products.Test.sql";
+
+			string filePath = GetEmbeddedResourceFile(resource, "sql");
 
 			return filePath;
 		}
