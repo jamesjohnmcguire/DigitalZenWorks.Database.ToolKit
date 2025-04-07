@@ -21,31 +21,6 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 	internal sealed class OleDbTests
 	{
 		/// <summary>
-		/// Test to see if test db exists
-		/// </summary>
-		[Test]
-		public void DatabaseCanOpen()
-		{
-			//	string provider = "Microsoft.ACE.OLEDB.12.0";
-
-			//	string connectionString = string.Format(
-			//		CultureInfo.InvariantCulture,
-			//		"provider={0}; Data Source={1}",
-			//		provider,
-			//		dataSource);
-			//	using (OleDbConnection oleDbConnection =
-			//		new OleDbConnection(connectionString))
-			//	{
-			//		oleDbConnection.Open();
-			//		oleDbConnection.Close();
-			//	}
-
-			//	// assuming no exceptions
-			//	Assert.IsTrue(File.Exists(dataSource));
-			Assert.Pass();
-		}
-
-		/// <summary>
 		/// Export schema test.
 		/// </summary>
 		[Test]
