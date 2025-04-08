@@ -169,8 +169,16 @@ namespace DigitalZenWorks.Database.ToolKit
 		{
 			if (dataItem != null)
 			{
-				dataItem = dataItem.Replace(
-					"'", "''", StringComparison.Ordinal);
+				Regex unescapedApostropheRegex =
+					new Regex(@"(?<!')'(?!')");
+
+				bool isUnescaped = unescapedApostropheRegex.IsMatch(dataItem);
+
+				if (isUnescaped == true)
+				{
+					dataItem = dataItem.Replace(
+						"'", "''", StringComparison.Ordinal);
+				}
 			}
 
 			return dataItem;
