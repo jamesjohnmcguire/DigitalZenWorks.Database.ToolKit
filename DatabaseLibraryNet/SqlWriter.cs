@@ -121,7 +121,7 @@ namespace DigitalZenWorks.Database.ToolKit
 
 				statement = string.Format(
 					CultureInfo.InvariantCulture,
-					"UPDATE {0} {1} {2};",
+					"UPDATE {0} SET {1} {2};",
 					tableName,
 					pairs,
 					where);
