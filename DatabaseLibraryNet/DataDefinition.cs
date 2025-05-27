@@ -7,6 +7,7 @@
 using Common.Logging;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Data;
 using System.Globalization;
 using System.IO;
@@ -236,6 +237,43 @@ namespace DigitalZenWorks.Database.ToolKit
 			}
 
 			return keys;
+		}
+
+		/// <summary>
+		/// Get ordered dependencies.
+		/// </summary>
+		/// <param name="tableDependencies">A collection of table
+		/// depdenencies.</param>
+		/// <returns>A list of ordered dependencies.</returns>
+		public static Collection<string> GetOrderedDependencies(
+			Dictionary<string, Collection<string>> tableDependencies)
+		{
+			Collection<string> orderedDependencies = [];
+
+			// Tracks previously processed nodes.
+			HashSet<string> visited = [];
+
+			// Tracks nodes in the current recursion stack
+			// (for cycle detection).
+			HashSet<string> visiting = [];
+
+			if (tableDependencies != null)
+			{
+				foreach (string key in tableDependencies.Keys)
+				{
+					if (!visited.Contains(key))
+					{
+						GetDependenciesRecursive(
+							key,
+							tableDependencies,
+							orderedDependencies,
+							visited,
+							visiting);
+					}
+				}
+			}
+
+			return orderedDependencies;
 		}
 
 		/// <summary>
@@ -668,6 +706,37 @@ namespace DigitalZenWorks.Database.ToolKit
 				int.Parse(position, CultureInfo.InvariantCulture);
 
 			return column;
+		}
+
+		private static void GetDependenciesRecursive(
+			string key,
+			Dictionary<string, Collection<string>> tableDependencies,
+			Collection<string> orderedDependencies,
+			HashSet<string> visited,
+			HashSet<string> visiting)
+		{
+			if (!visited.Contains(key) && !visiting.Contains(key))
+			{
+				visiting.Add(key);
+
+				if (tableDependencies.TryGetValue(
+					key, out Collection<string> value))
+				{
+					foreach (string dependency in value)
+					{
+						GetDependenciesRecursive(
+							dependency,
+							tableDependencies,
+							orderedDependencies,
+							visited,
+							visiting);
+					}
+				}
+
+				visiting.Remove(key); // Done visiting
+				visited.Add(key);     // Mark as processed
+				orderedDependencies.Add(key); // Add to result (postorder)
+			}
 		}
 
 		private static void GetDependenciesRecursive(

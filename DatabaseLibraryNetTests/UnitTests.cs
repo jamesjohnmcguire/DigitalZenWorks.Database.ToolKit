@@ -8,6 +8,7 @@ using NUnit.Framework;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Data;
 using System.Data.Common;
 using System.Data.SQLite;
@@ -155,6 +156,58 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 			};
 
 			List<string> orderedDependencies =
+				DataDefinition.GetOrderedDependencies(tableDependencies);
+
+			int tableCount = orderedDependencies.Count;
+			Assert.That(tableCount, Is.EqualTo(7));
+
+			string tableName = orderedDependencies[0];
+			Assert.That(
+				tableName, Is.AnyOf("Addresses", "Categories", "Makers"));
+
+			tableName = orderedDependencies[1];
+			Assert.That(
+				tableName, Is.AnyOf(
+					"Addresses", "Categories", "Contacts", "Makers"));
+
+			tableName = orderedDependencies[2];
+			Assert.That(
+				tableName, Is.AnyOf(
+					"Addresses", "Categories", "Contacts", "Makers"));
+
+			tableName = orderedDependencies[3];
+			Assert.That(
+				tableName, Is.AnyOf(
+					"Addresses", "Categories", "Contacts", "Makers"));
+
+			tableName = orderedDependencies[6];
+			Assert.That(tableName, Is.EqualTo("Products"));
+		}
+
+		/// <summary>
+		/// Dependencies order test.
+		/// </summary>
+		[Test]
+		public void DependenciesOrderCollection()
+		{
+			Dictionary<string, Collection<string>> tableDependencies = new()
+			{
+				{ "Addresses", [] },
+				{ "Categories", new Collection<string> { "Categories" } },
+				{ "Contacts", new Collection<string> { "Addresses" } },
+				{ "Makers", [] },
+				{ "Series", new Collection<string> { "Makers" } },
+				{
+					"Sections", new Collection<string>
+					{ "Categories", "Makers" }
+				},
+				{
+					"Products", new Collection<string>
+					{ "Sections", "Series", "Makers" }
+				}
+			};
+
+			Collection<string> orderedDependencies =
 				DataDefinition.GetOrderedDependencies(tableDependencies);
 
 			int tableCount = orderedDependencies.Count;
