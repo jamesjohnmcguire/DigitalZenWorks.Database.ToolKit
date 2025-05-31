@@ -1115,7 +1115,7 @@ namespace DigitalZenWorks.Database.ToolKit
 							// Two statements help in debugging problems
 							oleDbConnection =
 								new OleDbConnection(connectionText);
-							connection = oleDbConnection;
+							Connection = oleDbConnection;
 #endif
 
 							break;
