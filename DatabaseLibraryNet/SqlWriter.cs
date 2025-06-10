@@ -169,8 +169,18 @@ namespace DigitalZenWorks.Database.ToolKit
 		{
 			if (dataItem != null)
 			{
-				Regex unescapedApostropheRegex =
-					new Regex(@"(?<!')'(?!')");
+				bool enclosed = false;
+				bool beginEscape = dataItem.StartsWith('\'');
+				bool endsEscape = dataItem.EndsWith('\'');
+
+				if (beginEscape == true && endsEscape == true)
+				{
+					enclosed = true;
+
+					dataItem = dataItem.Trim('\'');
+				}
+
+				Regex unescapedApostropheRegex = new Regex(@"(?<!')'(?!')");
 
 				bool isUnescaped = unescapedApostropheRegex.IsMatch(dataItem);
 
@@ -178,6 +188,11 @@ namespace DigitalZenWorks.Database.ToolKit
 				{
 					dataItem = dataItem.Replace(
 						"'", "''", StringComparison.Ordinal);
+				}
+
+				if (enclosed == true)
+				{
+					dataItem = '\'' + dataItem + '\'';
 				}
 			}
 
