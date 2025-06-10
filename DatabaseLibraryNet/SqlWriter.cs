@@ -186,8 +186,13 @@ namespace DigitalZenWorks.Database.ToolKit
 
 				if (isUnescaped == true)
 				{
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP2_0_OR_GREATER
 					dataItem = dataItem.Replace(
-						"'", "''", StringComparison.Ordinal);
+					"'", "''", StringComparison.Ordinal);
+#else
+					dataItem = dataItem.Replace(
+					"'", "''");
+#endif
 				}
 
 				if (enclosed == true)
