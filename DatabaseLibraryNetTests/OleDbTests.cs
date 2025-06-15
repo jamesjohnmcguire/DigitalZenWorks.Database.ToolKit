@@ -24,7 +24,7 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 		/// Export schema test.
 		/// </summary>
 		[Test]
-		public static void ExportSchemaNew()
+		public static void ExportSchema()
 		{
 			string databaseFile = GetTestMdbFile();
 			string schemaFile = databaseFile + ".sql";
@@ -73,7 +73,7 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 		/// Get schema test.
 		/// </summary>
 		[Test]
-		public static void GetSchemaNew()
+		public static void GetSchema()
 		{
 			string databaseFile = GetTestMdbFile();
 
@@ -124,7 +124,7 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 		/// Order table test.
 		/// </summary>
 		[Test]
-		public void OrderTableNew()
+		public void OrderTable()
 		{
 			string databaseFile = GetTestMdbFile();
 
