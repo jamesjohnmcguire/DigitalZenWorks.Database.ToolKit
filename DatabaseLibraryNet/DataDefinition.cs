@@ -59,7 +59,7 @@ namespace DigitalZenWorks.Database.ToolKit
 
 				string schemaText = string.Empty;
 
-				List<string> list = OrderTable(tables);
+				Collection<string> list = OrderTable(tables);
 
 				foreach (string tableName in list)
 				{
@@ -537,18 +537,18 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// <returns>The ordered list of of tables.</returns>
 		/// <remarks>This orders the list taking dependencies into
 		/// account.</remarks>
-		public static List<string> OrderTable(
+		public static Collection<string> OrderTable(
 			List<Table> tables)
 		{
-			List<string> orderedTables = [];
+			Collection<string> orderedTables = [];
 
 			if (tables != null)
 			{
-				Dictionary<string, List<string>> tableDependencies = [];
+				Dictionary<string, Collection<string>> tableDependencies = [];
 
 				foreach (Table table in tables)
 				{
-					List<string> dependencies = [];
+					Collection<string> dependencies = [];
 					string name = table.Name;
 
 					foreach (ForeignKey foreignKeys in table.ForeignKeys)

@@ -7,6 +7,7 @@ using DigitalZenWorks.Common.Utilities;
 using NUnit.Framework;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Data;
 using System.IO;
 using System.Runtime.Versioning;
@@ -131,7 +132,8 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 			List<Table> tables =
 				DataDefinition.GetSchema(databaseFile);
 
-			List<string> orderedList = DataDefinition.OrderTable(tables);
+			Collection<string> orderedList =
+				DataDefinition.OrderTable(tables);
 
 			string tableName = orderedList[0];
 			Assert.That(tableName, Is.EqualTo("Addresses"));
