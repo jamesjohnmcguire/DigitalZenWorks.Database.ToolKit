@@ -7,6 +7,7 @@ using DigitalZenWorks.Common.Utilities;
 using NUnit.Framework;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Data;
 using System.IO;
 using System.Runtime.Versioning;
@@ -24,7 +25,7 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 		/// Export schema test.
 		/// </summary>
 		[Test]
-		public static void ExportSchemaNew()
+		public static void ExportSchema()
 		{
 			string databaseFile = GetTestMdbFile();
 			string schemaFile = databaseFile + ".sql";
@@ -52,7 +53,7 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 
 			using OleDbSchema oleDbSchema = new(databaseFile);
 
-			List<Relationship> relationships =
+			Collection<Relationship> relationships =
 				DataDefinition.GetRelationships(
 					oleDbSchema, dependentTableName);
 
@@ -73,11 +74,11 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 		/// Get schema test.
 		/// </summary>
 		[Test]
-		public static void GetSchemaNew()
+		public static void GetSchema()
 		{
 			string databaseFile = GetTestMdbFile();
 
-			List<Table> tables = DataDefinition.GetSchema(databaseFile);
+			Collection<Table> tables = DataDefinition.GetSchema(databaseFile);
 
 			int count = tables.Count;
 			Assert.That(count, Is.EqualTo(7));
@@ -124,14 +125,14 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 		/// Order table test.
 		/// </summary>
 		[Test]
-		public void OrderTableNew()
+		public void OrderTable()
 		{
 			string databaseFile = GetTestMdbFile();
 
-			List<Table> tables =
-				DataDefinition.GetSchema(databaseFile);
+			Collection<Table> tables = DataDefinition.GetSchema(databaseFile);
 
-			List<string> orderedList = DataDefinition.OrderTable(tables);
+			Collection<string> orderedList =
+				DataDefinition.OrderTable(tables);
 
 			string tableName = orderedList[0];
 			Assert.That(tableName, Is.EqualTo("Addresses"));

@@ -7,6 +7,7 @@
 using Common.Logging;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Data;
 using System.Globalization;
 using System.IO;
@@ -54,11 +55,11 @@ namespace DigitalZenWorks.Database.ToolKit
 
 			try
 			{
-				List<Table> tables = GetSchema(databaseFile);
+				Collection<Table> tables = GetSchema(databaseFile);
 
 				string schemaText = string.Empty;
 
-				List<string> list = OrderTable(tables);
+				Collection<string> list = OrderTable(tables);
 
 				foreach (string tableName in list)
 				{
@@ -241,13 +242,13 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// <summary>
 		/// Get ordered dependencies.
 		/// </summary>
-		/// <param name="tableDependencies">A dictionary of table
+		/// <param name="tableDependencies">A collection of table
 		/// depdenencies.</param>
 		/// <returns>A list of ordered dependencies.</returns>
-		public static List<string> GetOrderedDependencies(
-			Dictionary<string, List<string>> tableDependencies)
+		public static Collection<string> GetOrderedDependencies(
+			Dictionary<string, Collection<string>> tableDependencies)
 		{
-			List<string> orderedDependencies = [];
+			Collection<string> orderedDependencies = [];
 
 			// Tracks previously processed nodes.
 			HashSet<string> visited = [];
@@ -284,10 +285,10 @@ namespace DigitalZenWorks.Database.ToolKit
 #if NET5_0_OR_GREATER
 		[SupportedOSPlatform("windows")]
 #endif
-		public static List<Relationship> GetRelationships(
+		public static Collection<Relationship> GetRelationships(
 			OleDbSchema oleDbSchema, string tableName)
 		{
-			List<Relationship> relationships = [];
+			Collection<Relationship> relationships = [];
 
 			DataTable foreignKeyTable = oleDbSchema.GetForeignKeys(tableName);
 
@@ -310,9 +311,9 @@ namespace DigitalZenWorks.Database.ToolKit
 #if NET5_0_OR_GREATER
 		[SupportedOSPlatform("windows")]
 #endif
-		public static List<Table> GetSchema(string databaseFile)
+		public static Collection<Table> GetSchema(string databaseFile)
 		{
-			List<Table> tables = [];
+			Collection<Table> tables = [];
 			Dictionary<string, Table> tableDictionary = [];
 			List<Relationship> relationships = [];
 
@@ -326,7 +327,7 @@ namespace DigitalZenWorks.Database.ToolKit
 
 				Table table = SetPrimaryKey(oleDbSchema, row);
 
-				List<Relationship> newRelationships =
+				Collection<Relationship> newRelationships =
 					GetRelationships(oleDbSchema, tableName);
 				relationships = [.. relationships, .. newRelationships];
 
@@ -346,7 +347,8 @@ namespace DigitalZenWorks.Database.ToolKit
 				table.ForeignKeys.Add(foreignKey);
 			}
 
-			tables = tableDictionary.Values.ToList();
+			List<Table> newList = tableDictionary.Values.ToList();
+			tables = new Collection<Table>(newList);
 
 			return tables;
 		}
@@ -499,18 +501,18 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// <returns>The ordered list of of tables.</returns>
 		/// <remarks>This orders the list taking dependencies into
 		/// account.</remarks>
-		public static List<string> OrderTable(
-			List<Table> tables)
+		public static Collection<string> OrderTable(
+			Collection<Table> tables)
 		{
-			List<string> orderedTables = [];
+			Collection<string> orderedTables = [];
 
 			if (tables != null)
 			{
-				Dictionary<string, List<string>> tableDependencies = [];
+				Dictionary<string, Collection<string>> tableDependencies = [];
 
 				foreach (Table table in tables)
 				{
-					List<string> dependencies = [];
+					Collection<string> dependencies = [];
 					string name = table.Name;
 
 					foreach (ForeignKey foreignKeys in table.ForeignKeys)
@@ -668,6 +670,37 @@ namespace DigitalZenWorks.Database.ToolKit
 				int.Parse(position, CultureInfo.InvariantCulture);
 
 			return column;
+		}
+
+		private static void GetDependenciesRecursive(
+			string key,
+			Dictionary<string, Collection<string>> tableDependencies,
+			Collection<string> orderedDependencies,
+			HashSet<string> visited,
+			HashSet<string> visiting)
+		{
+			if (!visited.Contains(key) && !visiting.Contains(key))
+			{
+				visiting.Add(key);
+
+				if (tableDependencies.TryGetValue(
+					key, out Collection<string> value))
+				{
+					foreach (string dependency in value)
+					{
+						GetDependenciesRecursive(
+							dependency,
+							tableDependencies,
+							orderedDependencies,
+							visited,
+							visiting);
+					}
+				}
+
+				visiting.Remove(key); // Done visiting
+				visited.Add(key);     // Mark as processed
+				orderedDependencies.Add(key); // Add to result (postorder)
+			}
 		}
 
 		private static void GetDependenciesRecursive(
