@@ -277,43 +277,6 @@ namespace DigitalZenWorks.Database.ToolKit
 		}
 
 		/// <summary>
-		/// Get ordered dependencies.
-		/// </summary>
-		/// <param name="tableDependencies">A dictionary of table
-		/// depdenencies.</param>
-		/// <returns>A list of ordered dependencies.</returns>
-		public static List<string> GetOrderedDependencies(
-			Dictionary<string, List<string>> tableDependencies)
-		{
-			List<string> orderedDependencies = [];
-
-			// Tracks previously processed nodes.
-			HashSet<string> visited = [];
-
-			// Tracks nodes in the current recursion stack
-			// (for cycle detection).
-			HashSet<string> visiting = [];
-
-			if (tableDependencies != null)
-			{
-				foreach (string key in tableDependencies.Keys)
-				{
-					if (!visited.Contains(key))
-					{
-						GetDependenciesRecursive(
-							key,
-							tableDependencies,
-							orderedDependencies,
-							visited,
-							visiting);
-					}
-				}
-			}
-
-			return orderedDependencies;
-		}
-
-		/// <summary>
 		/// Gets a list of relationships.
 		/// </summary>
 		/// <param name="oleDbSchema">The OLE database schema.</param>
