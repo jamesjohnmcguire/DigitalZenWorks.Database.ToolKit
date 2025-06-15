@@ -44,6 +44,7 @@
 	<ItemGroup>
 		<EmbeddedResource Include="Products.Test.accdb" />
 		<EmbeddedResource Include="Products.Test.sql" />
+		<AdditionalFiles Include="stylecop.json" />
 		<EmbeddedResource Include="test.mdb" />
 	</ItemGroup>
 
