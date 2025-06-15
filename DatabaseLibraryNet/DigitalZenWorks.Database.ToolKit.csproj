@@ -68,9 +68,6 @@
 		</None>
 		<None Include="DatabaseLibraryNet.snk" />
 		<AdditionalFiles Include="stylecop.json" />
-		<EmbeddedResource Include="template.accdb">
-			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
-		</EmbeddedResource>
 	</ItemGroup>
 
 </Project>
