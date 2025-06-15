@@ -285,10 +285,10 @@ namespace DigitalZenWorks.Database.ToolKit
 #if NET5_0_OR_GREATER
 		[SupportedOSPlatform("windows")]
 #endif
-		public static List<Relationship> GetRelationships(
+		public static Collection<Relationship> GetRelationships(
 			OleDbSchema oleDbSchema, string tableName)
 		{
-			List<Relationship> relationships = [];
+			Collection<Relationship> relationships = [];
 
 			DataTable foreignKeyTable = oleDbSchema.GetForeignKeys(tableName);
 
@@ -327,7 +327,7 @@ namespace DigitalZenWorks.Database.ToolKit
 
 				Table table = SetPrimaryKey(oleDbSchema, row);
 
-				List<Relationship> newRelationships =
+				Collection<Relationship> newRelationships =
 					GetRelationships(oleDbSchema, tableName);
 				relationships = [.. relationships, .. newRelationships];
 

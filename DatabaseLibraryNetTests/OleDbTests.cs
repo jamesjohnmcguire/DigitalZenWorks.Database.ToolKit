@@ -53,7 +53,7 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 
 			using OleDbSchema oleDbSchema = new(databaseFile);
 
-			List<Relationship> relationships =
+			Collection<Relationship> relationships =
 				DataDefinition.GetRelationships(
 					oleDbSchema, dependentTableName);
 
