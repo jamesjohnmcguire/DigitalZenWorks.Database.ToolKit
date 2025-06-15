@@ -78,7 +78,7 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 		{
 			string databaseFile = GetTestMdbFile();
 
-			List<Table> tables = DataDefinition.GetSchema(databaseFile);
+			Collection<Table> tables = DataDefinition.GetSchema(databaseFile);
 
 			int count = tables.Count;
 			Assert.That(count, Is.EqualTo(7));
@@ -129,8 +129,7 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 		{
 			string databaseFile = GetTestMdbFile();
 
-			List<Table> tables =
-				DataDefinition.GetSchema(databaseFile);
+			Collection<Table> tables = DataDefinition.GetSchema(databaseFile);
 
 			Collection<string> orderedList =
 				DataDefinition.OrderTable(tables);

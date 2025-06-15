@@ -55,7 +55,7 @@ namespace DigitalZenWorks.Database.ToolKit
 
 			try
 			{
-				List<Table> tables = GetSchema(databaseFile);
+				Collection<Table> tables = GetSchema(databaseFile);
 
 				string schemaText = string.Empty;
 
@@ -348,9 +348,9 @@ namespace DigitalZenWorks.Database.ToolKit
 #if NET5_0_OR_GREATER
 		[SupportedOSPlatform("windows")]
 #endif
-		public static List<Table> GetSchema(string databaseFile)
+		public static Collection<Table> GetSchema(string databaseFile)
 		{
-			List<Table> tables = [];
+			Collection<Table> tables = [];
 			Dictionary<string, Table> tableDictionary = [];
 			List<Relationship> relationships = [];
 
@@ -384,7 +384,8 @@ namespace DigitalZenWorks.Database.ToolKit
 				table.ForeignKeys.Add(foreignKey);
 			}
 
-			tables = tableDictionary.Values.ToList();
+			List<Table> newList = tableDictionary.Values.ToList();
+			tables = new Collection<Table>(newList);
 
 			return tables;
 		}
@@ -538,7 +539,7 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// <remarks>This orders the list taking dependencies into
 		/// account.</remarks>
 		public static Collection<string> OrderTable(
-			List<Table> tables)
+			Collection<Table> tables)
 		{
 			Collection<string> orderedTables = [];
 
