@@ -141,55 +141,6 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 		[Test]
 		public void DependenciesOrder()
 		{
-			Dictionary<string, List<string>> tableDependencies = new()
-			{
-				{ "Addresses", [] },
-				{ "Categories", new List<string> { "Categories" } },
-				{ "Contacts", new List<string> { "Addresses" } },
-				{ "Makers", [] },
-				{ "Series", new List<string> { "Makers" } },
-				{ "Sections", new List<string> { "Categories", "Makers" } },
-				{
-					"Products", new List<string>
-					{ "Sections", "Series", "Makers" }
-				}
-			};
-
-			List<string> orderedDependencies =
-				DataDefinition.GetOrderedDependencies(tableDependencies);
-
-			int tableCount = orderedDependencies.Count;
-			Assert.That(tableCount, Is.EqualTo(7));
-
-			string tableName = orderedDependencies[0];
-			Assert.That(
-				tableName, Is.AnyOf("Addresses", "Categories", "Makers"));
-
-			tableName = orderedDependencies[1];
-			Assert.That(
-				tableName, Is.AnyOf(
-					"Addresses", "Categories", "Contacts", "Makers"));
-
-			tableName = orderedDependencies[2];
-			Assert.That(
-				tableName, Is.AnyOf(
-					"Addresses", "Categories", "Contacts", "Makers"));
-
-			tableName = orderedDependencies[3];
-			Assert.That(
-				tableName, Is.AnyOf(
-					"Addresses", "Categories", "Contacts", "Makers"));
-
-			tableName = orderedDependencies[6];
-			Assert.That(tableName, Is.EqualTo("Products"));
-		}
-
-		/// <summary>
-		/// Dependencies order test.
-		/// </summary>
-		[Test]
-		public void DependenciesOrderCollection()
-		{
 			Dictionary<string, Collection<string>> tableDependencies = new()
 			{
 				{ "Addresses", [] },
