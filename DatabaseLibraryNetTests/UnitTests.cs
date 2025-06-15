@@ -8,6 +8,7 @@ using NUnit.Framework;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Data;
 using System.Data.Common;
 using System.Data.SQLite;
@@ -140,21 +141,24 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 		[Test]
 		public void DependenciesOrder()
 		{
-			Dictionary<string, List<string>> tableDependencies = new()
+			Dictionary<string, Collection<string>> tableDependencies = new()
 			{
 				{ "Addresses", [] },
-				{ "Categories", new List<string> { "Categories" } },
-				{ "Contacts", new List<string> { "Addresses" } },
+				{ "Categories", new Collection<string> { "Categories" } },
+				{ "Contacts", new Collection<string> { "Addresses" } },
 				{ "Makers", [] },
-				{ "Series", new List<string> { "Makers" } },
-				{ "Sections", new List<string> { "Categories", "Makers" } },
+				{ "Series", new Collection<string> { "Makers" } },
 				{
-					"Products", new List<string>
+					"Sections", new Collection<string>
+					{ "Categories", "Makers" }
+				},
+				{
+					"Products", new Collection<string>
 					{ "Sections", "Series", "Makers" }
 				}
 			};
 
-			List<string> orderedDependencies =
+			Collection<string> orderedDependencies =
 				DataDefinition.GetOrderedDependencies(tableDependencies);
 
 			int tableCount = orderedDependencies.Count;
