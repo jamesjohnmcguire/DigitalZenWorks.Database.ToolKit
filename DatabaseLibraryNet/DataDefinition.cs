@@ -290,14 +290,18 @@ namespace DigitalZenWorks.Database.ToolKit
 		{
 			Collection<Relationship> relationships = [];
 
-			DataTable foreignKeyTable = oleDbSchema.GetForeignKeys(tableName);
-
-			foreach (DataRow foreignKey in foreignKeyTable.Rows)
+			if (oleDbSchema != null)
 			{
-				Relationship relationship =
-					GetRelationship(foreignKey);
+				DataTable foreignKeyTable =
+					oleDbSchema.GetForeignKeys(tableName);
 
-				relationships.Add(relationship);
+				foreach (DataRow foreignKey in foreignKeyTable.Rows)
+				{
+					Relationship relationship =
+						GetRelationship(foreignKey);
+
+					relationships.Add(relationship);
+				}
 			}
 
 			return relationships;
