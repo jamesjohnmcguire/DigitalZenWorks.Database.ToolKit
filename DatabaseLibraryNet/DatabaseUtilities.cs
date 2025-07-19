@@ -4,18 +4,18 @@
 // </copyright>
 /////////////////////////////////////////////////////////////////////////////
 
-using Common.Logging;
-using DigitalZenWorks.Common.Utilities;
-using System;
-using System.Data;
-using System.Globalization;
-using System.IO;
-using System.Reflection;
-using System.Resources;
-using System.Security;
-
 namespace DigitalZenWorks.Database.ToolKit
 {
+	using System;
+	using System.Data;
+	using System.Globalization;
+	using System.IO;
+	using System.Reflection;
+	using System.Resources;
+	using System.Security;
+	using DigitalZenWorks.Common.Utilities;
+	using global::Common.Logging;
+
 	/// <summary>
 	/// Class for common database uses.
 	/// </summary>
@@ -59,7 +59,7 @@ namespace DigitalZenWorks.Database.ToolKit
 				GeneralUtilities.CallingMethod() + ": " +
 				StringTable.GetString("BEGIN", CultureInfo.InvariantCulture)));
 
-			if ((null != table) && (null != file))
+			if (table != null && file != null)
 			{
 				// First write the headers.
 				int columnCount = table.Columns.Count;
@@ -150,7 +150,7 @@ namespace DigitalZenWorks.Database.ToolKit
 				// Get all the table names
 				DataTable tableNames = database.SchemaTable;
 
-				if (null != tableNames)
+				if (tableNames != null)
 				{
 					// for each table, select all the data
 					foreach (DataRow table in tableNames.Rows)
