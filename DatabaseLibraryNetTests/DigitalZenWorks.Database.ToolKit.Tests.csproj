@@ -13,10 +13,6 @@
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
-		<PackageReference Include="Microsoft.DotNet.Analyzers.Compatibility" Version="0.2.12-alpha">
-			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-			<PrivateAssets>all</PrivateAssets>
-		</PackageReference>
 		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
 		<PackageReference Include="NUnit" Version="4.3.2" />
 		<PackageReference Include="NUnit.Analyzers" Version="4.9.2">

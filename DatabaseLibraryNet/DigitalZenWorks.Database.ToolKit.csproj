@@ -42,10 +42,6 @@
 		<PackageReference Include="Dapper" Version="2.1.66" />
 		<PackageReference Include="DigitalZenWorks.Common.Utilities" Version="1.4.75" />
 		<PackageReference Include="Microsoft.Data.SqlClient" Version="6.0.2" />
-		<PackageReference Include="Microsoft.DotNet.Analyzers.Compatibility" Version="0.2.12-alpha">
-			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-			<PrivateAssets>all</PrivateAssets>
-		</PackageReference>
 		<PackageReference Include="MySql.Data" Version="9.3.0" />
 		<PackageReference Include="StyleCop.Analyzers" Version="1.1.118">
 			<PrivateAssets>all</PrivateAssets>
