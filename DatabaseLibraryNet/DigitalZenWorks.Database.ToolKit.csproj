@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<AnalysisMode>AllEnabledByDefault</AnalysisMode>
+		<AnalysisMode>All</AnalysisMode>
 		<AssemblyName>DigitalZenWorks.Database.ToolKit</AssemblyName>
 		<AssemblyOriginatorKeyFile>DatabaseLibraryNet.snk</AssemblyOriginatorKeyFile>
 		<AssemblyTitle>DigitalZenWorks.Database.ToolKit</AssemblyTitle>
@@ -9,16 +9,14 @@
 		<Authors>James John McGuire</Authors>
 		<Company>Digital Zen Works</Company>
 		<Copyright>Copyright © 2006 - 2025</Copyright>
-		<Description>
-			This client library provides common database functionality.
-		</Description>
+		<Description>This client library provides common database functionality.</Description>
 		<EnableNETAnalyzers>true</EnableNETAnalyzers>
+		<EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
 		<FileVersion>1.2.55.0</FileVersion>
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 		<LangVersion>Latest</LangVersion>
 		<NeutralLanguage>en</NeutralLanguage>
-		<NoWarn>NU1605;NU1701</NoWarn>
 		<PackageId>DigitalZenWorks.Database.ToolKit</PackageId>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
@@ -33,7 +31,7 @@
 		<TargetFramework>net9.0</TargetFramework>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)'=='Release'">
-		<TargetFrameworks>netstandard2.0;net472;net6.0;net7.0;net8.0;net9.0</TargetFrameworks>
+		<TargetFrameworks>netstandard2.0;net472;net5.0;net6.0;net7.0;net8.0;net9.0</TargetFrameworks>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -53,16 +51,16 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<None Include="..\LICENSE">
+		<None Include="../LICENSE">
 			<Pack>True</Pack>
 			<PackagePath>\</PackagePath>
 		</None>
-		<None Include="..\README.md">
+		<None Include="../README.md">
 			<Pack>True</Pack>
 			<PackagePath>\</PackagePath>
 		</None>
 		<None Include="DatabaseLibraryNet.snk" />
-		<AdditionalFiles Include="stylecop.json" />
+		<AdditionalFiles Include="../stylecop.json" />
 	</ItemGroup>
 
 </Project>
