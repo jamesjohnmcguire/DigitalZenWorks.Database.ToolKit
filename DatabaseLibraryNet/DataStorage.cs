@@ -4,32 +4,30 @@
 // </copyright>
 /////////////////////////////////////////////////////////////////////////////
 
-using Common.Logging;
-using DigitalZenWorks.Common.Utilities;
-using Microsoft.Data.SqlClient;
-using MySql.Data.MySqlClient;
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Configuration;
-using System.Data;
-using System.Data.Common;
-using System.Data.OleDb;
-using System.Data.SQLite;
-using System.Globalization;
-using System.Reflection;
-using System.Resources;
-using System.Runtime.Versioning;
-
 namespace DigitalZenWorks.Database.ToolKit
 {
-	/////////////////////////////////////////////////////////////////////////
+	using System;
+	using System.Collections.Generic;
+	using System.Collections.ObjectModel;
+	using System.Configuration;
+	using System.Data;
+	using System.Data.Common;
+	using System.Data.OleDb;
+	using System.Data.SQLite;
+	using System.Globalization;
+	using System.Reflection;
+	using System.Resources;
+	using System.Runtime.Versioning;
+	using DigitalZenWorks.Common.Utilities;
+	using global::Common.Logging;
+	using Microsoft.Data.SqlClient;
+	using MySql.Data.MySqlClient;
+
 	/// Class <c>DataStorage.</c>
 	/// <summary>
 	/// Class for Generic database access independent of the underlying
 	/// transport.
 	/// </summary>
-	/////////////////////////////////////////////////////////////////////////
 	public class DataStorage : IDataStorage
 	{
 		/// <summary>
@@ -61,7 +59,6 @@ namespace DigitalZenWorks.Database.ToolKit
 
 		private SQLiteConnection sqliteConnection;
 
-		// transactions
 		/// <summary>
 		/// transaction object.
 		/// </summary>
@@ -100,14 +97,12 @@ namespace DigitalZenWorks.Database.ToolKit
 			connectionText = connectionString;
 		}
 
-		/////////////////////////////////////////////////////////////////////
 		/// <summary>
 		/// Gets get the table schema information for the associated database.
 		/// </summary>
 		/// <value>
 		/// Get the table schema information for the associated database.
 		/// </value>
-		/////////////////////////////////////////////////////////////////////
 		public DataTable SchemaTable
 		{
 			get
@@ -119,7 +114,7 @@ namespace DigitalZenWorks.Database.ToolKit
 				if (returnCode == true)
 				{
 #if NET5_0_OR_GREATER
-					if (DatabaseType.OleDb == databaseType &&
+					if (databaseType == DatabaseType.OleDb &&
 						OperatingSystem.IsWindows())
 #else
 					if (DatabaseType.OleDb == databaseType)
@@ -194,11 +189,9 @@ namespace DigitalZenWorks.Database.ToolKit
 			GC.SuppressFinalize(this);
 		}
 
-		/////////////////////////////////////////////////////////////////////
 		/// <summary>
 		/// Shut down the database.
 		/// </summary>
-		/////////////////////////////////////////////////////////////////////
 		public void Shutdown()
 		{
 			Close();
@@ -247,7 +240,7 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// </summary>
 		public void CommitTransaction()
 		{
-			if (null != databaseTransaction)
+			if (databaseTransaction != null)
 			{
 				databaseTransaction.Commit();
 				databaseTransaction.Dispose();
@@ -264,21 +257,19 @@ namespace DigitalZenWorks.Database.ToolKit
 			databaseTransaction?.Rollback();
 		}
 
-		/////////////////////////////////////////////////////////////////////
 		/// Method <c>CanQuery.</c>
 		/// <summary>
 		/// Checks to see if the database can return a valid query. Helper
 		/// function for unit tests.
 		/// </summary>
 		/// <returns>true if connection is open, false otherwise.</returns>
-		/////////////////////////////////////////////////////////////////////
 		public bool CanQuery()
 		{
 			bool canQuery = false;
 
 			DataTable tables = SchemaTable;
 
-			if ((null != tables) && (tables.Rows.Count > 0))
+			if (tables != null && tables.Rows.Count > 0)
 			{
 				canQuery = true;
 			}
@@ -286,14 +277,12 @@ namespace DigitalZenWorks.Database.ToolKit
 			return canQuery;
 		}
 
-		/////////////////////////////////////////////////////////////////////
 		/// Method <c>Delete.</c>
 		/// <summary>
 		/// Performs an SQL DELETE command.
 		/// </summary>
 		/// <param name="sql">The sql statement to execute.</param>
 		/// <returns>Success / Failure.</returns>
-		/////////////////////////////////////////////////////////////////////
 		public bool Delete(string sql)
 		{
 			bool returnCode = ExecuteNonQuery(sql);
@@ -301,26 +290,22 @@ namespace DigitalZenWorks.Database.ToolKit
 			return returnCode;
 		}
 
-		/////////////////////////////////////////////////////////////////////
 		/// <summary>
 		/// Prepares and executes a Non-Query DB Command.
 		/// </summary>
 		/// <param name="sql">The sql statement to execute.</param>
 		/// <returns>A value indicating success or not.</returns>
-		/////////////////////////////////////////////////////////////////////
 		public bool ExecuteNonQuery(string sql)
 		{
 			return ExecuteNonQuery(sql, null);
 		}
 
-		/////////////////////////////////////////////////////////////////////
 		/// <summary>
 		/// Prepares and executes a Non-Query DB Command.
 		/// </summary>
 		/// <param name="sql">The sql statement to execute.</param>
 		/// <param name="values">The values to use in the query.</param>
 		/// <returns>A value indicating success or not.</returns>
-		/////////////////////////////////////////////////////////////////////
 		public bool ExecuteNonQuery(
 			string sql, IDictionary<string, object> values)
 		{
@@ -328,7 +313,7 @@ namespace DigitalZenWorks.Database.ToolKit
 
 			using (DbCommand command = GetCommandObject(sql, values))
 			{
-				if (null != command)
+				if (command != null)
 				{
 					try
 					{
@@ -344,7 +329,7 @@ namespace DigitalZenWorks.Database.ToolKit
 					}
 				}
 
-				if (null == databaseTransaction)
+				if (databaseTransaction == null)
 				{
 					Close();
 				}
@@ -366,7 +351,7 @@ namespace DigitalZenWorks.Database.ToolKit
 
 			using (DbCommand command = GetCommandObject(statement, null))
 			{
-				if (null != command)
+				if (command != null)
 				{
 					dbDataReader = command.ExecuteReader();
 				}
@@ -375,20 +360,18 @@ namespace DigitalZenWorks.Database.ToolKit
 			return dbDataReader;
 		}
 
-		/////////////////////////////////////////////////////////////////////
 		/// Method <c>GetDataField.</c>
 		/// <summary>
 		/// Gets a single field from a row of data.
 		/// </summary>
 		/// <param name="sql">The sql statement to execute.</param>
 		/// <returns>the field object.</returns>
-		/////////////////////////////////////////////////////////////////////
 		public object GetDataField(string sql)
 		{
 			object datafield = null;
 			DataRow dataRowOut = GetDataRow(sql);
 
-			if (null != dataRowOut)
+			if (dataRowOut != null)
 			{
 				datafield = dataRowOut.ItemArray[0];
 			}
@@ -396,20 +379,17 @@ namespace DigitalZenWorks.Database.ToolKit
 			return datafield;
 		}
 
-		/////////////////////////////////////////////////////////////////////
 		/// Method <c>GetDataRow.</c>
 		/// <summary>
 		/// Gets a single row of data.
 		/// </summary>
 		/// <param name="sql">The sql statement to execute.</param>
 		/// <returns>DataRow.</returns>
-		/////////////////////////////////////////////////////////////////////
 		public DataRow GetDataRow(string sql)
 		{
 			return GetDataRow(sql, null);
 		}
 
-		/////////////////////////////////////////////////////////////////////
 		/// Method <c>GetDataRow.</c>
 		/// <summary>
 		/// Gets a single row of data.
@@ -417,7 +397,6 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// <param name="sql">The sql statement to execute.</param>
 		/// <param name="values">The values of fields to get.</param>
 		/// <returns>DataRow, null on failure.</returns>
-		/////////////////////////////////////////////////////////////////////
 		public DataRow GetDataRow(
 			string sql, IDictionary<string, object> values)
 		{
@@ -433,26 +412,22 @@ namespace DigitalZenWorks.Database.ToolKit
 			return row;
 		}
 
-		/////////////////////////////////////////////////////////////////////
 		/// <summary>
 		/// Gets a DataSet based on the given query.
 		/// </summary>
 		/// <param name="sql">The sql statement to execute.</param>
 		/// <returns>DataSet or null on failure.</returns>
-		/////////////////////////////////////////////////////////////////////
 		public DataSet GetDataSet(string sql)
 		{
 			return GetDataSet(sql, null);
 		}
 
-		/////////////////////////////////////////////////////////////////////
 		/// <summary>
 		/// Gets a DataSet based on the given query.
 		/// </summary>
 		/// <param name="sql">The sql statement to execute.</param>
 		/// <param name="values">The values to use in the query.</param>
 		/// <returns>DataSet or null on failure.</returns>
-		/////////////////////////////////////////////////////////////////////
 		public DataSet GetDataSet(
 			string sql, IDictionary<string, object> values)
 		{
@@ -466,7 +441,7 @@ namespace DigitalZenWorks.Database.ToolKit
 
 				using DbCommand command = GetCommandObject(sql, values);
 
-				if (null != command)
+				if (command != null)
 				{
 					switch (databaseType)
 					{
@@ -545,13 +520,13 @@ namespace DigitalZenWorks.Database.ToolKit
 			}
 			finally
 			{
-				if (null != dataAdapter)
+				if (dataAdapter != null)
 				{
 					dataAdapter.Dispose();
 					dataAdapter = null;
 				}
 
-				if (null == databaseTransaction)
+				if (databaseTransaction == null)
 				{
 					Close();
 				}
@@ -560,26 +535,22 @@ namespace DigitalZenWorks.Database.ToolKit
 			return dataSet;
 		}
 
-		/////////////////////////////////////////////////////////////////////
 		/// <summary>
 		/// GetDataTable.
 		/// </summary>
 		/// <param name="sql">The sql statement to execute.</param>
 		/// <returns>number of records retrieved.</returns>
-		/////////////////////////////////////////////////////////////////////
 		public DataTable GetDataTable(string sql)
 		{
 			return GetDataTable(sql, null);
 		}
 
-		/////////////////////////////////////////////////////////////////////
 		/// <summary>
 		/// GetDataTable.
 		/// </summary>
 		/// <param name="sql">The sql statement to execute.</param>
 		/// <param name="values">The values to use in the query.</param>
 		/// <returns>DataTable or null on failure.</returns>
-		/////////////////////////////////////////////////////////////////////
 		public DataTable GetDataTable(
 			string sql, IDictionary<string, object> values)
 		{
@@ -634,20 +605,17 @@ namespace DigitalZenWorks.Database.ToolKit
 			return lastId;
 		}
 
-		/////////////////////////////////////////////////////////////////////
 		/// Method <c>Insert.</c>
 		/// <summary>
 		/// Performs an Sql UPDATE command.
 		/// </summary>
 		/// <param name="sql">The sql statement to execute.</param>
 		/// <returns>object item.</returns>
-		/////////////////////////////////////////////////////////////////////
 		public int Insert(string sql)
 		{
 			return Insert(sql, null);
 		}
 
-		/////////////////////////////////////////////////////////////////////
 		/// Method <c>Insert.</c>
 		/// <summary>
 		/// Performs an Sql UPDATE command.
@@ -655,7 +623,6 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// <param name="sql">The sql statement to execute.</param>
 		/// <param name="values">The values to use in the query.</param>
 		/// <returns>object item.</returns>
-		/////////////////////////////////////////////////////////////////////
 		public int Insert(string sql, IDictionary<string, object> values)
 		{
 			int returnCode = 0;
@@ -663,7 +630,7 @@ namespace DigitalZenWorks.Database.ToolKit
 			try
 			{
 				bool finishTransaction = false;
-				if (null == databaseTransaction)
+				if (databaseTransaction == null)
 				{
 					BeginTransaction();
 					finishTransaction = true;
@@ -680,7 +647,7 @@ namespace DigitalZenWorks.Database.ToolKit
 				// get id of effected row
 				returnCode = GetLastInsertId();
 
-				if (true == finishTransaction)
+				if (finishTransaction == true)
 				{
 					CommitTransaction();
 				}
@@ -704,19 +671,17 @@ namespace DigitalZenWorks.Database.ToolKit
 			return returnCode;
 		}
 
-		/////////////////////////////////////////////////////////////////////
 		/// Method <c>IsConnected.</c>
 		/// <summary>
 		/// Checks to see if the database is open and connected. Helper function
 		/// for unit tests.
 		/// </summary>
 		/// <returns>true if connection is open, false otherwise.</returns>
-		/////////////////////////////////////////////////////////////////////
 		public bool IsConnected()
 		{
 			bool connected = false;
 
-			if ((null != Connection) &&
+			if ((Connection != null) &&
 				(Connection.State == ConnectionState.Open))
 			{
 				connected = true;
@@ -734,20 +699,17 @@ namespace DigitalZenWorks.Database.ToolKit
 			return Initialize();
 		}
 
-		/////////////////////////////////////////////////////////////////////
 		/// Method <c>Update.</c>
 		/// <summary>
 		/// Performs an Sql UPDATE command.
 		/// </summary>
 		/// <param name="sql">The sql statement to execute.</param>
 		/// <returns>A value indicating success or not.</returns>
-		/////////////////////////////////////////////////////////////////////
 		public bool Update(string sql)
 		{
 			return ExecuteNonQuery(sql, null);
 		}
 
-		/////////////////////////////////////////////////////////////////////
 		/// Method <c>Update.</c>
 		/// <summary>
 		/// Performs an SQL UPDATE command.
@@ -755,7 +717,6 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// <param name="sql">The sql statement to execute.</param>
 		/// <param name="values">The values to use in the query.</param>
 		/// <returns>A value indicating success or not.</returns>
-		/////////////////////////////////////////////////////////////////////
 		public bool Update(string sql, IDictionary<string, object> values)
 		{
 			return ExecuteNonQuery(sql, values);
@@ -773,7 +734,7 @@ namespace DigitalZenWorks.Database.ToolKit
 #if NET5_0_OR_GREATER
 				if (OperatingSystem.IsWindows())
 				{
-					if (null != oleDbConnection)
+					if (oleDbConnection != null)
 					{
 						oleDbConnection.Close();
 						oleDbConnection.Dispose();
@@ -789,27 +750,27 @@ namespace DigitalZenWorks.Database.ToolKit
 				}
 #endif
 
-				if (null != mySqlConnection)
+				if (mySqlConnection != null)
 				{
 					mySqlConnection.Close();
 					mySqlConnection.Dispose();
 					mySqlConnection = null;
 				}
 
-				if (null != sqliteConnection)
+				if (sqliteConnection != null)
 				{
 					sqliteConnection.Close();
 					sqliteConnection.Dispose();
 					sqliteConnection = null;
 				}
 
-				if (null != databaseTransaction)
+				if (databaseTransaction != null)
 				{
 					databaseTransaction.Dispose();
 					databaseTransaction = null;
 				}
 
-				if (null != Connection)
+				if (Connection != null)
 				{
 					Connection.Dispose();
 					Connection = null;
@@ -830,7 +791,7 @@ namespace DigitalZenWorks.Database.ToolKit
 				string name = "@" + valuePair.Key;
 				OleDbParameter parameter;
 
-				if (null == valuePair.Value)
+				if (valuePair.Value == null)
 				{
 					parameter = parameters.AddWithValue(name, DBNull.Value);
 				}
@@ -916,7 +877,7 @@ namespace DigitalZenWorks.Database.ToolKit
 			{
 				int result;
 
-				if (null == valuePair.Value)
+				if (valuePair.Value == null)
 				{
 					result = parameters.Add(DBNull.Value);
 				}
@@ -945,30 +906,28 @@ namespace DigitalZenWorks.Database.ToolKit
 			return parameters;
 		}
 
-		/////////////////////////////////////////////////////////////////////
 		/// <summary>
 		/// The first column of the first row in the result set,
 		/// or a null reference if the result set is empty.
 		/// </summary>
-		/////////////////////////////////////////////////////////////////////
 		private int ExecuteScalar(string sql)
 		{
 			int result = 0;
 
 			using (DbCommand command = GetCommandObject(sql, null))
 			{
-				if (null != command)
+				if (command != null)
 				{
 					object field = command.ExecuteScalar();
 
-					if (null != field)
+					if (field != null)
 					{
 						result = Convert.ToInt32(
 							field, CultureInfo.InvariantCulture);
 					}
 				}
 
-				if (null == databaseTransaction)
+				if (databaseTransaction == null)
 				{
 					Close();
 				}
@@ -986,7 +945,7 @@ namespace DigitalZenWorks.Database.ToolKit
 			{
 				bool returnCode = Initialize();
 
-				if (true == returnCode)
+				if (returnCode == true)
 				{
 					switch (databaseType)
 					{
@@ -1023,7 +982,7 @@ namespace DigitalZenWorks.Database.ToolKit
 							break;
 					}
 
-					if (null != values)
+					if (values != null)
 					{
 						switch (databaseType)
 						{
@@ -1078,9 +1037,9 @@ namespace DigitalZenWorks.Database.ToolKit
 
 			try
 			{
-				if (true == forceReset)
+				if (forceReset == true)
 				{
-					if ((null != Connection) &&
+					if ((Connection != null) &&
 						(Connection.State == ConnectionState.Open))
 					{
 						Connection.Dispose();
@@ -1088,7 +1047,7 @@ namespace DigitalZenWorks.Database.ToolKit
 					}
 				}
 
-				if (null == Connection)
+				if (Connection != null)
 				{
 					switch (databaseType)
 					{
@@ -1137,7 +1096,7 @@ namespace DigitalZenWorks.Database.ToolKit
 					}
 				}
 
-				if ((null != Connection) &&
+				if ((Connection != null) &&
 					(Connection.State != ConnectionState.Open))
 				{
 					Connection.Open();

@@ -4,14 +4,14 @@
 // </copyright>
 /////////////////////////////////////////////////////////////////////////////
 
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Data;
-using System.Data.Common;
-
 namespace DigitalZenWorks.Database.ToolKit
 {
+	using System;
+	using System.Collections.Generic;
+	using System.Collections.ObjectModel;
+	using System.Data;
+	using System.Data.Common;
+
 	/// <summary>
 	/// Database collection interface.
 	/// </summary>

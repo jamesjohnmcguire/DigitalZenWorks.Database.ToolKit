@@ -4,38 +4,32 @@
 // </copyright>
 /////////////////////////////////////////////////////////////////////////////
 
-using System;
-using System.Data;
-using System.Data.OleDb;
-using System.Globalization;
-using System.Runtime.Versioning;
-
 namespace DigitalZenWorks.Database.ToolKit
 {
-	/////////////////////////////////////////////////////////////////////////
+	using System;
+	using System.Data;
+	using System.Data.OleDb;
+	using System.Globalization;
+	using System.Runtime.Versioning;
+
 	/// Class <c>OleDbSchema.</c>
 	/// <summary>
 	/// Represents an OleDbSchema object.
 	/// </summary>
-	/////////////////////////////////////////////////////////////////////////
 #if NET5_0_OR_GREATER
 	[SupportedOSPlatform("windows")]
 #endif
 	public class OleDbSchema : IDisposable
 	{
-		/////////////////////////////////////////////////////////////////////
 		/// <summary>
 		/// Represents an OleDb open connection to a data source.
 		/// </summary>
-		/////////////////////////////////////////////////////////////////////
 		private OleDbConnection oleDbConnection;
 
-		/////////////////////////////////////////////////////////////////////
 		/// <summary>
 		/// Initializes a new instance of the <see cref="OleDbSchema"/> class.
 		/// </summary>
 		/// <param name="databaseFile">The database file to use.</param>
-		/////////////////////////////////////////////////////////////////////
 		public OleDbSchema(string databaseFile)
 		{
 			string baseFormat = "Provider=Microsoft.ACE.OLEDB.12.0" +
@@ -63,7 +57,6 @@ namespace DigitalZenWorks.Database.ToolKit
 			oleDbConnection = new OleDbConnection(connectionString);
 		}
 
-		/////////////////////////////////////////////////////////////////////
 		/// <summary>
 		/// Gets all table names from the connected database.
 		/// </summary>
@@ -71,7 +64,6 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// <value>
 		/// All table names from the connected database.
 		/// </value>
-		/////////////////////////////////////////////////////////////////////
 		public DataTable TableNames
 		{
 			get
@@ -99,13 +91,11 @@ namespace DigitalZenWorks.Database.ToolKit
 			GC.SuppressFinalize(this);
 		}
 
-		/////////////////////////////////////////////////////////////////////
 		/// <summary>
 		/// Gets the constraints from the given table.
 		/// </summary>
 		/// <param name="tableName">The name of the table.</param>
 		/// <returns>DataTable.</returns>
-		/////////////////////////////////////////////////////////////////////
 		public DataTable GetConstraints(string tableName)
 		{
 			oleDbConnection.Open();
@@ -121,13 +111,11 @@ namespace DigitalZenWorks.Database.ToolKit
 			return schemaTable;
 		}
 
-		/////////////////////////////////////////////////////////////////////
 		/// <summary>
 		/// Gets the foreign keys from the given table.
 		/// </summary>
 		/// <param name="tableName">The name of the table.</param>
 		/// <returns>DataTable.</returns>
-		/////////////////////////////////////////////////////////////////////
 		public DataTable GetForeignKeys(string tableName)
 		{
 			oleDbConnection.Open();
@@ -142,13 +130,11 @@ namespace DigitalZenWorks.Database.ToolKit
 			return schemaTable;
 		}
 
-		/////////////////////////////////////////////////////////////////////
 		/// <summary>
 		/// Gets the primary keys from the given table.
 		/// </summary>
 		/// <param name="tableName">The name of the table.</param>
 		/// <returns>DataTable.</returns>
-		/////////////////////////////////////////////////////////////////////
 		public DataTable GetPrimaryKeys(string tableName)
 		{
 			oleDbConnection.Open();
@@ -163,13 +149,11 @@ namespace DigitalZenWorks.Database.ToolKit
 			return schemaTable;
 		}
 
-		/////////////////////////////////////////////////////////////////////
 		/// <summary>
 		/// Gets the column names from the given table.
 		/// </summary>
 		/// <param name="tableName">The name of the table.</param>
 		/// <returns>DataTable.</returns>
-		/////////////////////////////////////////////////////////////////////
 		public DataTable GetTableColumns(string tableName)
 		{
 			oleDbConnection.Open();
@@ -184,13 +168,11 @@ namespace DigitalZenWorks.Database.ToolKit
 			return schemaTable;
 		}
 
-		/////////////////////////////////////////////////////////////////////
 		/// <summary>
 		/// Gets the constraints from the given table.
 		/// </summary>
 		/// <returns>DataTable.</returns>
 		/// <param name="tableName">The name of the table.</param>
-		/////////////////////////////////////////////////////////////////////
 		public DataTable GetTableConstraints(string tableName)
 		{
 			oleDbConnection.Open();
@@ -215,7 +197,7 @@ namespace DigitalZenWorks.Database.ToolKit
 		{
 			if (disposing)
 			{
-				if (null != oleDbConnection)
+				if (oleDbConnection != null)
 				{
 					oleDbConnection.Close();
 					oleDbConnection = null;

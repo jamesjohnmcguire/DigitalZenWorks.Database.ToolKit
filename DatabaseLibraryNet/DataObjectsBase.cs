@@ -7,53 +7,45 @@
 /////////////////////////////////////////////////////////////////////////////
 // Namespace includes
 /////////////////////////////////////////////////////////////////////////////
-using System;
-using System.Data;
-using System.Globalization;
-using System.IO;
-
 namespace DigitalZenWorks.Database.ToolKit
 {
-	/////////////////////////////////////////////////////////////////////////
+	using System;
+	using System.Data;
+	using System.Globalization;
+	using System.IO;
+
 	/// <summary>
 	/// Base class for database collection classes.
 	/// </summary>
-	/////////////////////////////////////////////////////////////////////////
 	public class DataObjectsBase : IDisposable
 	{
-		/////////////////////////////////////////////////////////////////////
 		/// <summary>
 		/// Initializes a new instance of the <see cref="DataObjectsBase"/>
 		/// class.
 		/// </summary>
 		/// <param name="database">The DataStorage object to use.</param>
-		/////////////////////////////////////////////////////////////////////
 		public DataObjectsBase(DataStorage database)
 		{
 			this.Database = database;
 		}
 
 		// Future Use.
-		///////////////////////////////////////////////////////////////////////
 		///// <summary>
 		///// Initializes a new instance of the <see cref="DataObjectsBase"/>
 		///// class.
 		///// </summary>
 		///// <param name="connectionString">The connection string to
 		///// use.</param>
-		///////////////////////////////////////////////////////////////////////
 		// public DataObjectsBase(string connectionString)
 		// {
 		// database = new DataStorage(connectionString);
 		// }
 
-		/////////////////////////////////////////////////////////////////////
 		/// <summary>
 		/// Initializes a new instance of the <see cref="DataObjectsBase"/>
 		/// class.
 		/// </summary>
 		/// <param name="dataSource">The data source to use.</param>
-		/////////////////////////////////////////////////////////////////////
 		[Obsolete("DataObjectsBase(string) is deprecated, " +
 			"please use DataObjectsBase(DatabaseType, string) instead.")]
 		public DataObjectsBase(string dataSource)
@@ -128,14 +120,12 @@ namespace DigitalZenWorks.Database.ToolKit
 			Database = new DataStorage(databaseType, connectionString);
 		}
 
-		/////////////////////////////////////////////////////////////////////
 		/// <summary>
 		/// Initializes a new instance of the <see cref="DataObjectsBase"/>
 		/// class.
 		/// </summary>
 		/// <param name="tableName">The table name to use.</param>
 		/// <param name="dataSource">The data source to use.</param>
-		/////////////////////////////////////////////////////////////////////
 		[Obsolete("DataObjectsBase(string, string) is deprecated, " +
 			"please use DataObjectsBase(DatabaseType, string, string) " +
 			"instead.")]
@@ -145,7 +135,6 @@ namespace DigitalZenWorks.Database.ToolKit
 			this.TableName = tableName;
 		}
 
-		/////////////////////////////////////////////////////////////////////
 		/// <summary>
 		/// Initializes a new instance of the <see cref="DataObjectsBase"/>
 		/// class.
@@ -153,7 +142,6 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// <param name="databaseType">The database type.</param>
 		/// <param name="databaseFilePath">The database file path.</param>
 		/// <param name="tableName">The table name to use.</param>
-		/////////////////////////////////////////////////////////////////////
 		public DataObjectsBase(
 			DatabaseType databaseType,
 			string databaseFilePath,
@@ -163,7 +151,6 @@ namespace DigitalZenWorks.Database.ToolKit
 			this.TableName = tableName;
 		}
 
-		/////////////////////////////////////////////////////////////////////
 		/// <summary>
 		/// Initializes a new instance of the <see cref="DataObjectsBase"/>
 		/// class.
@@ -172,7 +159,6 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// <param name="databaseType">The database type.</param>
 		/// <param name="connectionString">The connection string
 		/// to use.</param>
-		/////////////////////////////////////////////////////////////////////
 		public DataObjectsBase(
 			string tableName,
 			DatabaseType databaseType,
@@ -189,12 +175,10 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// <value>Represents the database file path.</value>
 		public string DatabaseFilePath { get; }
 
-		/////////////////////////////////////////////////////////////////////
 		/// <summary>
 		/// Gets the core database object.
 		/// </summary>
 		/// <value>Represents the core database object.</value>
-		/////////////////////////////////////////////////////////////////////
 		[CLSCompliantAttribute(false)]
 		public DataStorage Database { get; private set; }
 
@@ -204,28 +188,23 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// <value>The database type.</value>
 		public DatabaseType DatabaseType { get; }
 
-		/////////////////////////////////////////////////////////////////////
 		/// <summary>
 		/// Gets or sets the name of the primary database table associated with
 		/// this collection.
 		/// </summary>
 		/// <value>Contains the name of the primary database table associated
 		/// with this collection.</value>
-		/////////////////////////////////////////////////////////////////////
 		protected string TableName { get; set; }
 
-		/////////////////////////////////////////////////////////////////////
 		/// <summary>
 		/// Dispose.
 		/// </summary>
-		/////////////////////////////////////////////////////////////////////
 		public void Dispose()
 		{
 			Dispose(true);
 			GC.SuppressFinalize(this);
 		}
 
-		/////////////////////////////////////////////////////////////////////
 		/// <summary>
 		/// Deletes the record identified by Id.
 		/// </summary>
@@ -233,7 +212,6 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// <param name="idColumn">The name of the primay key column.</param>
 		/// <param name="id">The id of item.</param>
 		/// <returns>A value indicating success or not.</returns>
-		/////////////////////////////////////////////////////////////////////
 		public bool Delete(string tableName, string idColumn, int id)
 		{
 			bool returnCode;
@@ -250,13 +228,11 @@ namespace DigitalZenWorks.Database.ToolKit
 			return returnCode;
 		}
 
-		/////////////////////////////////////////////////////////////////////
 		/// <summary>
 		/// Returns a DataTable of the table.
 		/// </summary>
 		/// <param name="table">The name of the table.</param>
 		/// <returns>A DataTable object.</returns>
-		/////////////////////////////////////////////////////////////////////
 		public DataTable GetAllDataTable(string table)
 		{
 			DataTable tableList;
@@ -270,14 +246,12 @@ namespace DigitalZenWorks.Database.ToolKit
 			return tableList;
 		}
 
-		/////////////////////////////////////////////////////////////////////
 		/// <summary>
 		/// Represents the record identified by the where clause.
 		/// </summary>
 		/// <param name="table">The name of the table.</param>
 		/// <param name="where">The where clause to use.</param>
 		/// <returns>A DataRow object.</returns>
-		/////////////////////////////////////////////////////////////////////
 		public DataRow GetBy(string table, string where)
 		{
 			DataRow dataRow;
@@ -293,7 +267,6 @@ namespace DigitalZenWorks.Database.ToolKit
 			return dataRow;
 		}
 
-		/////////////////////////////////////////////////////////////////////
 		/// <summary>
 		/// Represents the Category record identified by the where clause.
 		/// </summary>
@@ -302,7 +275,6 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// <param name="orderBy">The order by clause.</param>
 		/// <param name="limit">The limit clause.</param>
 		/// <returns>A DataTable Object.</returns>
-		/////////////////////////////////////////////////////////////////////
 		public DataTable GetBy(
 			string tableName, string where, string orderBy, string limit)
 		{
@@ -324,34 +296,30 @@ namespace DigitalZenWorks.Database.ToolKit
 			return table;
 		}
 
-		/////////////////////////////////////////////////////////////////////
 		/// <summary>
 		/// Gets the id of the record identified by the where clause.
 		/// </summary>
 		/// <param name="table">The name of the table.</param>
 		/// <param name="name">The name of item to get.</param>
 		/// <returns>A DataRow object.</returns>
-		/////////////////////////////////////////////////////////////////////
 		public virtual DataRow GetByName(string table, string name)
 		{
 			return GetBy(table, "`name` = '" + name + "'");
 		}
 
-		/////////////////////////////////////////////////////////////////////
 		/// <summary>
 		/// Gets the id of the record identified by the where clause.
 		/// </summary>
 		/// <param name="table">The name of the table.</param>
 		/// <param name="name">The name of item to get.</param>
 		/// <returns>The id of the record.</returns>
-		/////////////////////////////////////////////////////////////////////
 		public virtual int GetIdByName(string table, string name)
 		{
 			int id = 0;
 
 			DataRow row = GetByName(table, name);
 
-			if (null != row)
+			if (row != null)
 			{
 				if (!row.IsNull(0))
 				{
@@ -362,18 +330,16 @@ namespace DigitalZenWorks.Database.ToolKit
 			return id;
 		}
 
-		/////////////////////////////////////////////////////////////////////
 		/// <summary>
 		/// Dispose.
 		/// </summary>
 		/// <param name="disposing">Indicates whether it is
 		/// currently disposing.</param>
-		/////////////////////////////////////////////////////////////////////
 		protected virtual void Dispose(bool disposing)
 		{
 			if (disposing)
 			{
-				if (null != Database)
+				if (Database != null)
 				{
 					Database.Close();
 					Database = null;

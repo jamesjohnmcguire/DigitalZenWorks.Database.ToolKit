@@ -6,15 +6,15 @@
 
 #nullable enable
 
-using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.IO;
-using System.Text;
-using System.Text.RegularExpressions;
-
 namespace DigitalZenWorks.Database.ToolKit
 {
+	using System;
+	using System.Collections.Generic;
+	using System.Globalization;
+	using System.IO;
+	using System.Text;
+	using System.Text.RegularExpressions;
+
 	/// <summary>
 	/// SQL writer helper class.
 	/// </summary>

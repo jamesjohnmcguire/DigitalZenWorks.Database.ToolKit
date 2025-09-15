@@ -6,11 +6,9 @@
 
 namespace DigitalZenWorks.Database.ToolKit
 {
-	/////////////////////////////////////////////////////////////////////////
 	/// <summary>
 	/// Represents a foreign key.
 	/// </summary>
-	/////////////////////////////////////////////////////////////////////////
 	public class ForeignKey
 	{
 		private bool cascadeOnDelete;
@@ -20,7 +18,6 @@ namespace DigitalZenWorks.Database.ToolKit
 		private string parentTable;
 		private string parentTableColumn;
 
-		/////////////////////////////////////////////////////////////////////
 		/// <summary>
 		/// Initializes a new instance of the <see cref="ForeignKey"/> class.
 		/// </summary>
@@ -32,7 +29,6 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// cascading deletes.</param>
 		/// <param name="cascadeUpdate">Indicates wheter to use
 		/// cascading updates.</param>
-		/////////////////////////////////////////////////////////////////////
 		public ForeignKey(
 			string name,
 			string columnName,
@@ -49,84 +45,72 @@ namespace DigitalZenWorks.Database.ToolKit
 			this.cascadeOnUpdate = cascadeUpdate;
 		}
 
-		/////////////////////////////////////////////////////////////////////
 		/// <summary>
 		/// Gets or sets a value indicating whether cascade On Delete.
 		/// </summary>
 		/// <value>
 		/// A value indicating whether cascade On Delete.
 		/// </value>
-		/////////////////////////////////////////////////////////////////////
 		public bool CascadeOnDelete
 		{
 			get { return cascadeOnDelete; }
 			set { cascadeOnDelete = value; }
 		}
 
-		/////////////////////////////////////////////////////////////////////
 		/// <summary>
 		/// Gets or sets a value indicating whether cascade On Update.
 		/// </summary>
 		/// <value>
 		/// A value indicating whether cascade On Update.
 		/// </value>
-		/////////////////////////////////////////////////////////////////////
 		public bool CascadeOnUpdate
 		{
 			get { return cascadeOnUpdate; }
 			set { cascadeOnUpdate = value; }
 		}
 
-		/////////////////////////////////////////////////////////////////////
 		/// <summary>
 		/// Gets or sets column Name.
 		/// </summary>
 		/// <value>
 		/// Column Name.
 		/// </value>
-		/////////////////////////////////////////////////////////////////////
 		public string ColumnName
 		{
 			get { return columnName; }
 			set { columnName = value; }
 		}
 
-		/////////////////////////////////////////////////////////////////////
 		/// <summary>
 		/// Gets or sets foreign Key Name.
 		/// </summary>
 		/// <value>
 		/// Foreign Key Name.
 		/// </value>
-		/////////////////////////////////////////////////////////////////////
 		public string Name
 		{
 			get { return name; }
 			set { name = value; }
 		}
 
-		/////////////////////////////////////////////////////////////////////
 		/// <summary>
 		/// Gets or sets parent Table.
 		/// </summary>
 		/// <value>
 		/// Parent Table.
 		/// </value>
-		/////////////////////////////////////////////////////////////////////
 		public string ParentTable
 		{
 			get { return parentTable; }
 			set { parentTable = value; }
 		}
 
-		/////////////////////////////////////////////////////////////////////
 		/// <summary>
 		/// Gets or sets parent Table Column.
 		/// </summary>
 		/// <value>
 		/// Parent Table Column.
 		/// </value>
-		/////////////////////////////////////////////////////////////////////
 		public string ParentTableColumn
 		{
 			get { return parentTableColumn; }

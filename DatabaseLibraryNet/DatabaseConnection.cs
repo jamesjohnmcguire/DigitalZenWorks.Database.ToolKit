@@ -4,14 +4,14 @@
 // </copyright>
 /////////////////////////////////////////////////////////////////////////////
 
-using Dapper;
-using MySql.Data.MySqlClient;
-using System;
-using System.Collections.Generic;
-using System.Data;
-
 namespace DigitalZenWorks.Database.ToolKit
 {
+	using System;
+	using System.Collections.Generic;
+	using System.Data;
+	using Dapper;
+	using MySql.Data.MySqlClient;
+
 	/// <summary>
 	/// The database connection class.
 	/// </summary>

@@ -4,26 +4,24 @@
 // </copyright>
 /////////////////////////////////////////////////////////////////////////////
 
-using Common.Logging;
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Data;
-using System.Globalization;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Resources;
-using System.Runtime.Versioning;
-
 namespace DigitalZenWorks.Database.ToolKit
 {
-	/////////////////////////////////////////////////////////////////////////
+	using System;
+	using System.Collections.Generic;
+	using System.Collections.ObjectModel;
+	using System.Data;
+	using System.Globalization;
+	using System.IO;
+	using System.Linq;
+	using System.Reflection;
+	using System.Resources;
+	using System.Runtime.Versioning;
+	using global::Common.Logging;
+
 	/// Class <c>DataDefinition.</c>
 	/// <summary>
 	/// Class for support on operations on complete data storage containers.
 	/// </summary>
-	/////////////////////////////////////////////////////////////////////////
 	public static class DataDefinition
 	{
 		/// <summary>
@@ -36,7 +34,6 @@ namespace DigitalZenWorks.Database.ToolKit
 			"DigitalZenWorks.Database.ToolKit.Resources",
 			Assembly.GetExecutingAssembly());
 
-		/////////////////////////////////////////////////////////////////////
 		/// Method <c>ExportSchema.</c>
 		/// <summary>
 		/// Export all tables to similarly named csv files.
@@ -44,7 +41,6 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// <returns>A values indicating success or not.</returns>
 		/// <param name="databaseFile">The database file to use.</param>
 		/// <param name="schemaFile">The schema file to export to.</param>
-		/////////////////////////////////////////////////////////////////////
 #if NET5_0_OR_GREATER
 		[SupportedOSPlatform("windows")]
 #endif
@@ -220,7 +216,7 @@ namespace DigitalZenWorks.Database.ToolKit
 		{
 			ForeignKey[] keys = null;
 
-			if (null != relationships)
+			if (relationships != null)
 			{
 				int count = 0;
 				keys = new ForeignKey[relationships.Length];
