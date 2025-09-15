@@ -1,7 +1,7 @@
-﻿[*.{cs,vb}]
+﻿[*.cs]
 
 # IDE0017: Simplify object initialization
-dotnet_style_object_initializer = false:suggestion
+dotnet_style_object_initializer = false
 
 # IDE0028: Collection initialization can be simplified
 dotnet_style_collection_initializer	= false
@@ -25,5 +25,11 @@ dotnet_diagnostic.IDE0100.severity = none
 # SA1010: Opening square brackets should be spaced correctly
 dotnet_diagnostic.SA1010.severity = none
 
+# SA1101: Prefix local calls with this
+dotnet_diagnostic.SA1101.severity = none
+
 # SA1305: Field names must not use hungarian notation
 dotnet_diagnostic.SA1305.severity = none
+
+# SA1413: Use Trailing Commas In MultiLine Initializers
+dotnet_diagnostic.SA1413.severity = none
