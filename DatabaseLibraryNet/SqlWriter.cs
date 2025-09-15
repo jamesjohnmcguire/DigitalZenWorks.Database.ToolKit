@@ -170,8 +170,13 @@ namespace DigitalZenWorks.Database.ToolKit
 			if (dataItem != null)
 			{
 				bool enclosed = false;
+#if NETSTANDARD2_1_OR_GREATER || NET5_0_OR_GREATER
 				bool beginEscape = dataItem.StartsWith('\'');
 				bool endsEscape = dataItem.EndsWith('\'');
+#else
+				bool beginEscape = dataItem.StartsWith("\'");
+				bool endsEscape = dataItem.EndsWith("\'");
+#endif
 
 				if (beginEscape == true && endsEscape == true)
 				{
