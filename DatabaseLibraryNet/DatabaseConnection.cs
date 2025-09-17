@@ -4,16 +4,17 @@
 // </copyright>
 /////////////////////////////////////////////////////////////////////////////
 
+#nullable enable
+
 namespace DigitalZenWorks.Database.ToolKit
 {
-	using Dapper;
-	using Microsoft.Data.SqlClient;
-	using MySql.Data.MySqlClient;
 	using System;
 	using System.Collections.Generic;
 	using System.Data;
-	using System.Data.OleDb;
 	using System.Data.SQLite;
+	using Dapper;
+	using Microsoft.Data.SqlClient;
+	using MySql.Data.MySqlClient;
 
 	/// <summary>
 	/// The database connection class.
@@ -21,7 +22,7 @@ namespace DigitalZenWorks.Database.ToolKit
 	public class DatabaseConnection : IDisposable
 	{
 		private readonly string connectionString;
-		private IDbConnection connection;
+		private IDbConnection? connection;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="DatabaseConnection"/>
@@ -65,7 +66,7 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// <returns>A list of items.</returns>
 		public int Execute(string statement, object? item)
 		{
-			int result = connection.Execute(statement, item);
+			int result = connection!.Execute(statement, item);
 
 			return result;
 		}
@@ -79,7 +80,7 @@ namespace DigitalZenWorks.Database.ToolKit
 		public IEnumerable<T> Query<T>(
 		string statement)
 		{
-			IEnumerable<T> list = connection.Query<T>(statement);
+			IEnumerable<T> list = connection!.Query<T>(statement);
 
 			return list;
 		}
@@ -101,24 +102,21 @@ namespace DigitalZenWorks.Database.ToolKit
 			}
 		}
 
-		private IDbConnection GetConnection(
+		private IDbConnection? GetConnection(
 			DatabaseType databaseType, string connectionString)
 		{
 			switch (databaseType)
 			{
 				case DatabaseType.MySql:
-					MySqlConnection mySqlConnection =
-						new MySqlConnection(connectionString);
+					MySqlConnection mySqlConnection = new (connectionString);
 					connection = mySqlConnection;
 					break;
 				case DatabaseType.SQLite:
-					SQLiteConnection sqliteConnection =
-						new SQLiteConnection(connectionString);
+					SQLiteConnection sqliteConnection = new (connectionString);
 					connection = sqliteConnection;
 					break;
 				case DatabaseType.SqlServer:
-					connection =
-						new SqlConnection(connectionString);
+					connection = new SqlConnection(connectionString);
 					break;
 				case DatabaseType.Oracle:
 				case DatabaseType.Unknown:
