@@ -53,18 +53,16 @@ namespace DigitalZenWorks.Database.ToolKit
 			switch (databaseType)
 			{
 				case DatabaseType.MySql:
-					MySqlConnection mySqlConnection =
-						new MySqlConnection(connectionText);
+					MySqlConnection mySqlConnection = new (connectionText);
 					connection = mySqlConnection;
 					break;
 				case DatabaseType.SQLite:
-					SQLiteConnection sqliteConnection =
-						new SQLiteConnection(connectionText);
+					SQLiteConnection sqliteConnection = new (connectionText);
 					connection = sqliteConnection;
 					break;
 				case DatabaseType.SqlServer:
-					SqlConnection Connection =
-						new SqlConnection(connectionText);
+					SqlConnection sqlConnection = new (connectionText);
+					connection = sqlConnection;
 					break;
 				case DatabaseType.Unknown:
 					break;
