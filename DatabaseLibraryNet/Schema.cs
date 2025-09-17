@@ -48,6 +48,27 @@ namespace DigitalZenWorks.Database.ToolKit
 		}
 
 		/// <summary>
+		/// Gets all table names from the connected database.
+		/// </summary>
+		/// <returns>DataTable.</returns>
+		/// <value>
+		/// All table names from the connected database.
+		/// </value>
+		public DataTable TableNames
+		{
+			get
+			{
+				connection.Open();
+
+				DataTable schemaTable = connection.GetSchema("Tables");
+
+				connection.Close();
+
+				return schemaTable;
+			}
+		}
+
+		/// <summary>
 		/// Dispose.
 		/// </summary>
 		public void Dispose()
