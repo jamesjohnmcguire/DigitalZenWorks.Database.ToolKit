@@ -185,7 +185,7 @@ namespace DigitalZenWorks.Database.ToolKit
 					dataItem = dataItem.Trim('\'');
 				}
 
-				Regex unescapedApostropheRegex = new Regex(@"(?<!')'(?!')");
+				Regex unescapedApostropheRegex = new (@"(?<!')'(?!')");
 
 				bool isUnescaped = unescapedApostropheRegex.IsMatch(dataItem);
 
