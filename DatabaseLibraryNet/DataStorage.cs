@@ -1047,7 +1047,7 @@ namespace DigitalZenWorks.Database.ToolKit
 					}
 				}
 
-				if (Connection != null)
+				if (Connection == null)
 				{
 					switch (databaseType)
 					{
