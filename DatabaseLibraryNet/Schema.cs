@@ -18,7 +18,7 @@ namespace DigitalZenWorks.Database.ToolKit
 	/// <summary>
 	/// Represents a database schema.
 	/// </summary>
-	public class Schema
+	public class Schema : IDisposable
 	{
 		/// <summary>
 		/// Represents the database type.
@@ -45,6 +45,32 @@ namespace DigitalZenWorks.Database.ToolKit
 				databaseFile);
 
 			connection = GetConnection(databaseType, connectionString);
+		}
+
+		/// <summary>
+		/// Dispose.
+		/// </summary>
+		public void Dispose()
+		{
+			Dispose(true);
+			GC.SuppressFinalize(this);
+		}
+
+		/// <summary>
+		/// Dispose.
+		/// </summary>
+		/// <param name="disposing">Indicates whether the object is
+		/// currently disposing.</param>
+		protected virtual void Dispose(bool disposing)
+		{
+			if (disposing)
+			{
+				if (connection != null)
+				{
+					connection.Close();
+					connection = null;
+				}
+			}
 		}
 
 		private DbConnection GetConnection(
