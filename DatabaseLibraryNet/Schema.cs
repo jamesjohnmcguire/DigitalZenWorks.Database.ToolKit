@@ -6,14 +6,13 @@
 
 namespace DigitalZenWorks.Database.ToolKit
 {
-	using Microsoft.Data.SqlClient;
-	using MySql.Data.MySqlClient;
 	using System;
 	using System.Data;
 	using System.Data.Common;
-	using System.Data.OleDb;
 	using System.Data.SQLite;
 	using System.Globalization;
+	using Microsoft.Data.SqlClient;
+	using MySql.Data.MySqlClient;
 
 	/// Class <c>Schema.</c>
 	/// <summary>
