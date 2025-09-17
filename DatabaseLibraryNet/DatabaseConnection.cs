@@ -4,12 +4,16 @@
 // </copyright>
 /////////////////////////////////////////////////////////////////////////////
 
+#nullable enable
+
 namespace DigitalZenWorks.Database.ToolKit
 {
 	using System;
 	using System.Collections.Generic;
 	using System.Data;
+	using System.Data.SQLite;
 	using Dapper;
+	using Microsoft.Data.SqlClient;
 	using MySql.Data.MySqlClient;
 
 	/// <summary>
@@ -18,7 +22,7 @@ namespace DigitalZenWorks.Database.ToolKit
 	public class DatabaseConnection : IDisposable
 	{
 		private readonly string connectionString;
-		private IDbConnection databaseConnection;
+		private IDbConnection? connection;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="DatabaseConnection"/>
@@ -27,9 +31,22 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// <param name="connectionString">The connection string
 		/// to use.</param>
 		public DatabaseConnection(string connectionString)
+			: this(DatabaseType.SQLite, connectionString)
+		{
+		}
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="DatabaseConnection"/>
+		/// class.
+		/// </summary>
+		/// <param name="databaseType">The database type.</param>
+		/// <param name="connectionString">The connection string
+		/// to use.</param>
+		public DatabaseConnection(
+			DatabaseType databaseType, string connectionString)
 		{
 			this.connectionString = connectionString;
-			databaseConnection = new MySqlConnection(connectionString);
+			connection = GetConnection(databaseType, connectionString);
 		}
 
 		/// <summary>
@@ -49,7 +66,7 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// <returns>A list of items.</returns>
 		public int Execute(string statement, object? item)
 		{
-			int result = databaseConnection.Execute(statement, item);
+			int result = connection!.Execute(statement, item);
 
 			return result;
 		}
@@ -63,7 +80,7 @@ namespace DigitalZenWorks.Database.ToolKit
 		public IEnumerable<T> Query<T>(
 		string statement)
 		{
-			IEnumerable<T> list = databaseConnection.Query<T>(statement);
+			IEnumerable<T> list = connection!.Query<T>(statement);
 
 			return list;
 		}
@@ -77,12 +94,37 @@ namespace DigitalZenWorks.Database.ToolKit
 		{
 			if (disposing)
 			{
-				if (databaseConnection != null)
+				if (connection != null)
 				{
-					databaseConnection.Dispose();
-					databaseConnection = null;
+					connection.Dispose();
+					connection = null;
 				}
 			}
+		}
+
+		private IDbConnection? GetConnection(
+			DatabaseType databaseType, string connectionString)
+		{
+			switch (databaseType)
+			{
+				case DatabaseType.MySql:
+					MySqlConnection mySqlConnection = new (connectionString);
+					connection = mySqlConnection;
+					break;
+				case DatabaseType.SQLite:
+					SQLiteConnection sqliteConnection = new (connectionString);
+					connection = sqliteConnection;
+					break;
+				case DatabaseType.SqlServer:
+					connection = new SqlConnection(connectionString);
+					break;
+				case DatabaseType.Oracle:
+				case DatabaseType.Unknown:
+				default:
+					break;
+			}
+
+			return connection;
 		}
 	}
 }
