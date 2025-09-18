@@ -70,8 +70,7 @@ namespace DigitalZenWorks.Database.ToolKit
 			{
 				oleDbConnection.Open();
 
-				object[] testTable =
-					new object[] { null, null, null, "TABLE" };
+				object[] testTable = [null, null, null, "TABLE"];
 
 				DataTable schemaTable = oleDbConnection.GetOleDbSchemaTable(
 					OleDbSchemaGuid.Tables, testTable);
@@ -100,8 +99,7 @@ namespace DigitalZenWorks.Database.ToolKit
 		{
 			oleDbConnection.Open();
 
-			object[] testTable =
-				new object[] { null, null, tableName, null, null, null };
+			object[] testTable = [null, null, tableName, null, null, null];
 
 			DataTable schemaTable = oleDbConnection.GetOleDbSchemaTable(
 				OleDbSchemaGuid.Constraint_Column_Usage, testTable);
@@ -120,7 +118,7 @@ namespace DigitalZenWorks.Database.ToolKit
 		{
 			oleDbConnection.Open();
 
-			object[] testTable = new object[] { null, null, tableName };
+			object[] testTable = [null, null, tableName];
 
 			DataTable schemaTable = oleDbConnection.GetOleDbSchemaTable(
 				OleDbSchemaGuid.Foreign_Keys, testTable);
@@ -139,7 +137,7 @@ namespace DigitalZenWorks.Database.ToolKit
 		{
 			oleDbConnection.Open();
 
-			object[] testTable = new object[] { null, null, tableName };
+			object[] testTable = [null, null, tableName];
 
 			DataTable schemaTable = oleDbConnection.GetOleDbSchemaTable(
 				OleDbSchemaGuid.Primary_Keys, testTable);
@@ -158,7 +156,7 @@ namespace DigitalZenWorks.Database.ToolKit
 		{
 			oleDbConnection.Open();
 
-			object[] testTable = new object[] { null, null, tableName };
+			object[] testTable = [null, null, tableName];
 
 			DataTable schemaTable = oleDbConnection.GetOleDbSchemaTable(
 				OleDbSchemaGuid.Columns, testTable);
@@ -177,8 +175,7 @@ namespace DigitalZenWorks.Database.ToolKit
 		{
 			oleDbConnection.Open();
 
-			object[] testTable =
-				new object[] { null, null, null, null, null, tableName };
+			object[] testTable = [null, null, null, null, null, tableName];
 
 			DataTable schemaTable = oleDbConnection.GetOleDbSchemaTable(
 				OleDbSchemaGuid.Table_Constraints, testTable);
