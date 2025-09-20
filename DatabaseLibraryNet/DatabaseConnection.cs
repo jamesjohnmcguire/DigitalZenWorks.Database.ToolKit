@@ -50,6 +50,17 @@ namespace DigitalZenWorks.Database.ToolKit
 		}
 
 		/// <summary>
+		/// Begin transaction.
+		/// </summary>
+		/// <returns>The transaction object.</returns>
+		public IDbTransaction BeginTransaction()
+		{
+			IDbTransaction transaction = connection!.BeginTransaction();
+
+			return transaction;
+		}
+
+		/// <summary>
 		/// The dispose method.
 		/// </summary>
 		public void Dispose()
@@ -59,11 +70,11 @@ namespace DigitalZenWorks.Database.ToolKit
 		}
 
 		/// <summary>
-		/// The query method.
+		/// Execute a SQL statement.
 		/// </summary>
 		/// <param name="statement">The SQL statement to execute.</param>
 		/// <param name="item">The item.</param>
-		/// <returns>A list of items.</returns>
+		/// <returns>A result indicator.</returns>
 		public int Execute(string statement, object? item)
 		{
 			int result = connection!.Execute(statement, item);
@@ -72,17 +83,70 @@ namespace DigitalZenWorks.Database.ToolKit
 		}
 
 		/// <summary>
-		/// The query method.
+		/// Execute a SQL statement.
+		/// </summary>
+		/// <param name="statement">The SQL statement to execute.</param>
+		/// <param name="parameter">The parameter.</param>
+		/// <param name="transaction">The database transaction.</param>
+		/// <returns>A result indicator.</returns>
+		public int Execute(
+			string statement,
+			object? parameter,
+			IDbTransaction transaction)
+		{
+			int result = connection!.Execute(statement, parameter, transaction);
+
+			return result;
+		}
+
+		/// <summary>
+		/// Query SQL statment.
 		/// </summary>
 		/// <typeparam name="T">The type of object to enumerate.</typeparam>
 		/// <param name="statement">The SQL statement to execute.</param>
 		/// <returns>A list of items.</returns>
 		public IEnumerable<T> Query<T>(
-		string statement)
+			string statement)
 		{
 			IEnumerable<T> list = connection!.Query<T>(statement);
 
 			return list;
+		}
+
+		/// <summary>
+		/// Query for single or default from SQL statment.
+		/// </summary>
+		/// <typeparam name="T">The type of object to enumerate.</typeparam>
+		/// <param name="statement">The SQL statement to execute.</param>
+		/// <param name="parameter">The parameter.</param>
+		/// <returns>A list of items.</returns>
+		public T? QuerySingleOrDefault<T>(
+			string statement,
+			object? parameter)
+		{
+			T? item =
+				connection!.QuerySingleOrDefault<T>(statement, parameter);
+
+			return item;
+		}
+
+		/// <summary>
+		/// Query for single from SQL statment.
+		/// </summary>
+		/// <typeparam name="T">The type of object to enumerate.</typeparam>
+		/// <param name="statement">The SQL statement to execute.</param>
+		/// <param name="parameter">The parameter.</param>
+		/// <param name="transaction">The database transaction.</param>
+		/// <returns>An item.</returns>
+		public T QuerySingle<T>(
+			string statement,
+			object? parameter,
+			IDbTransaction transaction)
+		{
+			T item =
+				connection!.QuerySingle<T>(statement, parameter, transaction);
+
+			return item;
 		}
 
 		/// <summary>
