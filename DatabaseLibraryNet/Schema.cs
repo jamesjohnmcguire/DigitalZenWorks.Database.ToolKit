@@ -137,5 +137,46 @@ namespace DigitalZenWorks.Database.ToolKit
 
 			return connection;
 		}
+
+		private DataTable AddForeignKeyConstraints(string tableName, DataTable table)
+		{
+			try
+			{
+				string[] tableInformation = [null, null, tableName];
+
+				DataTable foreignKeys = connection.GetSchema(
+					"ForeignKeys", tableInformation);
+
+				foreach (DataRow row in foreignKeys.Rows)
+				{
+					DataRow newRow = table.NewRow();
+
+					newRow["ConstraintType"] = "FOREIGN KEY";
+					newRow["ConstraintName"] = row["CONSTRAINT_NAME"];
+					newRow["TableName"] = row["TABLE_NAME"];
+					newRow["ColumnName"] = row["COLUMN_NAME"];
+					newRow["ReferencedTable"] = row["REFERENCED_TABLE_NAME"];
+					newRow["ReferencedColumn"] = row["REFERENCED_COLUMN_NAME"];
+
+					table.Rows.Add(newRow);
+				}
+			}
+			catch (Exception exception) when
+				(exception is ArgumentException ||
+				exception is NotSupportedException ||
+				exception is InvalidOperationException)
+			{
+				// Some providers might not support ForeignKeys schema
+				Log.Error(exception.ToString());
+			}
+			catch (Exception exception)
+			{
+				Log.Error(exception.ToString());
+
+				throw;
+			}
+
+			return table;
+		}
 	}
 }
