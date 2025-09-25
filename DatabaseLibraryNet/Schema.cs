@@ -78,6 +78,18 @@ namespace DigitalZenWorks.Database.ToolKit
 		}
 
 		/// <summary>
+		/// Gets the constraints from the given table.
+		/// </summary>
+		/// <param name="tableName">The name of the table.</param>
+		/// <returns>DataTable.</returns>
+		public DataTable GetConstraints(string tableName)
+		{
+			DataTable schemaTable = null;
+
+			return schemaTable;
+		}
+
+		/// <summary>
 		/// Dispose.
 		/// </summary>
 		/// <param name="disposing">Indicates whether the object is
