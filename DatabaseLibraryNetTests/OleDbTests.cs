@@ -3,18 +3,18 @@
 // All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-using DigitalZenWorks.Common.Utilities;
-using NUnit.Framework;
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Data;
-using System.IO;
-using System.Linq;
-using System.Runtime.Versioning;
-
 namespace DigitalZenWorks.Database.ToolKit.Tests
 {
+	using System;
+	using System.Collections.Generic;
+	using System.Collections.ObjectModel;
+	using System.Data;
+	using System.IO;
+	using System.Linq;
+	using System.Runtime.Versioning;
+	using DigitalZenWorks.Common.Utilities;
+	using NUnit.Framework;
+
 	/// <summary>
 	/// Ole db tests class.
 	/// </summary>
@@ -75,7 +75,7 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 				dataRows.Select(row => row["CONSTRAINT_NAME"]?.ToString());
 			IEnumerable<string> nonEmptyConstraintNames =
 				constraintNameStrings.Where(name => !string.IsNullOrEmpty(name));
-			List<string> constraintNames = nonEmptyConstraintNames.ToList();
+			List<string> constraintNames = [.. nonEmptyConstraintNames];
 
 			Assert.That(constraintNames, Contains.Item("SectionsCategories"));
 			Assert.That(constraintNames, Contains.Item("SectionsMakers"));
