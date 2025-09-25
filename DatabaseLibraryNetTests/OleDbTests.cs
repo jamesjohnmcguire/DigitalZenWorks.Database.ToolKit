@@ -5,9 +5,7 @@
 
 using DigitalZenWorks.Common.Utilities;
 using NUnit.Framework;
-using NUnit.Framework.Constraints;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data;
@@ -93,7 +91,7 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 
 			foreach (DataRow row in constraints.Rows)
 			{
-				string tableName = row["TABLE_NAME"]?.ToString();
+				tableName = row["TABLE_NAME"]?.ToString();
 				Assert.That(tableName, Is.EqualTo("Sections"));
 			}
 		}
