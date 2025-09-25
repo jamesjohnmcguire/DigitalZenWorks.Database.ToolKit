@@ -11,6 +11,7 @@ namespace DigitalZenWorks.Database.ToolKit
 	using System.Data.Common;
 	using System.Data.SQLite;
 	using System.Globalization;
+	using global::Common.Logging;
 	using Microsoft.Data.SqlClient;
 	using MySql.Data.MySqlClient;
 
@@ -20,6 +21,9 @@ namespace DigitalZenWorks.Database.ToolKit
 	/// </summary>
 	public class Schema : IDisposable
 	{
+		private static readonly ILog Log = LogManager.GetLogger(
+			System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
 		/// <summary>
 		/// Represents the database type.
 		/// </summary>
