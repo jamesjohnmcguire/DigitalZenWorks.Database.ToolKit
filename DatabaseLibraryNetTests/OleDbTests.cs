@@ -5,11 +5,14 @@
 
 using DigitalZenWorks.Common.Utilities;
 using NUnit.Framework;
+using NUnit.Framework.Constraints;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data;
 using System.IO;
+using System.Linq;
 using System.Runtime.Versioning;
 
 namespace DigitalZenWorks.Database.ToolKit.Tests
@@ -40,6 +43,59 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 
 			string text = File.ReadAllText(schemaFile);
 			Assert.That(text, Is.EqualTo(compareText));
+		}
+
+		/// <summary>
+		/// Get constaints test.
+		/// </summary>
+		[Test]
+		public static void GetConstraints()
+		{
+			string tableName = "Sections";
+			string databaseFile = GetTestMdbFile();
+
+			using OleDbSchema oleDbSchema = new(databaseFile);
+
+			DataTable constraints =
+				oleDbSchema.GetConstraints(tableName);
+
+			int count = constraints.Rows.Count;
+
+			Assert.That(count, Is.EqualTo(3));
+
+			bool exists = constraints.Columns.Contains("CONSTRAINT_NAME");
+			Assert.That(exists, Is.True);
+
+			exists = constraints.Columns.Contains("TABLE_NAME");
+			Assert.That(exists, Is.True);
+
+			exists = constraints.Columns.Contains("COLUMN_NAME");
+			Assert.That(exists, Is.True);
+
+			IEnumerable<DataRow> dataRows = constraints.Rows.Cast<DataRow>();
+			IEnumerable<string> constraintNameStrings =
+				dataRows.Select(row => row["CONSTRAINT_NAME"]?.ToString());
+			IEnumerable<string> nonEmptyConstraintNames =
+				constraintNameStrings.Where(name => !string.IsNullOrEmpty(name));
+			List<string> constraintNames = nonEmptyConstraintNames.ToList();
+
+			Assert.That(constraintNames, Contains.Item("SectionsCategories"));
+			Assert.That(constraintNames, Contains.Item("SectionsMakers"));
+
+			bool hasPrimaryKeyLikeConstraint = constraintNames.Any(
+				name => name.StartsWith("Index_", StringComparison.Ordinal));
+			Assert.That(hasPrimaryKeyLikeConstraint, Is.True);
+
+			bool hasCategoriesConstraint =
+				constraintNames.Any(name => name.Contains(
+					"Categories", StringComparison.Ordinal));
+			Assert.That(hasCategoriesConstraint, Is.True);
+
+			foreach (DataRow row in constraints.Rows)
+			{
+				string tableName = row["TABLE_NAME"]?.ToString();
+				Assert.That(tableName, Is.EqualTo("Sections"));
+			}
 		}
 
 		/// <summary>
