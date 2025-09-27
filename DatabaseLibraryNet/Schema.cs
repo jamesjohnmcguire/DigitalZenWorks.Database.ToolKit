@@ -160,6 +160,42 @@ namespace DigitalZenWorks.Database.ToolKit
 			return newRow;
 		}
 
+		private static string GetSqlServerConstraintQuery(string tableName)
+		{
+			string fields = @"SELECT tableConstraints.CONSTRAINT_TYPE,
+				tableConstraints.CONSTRAINT_NAME,
+				tableConstraints.TABLE_NAME,
+				constraintColumnUsage.COLUMN_NAME,
+				rc.UNIQUE_CONSTRAINT_NAME,
+				ccu2.TABLE_NAME as REFERENCED_TABLE_NAME,
+				ccu2.COLUMN_NAME as REFERENCED_COLUMN_NAME";
+
+			string from =
+				"INFORMATION_SCHEMA.TABLE_CONSTRAINTS tableConstraints";
+
+			string joins =
+				"LEFT JOIN INFORMATION_SCHEMA.CONSTRAINT_COLUMN_USAGE " +
+				"constraintColumnUsage ON " +
+				"tableConstraints.CONSTRAINT_NAME = " +
+				"constraintColumnUsage.CONSTRAINT_NAME " +
+				"LEFT JOIN INFORMATION_SCHEMA.REFERENTIAL_CONSTRAINTS " +
+				"referentialConstraints ON " +
+				"tableConstraints.CONSTRAINT_NAME = " +
+				"referentialConstraints.CONSTRAINT_NAME " +
+				"LEFT JOIN INFORMATION_SCHEMA.CONSTRAINT_COLUMN_USAGE " +
+				"constraintColumnUsageNext ON " +
+				"referentialConstraints.UNIQUE_CONSTRAINT_NAME = " +
+				"constraintColumnUsageNext.CONSTRAINT_NAME";
+
+			string where =
+				$"WHERE tableConstraints.TABLE_NAME = '{tableName}'";
+
+			string query = $@"SELECT {fields} FROM {from}
+				{joins} {where}";
+
+			return query;
+		}
+
 		private DataTable AddForeignKeyConstraints(
 			string tableName, DataTable table)
 		{
@@ -241,15 +277,15 @@ namespace DigitalZenWorks.Database.ToolKit
 			switch (databaseType)
 			{
 				case DatabaseType.MySql:
-					MySqlConnection mySqlConnection = new(connectionText);
+					MySqlConnection mySqlConnection = new (connectionText);
 					connection = mySqlConnection;
 					break;
 				case DatabaseType.SQLite:
-					SQLiteConnection sqliteConnection = new(connectionText);
+					SQLiteConnection sqliteConnection = new (connectionText);
 					connection = sqliteConnection;
 					break;
 				case DatabaseType.SqlServer:
-					SqlConnection sqlConnection = new(connectionText);
+					SqlConnection sqlConnection = new (connectionText);
 					connection = sqlConnection;
 					break;
 				case DatabaseType.Unknown:
