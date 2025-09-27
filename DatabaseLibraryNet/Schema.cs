@@ -88,9 +88,15 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// <returns>DataTable.</returns>
 		public DataTable GetConstraints(string tableName)
 		{
-			DataTable schemaTable = null;
+			DataTable constraints = GetBaseConstraints();
 
-			return schemaTable;
+			constraints = AddForeignKeyConstraints(
+				tableName, constraints);
+
+			constraints = AddIndexConstraints(
+				tableName, constraints);
+
+			return constraints;
 		}
 
 		/// <summary>
@@ -110,35 +116,52 @@ namespace DigitalZenWorks.Database.ToolKit
 			}
 		}
 
-		private DbConnection GetConnection(
-			DatabaseType databaseType, string connectionText)
+		private static DataTable GetBaseConstraints()
 		{
-			switch (databaseType)
-			{
-				case DatabaseType.MySql:
-					MySqlConnection mySqlConnection = new (connectionText);
-					connection = mySqlConnection;
-					break;
-				case DatabaseType.SQLite:
-					SQLiteConnection sqliteConnection = new (connectionText);
-					connection = sqliteConnection;
-					break;
-				case DatabaseType.SqlServer:
-					SqlConnection sqlConnection = new (connectionText);
-					connection = sqlConnection;
-					break;
-				case DatabaseType.Unknown:
-					break;
-				case DatabaseType.Oracle:
-					break;
-				default:
-					break;
-			}
+			DataTable table = new ();
 
-			return connection;
+			Type stringType = typeof(string);
+
+			table.Columns.Add("ConstraintType", stringType);
+			table.Columns.Add("ConstraintName", stringType);
+			table.Columns.Add("TableName", stringType);
+			table.Columns.Add("ColumnName", stringType);
+			table.Columns.Add("ReferencedTable", stringType);
+			table.Columns.Add("ReferencedColumn", stringType);
+
+			return table;
 		}
 
-		private DataTable AddForeignKeyConstraints(string tableName, DataTable table)
+		private static DataRow GetForeignKeyConstaintsRow(
+			DataTable table, DataRow row)
+		{
+			DataRow newRow = table.NewRow();
+
+			newRow["ConstraintType"] = "FOREIGN KEY";
+			newRow["ConstraintName"] = row["CONSTRAINT_NAME"];
+			newRow["TableName"] = row["TABLE_NAME"];
+			newRow["ColumnName"] = row["COLUMN_NAME"];
+			newRow["ReferencedTable"] = row["REFERENCED_TABLE_NAME"];
+			newRow["ReferencedColumn"] = row["REFERENCED_COLUMN_NAME"];
+
+			return newRow;
+		}
+
+		private static DataRow GetIndexConstaintsRow(
+			DataTable table, DataRow row)
+		{
+			DataRow newRow = table.NewRow();
+
+			newRow["ConstraintType"] = "PRIMARY KEY";
+			newRow["ConstraintName"] = row["INDEX_NAME"];
+			newRow["TableName"] = row["TABLE_NAME"];
+			newRow["ColumnName"] = row["COLUMN_NAME"];
+
+			return newRow;
+		}
+
+		private DataTable AddForeignKeyConstraints(
+			string tableName, DataTable table)
 		{
 			try
 			{
@@ -149,14 +172,7 @@ namespace DigitalZenWorks.Database.ToolKit
 
 				foreach (DataRow row in foreignKeys.Rows)
 				{
-					DataRow newRow = table.NewRow();
-
-					newRow["ConstraintType"] = "FOREIGN KEY";
-					newRow["ConstraintName"] = row["CONSTRAINT_NAME"];
-					newRow["TableName"] = row["TABLE_NAME"];
-					newRow["ColumnName"] = row["COLUMN_NAME"];
-					newRow["ReferencedTable"] = row["REFERENCED_TABLE_NAME"];
-					newRow["ReferencedColumn"] = row["REFERENCED_COLUMN_NAME"];
+					DataRow newRow = GetForeignKeyConstaintsRow(table, row);
 
 					table.Rows.Add(newRow);
 				}
@@ -177,6 +193,74 @@ namespace DigitalZenWorks.Database.ToolKit
 			}
 
 			return table;
+		}
+
+		private DataTable AddIndexConstraints(
+			string tableName, DataTable table)
+		{
+			try
+			{
+				string[] tableInformation = [null, null, tableName];
+				DataTable primaryKeys =
+					connection.GetSchema("IndexColumns", tableInformation);
+
+				foreach (DataRow row in primaryKeys.Rows)
+				{
+					bool exists = row["PRIMARY_KEY"] != DBNull.Value;
+					bool isPrimaryKey = (bool)row["PRIMARY_KEY"];
+
+					if (exists == true && isPrimaryKey == true)
+					{
+						DataRow newRow = GetIndexConstaintsRow(table, row);
+
+						table.Rows.Add(newRow);
+					}
+				}
+			}
+			catch (Exception exception) when
+				(exception is ArgumentException ||
+				exception is NotSupportedException ||
+				exception is InvalidOperationException)
+			{
+				// Some providers might not support ForeignKeys schema
+				Log.Error(exception.ToString());
+			}
+			catch (Exception exception)
+			{
+				Log.Error(exception.ToString());
+
+				throw;
+			}
+
+			return table;
+		}
+
+		private DbConnection GetConnection(
+			DatabaseType databaseType, string connectionText)
+		{
+			switch (databaseType)
+			{
+				case DatabaseType.MySql:
+					MySqlConnection mySqlConnection = new(connectionText);
+					connection = mySqlConnection;
+					break;
+				case DatabaseType.SQLite:
+					SQLiteConnection sqliteConnection = new(connectionText);
+					connection = sqliteConnection;
+					break;
+				case DatabaseType.SqlServer:
+					SqlConnection sqlConnection = new(connectionText);
+					connection = sqlConnection;
+					break;
+				case DatabaseType.Unknown:
+					break;
+				case DatabaseType.Oracle:
+					break;
+				default:
+					break;
+			}
+
+			return connection;
 		}
 	}
 }
