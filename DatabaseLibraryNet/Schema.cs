@@ -6,14 +6,15 @@
 
 namespace DigitalZenWorks.Database.ToolKit
 {
+	using global::Common.Logging;
+	using Microsoft.Data.SqlClient;
+	using MySql.Data.MySqlClient;
 	using System;
+	using System.Configuration.Provider;
 	using System.Data;
 	using System.Data.Common;
 	using System.Data.SQLite;
 	using System.Globalization;
-	using global::Common.Logging;
-	using Microsoft.Data.SqlClient;
-	using MySql.Data.MySqlClient;
 
 	/// Class <c>Schema.</c>
 	/// <summary>
@@ -132,35 +133,102 @@ namespace DigitalZenWorks.Database.ToolKit
 			return table;
 		}
 
-		private static DataRow GetForeignKeyConstaintsRow(
-			DataTable table, DataRow row)
+		private static string GetConstraintQueryMySql(string tableName)
 		{
-			DataRow newRow = table.NewRow();
+			string fields = "CONSTRAINT_TYPE, CONSTRAINT_NAME, TABLE_NAME, " +
+				"COLUMN_NAME, REFERENCED_TABLE_NAME, REFERENCED_COLUMN_NAME";
 
-			newRow["ConstraintType"] = "FOREIGN KEY";
-			newRow["ConstraintName"] = row["CONSTRAINT_NAME"];
-			newRow["TableName"] = row["TABLE_NAME"];
-			newRow["ColumnName"] = row["COLUMN_NAME"];
-			newRow["ReferencedTable"] = row["REFERENCED_TABLE_NAME"];
-			newRow["ReferencedColumn"] = row["REFERENCED_COLUMN_NAME"];
+			string from = "INFORMATION_SCHEMA.KEY_COLUMN_USAGE";
 
-			return newRow;
+			string union = "UNION SELECT 'PRIMARY KEY' as CONSTRAINT_TYPE, " +
+				"CONSTRAINT_NAME, TABLE_NAME, COLUMN_NAME, " +
+				"NULL as REFERENCED_TABLE_NAME, " +
+				"NULL as REFERENCED_COLUMN_NAME";
+
+			string where = $"WHERE TABLE_NAME = '{tableName}' " +
+				"AND CONSTRAINT_NAME != 'PRIMARY'";
+
+			string query = $"SELECT {fields} FROM {from} " +
+				$"{union} FROM {from} {where}";
+
+			return query;
 		}
 
-		private static DataRow GetIndexConstaintsRow(
-			DataTable table, DataRow row)
+		private static string GetConstraintQueryOracle(string tableName)
 		{
-			DataRow newRow = table.NewRow();
+			string fields = @"SELECT constraints.CONSTRAINT_TYPE,
+				constraints.CONSTRAINT_NAME,
+				constraints.TABLE_NAME,
+				constraintColumns.COLUMN_NAME,
+				constraints.R_CONSTRAINT_NAME,
+				referentialConstraints.TABLE_NAME as REFERENCED_TABLE_NAME,
+				referentialConstraintColumns.COLUMN_NAME as
+				REFERENCED_COLUMN_NAME";
 
-			newRow["ConstraintType"] = "PRIMARY KEY";
-			newRow["ConstraintName"] = row["INDEX_NAME"];
-			newRow["TableName"] = row["TABLE_NAME"];
-			newRow["ColumnName"] = row["COLUMN_NAME"];
+			string from = "ALL_CONSTRAINTS constraints";
 
-			return newRow;
+			string joins =
+				"LEFT JOIN ALL_CONS_COLUMNS constraintColumns ON " +
+				"constraints.CONSTRAINT_NAME = " +
+				"constraintColumns.CONSTRAINT_NAME " +
+				"LEFT JOIN ALL_CONSTRAINTS referentialConstraints ON " +
+				"constraints.R_CONSTRAINT_NAME = " +
+				"referentialConstraints.CONSTRAINT_NAME " +
+				"LEFT JOIN ALL_CONS_COLUMNS referentialConstraintColumns ON " +
+				"referentialConstraints.CONSTRAINT_NAME = " +
+				"referentialConstraintColumns.CONSTRAINT_NAME";
+
+			string where =
+				$"WHERE constraints.TABLE_NAME = UPPER('{tableName}')";
+
+			string query = $"SELECT {fields} FROM {from} {joins} {where}";
+
+			return query;
 		}
 
-		private static string GetSqlServerConstraintQuery(string tableName)
+		private static string GetConstraintQueryPostgresSql(string tableName)
+		{
+			string fields = @"SELECT tableConstraints.constraint_type,
+				tableConstraints.constraint_name,
+				tableConstraints.table_name,
+				constraintColumnUsage.column_name,
+				constraintColumnUsageNext.table_name as referenced_table_name,
+				constraintColumnUsageNext.column_name as
+				referenced_column_name";
+
+			string from =
+				"information_schema.table_constraints tableConstraints";
+
+			string joins =
+				"LEFT JOIN information_schema.constraint_column_usage " +
+				"constraintColumnUsage ON " +
+				"tableConstraints.constraint_name= " +
+				"constraintColumnUsage.constraint_name" +
+				"LEFT JOIN information_schema.referential_constraints " +
+				"referentialConstraints ON " +
+				"tableConstraints.constraint_name = " +
+				"referentialConstraints.constraint_name" +
+				"LEFT JOIN information_schema.constraint_column_usage " +
+				"constraintColumnUsageNext ON " +
+				"referentialConstraints.unique_constraint_name = " +
+				"constraintColumnUsageNext.constraint_name";
+
+			string where =
+				$"WHERE tableConstraints.table_name = '{tableName}'";
+
+			string query = $"SELECT {fields} FROM {from} {joins} {where}";
+
+			return query;
+		}
+
+		private string GetConstraintQuerySqlite(string tableName)
+		{
+			string query = $"PRAGMA foreign_key_list('{tableName}')";
+
+			return query;
+		}
+
+		private static string GetConstraintQuerySqlServer(string tableName)
 		{
 			string fields = @"SELECT tableConstraints.CONSTRAINT_TYPE,
 				tableConstraints.CONSTRAINT_NAME,
@@ -190,10 +258,37 @@ namespace DigitalZenWorks.Database.ToolKit
 			string where =
 				$"WHERE tableConstraints.TABLE_NAME = '{tableName}'";
 
-			string query = $@"SELECT {fields} FROM {from}
-				{joins} {where}";
+			string query = $"SELECT {fields} FROM {from} {joins} {where}";
 
 			return query;
+		}
+
+		private static DataRow GetForeignKeyConstaintsRow(
+			DataTable table, DataRow row)
+		{
+			DataRow newRow = table.NewRow();
+
+			newRow["ConstraintType"] = "FOREIGN KEY";
+			newRow["ConstraintName"] = row["CONSTRAINT_NAME"];
+			newRow["TableName"] = row["TABLE_NAME"];
+			newRow["ColumnName"] = row["COLUMN_NAME"];
+			newRow["ReferencedTable"] = row["REFERENCED_TABLE_NAME"];
+			newRow["ReferencedColumn"] = row["REFERENCED_COLUMN_NAME"];
+
+			return newRow;
+		}
+
+		private static DataRow GetIndexConstaintsRow(
+			DataTable table, DataRow row)
+		{
+			DataRow newRow = table.NewRow();
+
+			newRow["ConstraintType"] = "PRIMARY KEY";
+			newRow["ConstraintName"] = row["INDEX_NAME"];
+			newRow["TableName"] = row["TABLE_NAME"];
+			newRow["ColumnName"] = row["COLUMN_NAME"];
+
+			return newRow;
 		}
 
 		private DataTable AddForeignKeyConstraints(
@@ -297,6 +392,41 @@ namespace DigitalZenWorks.Database.ToolKit
 			}
 
 			return connection;
+		}
+
+		private DataTable GetConstraintsByProvider(string tableName)
+		{
+			string query = GetConstraintQueryByProvider(tableName);
+
+			using DbCommand command = connection.CreateCommand();
+			command.CommandText = query;
+			using var adapter =
+				DbProviderFactories.GetFactory(connection).CreateDataAdapter();
+			adapter.SelectCommand = command;
+
+			DataTable constraints = new ();
+			adapter.Fill(constraints);
+
+			return constraints;
+		}
+
+		private string GetConstraintQueryByProvider(string tableName)
+		{
+			string query = databaseType switch
+			{
+				DatabaseType.MySql => GetConstraintQueryMySql(tableName),
+				DatabaseType.Oracle => GetConstraintQueryOracle(tableName),
+				DatabaseType.PostgresSql =>
+					GetConstraintQueryPostgresSql(tableName),
+				DatabaseType.SQLite => GetConstraintQuerySqlite(tableName),
+				DatabaseType.SqlServer =>
+					GetConstraintQuerySqlServer(tableName),
+
+				_ => throw new NotSupportedException(
+					$"Provider not supported for constraint queries")
+			};
+
+			return query;
 		}
 	}
 }
