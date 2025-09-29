@@ -22,6 +22,11 @@ namespace DigitalZenWorks.Database.ToolKit
 		OleDb,
 
 		/// <summary>
+		/// Postgres
+		/// </summary>
+		PostgresSql,
+
+		/// <summary>
 		/// SqlServer
 		/// </summary>
 		SqlServer,
