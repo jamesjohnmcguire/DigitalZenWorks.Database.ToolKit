@@ -16,323 +16,323 @@ namespace DigitalZenWorks.Database.ToolKit
 	{
 		/// <summary>
 		/// MS Access
-		/// Auto increment type
+		/// Auto increment type.
 		/// </summary>
 		AutoNumber,
 
 		/// <summary>
-		/// MySQL, SQLServer
+		/// MySQL, SQLServer.
 		/// </summary>
 		BigInt,
 
 		/// <summary>
-		/// SQLServer
+		/// SQLServer.
 		/// </summary>
 		Binary,
 
 		/// <summary>
-		/// SQLServer
+		/// SQLServer.
 		/// </summary>
 		Bit,
 
 		/// <summary>
-		/// MySQL
+		/// MySQL.
 		/// </summary>
 		Blob,
 
 		/// <summary>
-		/// MS Access (Yes/No), MySQL, SQLServer
+		/// MS Access (Yes/No), MySQL, SQLServer.
 		/// </summary>
 		Boolean,
 
 		/// <summary>
-		/// MS Access
+		/// MS Access.
 		/// </summary>
 		Byte,
 
 		/// <summary>
-		/// MS Access, MySQL, SQLServer
+		/// MS Access, MySQL, SQLServer.
 		/// </summary>
 		Char,
 
 		/// <summary>
 		/// Currency type
-		/// MySQL, SQLServer
+		/// MySQL, SQLServer.
 		/// </summary>
 		Currency,
 
 		/// <summary>
-		/// SQLServer
+		/// SQLServer.
 		/// </summary>
 		Cursor,
 
 		/// <summary>
-		/// MySQL, SQLServer
+		/// MySQL, SQLServer.
 		/// </summary>
 		Date,
 
 		/// <summary>
 		/// DateTime type
-		/// MySQL, SQLServer, MS ACCESS (as Date/Time)
+		/// MySQL, SQLServer, MS ACCESS (as Date/Time).
 		/// </summary>
 		DateTime,
 
 		/// <summary>
-		/// SQLServer
+		/// SQLServer.
 		/// </summary>
 		DateTime2,
 
 		/// <summary>
-		/// SQLServer
+		/// SQLServer.
 		/// </summary>
 		DateTimeOffset,
 
 		/// <summary>
-		/// MySQL, SQLServer
+		/// MySQL, SQLServer.
 		/// </summary>
 		Decimal,
 
 		/// <summary>
-		/// MS Access, MySQL
+		/// MS Access, MySQL.
 		/// </summary>
 		Double,
 
 		/// <summary>
-		/// MS Access
+		/// MS Access.
 		/// </summary>
 		Hyperlink,
 
 		/// <summary>
-		/// MySQL
+		/// MySQL.
 		/// </summary>
 		Enum,
 
 		/// <summary>
-		/// MySQL, SQLServer
+		/// MySQL, SQLServer.
 		/// </summary>
 		Float,
 
 		/// <summary>
-		/// MS Access
+		/// MS Access.
 		/// </summary>
 		Identity,
 
 		/// <summary>
-		/// SQLServer
+		/// SQLServer.
 		/// </summary>
 		Image,
 
 		/// <summary>
-		/// MySQL, SQLServer
+		/// MySQL, SQLServer.
 		/// </summary>
 		Int,
 
 		/// <summary>
-		/// MS Access
+		/// MS Access.
 		/// </summary>
 		Integer,
 
 		/// <summary>
-		/// Other
+		/// Other.
 		/// </summary>
 		JavaObject,
 
 		/// <summary>
-		/// MS Access
+		/// MS Access.
 		/// </summary>
 		Long,
 
 		/// <summary>
-		/// MySQL
+		/// MySQL.
 		/// </summary>
 		LongBlob,
 
 		/// <summary>
-		/// MySQL
+		/// MySQL.
 		/// </summary>
 		LongText,
 
 		/// <summary>
-		/// MySQL
+		/// MySQL.
 		/// </summary>
 		LongVarBinary,
 
 		/// <summary>
-		/// MySQL
+		/// MySQL.
 		/// </summary>
 		LongVarChar,
 
 		/// <summary>
-		/// MS Access
+		/// MS Access.
 		/// </summary>
 		LookupWizard,
 
 		/// <summary>
-		/// MySQL
+		/// MySQL.
 		/// </summary>
 		MediumBlob,
 
 		/// <summary>
-		/// MySQL
+		/// MySQL.
 		/// </summary>
 		MediumInt,
 
 		/// <summary>
-		/// MySQL
+		/// MySQL.
 		/// </summary>
 		MediumText,
 
 		/// <summary>
 		/// Memo (large text) type
-		/// MS Access
+		/// MS Access.
 		/// </summary>
 		Memo,
 
 		/// <summary>
-		/// SQLServer
+		/// SQLServer.
 		/// </summary>
 		Money,
 
 		/// <summary>
-		/// SQLServer
+		/// SQLServer.
 		/// </summary>
 		NChar,
 
 		/// <summary>
-		/// SQLServer
+		/// SQLServer.
 		/// </summary>
 		NText,
 
 		/// <summary>
 		/// Number (integer) type
-		/// SQLServer
+		/// SQLServer.
 		/// </summary>
 		Number,
 
 		/// <summary>
-		/// SQLServer
+		/// SQLServer.
 		/// </summary>
 		Numeric,
 
 		/// <summary>
-		/// SQLServer
+		/// SQLServer.
 		/// </summary>
 		NVarChar,
 
 		/// <summary>
-		/// MS Access
+		/// MS Access.
 		/// </summary>
 		OleObject,
 
 		/// <summary>
 		/// Ole object type
-		/// MS Access
+		/// MS Access.
 		/// </summary>
 		Ole,
 
 		/// <summary>
-		/// Other column type
+		/// Other column type.
 		/// </summary>
 		Other,
 
 		/// <summary>
-		/// SQLServer
+		/// SQLServer.
 		/// </summary>
 		Real,
 
 		/// <summary>
-		/// MySQL
+		/// MySQL.
 		/// </summary>
 		Set,
 
 		/// <summary>
-		/// MS Access
+		/// MS Access.
 		/// </summary>
 		Single,
 
 		/// <summary>
-		/// SQLServer
+		/// SQLServer.
 		/// </summary>
 		SmallDateTime,
 
 		/// <summary>
-		/// MySQL, SQLServer
+		/// MySQL, SQLServer.
 		/// </summary>
 		SmallInt,
 
 		/// <summary>
-		/// SQLServer
+		/// SQLServer.
 		/// </summary>
 		SmallMoney,
 
 		/// <summary>
-		/// SQLServer
+		/// SQLServer.
 		/// </summary>
 		SqlVariant,
 
 		/// <summary>
 		/// MS Access
-		/// String type
+		/// String type.
 		/// </summary>
 		String,
 
 		/// <summary>
-		/// MS Access
+		/// MS Access.
 		/// </summary>
 		Table,
 
 		/// <summary>
-		/// MS Access, MySQL, SQLServer
+		/// MS Access, MySQL, SQLServer.
 		/// </summary>
 		Text,
 
 		/// <summary>
-		/// MySQL, SQLServer
+		/// MySQL, SQLServer.
 		/// </summary>
 		Time,
 
 		/// <summary>
-		/// MySQL, SQLServer
+		/// MySQL, SQLServer.
 		/// </summary>
 		Timestamp,
 
 		/// <summary>
-		/// MySQL, SQLServer
+		/// MySQL, SQLServer.
 		/// </summary>
 		TinyInt,
 
 		/// <summary>
-		/// MySQL
+		/// MySQL.
 		/// </summary>
 		TinyText,
 
 		/// <summary>
-		/// SQLServer
+		/// SQLServer.
 		/// </summary>
 		UniqueIdentifier,
 
 		/// <summary>
-		/// SQLServer
+		/// SQLServer.
 		/// </summary>
 		VarBinary,
 
 		/// <summary>
-		/// MySQL, SQLServer
+		/// MySQL, SQLServer.
 		/// </summary>
 		VarChar,
 
 		/// <summary>
-		/// SQLServer
+		/// SQLServer.
 		/// </summary>
 		Xml,
 
 		/// <summary>
-		/// MySQL
+		/// MySQL.
 		/// </summary>
 		Year,
 
 		/// <summary>
-		/// Boolean
+		/// Boolean.
 		/// </summary>
 		YesNo
 	}

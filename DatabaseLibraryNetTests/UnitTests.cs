@@ -21,13 +21,13 @@ using System.Runtime.Versioning;
 namespace DigitalZenWorks.Database.ToolKit.Tests
 {
 	/// <summary>
-	/// Database Unit Testing Class
+	/// Database Unit Testing Class.
 	/// </summary>
 	[TestFixture]
 	internal sealed class TransactionUnitTests : IDisposable
 	{
 		/// <summary>
-		/// database
+		/// database storage object.
 		/// </summary>
 		private DataStorage database;
 		private string dataSource;
@@ -69,7 +69,7 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 		}
 
 		/// <summary>
-		/// Dispose
+		/// Dispose method.
 		/// </summary>
 		/// <param name="disposing"></param>
 		public void Dispose(bool disposing)
@@ -85,7 +85,7 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 		}
 
 		/// <summary>
-		/// Dispose
+		/// Dispose method.
 		/// </summary>
 		public void Dispose()
 		{
@@ -94,7 +94,7 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 		}
 
 		/// <summary>
-		/// Test to see if Unit Testing is working
+		/// Test to see if Unit Testing is working.
 		/// </summary>
 		[Test]
 		public static void BasicTest()
@@ -105,7 +105,7 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 		}
 
 		/// <summary>
-		/// Test to see if Unit Testing is working
+		/// Test to see if Unit Testing is working.
 		/// </summary>
 		[Test]
 		public void CanQueryTest()
@@ -117,7 +117,7 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 		}
 
 		/// <summary>
-		/// Create table test
+		/// Create table test.
 		/// </summary>
 		[Test, Order(1)]
 		public void CreateTableTest()
@@ -188,7 +188,7 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 		}
 
 		/// <summary>
-		/// Delete Test
+		/// Delete Test.
 		/// </summary>
 		[Test]
 		public void Delete()
@@ -211,7 +211,7 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 		}
 
 		/// <summary>
-		/// Export to CSV Test
+		/// Export to CSV Test.
 		/// </summary>
 		[Test]
 		public void ExportToCsv()
@@ -227,7 +227,7 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 		}
 
 		/// <summary>
-		/// Insert Test
+		/// Insert Test.
 		/// </summary>
 		[Test]
 		public void Insert()
@@ -246,7 +246,7 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 		}
 
 		/// <summary>
-		/// Delete Test
+		/// Delete Test.
 		/// </summary>
 		[Test]
 		public void SchemaTable()
@@ -257,7 +257,7 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 		}
 
 		/// <summary>
-		/// Test to see if Unit Testing is working
+		/// Test to see if Unit Testing is working.
 		/// </summary>
 		[Test]
 		public void SelectTest()
@@ -273,7 +273,7 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 		}
 
 		/// <summary>
-		/// Update Test
+		/// Update Test.
 		/// </summary>
 		[Test]
 		public void Update()
@@ -290,7 +290,7 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 		}
 
 		/// <summary>
-		/// Update with Parameters Test
+		/// Update with Parameters Test.
 		/// </summary>
 		[Test]
 		public void UpdateWithParameters()
@@ -307,7 +307,7 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 		}
 
 		/// <summary>
-		/// Test to see if test db exists
+		/// Test to see if test db exists.
 		/// </summary>
 		[Test]
 		public void VerifyTestSourceExists()

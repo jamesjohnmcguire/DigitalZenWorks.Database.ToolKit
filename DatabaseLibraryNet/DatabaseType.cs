@@ -12,37 +12,37 @@ namespace DigitalZenWorks.Database.ToolKit
 	public enum DatabaseType
 	{
 		/// <summary>
-		/// Unknown
+		/// Unknown.
 		/// </summary>
 		Unknown,
 
 		/// <summary>
-		/// OleDb
+		/// OleDb.
 		/// </summary>
 		OleDb,
 
 		/// <summary>
-		/// Postgres
+		/// Postgres.
 		/// </summary>
 		PostgresSql,
 
 		/// <summary>
-		/// SqlServer
+		/// SqlServer.
 		/// </summary>
 		SqlServer,
 
 		/// <summary>
-		/// Oracle
+		/// Oracle.
 		/// </summary>
 		Oracle,
 
 		/// <summary>
-		/// MySql
+		/// MySql.
 		/// </summary>
 		MySql,
 
 		/// <summary>
-		/// SQLite
+		/// SQLite.
 		/// </summary>
 		SQLite
 	}
