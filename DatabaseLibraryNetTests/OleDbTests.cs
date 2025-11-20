@@ -1,7 +1,6 @@
-﻿/////////////////////////////////////////////////////////////////////////////
-// Copyright @ 2006 - 2025 by James John McGuire
-// All rights reserved.
-/////////////////////////////////////////////////////////////////////////////
+﻿// <copyright file="OleDbTests.cs" company="James John McGuire">
+// Copyright © 2006 - 2025 James John McGuire. All Rights Reserved.
+// </copyright>
 
 namespace DigitalZenWorks.Database.ToolKit.Tests
 {
@@ -139,15 +138,21 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 
 			foreach (Table table in tables)
 			{
-				Assert.That(table.Name, Is.AnyOf("Addresses", "Categories",
-					"Contacts", "Makers", "Products", "Sections", "Series"));
+				Assert.That(table.Name, Is.AnyOf(
+					"Addresses",
+					"Categories",
+					"Contacts",
+					"Makers",
+					"Products",
+					"Sections",
+					"Series"));
 			}
 
 			Table tableItem = tables[0];
 			Assert.That(tableItem.Name, Is.EqualTo("Addresses"));
 
 			count = tableItem.ForeignKeys.Count;
-			Assert.That(count, Is.EqualTo(0));
+			Assert.That(count, Is.Zero);
 
 			tableItem = tables[2];
 			Assert.That(tableItem.Name, Is.EqualTo("Contacts"));

@@ -36,8 +36,8 @@ namespace DigitalZenWorks.Database.ToolKit
 		private static readonly ILog Log = LogManager.GetLogger(
 			System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-		private static readonly ResourceManager StringTable = new
-			("DigitalZenWorks.Database.ToolKit.Resources",
+		private static readonly ResourceManager StringTable = new (
+			"DigitalZenWorks.Database.ToolKit.Resources",
 			Assembly.GetExecutingAssembly());
 
 		/// <summary>
@@ -520,11 +520,8 @@ namespace DigitalZenWorks.Database.ToolKit
 			}
 			finally
 			{
-				if (dataAdapter != null)
-				{
-					dataAdapter.Dispose();
-					dataAdapter = null;
-				}
+				dataAdapter?.Dispose();
+				dataAdapter = null;
 
 				if (databaseTransaction == null)
 				{
@@ -764,17 +761,10 @@ namespace DigitalZenWorks.Database.ToolKit
 					sqliteConnection = null;
 				}
 
-				if (databaseTransaction != null)
-				{
-					databaseTransaction.Dispose();
-					databaseTransaction = null;
-				}
-
-				if (Connection != null)
-				{
-					Connection.Dispose();
-					Connection = null;
-				}
+				databaseTransaction?.Dispose();
+				databaseTransaction = null;
+				Connection?.Dispose();
+				Connection = null;
 			}
 		}
 

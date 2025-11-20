@@ -1,12 +1,11 @@
-/////////////////////////////////////////////////////////////////////////////
-// Copyright @ 2006 - 2025 by James John McGuire
-// All rights reserved.
-/////////////////////////////////////////////////////////////////////////////
+﻿// <copyright file="UnitTests.cs" company="James John McGuire">
+// Copyright © 2006 - 2025 James John McGuire. All Rights Reserved.
+// </copyright>
 
-using DigitalZenWorks.Common.Utilities;
+using Google.Protobuf.WellKnownTypes;
+using MySqlX.XDevAPI.Common;
 using NUnit.Framework;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data;
@@ -14,7 +13,6 @@ using System.Data.Common;
 using System.Data.SQLite;
 using System.Globalization;
 using System.IO;
-using System.Runtime.Versioning;
 
 [assembly: CLSCompliant(true)]
 
@@ -31,6 +29,17 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 		/// </summary>
 		private DataStorage database;
 		private string dataSource;
+
+		/// <summary>
+		/// Test to see if Unit Testing is working.
+		/// </summary>
+		[Test]
+		public static void BasicTest()
+		{
+			bool alwaysTrue = true;
+
+			Assert.That(alwaysTrue, Is.True);
+		}
 
 		/// <summary>
 		/// One time set up method.
@@ -71,16 +80,14 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 		/// <summary>
 		/// Dispose method.
 		/// </summary>
-		/// <param name="disposing"></param>
+		/// <param name="disposing">True to release both managed and unmanaged
+		/// resources; false to release only unmanaged resources.</param>
 		public void Dispose(bool disposing)
 		{
 			if (disposing)
 			{
-				if (null != database)
-				{
-					database.Close();
-					database = null;
-				}
+				database?.Close();
+				database = null;
 			}
 		}
 
@@ -91,17 +98,6 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 		{
 			Dispose(true);
 			GC.SuppressFinalize(this);
-		}
-
-		/// <summary>
-		/// Test to see if Unit Testing is working.
-		/// </summary>
-		[Test]
-		public static void BasicTest()
-		{
-			bool AlwaysTrue = true;
-
-			Assert.That(AlwaysTrue, Is.True);
 		}
 
 		/// <summary>
@@ -119,13 +115,15 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 		/// <summary>
 		/// Create table test.
 		/// </summary>
-		[Test, Order(1)]
+		[Test]
+		[Order(1)]
 		public void CreateTableTest()
 		{
 			string statement = "CREATE TABLE TestTable " +
 				"(id INTEGER PRIMARY KEY, description VARCHAR(64))";
 
 			bool result = database.ExecuteNonQuery(statement);
+			Assert.That(result, Is.True);
 
 			statement = "SELECT name FROM sqlite_master " +
 				"WHERE type = 'table' AND name = 'TestTable';";
@@ -203,9 +201,9 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 
 			query = "DELETE FROM TestTable WHERE id=" + rowId;
 
-			bool Result = database.Delete(query);
+			bool result = database.Delete(query);
 
-			Assert.That(Result, Is.True);
+			Assert.That(result, Is.True);
 
 			VerifyRowExists(rowId, false);
 		}
@@ -232,13 +230,13 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 		[Test]
 		public void Insert()
 		{
-			string Description = "Unit Test - Time: " + DateTime.Now;
+			string description = "Unit Test - Time: " + DateTime.Now;
 
-			string SqlQueryCommand = "INSERT INTO TestTable " +
+			string sqlQueryCommand = "INSERT INTO TestTable " +
 							@"(Description) VALUES " +
-							@"('" + Description + "')";
+							@"('" + description + "')";
 
-			int rowId = database.Insert(SqlQueryCommand);
+			int rowId = database.Insert(sqlQueryCommand);
 
 			Assert.That(rowId, Is.GreaterThanOrEqualTo(1));
 
@@ -267,9 +265,7 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 			DataSet dataSet = database.GetDataSet(query);
 
 			Assert.That(dataSet, Is.Not.Null);
-
-			// No exceptions found
-			Assert.That(dataSet.Tables.Count, Is.GreaterThanOrEqualTo(0));
+			Assert.That(dataSet.Tables, Has.Count.GreaterThanOrEqualTo(0));
 		}
 
 		/// <summary>
@@ -298,7 +294,7 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 			string description = "Unit Test - Time: " + DateTime.Now;
 			string query = "UPDATE TestTable SET [Description] = ?";
 
-			Dictionary<string, object> parameters = new ();
+			Dictionary<string, object> parameters = [];
 			parameters.Add("[Description]", description);
 
 			bool result = database.Update(query, parameters);
