@@ -117,7 +117,7 @@ namespace DigitalZenWorks.Database.ToolKit
 					if (databaseType == DatabaseType.OleDb &&
 						OperatingSystem.IsWindows())
 #else
-					if (DatabaseType.OleDb == databaseType)
+					if (databaseType == DatabaseType.OleDb)
 #endif
 					{
 						tables = oleDbConnection.GetOleDbSchemaTable(
@@ -460,7 +460,7 @@ namespace DigitalZenWorks.Database.ToolKit
 									"OleDb is only available on Windows.");
 							}
 #else
-								dataAdapter = new OleDbDataAdapter();
+							dataAdapter = new OleDbDataAdapter();
 #endif
 
 							break;
@@ -739,7 +739,7 @@ namespace DigitalZenWorks.Database.ToolKit
 					}
 				}
 #else
-				if (null != oleDbConnection)
+				if (oleDbConnection != null)
 				{
 					oleDbConnection.Close();
 					oleDbConnection.Dispose();
