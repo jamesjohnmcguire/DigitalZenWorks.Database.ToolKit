@@ -2,10 +2,10 @@
 // Copyright © 2006 - 2025 James John McGuire. All Rights Reserved.
 // </copyright>
 
-using NUnit.Framework;
-
 namespace DigitalZenWorks.Database.ToolKit.Tests
 {
+	using NUnit.Framework;
+
 	/// <summary>
 	/// Schema tests class.
 	/// </summary>
