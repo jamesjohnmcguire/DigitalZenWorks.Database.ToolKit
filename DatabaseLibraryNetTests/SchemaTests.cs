@@ -1,7 +1,6 @@
-﻿/////////////////////////////////////////////////////////////////////////////
-// Copyright @ 2006 - 2025 by James John McGuire
-// All rights reserved.
-/////////////////////////////////////////////////////////////////////////////
+﻿// <copyright file="SchemaTests.cs" company="James John McGuire">
+// Copyright © 2006 - 2025 James John McGuire. All Rights Reserved.
+// </copyright>
 
 using NUnit.Framework;
 

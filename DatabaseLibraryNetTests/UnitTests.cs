@@ -1,12 +1,11 @@
-/////////////////////////////////////////////////////////////////////////////
-// Copyright @ 2006 - 2025 by James John McGuire
-// All rights reserved.
-/////////////////////////////////////////////////////////////////////////////
+﻿// <copyright file="UnitTests.cs" company="James John McGuire">
+// Copyright © 2006 - 2025 James John McGuire. All Rights Reserved.
+// </copyright>
 
-using DigitalZenWorks.Common.Utilities;
+using Google.Protobuf.WellKnownTypes;
+using MySqlX.XDevAPI.Common;
 using NUnit.Framework;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data;
@@ -14,23 +13,33 @@ using System.Data.Common;
 using System.Data.SQLite;
 using System.Globalization;
 using System.IO;
-using System.Runtime.Versioning;
 
 [assembly: CLSCompliant(true)]
 
 namespace DigitalZenWorks.Database.ToolKit.Tests
 {
 	/// <summary>
-	/// Database Unit Testing Class
+	/// Database Unit Testing Class.
 	/// </summary>
 	[TestFixture]
 	internal sealed class TransactionUnitTests : IDisposable
 	{
 		/// <summary>
-		/// database
+		/// database storage object.
 		/// </summary>
 		private DataStorage database;
 		private string dataSource;
+
+		/// <summary>
+		/// Test to see if Unit Testing is working.
+		/// </summary>
+		[Test]
+		public static void BasicTest()
+		{
+			bool alwaysTrue = true;
+
+			Assert.That(alwaysTrue, Is.True);
+		}
 
 		/// <summary>
 		/// One time set up method.
@@ -69,23 +78,21 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 		}
 
 		/// <summary>
-		/// Dispose
+		/// Dispose method.
 		/// </summary>
-		/// <param name="disposing"></param>
+		/// <param name="disposing">True to release both managed and unmanaged
+		/// resources; false to release only unmanaged resources.</param>
 		public void Dispose(bool disposing)
 		{
 			if (disposing)
 			{
-				if (null != database)
-				{
-					database.Close();
-					database = null;
-				}
+				database?.Close();
+				database = null;
 			}
 		}
 
 		/// <summary>
-		/// Dispose
+		/// Dispose method.
 		/// </summary>
 		public void Dispose()
 		{
@@ -94,18 +101,7 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 		}
 
 		/// <summary>
-		/// Test to see if Unit Testing is working
-		/// </summary>
-		[Test]
-		public static void BasicTest()
-		{
-			bool AlwaysTrue = true;
-
-			Assert.That(AlwaysTrue, Is.True);
-		}
-
-		/// <summary>
-		/// Test to see if Unit Testing is working
+		/// Test to see if Unit Testing is working.
 		/// </summary>
 		[Test]
 		public void CanQueryTest()
@@ -117,15 +113,17 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 		}
 
 		/// <summary>
-		/// Create table test
+		/// Create table test.
 		/// </summary>
-		[Test, Order(1)]
+		[Test]
+		[Order(1)]
 		public void CreateTableTest()
 		{
 			string statement = "CREATE TABLE TestTable " +
 				"(id INTEGER PRIMARY KEY, description VARCHAR(64))";
 
 			bool result = database.ExecuteNonQuery(statement);
+			Assert.That(result, Is.True);
 
 			statement = "SELECT name FROM sqlite_master " +
 				"WHERE type = 'table' AND name = 'TestTable';";
@@ -188,7 +186,7 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 		}
 
 		/// <summary>
-		/// Delete Test
+		/// Delete Test.
 		/// </summary>
 		[Test]
 		public void Delete()
@@ -203,15 +201,15 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 
 			query = "DELETE FROM TestTable WHERE id=" + rowId;
 
-			bool Result = database.Delete(query);
+			bool result = database.Delete(query);
 
-			Assert.That(Result, Is.True);
+			Assert.That(result, Is.True);
 
 			VerifyRowExists(rowId, false);
 		}
 
 		/// <summary>
-		/// Export to CSV Test
+		/// Export to CSV Test.
 		/// </summary>
 		[Test]
 		public void ExportToCsv()
@@ -227,18 +225,18 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 		}
 
 		/// <summary>
-		/// Insert Test
+		/// Insert Test.
 		/// </summary>
 		[Test]
 		public void Insert()
 		{
-			string Description = "Unit Test - Time: " + DateTime.Now;
+			string description = "Unit Test - Time: " + DateTime.Now;
 
-			string SqlQueryCommand = "INSERT INTO TestTable " +
+			string sqlQueryCommand = "INSERT INTO TestTable " +
 							@"(Description) VALUES " +
-							@"('" + Description + "')";
+							@"('" + description + "')";
 
-			int rowId = database.Insert(SqlQueryCommand);
+			int rowId = database.Insert(sqlQueryCommand);
 
 			Assert.That(rowId, Is.GreaterThanOrEqualTo(1));
 
@@ -246,7 +244,7 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 		}
 
 		/// <summary>
-		/// Delete Test
+		/// Delete Test.
 		/// </summary>
 		[Test]
 		public void SchemaTable()
@@ -257,7 +255,7 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 		}
 
 		/// <summary>
-		/// Test to see if Unit Testing is working
+		/// Test to see if Unit Testing is working.
 		/// </summary>
 		[Test]
 		public void SelectTest()
@@ -267,13 +265,11 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 			DataSet dataSet = database.GetDataSet(query);
 
 			Assert.That(dataSet, Is.Not.Null);
-
-			// No exceptions found
-			Assert.That(dataSet.Tables.Count, Is.GreaterThanOrEqualTo(0));
+			Assert.That(dataSet.Tables, Has.Count.GreaterThanOrEqualTo(0));
 		}
 
 		/// <summary>
-		/// Update Test
+		/// Update Test.
 		/// </summary>
 		[Test]
 		public void Update()
@@ -290,7 +286,7 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 		}
 
 		/// <summary>
-		/// Update with Parameters Test
+		/// Update with Parameters Test.
 		/// </summary>
 		[Test]
 		public void UpdateWithParameters()
@@ -298,7 +294,7 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 			string description = "Unit Test - Time: " + DateTime.Now;
 			string query = "UPDATE TestTable SET [Description] = ?";
 
-			Dictionary<string, object> parameters = new ();
+			Dictionary<string, object> parameters = [];
 			parameters.Add("[Description]", description);
 
 			bool result = database.Update(query, parameters);
@@ -307,7 +303,7 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 		}
 
 		/// <summary>
-		/// Test to see if test db exists
+		/// Test to see if test db exists.
 		/// </summary>
 		[Test]
 		public void VerifyTestSourceExists()

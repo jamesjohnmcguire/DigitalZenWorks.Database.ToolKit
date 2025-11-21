@@ -36,8 +36,8 @@ namespace DigitalZenWorks.Database.ToolKit
 		private static readonly ILog Log = LogManager.GetLogger(
 			System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-		private static readonly ResourceManager StringTable = new
-			("DigitalZenWorks.Database.ToolKit.Resources",
+		private static readonly ResourceManager StringTable = new (
+			"DigitalZenWorks.Database.ToolKit.Resources",
 			Assembly.GetExecutingAssembly());
 
 		/// <summary>
@@ -117,7 +117,7 @@ namespace DigitalZenWorks.Database.ToolKit
 					if (databaseType == DatabaseType.OleDb &&
 						OperatingSystem.IsWindows())
 #else
-					if (DatabaseType.OleDb == databaseType)
+					if (databaseType == DatabaseType.OleDb)
 #endif
 					{
 						tables = oleDbConnection.GetOleDbSchemaTable(
@@ -460,7 +460,7 @@ namespace DigitalZenWorks.Database.ToolKit
 									"OleDb is only available on Windows.");
 							}
 #else
-								dataAdapter = new OleDbDataAdapter();
+							dataAdapter = new OleDbDataAdapter();
 #endif
 
 							break;
@@ -520,11 +520,8 @@ namespace DigitalZenWorks.Database.ToolKit
 			}
 			finally
 			{
-				if (dataAdapter != null)
-				{
-					dataAdapter.Dispose();
-					dataAdapter = null;
-				}
+				dataAdapter?.Dispose();
+				dataAdapter = null;
 
 				if (databaseTransaction == null)
 				{
@@ -742,7 +739,7 @@ namespace DigitalZenWorks.Database.ToolKit
 					}
 				}
 #else
-				if (null != oleDbConnection)
+				if (oleDbConnection != null)
 				{
 					oleDbConnection.Close();
 					oleDbConnection.Dispose();
@@ -764,17 +761,10 @@ namespace DigitalZenWorks.Database.ToolKit
 					sqliteConnection = null;
 				}
 
-				if (databaseTransaction != null)
-				{
-					databaseTransaction.Dispose();
-					databaseTransaction = null;
-				}
-
-				if (Connection != null)
-				{
-					Connection.Dispose();
-					Connection = null;
-				}
+				databaseTransaction?.Dispose();
+				databaseTransaction = null;
+				Connection?.Dispose();
+				Connection = null;
 			}
 		}
 
