@@ -4,7 +4,6 @@
 		<AnalysisMode>All</AnalysisMode>
 		<AssemblyName>DigitalZenWorks.Database.ToolKit</AssemblyName>
 		<AssemblyOriginatorKeyFile>DatabaseLibraryNet.snk</AssemblyOriginatorKeyFile>
-		<AssemblyTitle>DigitalZenWorks.Database.ToolKit</AssemblyTitle>
 		<AssemblyVersion>1.0.0.0</AssemblyVersion>
 		<Authors>James John McGuire</Authors>
 		<Company>Digital Zen Works</Company>
