@@ -6,6 +6,8 @@
 
 namespace DigitalZenWorks.Database.ToolKit
 {
+	using global::Common.Logging;
+	using MySqlX.XDevAPI.Relational;
 	using System;
 	using System.Collections.Generic;
 	using System.Collections.ObjectModel;
@@ -13,7 +15,6 @@ namespace DigitalZenWorks.Database.ToolKit
 	using System.Globalization;
 	using System.Reflection;
 	using System.Resources;
-	using global::Common.Logging;
 
 	/// <summary>
 	/// Represents a database table.
@@ -25,10 +26,6 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// </summary>
 		private static readonly ILog Log = LogManager.GetLogger(
 			System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
-
-		private static readonly ResourceManager StringTable = new(
-			"DigitalZenWorks.Database.ToolKit.Resources",
-			Assembly.GetExecutingAssembly());
 
 		private readonly Dictionary<string, Column> columns = [];
 		private readonly Collection<ForeignKey> foreignKeys = [];
@@ -110,37 +107,24 @@ namespace DigitalZenWorks.Database.ToolKit
 
 			if (table != null)
 			{
-				Log.Info(
-					CultureInfo.InvariantCulture,
-					m => m(StringTable.GetString(
-						"TABLE",
-						CultureInfo.InvariantCulture) + table.TableName));
-				output = StringTable.GetString(
-					"TABLE",
-					CultureInfo.InvariantCulture) +
-					table.TableName + Environment.NewLine;
+				string message = Strings.Table + table.TableName;
+				Log.Info(message);
+
+				output =
+					Strings.Table + table.TableName + Environment.NewLine;
 
 				foreach (DataColumn column in table.Columns)
 				{
-					Log.Info(CultureInfo.InvariantCulture, m => m(
-						StringTable.GetString(
-							"TABDASH",
-							CultureInfo.InvariantCulture) +
-							column.ColumnName));
-					output += StringTable.GetString(
-						"TABDASH",
-						CultureInfo.InvariantCulture) +
-						column.ColumnName + Environment.NewLine;
+					message = Strings.TabDash + column.ColumnName;
+					Log.Info(message);
+
+					output += message + Environment.NewLine;
 				}
 
-				Log.Info(CultureInfo.InvariantCulture, m => m(
-					StringTable.GetString(
-						"PRIMARYKEY",
-						CultureInfo.InvariantCulture) + table.PrimaryKey));
-				output += StringTable.GetString(
-					"PRIMARYKEY",
-					CultureInfo.InvariantCulture) +
-					table.PrimaryKey + Environment.NewLine;
+				message = Strings.PrimaryKey + table.PrimaryKey;
+				Log.Info(message);
+
+				output += message + Environment.NewLine;
 			}
 
 			return output;
@@ -164,34 +148,26 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// <returns>DataTable.</returns>
 		public string Dump()
 		{
-			string output = StringTable.GetString(
-				"TABLE",
-				CultureInfo.InvariantCulture) + Name + Environment.NewLine;
-			Log.Info(CultureInfo.InvariantCulture, m => m(output));
+			string message;
+			string output =
+				Strings.Table + Name + Environment.NewLine;
+			Log.Info(output);
 
 			foreach (KeyValuePair<string, Column> column in Columns)
 			{
-				Log.Info(
-					CultureInfo.InvariantCulture,
-					m => m(StringTable.GetString(
-						"TABDASH",
-						CultureInfo.InvariantCulture) +
-						((Column)column.Value).Name));
-				output += StringTable.GetString(
-					"TABDASH",
-					CultureInfo.InvariantCulture) +
-					((Column)column.Value).Name + Environment.NewLine;
+				Column columnValue = column.Value;
+				string name = columnValue.Name;
+
+				message = Strings.TabDash + name;
+				Log.Info(message);
+
+				output += message + Environment.NewLine;
 			}
 
-			Log.Info(
-				CultureInfo.InvariantCulture,
-				m => m(StringTable.GetString(
-					"PRIMARYKEY",
-					CultureInfo.InvariantCulture) + PrimaryKey));
-			output += StringTable.GetString(
-				"PRIMARYKEY",
-				CultureInfo.InvariantCulture) + PrimaryKey +
-				Environment.NewLine;
+			message = Strings.PrimaryKey + PrimaryKey;
+			Log.Info(message);
+
+			output += message + Environment.NewLine;
 
 			foreach (ForeignKey foreignKey in ForeignKeys)
 			{
@@ -202,15 +178,10 @@ namespace DigitalZenWorks.Database.ToolKit
 					foreignKey.ColumnName,
 					foreignKey.ParentTable);
 
-				Log.Info(
-					CultureInfo.InvariantCulture,
-					m => m(StringTable.GetString(
-						"FOREIGNKEY",
-						CultureInfo.InvariantCulture) + format));
-				output += StringTable.GetString(
-					"FOREIGNKEY",
-					CultureInfo.InvariantCulture) + format +
-					Environment.NewLine;
+				message = Strings.ForeignKey + format;
+				Log.Info(message);
+
+				output += message + Environment.NewLine;
 			}
 
 			return output;

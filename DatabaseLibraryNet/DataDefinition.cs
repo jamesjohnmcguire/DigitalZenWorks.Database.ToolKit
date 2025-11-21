@@ -30,10 +30,6 @@ namespace DigitalZenWorks.Database.ToolKit
 		private static readonly ILog Log = LogManager.GetLogger(
 			System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-		private static readonly ResourceManager StringTable = new(
-			"DigitalZenWorks.Database.ToolKit.Resources",
-			Assembly.GetExecutingAssembly());
-
 		/// Method <c>ExportSchema.</c>
 		/// <summary>
 		/// Export all tables to similarly named csv files.
@@ -79,10 +75,8 @@ namespace DigitalZenWorks.Database.ToolKit
 				exception is ArgumentException ||
 				exception is InvalidOperationException)
 			{
-				Log.Error(CultureInfo.InvariantCulture, m => m(
-					StringTable.GetString(
-						"EXCEPTION", CultureInfo.InvariantCulture) +
-						exception));
+				string message = Strings.Exception + exception.ToString();
+				Log.Error(message);
 			}
 			catch
 			{
@@ -197,10 +191,8 @@ namespace DigitalZenWorks.Database.ToolKit
 
 			if (columnType == ColumnType.Other)
 			{
-				Log.Warn(CultureInfo.InvariantCulture, m => m(
-					StringTable.GetString(
-						"WARNING_OTHER", CultureInfo.InvariantCulture) +
-						column));
+				string message = Strings.WarningOther + column;
+				Log.Warn(message);
 			}
 
 			return columnType;
@@ -313,10 +305,11 @@ namespace DigitalZenWorks.Database.ToolKit
 #endif
 		public static Collection<Table> GetSchema(string databaseFile)
 		{
+			Collection<Table> tables = [];
 			Dictionary<string, Table> tableDictionary = [];
 			List<Relationship> relationships = [];
 
-			using OleDbSchema oleDbSchema = new(databaseFile);
+			using OleDbSchema oleDbSchema = new (databaseFile);
 			DataTable tableNames = oleDbSchema.TableNames;
 
 			foreach (DataRow row in tableNames.Rows)
@@ -346,8 +339,8 @@ namespace DigitalZenWorks.Database.ToolKit
 				table.ForeignKeys.Add(foreignKey);
 			}
 
-			List<Table> newList = [.. tableDictionary.Values];
-			Collection<Table> tables = new(newList);
+			List<Table> newList = tableDictionary.Values.ToList();
+			tables = new Collection<Table>(newList);
 
 			return tables;
 		}
@@ -451,17 +444,13 @@ namespace DigitalZenWorks.Database.ToolKit
 				exception is OutOfMemoryException ||
 				exception is System.Data.OleDb.OleDbException)
 			{
-				Log.Error(CultureInfo.InvariantCulture, m => m(
-					StringTable.GetString(
-						"EXCEPTION",
-						CultureInfo.InvariantCulture) + exception));
+				string message = Strings.Exception + exception.ToString();
+				Log.Error(message);
 			}
 			catch (Exception exception)
 			{
-				Log.Error(CultureInfo.InvariantCulture, m => m(
-					StringTable.GetString(
-						"EXCEPTION",
-						CultureInfo.InvariantCulture) + exception));
+				string message = Strings.Exception + exception.ToString();
+				Log.Error(message);
 
 				throw;
 			}
@@ -561,9 +550,7 @@ namespace DigitalZenWorks.Database.ToolKit
 			{
 				try
 				{
-					string command = StringTable.GetString(
-						"COMMAND", CultureInfo.InvariantCulture);
-					string message = command + sqlQuery;
+					string message = Strings.Command + sqlQuery;
 					Log.Info(message);
 
 					database.ExecuteNonQuery(sqlQuery);
@@ -573,18 +560,12 @@ namespace DigitalZenWorks.Database.ToolKit
 					exception is OutOfMemoryException ||
 					exception is System.Data.OleDb.OleDbException)
 				{
-					string command = StringTable.GetString(
-						"EXCEPTION", CultureInfo.InvariantCulture);
-					string message = command + exception;
-
+					string message = Strings.Exception + exception.ToString();
 					Log.Error(message);
 				}
 				catch (Exception exception)
 				{
-					string command = StringTable.GetString(
-						"EXCEPTION", CultureInfo.InvariantCulture);
-					string message = command + exception;
-
+					string message = Strings.Exception + exception.ToString();
 					Log.Error(message);
 
 					throw;
@@ -594,7 +575,7 @@ namespace DigitalZenWorks.Database.ToolKit
 
 		private static Column FormatColumnFromDataRow(DataRow row)
 		{
-			Column column = new();
+			Column column = new ();
 			column.Name = row["COLUMN_NAME"].ToString();
 
 			switch ((int)row["DATA_TYPE"])
@@ -736,7 +717,7 @@ namespace DigitalZenWorks.Database.ToolKit
 		private static ForeignKey GetForeignKeyRelationship(
 			Relationship relationship)
 		{
-			ForeignKey foreignKey = new(
+			ForeignKey foreignKey = new (
 				relationship.Name,
 				relationship.ChildTableCol,
 				relationship.ParentTable,
@@ -749,7 +730,7 @@ namespace DigitalZenWorks.Database.ToolKit
 
 		private static Relationship GetRelationship(DataRow foreignKey)
 		{
-			Relationship relationship = new();
+			Relationship relationship = new ();
 			relationship.Name = foreignKey["FK_NAME"].ToString();
 			relationship.ParentTable =
 				foreignKey["PK_TABLE_NAME"].ToString();
@@ -779,7 +760,7 @@ namespace DigitalZenWorks.Database.ToolKit
 		private static Table GetTable(
 			OleDbSchema oleDbSchema, string tableName)
 		{
-			Table table = new(tableName);
+			Table table = new (tableName);
 
 			Log.Info("Getting Columns for " + tableName);
 			DataTable dataColumns =
@@ -808,7 +789,7 @@ namespace DigitalZenWorks.Database.ToolKit
 				databaseFile);
 
 			using (DataStorage database =
-				new(DatabaseType.OleDb, connectionString))
+				new (DatabaseType.OleDb, connectionString))
 			{
 				ExecuteQueries(database, queries);
 				successCode = true;
@@ -1033,7 +1014,7 @@ namespace DigitalZenWorks.Database.ToolKit
 			}
 
 			// Remove trailing ','
-			sql = sql[..^3];
+			sql = sql.Remove(sql.Length - 3, 3);
 
 			sql += string.Format(
 				CultureInfo.InvariantCulture,
