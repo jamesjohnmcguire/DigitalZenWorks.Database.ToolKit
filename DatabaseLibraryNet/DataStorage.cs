@@ -36,10 +36,6 @@ namespace DigitalZenWorks.Database.ToolKit
 		private static readonly ILog Log = LogManager.GetLogger(
 			System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-		private static readonly ResourceManager StringTable = new (
-			"DigitalZenWorks.Database.ToolKit.Resources",
-			Assembly.GetExecutingAssembly());
-
 		/// <summary>
 		/// databaseType.
 		/// </summary>
@@ -216,11 +212,7 @@ namespace DigitalZenWorks.Database.ToolKit
 			}
 			catch (Exception exception)
 			{
-				string prefix = StringTable.GetString(
-						"EXCEPTION",
-						CultureInfo.InvariantCulture);
-				string message = prefix + exception.ToString();
-
+				string message = Strings.Exception + exception.ToString();
 				Log.Error(message);
 
 				throw;
@@ -493,29 +485,22 @@ namespace DigitalZenWorks.Database.ToolKit
 			{
 				RollbackTransaction();
 
-				string message = StringTable.GetString(
-					"EXCEPTION", CultureInfo.InvariantCulture);
-				Log.Error(CultureInfo.InvariantCulture, m => m(
-					message + exception));
+				string message = Strings.Exception + exception.ToString();
+				Log.Error(message);
 
-				message = StringTable.GetString(
-					"COMMAND", CultureInfo.InvariantCulture);
-				Log.Error(CultureInfo.InvariantCulture, m => m(
-					message + sql));
+				message = Strings.Command + sql;
+				Log.Error(message);
 			}
 			catch (Exception exception)
 			{
 				RollbackTransaction();
 
-				string message = StringTable.GetString(
-					"EXCEPTION", CultureInfo.InvariantCulture);
-				Log.Error(CultureInfo.InvariantCulture, m => m(
-					message + exception));
+				string message = Strings.Exception + exception.ToString();
+				Log.Error(message);
 
-				message = StringTable.GetString(
-					"COMMAND", CultureInfo.InvariantCulture);
-				Log.Error(CultureInfo.InvariantCulture, m => m(
-					message + sql));
+				message = Strings.Command + sql;
+				Log.Error(message);
+
 				throw;
 			}
 			finally
@@ -653,14 +638,11 @@ namespace DigitalZenWorks.Database.ToolKit
 			{
 				RollbackTransaction();
 
-				Log.Error(CultureInfo.InvariantCulture, m => m(
-					StringTable.GetString(
-						"EXCEPTION",
-						CultureInfo.InvariantCulture) + exception));
-				Log.Error(CultureInfo.InvariantCulture, m => m(
-					StringTable.GetString(
-						"COMMAND",
-						CultureInfo.InvariantCulture) + sql));
+				string message = Strings.Exception + exception.ToString();
+				Log.Error(message);
+
+				message = Strings.Command + sql;
+				Log.Error(message);
 
 				throw;
 			}
@@ -1003,14 +985,11 @@ namespace DigitalZenWorks.Database.ToolKit
 			{
 				RollbackTransaction();
 
-				Log.Error(CultureInfo.InvariantCulture, m => m(
-					StringTable.GetString(
-						"EXCEPTION",
-						CultureInfo.InvariantCulture) + exception));
-				Log.Error(CultureInfo.InvariantCulture, m => m(
-					StringTable.GetString(
-						"COMMAND",
-						CultureInfo.InvariantCulture) + sql));
+				string message = Strings.Exception + exception.ToString();
+				Log.Error(message);
+
+				message = Strings.Command + sql;
+				Log.Error(message);
 
 				throw;
 			}
@@ -1098,12 +1077,7 @@ namespace DigitalZenWorks.Database.ToolKit
 			{
 				RollbackTransaction();
 
-				string prefix = StringTable.GetString(
-					"EXCEPTION",
-					CultureInfo.InvariantCulture);
-
-				string message = prefix + exception.ToString();
-
+				string message = Strings.Exception + exception.ToString();
 				Log.Error(message);
 
 				throw;

@@ -24,11 +24,6 @@ namespace DigitalZenWorks.Database.ToolKit
 		private static readonly ILog Log = LogManager.GetLogger(
 			System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-		private static readonly ResourceManager StringTable = new
-			ResourceManager(
-			"DigitalZenWorks.Database.ToolKit.Resources",
-			Assembly.GetExecutingAssembly());
-
 		/// Method <c>CreateAccessDatabaseFile.</c>
 		/// <summary>
 		/// Creates an empty MDB (MS Jet / Access database) file.
@@ -53,9 +48,9 @@ namespace DigitalZenWorks.Database.ToolKit
 		{
 			bool returnCode = false;
 
-			Log.Info(CultureInfo.InvariantCulture, m => m(
-				GeneralUtilities.CallingMethod() + ": " +
-				StringTable.GetString("BEGIN", CultureInfo.InvariantCulture)));
+			string message =
+				GeneralUtilities.CallingMethod() + ": " + Strings.Begin;
+			Log.Info(message);
 
 			if (table != null && file != null)
 			{

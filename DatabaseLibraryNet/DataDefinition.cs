@@ -30,10 +30,6 @@ namespace DigitalZenWorks.Database.ToolKit
 		private static readonly ILog Log = LogManager.GetLogger(
 			System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-		private static readonly ResourceManager StringTable = new (
-			"DigitalZenWorks.Database.ToolKit.Resources",
-			Assembly.GetExecutingAssembly());
-
 		/// Method <c>ExportSchema.</c>
 		/// <summary>
 		/// Export all tables to similarly named csv files.
@@ -79,10 +75,8 @@ namespace DigitalZenWorks.Database.ToolKit
 				exception is ArgumentException ||
 				exception is InvalidOperationException)
 			{
-				Log.Error(CultureInfo.InvariantCulture, m => m(
-					StringTable.GetString(
-						"EXCEPTION", CultureInfo.InvariantCulture) +
-						exception));
+				string message = Strings.Exception + exception.ToString();
+				Log.Error(message);
 			}
 			catch
 			{
@@ -197,10 +191,8 @@ namespace DigitalZenWorks.Database.ToolKit
 
 			if (columnType == ColumnType.Other)
 			{
-				Log.Warn(CultureInfo.InvariantCulture, m => m(
-					StringTable.GetString(
-						"WARNING_OTHER", CultureInfo.InvariantCulture) +
-						column));
+				string message = Strings.WarningOther + column;
+				Log.Warn(message);
 			}
 
 			return columnType;
@@ -452,17 +444,13 @@ namespace DigitalZenWorks.Database.ToolKit
 				exception is OutOfMemoryException ||
 				exception is System.Data.OleDb.OleDbException)
 			{
-				Log.Error(CultureInfo.InvariantCulture, m => m(
-					StringTable.GetString(
-						"EXCEPTION",
-						CultureInfo.InvariantCulture) + exception));
+				string message = Strings.Exception + exception.ToString();
+				Log.Error(message);
 			}
 			catch (Exception exception)
 			{
-				Log.Error(CultureInfo.InvariantCulture, m => m(
-					StringTable.GetString(
-						"EXCEPTION",
-						CultureInfo.InvariantCulture) + exception));
+				string message = Strings.Exception + exception.ToString();
+				Log.Error(message);
 
 				throw;
 			}
@@ -562,9 +550,7 @@ namespace DigitalZenWorks.Database.ToolKit
 			{
 				try
 				{
-					string command = StringTable.GetString(
-						"COMMAND", CultureInfo.InvariantCulture);
-					string message = command + sqlQuery;
+					string message = Strings.Command + sqlQuery;
 					Log.Info(message);
 
 					database.ExecuteNonQuery(sqlQuery);
@@ -574,18 +560,12 @@ namespace DigitalZenWorks.Database.ToolKit
 					exception is OutOfMemoryException ||
 					exception is System.Data.OleDb.OleDbException)
 				{
-					string command = StringTable.GetString(
-						"EXCEPTION", CultureInfo.InvariantCulture);
-					string message = command + exception;
-
+					string message = Strings.Exception + exception.ToString();
 					Log.Error(message);
 				}
 				catch (Exception exception)
 				{
-					string command = StringTable.GetString(
-						"EXCEPTION", CultureInfo.InvariantCulture);
-					string message = command + exception;
-
+					string message = Strings.Exception + exception.ToString();
 					Log.Error(message);
 
 					throw;
