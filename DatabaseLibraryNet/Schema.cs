@@ -6,15 +6,16 @@
 
 namespace DigitalZenWorks.Database.ToolKit
 {
+	using global::Common.Logging;
+	using Microsoft.Data.SqlClient;
+	using MySql.Data.MySqlClient;
 	using System;
 	using System.Configuration.Provider;
 	using System.Data;
 	using System.Data.Common;
+	using System.Data.OleDb;
 	using System.Data.SQLite;
 	using System.Globalization;
-	using global::Common.Logging;
-	using Microsoft.Data.SqlClient;
-	using MySql.Data.MySqlClient;
 
 	/// Class <c>Schema.</c>
 	/// <summary>
@@ -98,6 +99,43 @@ namespace DigitalZenWorks.Database.ToolKit
 				tableName, constraints);
 
 			return constraints;
+		}
+
+		/// <summary>
+		/// Gets the primary keys from the given table.
+		/// </summary>
+		/// <param name="tableName">The name of the table.</param>
+		/// <returns>DataTable.</returns>
+		public DataTable GetPrimaryKeys(string tableName)
+		{
+			connection.Open();
+
+			string[] tableInformation = [null, null, tableName];
+
+			DataTable schemaTable = connection.GetSchema(
+				"PrimaryKeys", tableInformation);
+
+			connection.Close();
+
+			return schemaTable;
+		}
+
+		/// <summary>
+		/// Gets the column names from the given table.
+		/// </summary>
+		/// <param name="tableName">The name of the table.</param>
+		/// <returns>DataTable.</returns>
+		public DataTable GetTableColumns(string tableName)
+		{
+			connection.Open();
+
+			object[] testTable = [null, null, tableName];
+
+			DataTable schemaTable = connection.GetSchema("Columns");
+
+			connection.Close();
+
+			return schemaTable;
 		}
 
 		/// <summary>

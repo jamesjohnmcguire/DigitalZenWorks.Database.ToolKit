@@ -754,6 +754,24 @@ namespace DigitalZenWorks.Database.ToolKit
 			return relationship;
 		}
 
+		private static Table GetTable(
+			Schema schema, string tableName)
+		{
+			Table table = new (tableName);
+
+			Log.Info("Getting Columns for " + tableName);
+			DataTable dataColumns = schema.GetTableColumns(tableName);
+
+			foreach (DataRow dataColumn in dataColumns.Rows)
+			{
+				Column column = FormatColumnFromDataRow(dataColumn);
+
+				table.AddColumn(column);
+			}
+
+			return table;
+		}
+
 #if NET5_0_OR_GREATER
 		[SupportedOSPlatform("windows")]
 #endif
@@ -796,6 +814,34 @@ namespace DigitalZenWorks.Database.ToolKit
 			}
 
 			return successCode;
+		}
+
+		private static Table SetPrimaryKey(
+			Schema schema, DataRow row)
+		{
+			object nameRaw = row["TABLE_NAME"];
+			string tableName = nameRaw.ToString();
+
+			Table table = GetTable(schema, tableName);
+
+			DataTable primaryKeys =
+				schema.GetPrimaryKeys(tableName);
+
+			// TODO: This assumes only a single primary key.  Need to
+			// compensate for composite primary keys.
+			DataRow primaryKeyRow = primaryKeys.Rows[0];
+			nameRaw = primaryKeyRow["COLUMN_NAME"];
+			table.PrimaryKey = nameRaw.ToString();
+
+			// If PK is an integer change type to AutoNumber
+			Column primaryKey = SetPrimaryKeyType(table);
+
+			if (primaryKey != null)
+			{
+				table.Columns[table.PrimaryKey] = primaryKey;
+			}
+
+			return table;
 		}
 
 #if NET5_0_OR_GREATER
