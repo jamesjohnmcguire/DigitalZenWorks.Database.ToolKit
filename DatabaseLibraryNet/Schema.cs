@@ -254,7 +254,7 @@ namespace DigitalZenWorks.Database.ToolKit
 			return query;
 		}
 
-		private string GetConstraintQuerySqlite(string tableName)
+		private static string GetConstraintQuerySqlite(string tableName)
 		{
 			string query = $"PRAGMA foreign_key_list('{tableName}')";
 
