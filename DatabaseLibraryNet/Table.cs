@@ -6,15 +6,12 @@
 
 namespace DigitalZenWorks.Database.ToolKit
 {
-	using global::Common.Logging;
-	using MySqlX.XDevAPI.Relational;
 	using System;
 	using System.Collections.Generic;
 	using System.Collections.ObjectModel;
 	using System.Data;
 	using System.Globalization;
-	using System.Reflection;
-	using System.Resources;
+	using global::Common.Logging;
 
 	/// <summary>
 	/// Represents a database table.
