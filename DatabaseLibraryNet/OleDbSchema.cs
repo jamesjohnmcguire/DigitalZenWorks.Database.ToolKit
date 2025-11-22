@@ -194,11 +194,8 @@ namespace DigitalZenWorks.Database.ToolKit
 		{
 			if (disposing)
 			{
-				if (oleDbConnection != null)
-				{
-					oleDbConnection.Close();
-					oleDbConnection = null;
-				}
+				oleDbConnection?.Close();
+				oleDbConnection = null;
 			}
 		}
 	}
