@@ -17,7 +17,7 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 	/// Schema tests class.
 	/// </summary>
 	[TestFixture]
-	internal sealed class SchemaTests
+	internal sealed class SchemaTests : BaseTestsSupport
 	{
 		/// <summary>
 		/// database storage object.
