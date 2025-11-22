@@ -127,9 +127,9 @@ namespace DigitalZenWorks.Database.ToolKit
 		{
 			connection.Open();
 
-			object[] testTable = [null, null, tableName];
+			string[] testTable = [null, null, tableName];
 
-			DataTable schemaTable = connection.GetSchema("Columns");
+			DataTable schemaTable = connection.GetSchema("Columns", testTable);
 
 			connection.Close();
 
