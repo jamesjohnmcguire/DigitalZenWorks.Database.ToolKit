@@ -305,7 +305,6 @@ namespace DigitalZenWorks.Database.ToolKit
 #endif
 		public static Collection<Table> GetSchema(string databaseFile)
 		{
-			Collection<Table> tables = [];
 			Dictionary<string, Table> tableDictionary = [];
 			List<Relationship> relationships = [];
 
@@ -340,7 +339,7 @@ namespace DigitalZenWorks.Database.ToolKit
 			}
 
 			List<Table> newList = tableDictionary.Values.ToList();
-			tables = new Collection<Table>(newList);
+			Collection<Table> tables = new (newList);
 
 			return tables;
 		}
@@ -1060,7 +1059,7 @@ namespace DigitalZenWorks.Database.ToolKit
 			}
 
 			// Remove trailing ','
-			sql = sql.Remove(sql.Length - 3, 3);
+			sql = sql[..^3];
 
 			sql += string.Format(
 				CultureInfo.InvariantCulture,
