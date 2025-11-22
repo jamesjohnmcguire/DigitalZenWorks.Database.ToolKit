@@ -248,7 +248,7 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 		private static string GetTestSqlFile()
 		{
 			string resource = "DigitalZenWorks.Database.ToolKit.Tests." +
-				"Products.MySql.Test.sql";
+				"Products.Access.Test.sql";
 
 			string filePath = GetEmbeddedResourceFile(resource, "sql");
 
