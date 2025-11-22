@@ -432,7 +432,9 @@ namespace DigitalZenWorks.Database.ToolKit
 			string query = GetConstraintQueryByProvider(tableName);
 
 			using DbCommand command = connection.CreateCommand();
+#pragma warning disable CA2100
 			command.CommandText = query;
+#pragma warning restore CA2100
 			using var adapter =
 				DbProviderFactories.GetFactory(connection).CreateDataAdapter();
 			adapter.SelectCommand = command;
