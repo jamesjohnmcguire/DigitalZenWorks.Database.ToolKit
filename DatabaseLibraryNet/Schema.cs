@@ -6,16 +6,14 @@
 
 namespace DigitalZenWorks.Database.ToolKit
 {
+	using System;
+	using System.Data;
+	using System.Data.Common;
+	using System.Data.SQLite;
+	using System.Globalization;
 	using global::Common.Logging;
 	using Microsoft.Data.SqlClient;
 	using MySql.Data.MySqlClient;
-	using System;
-	using System.Configuration.Provider;
-	using System.Data;
-	using System.Data.Common;
-	using System.Data.OleDb;
-	using System.Data.SQLite;
-	using System.Globalization;
 
 	/// Class <c>Schema.</c>
 	/// <summary>
