@@ -22,14 +22,8 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 	/// Database Unit Testing Class.
 	/// </summary>
 	[TestFixture]
-	internal sealed class TransactionUnitTests : IDisposable
+	internal sealed class TransactionUnitTests : BaseTestsSupport
 	{
-		/// <summary>
-		/// database storage object.
-		/// </summary>
-		private DataStorage database;
-		private string dataSource;
-
 		/// <summary>
 		/// Test to see if Unit Testing is working.
 		/// </summary>
@@ -42,71 +36,12 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 		}
 
 		/// <summary>
-		/// One time set up method.
-		/// </summary>
-		[OneTimeSetUp]
-		public void OneTimeSetUp()
-		{
-			dataSource = GetTestDatabasePath();
-
-			SQLiteConnection.CreateFile(dataSource);
-
-			string connectionBase = "Data Source={0};Version=3;" +
-				"DateTimeFormat=InvariantCulture";
-
-			string connectionString = string.Format(
-				CultureInfo.InvariantCulture,
-				connectionBase,
-				dataSource);
-
-			database = new DataStorage(DatabaseType.SQLite, connectionString);
-		}
-
-		/// <summary>
-		/// function that is called when all tests are completed.
-		/// </summary>
-		[OneTimeTearDown]
-		public void OneTimeTearDown()
-		{
-			if (database != null)
-			{
-				database.Close();
-				database.Shutdown();
-			}
-
-			File.Delete(dataSource);
-		}
-
-		/// <summary>
-		/// Dispose method.
-		/// </summary>
-		/// <param name="disposing">True to release both managed and unmanaged
-		/// resources; false to release only unmanaged resources.</param>
-		public void Dispose(bool disposing)
-		{
-			if (disposing)
-			{
-				database?.Close();
-				database = null;
-			}
-		}
-
-		/// <summary>
-		/// Dispose method.
-		/// </summary>
-		public void Dispose()
-		{
-			Dispose(true);
-			GC.SuppressFinalize(this);
-		}
-
-		/// <summary>
 		/// Test to see if Unit Testing is working.
 		/// </summary>
 		[Test]
 		public void CanQueryTest()
 		{
-			bool canQuery = database.CanQuery();
+			bool canQuery = Database.CanQuery();
 
 			// No exceptions found
 			Assert.That(canQuery, Is.True);
@@ -122,13 +57,14 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 			string statement = "CREATE TABLE TestTable " +
 				"(id INTEGER PRIMARY KEY, description VARCHAR(64))";
 
-			bool result = database.ExecuteNonQuery(statement);
+			bool result = Database.ExecuteNonQuery(statement);
 			Assert.That(result, Is.True);
 
 			statement = "SELECT name FROM sqlite_master " +
 				"WHERE type = 'table' AND name = 'TestTable';";
 
-			using DbDataReader dbDataReader = database.ExecuteReader(statement);
+			using DbDataReader dbDataReader =
+				Database.ExecuteReader(statement);
 
 			Assert.That(dbDataReader.HasRows, Is.True);
 		}
@@ -197,11 +133,11 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 				"INSERT INTO TestTable (Description) VALUES ('{0}')",
 				description);
 
-			int rowId = database.Insert(query);
+			int rowId = Database.Insert(query);
 
 			query = "DELETE FROM TestTable WHERE id=" + rowId;
 
-			bool result = database.Delete(query);
+			bool result = Database.Delete(query);
 
 			Assert.That(result, Is.True);
 
@@ -216,7 +152,7 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 		{
 			string tempPath = Path.GetTempPath();
 
-			DatabaseUtilities.ExportToCsv(dataSource, tempPath);
+			DatabaseUtilities.ExportToCsv(DataSource, tempPath);
 
 			string csvFile = tempPath + "TestTable.csv";
 
@@ -236,7 +172,7 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 							@"(Description) VALUES " +
 							@"('" + description + "')";
 
-			int rowId = database.Insert(sqlQueryCommand);
+			int rowId = Database.Insert(sqlQueryCommand);
 
 			Assert.That(rowId, Is.GreaterThanOrEqualTo(1));
 
@@ -249,7 +185,7 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 		[Test]
 		public void SchemaTable()
 		{
-			DataTable table = database.SchemaTable;
+			DataTable table = Database.SchemaTable;
 
 			Assert.That(table, Is.Not.Null);
 		}
@@ -262,7 +198,7 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 		{
 			string query = "SELECT * FROM TestTable";
 
-			DataSet dataSet = database.GetDataSet(query);
+			DataSet dataSet = Database.GetDataSet(query);
 
 			Assert.That(dataSet, Is.Not.Null);
 			Assert.That(dataSet.Tables, Has.Count.GreaterThanOrEqualTo(0));
@@ -280,7 +216,7 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 				"UPDATE TestTable SET [Description] = '{0}'",
 				description);
 
-			bool result = database.Update(query);
+			bool result = Database.Update(query);
 
 			Assert.That(result, Is.True);
 		}
@@ -297,7 +233,7 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 			Dictionary<string, object> parameters = [];
 			parameters.Add("[Description]", description);
 
-			bool result = database.Update(query, parameters);
+			bool result = Database.Update(query, parameters);
 
 			Assert.That(result, Is.True);
 		}
@@ -308,25 +244,14 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 		[Test]
 		public void VerifyTestSourceExists()
 		{
-			Assert.That(File.Exists(dataSource), Is.True);
-		}
-
-		private static string GetTestDatabasePath()
-		{
-			string fileName = Path.GetTempFileName();
-
-			// A 0 byte sized file is created.  Need to remove it.
-			File.Delete(fileName);
-			string databasePath = Path.ChangeExtension(fileName, ".db");
-
-			return databasePath;
+			Assert.That(File.Exists(DataSource), Is.True);
 		}
 
 		private void VerifyRowExists(int existingRowId, bool shouldExist)
 		{
 			string sql = "Select * from TestTable where Id=" + existingRowId;
 
-			DataRow tempDataRow = database.GetDataRow(sql);
+			DataRow tempDataRow = Database.GetDataRow(sql);
 
 			if (true == shouldExist)
 			{
