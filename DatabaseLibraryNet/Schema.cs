@@ -41,6 +41,8 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// <param name="databaseFile">The database file to use.</param>
 		public Schema(DatabaseType databaseType, string databaseFile)
 		{
+			this.databaseType = databaseType;
+
 			string baseFormat = "Data Source={0}";
 
 			string connectionString = string.Format(
