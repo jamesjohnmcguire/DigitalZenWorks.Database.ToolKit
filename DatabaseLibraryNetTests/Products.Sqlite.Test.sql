@@ -10,7 +10,7 @@ CREATE TABLE Categories
 	id INTEGER PRIMARY KEY AUTOINCREMENT,
 	name TEXT NOT NULL,
 	parentId INTEGER DEFAULT NULL,
-	FOREIGN KEY(parentId) REFERENCES Categories(id)
+	CONSTRAINT CategoriesParents FOREIGN KEY(parentId) REFERENCES Categories(id)
 );
 
 CREATE TABLE Contacts
@@ -18,7 +18,7 @@ CREATE TABLE Contacts
 	id INTEGER PRIMARY KEY AUTOINCREMENT,
 	addressId INTEGER DEFAULT NULL,
 	Label TEXT NOT NULL,
-	FOREIGN KEY(addressId) REFERENCES Addresses(id)
+	CONSTRAINT ContactsAddresses FOREIGN KEY(addressId) REFERENCES Addresses(id)
 );
 
 CREATE TABLE Makers
@@ -33,8 +33,8 @@ CREATE TABLE Sections
 	categoryId INTEGER DEFAULT NULL,
 	makerId INTEGER DEFAULT NULL,
 	Label TEXT NOT NULL,
-	FOREIGN KEY(categoryId) REFERENCES Categories(id),
-	FOREIGN KEY(makerId) REFERENCES Makers(id)
+	CONSTRAINT SectionsCategories FOREIGN KEY(categoryId) REFERENCES Categories(id),
+	CONSTRAINT SectionsMakers FOREIGN KEY(makerId) REFERENCES Makers(id)
 );
 
 CREATE TABLE Series
@@ -42,7 +42,7 @@ CREATE TABLE Series
 	id INTEGER PRIMARY KEY AUTOINCREMENT,
 	makerId INTEGER DEFAULT NULL,
 	Label TEXT NOT NULL,
-	FOREIGN KEY(makerId) REFERENCES Makers(id)
+	CONSTRAINT SeriesMakers FOREIGN KEY(makerId) REFERENCES Makers(id)
 );
 
 CREATE TABLE Products
@@ -52,7 +52,7 @@ CREATE TABLE Products
 	sectionId INTEGER DEFAULT NULL,
 	seriesId INTEGER DEFAULT NULL,
 	Label TEXT NOT NULL,
-	FOREIGN KEY(makerId) REFERENCES Makers(id),
-	FOREIGN KEY(sectionId) REFERENCES Sections(id),
-	FOREIGN KEY(seriesId) REFERENCES Series(id)
+	CONSTRAINT ProductsMakers FOREIGN KEY(makerId) REFERENCES Makers(id),
+	CONSTRAINT ProductsSections FOREIGN KEY(sectionId) REFERENCES Sections(id),
+	CONSTRAINT ProductsSeries FOREIGN KEY(seriesId) REFERENCES Series(id)
 );
