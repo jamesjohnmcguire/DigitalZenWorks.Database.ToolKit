@@ -206,23 +206,8 @@ namespace DigitalZenWorks.Database.ToolKit
 		public static ForeignKey[] GetForeignKeyRelationships(
 			Relationship[] relationships)
 		{
-			ForeignKey[] keys = null;
-
-			if (relationships != null)
-			{
-				int count = 0;
-				keys = new ForeignKey[relationships.Length];
-
-				// Add foreign keys to table, using relationships
-				foreach (Relationship relationship in relationships)
-				{
-					ForeignKey foreignKey =
-						GetForeignKeyRelationship(relationship);
-
-					keys[count] = foreignKey;
-					count++;
-				}
-			}
+			ForeignKey[] keys =
+				Schema.GetForeignKeyRelationships(relationships);
 
 			return keys;
 		}
@@ -316,7 +301,7 @@ namespace DigitalZenWorks.Database.ToolKit
 				object nameRaw = row["TABLE_NAME"];
 				string tableName = nameRaw.ToString();
 
-				Table table = SetPrimaryKey(oleDbSchema, row);
+				Table table = oleDbSchema.SetPrimaryKey(row);
 
 				Collection<Relationship> newRelationships =
 					GetRelationships(oleDbSchema, tableName);
@@ -331,7 +316,7 @@ namespace DigitalZenWorks.Database.ToolKit
 				string name = relationship.ChildTable;
 
 				ForeignKey foreignKey =
-					GetForeignKeyRelationship(relationship);
+					Schema.GetForeignKeyRelationship(relationship);
 
 				Table table = tableDictionary[name];
 
@@ -572,85 +557,6 @@ namespace DigitalZenWorks.Database.ToolKit
 			}
 		}
 
-		private static Column FormatColumnFromDataRow(DataRow row)
-		{
-			Column column = new ();
-			column.Name = row["COLUMN_NAME"].ToString();
-
-			switch ((int)row["DATA_TYPE"])
-			{
-				case 3: // Number
-				{
-					column.ColumnType = ColumnType.Number;
-					break;
-				}
-
-				case 130: // String
-				{
-					string flags = row["COLUMN_FLAGS"].ToString();
-
-					if (int.Parse(flags, CultureInfo.InvariantCulture) > 127)
-					{
-						column.ColumnType = ColumnType.Memo;
-					}
-					else
-					{
-						column.ColumnType = ColumnType.String;
-					}
-
-					break;
-				}
-
-				case 7: // Date
-				{
-					column.ColumnType = ColumnType.DateTime;
-					break;
-				}
-
-				case 6: // Currency
-				{
-					column.ColumnType = ColumnType.Currency;
-					break;
-				}
-
-				case 11: // Yes/No
-				{
-					column.ColumnType = ColumnType.YesNo;
-					break;
-				}
-
-				case 128: // OLE
-				{
-					column.ColumnType = ColumnType.Ole;
-					break;
-				}
-			}
-
-			if (!row.IsNull("CHARACTER_MAXIMUM_LENGTH"))
-			{
-				string maxLength = row["CHARACTER_MAXIMUM_LENGTH"].ToString();
-
-				column.Length =
-					int.Parse(maxLength, CultureInfo.InvariantCulture);
-			}
-
-			if (row["IS_NULLABLE"].ToString() == "True")
-			{
-				column.Nullable = true;
-			}
-
-			if (row["COLUMN_HASDEFAULT"].ToString() == "True")
-			{
-				column.DefaultValue = row["COLUMN_DEFAULT"].ToString();
-			}
-
-			string position = row["ORDINAL_POSITION"].ToString();
-			column.Position =
-				int.Parse(position, CultureInfo.InvariantCulture);
-
-			return column;
-		}
-
 		private static void GetDependenciesRecursive(
 			string key,
 			Dictionary<string, Collection<string>> tableDependencies,
@@ -713,20 +619,6 @@ namespace DigitalZenWorks.Database.ToolKit
 			}
 		}
 
-		private static ForeignKey GetForeignKeyRelationship(
-			Relationship relationship)
-		{
-			ForeignKey foreignKey = new (
-				relationship.Name,
-				relationship.ChildTableCol,
-				relationship.ParentTable,
-				relationship.ParentTableCol,
-				relationship.OnDeleteCascade,
-				relationship.OnUpdateCascade);
-
-			return foreignKey;
-		}
-
 		private static Relationship GetRelationship(DataRow foreignKey)
 		{
 			Relationship relationship = new ();
@@ -753,46 +645,6 @@ namespace DigitalZenWorks.Database.ToolKit
 			return relationship;
 		}
 
-		private static Table GetTable(
-			Schema schema, string tableName)
-		{
-			Table table = new (tableName);
-
-			Log.Info("Getting Columns for " + tableName);
-			DataTable dataColumns = schema.GetTableColumns(tableName);
-
-			foreach (DataRow dataColumn in dataColumns.Rows)
-			{
-				Column column = FormatColumnFromDataRow(dataColumn);
-
-				table.AddColumn(column);
-			}
-
-			return table;
-		}
-
-#if NET5_0_OR_GREATER
-		[SupportedOSPlatform("windows")]
-#endif
-		private static Table GetTable(
-			OleDbSchema oleDbSchema, string tableName)
-		{
-			Table table = new (tableName);
-
-			Log.Info("Getting Columns for " + tableName);
-			DataTable dataColumns =
-				oleDbSchema.GetTableColumns(tableName);
-
-			foreach (DataRow dataColumn in dataColumns.Rows)
-			{
-				Column column = FormatColumnFromDataRow(dataColumn);
-
-				table.AddColumn(column);
-			}
-
-			return table;
-		}
-
 		private static bool ImportSchemaMdb(
 			string[] queries, string databaseFile)
 		{
@@ -813,103 +665,6 @@ namespace DigitalZenWorks.Database.ToolKit
 			}
 
 			return successCode;
-		}
-
-		private static Table SetPrimaryKey(
-			Schema schema, DataRow row)
-		{
-			object nameRaw = row["TABLE_NAME"];
-			string tableName = nameRaw.ToString();
-
-			Table table = GetTable(schema, tableName);
-
-			DataTable primaryKeys =
-				schema.GetPrimaryKeys(tableName);
-
-			// TODO: This assumes only a single primary key.  Need to
-			// compensate for composite primary keys.
-			DataRow primaryKeyRow = primaryKeys.Rows[0];
-			nameRaw = primaryKeyRow["COLUMN_NAME"];
-			table.PrimaryKey = nameRaw.ToString();
-
-			// If PK is an integer change type to AutoNumber
-			Column primaryKey = SetPrimaryKeyType(table);
-
-			if (primaryKey != null)
-			{
-				table.Columns[table.PrimaryKey] = primaryKey;
-			}
-
-			return table;
-		}
-
-#if NET5_0_OR_GREATER
-		[SupportedOSPlatform("windows")]
-#endif
-		private static Table SetPrimaryKey(
-			OleDbSchema oleDbSchema, DataRow row)
-		{
-			object nameRaw = row["TABLE_NAME"];
-			string tableName = nameRaw.ToString();
-
-			Table table = GetTable(oleDbSchema, tableName);
-
-			DataTable primaryKeys =
-				oleDbSchema.GetPrimaryKeys(tableName);
-
-			// TODO: This assumes only a single primary key.  Need to
-			// compensate for composite primary keys.
-			DataRow primaryKeyRow = primaryKeys.Rows[0];
-			nameRaw = primaryKeyRow["COLUMN_NAME"];
-			table.PrimaryKey = nameRaw.ToString();
-
-			// If PK is an integer change type to AutoNumber
-			Column primaryKey = SetPrimaryKeyType(table);
-
-			if (primaryKey != null)
-			{
-				table.Columns[table.PrimaryKey] = primaryKey;
-			}
-
-			return table;
-		}
-
-		// If primary key is an integer, change type to AutoNumber.
-		private static Column SetPrimaryKeyType(Table table)
-		{
-			Column primaryKey = null;
-
-			string primaryKeyName = table.PrimaryKey;
-			if (!string.IsNullOrWhiteSpace(primaryKeyName))
-			{
-				primaryKey = table.Columns[primaryKeyName];
-
-				if (primaryKey.ColumnType == ColumnType.Number)
-				{
-					primaryKey.ColumnType = ColumnType.AutoNumber;
-				}
-			}
-
-			return primaryKey;
-		}
-
-#if NET5_0_OR_GREATER
-		[SupportedOSPlatform("windows")]
-#endif
-		private static Table SetForeignKeys(
-			Table table, List<Relationship> relationships)
-		{
-			table.ForeignKeys.Clear();
-
-			foreach (Relationship relationship in relationships)
-			{
-				ForeignKey foreignKey =
-					GetForeignKeyRelationship(relationship);
-
-				table.ForeignKeys.Add(foreignKey);
-			}
-
-			return table;
 		}
 
 		// Write the SQL for a column
