@@ -90,6 +90,8 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// <returns>DataTable.</returns>
 		public DataTable GetConstraints(string tableName)
 		{
+			connection.Open();
+
 			DataTable constraints = GetBaseConstraints();
 
 			constraints = AddForeignKeyConstraints(
@@ -97,6 +99,8 @@ namespace DigitalZenWorks.Database.ToolKit
 
 			constraints = AddIndexConstraints(
 				tableName, constraints);
+
+			connection.Close();
 
 			return constraints;
 		}
