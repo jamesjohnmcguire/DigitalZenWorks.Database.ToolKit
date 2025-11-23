@@ -20,48 +20,6 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 	internal sealed class SchemaTests : BaseTestsSupport
 	{
 		/// <summary>
-		/// database storage object.
-		/// </summary>
-		private DataStorage database;
-		private string dataSource;
-
-		/// <summary>
-		/// One time set up method.
-		/// </summary>
-		[OneTimeSetUp]
-		public void OneTimeSetUp()
-		{
-			dataSource = GetTestDatabasePath();
-
-			SQLiteConnection.CreateFile(dataSource);
-
-			string connectionBase = "Data Source={0};Version=3;" +
-				"DateTimeFormat=InvariantCulture";
-
-			string connectionString = string.Format(
-				CultureInfo.InvariantCulture,
-				connectionBase,
-				dataSource);
-
-			database = new DataStorage(DatabaseType.SQLite, connectionString);
-		}
-
-		/// <summary>
-		/// function that is called when all tests are completed.
-		/// </summary>
-		[OneTimeTearDown]
-		public void OneTimeTearDown()
-		{
-			if (database != null)
-			{
-				database.Close();
-				database.Shutdown();
-			}
-
-			File.Delete(dataSource);
-		}
-
-		/// <summary>
 		/// Get constaints test.
 		/// </summary>
 		[Test]
@@ -69,7 +27,7 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 		{
 			string tableName = "Sections";
 
-			using Schema schema = new (DatabaseType.SQLite, dataSource);
+			using Schema schema = new (DatabaseType.SQLite, DataSource);
 
 			DataTable constraints =
 				schema.GetConstraints(tableName);
