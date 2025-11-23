@@ -69,7 +69,7 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 
 			foreach (DataRow row in constraints.Rows)
 			{
-				tableName = row["TABLE_NAME"]?.ToString();
+				tableName = row["TableName"]?.ToString();
 				Assert.That(tableName, Is.EqualTo("Sections"));
 			}
 		}
