@@ -339,7 +339,7 @@ namespace DigitalZenWorks.Database.ToolKit
 		{
 			try
 			{
-				string[] tableInformation = [null, null, tableName];
+				string[] tableInformation = [null, null, tableName, null];
 
 				DataTable foreignKeys = connection.GetSchema(
 					"ForeignKeys", tableInformation);
