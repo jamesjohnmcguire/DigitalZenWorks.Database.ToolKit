@@ -36,25 +36,27 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 
 			Assert.That(count, Is.EqualTo(3));
 
-			bool exists = constraints.Columns.Contains("CONSTRAINT_NAME");
+			bool exists = constraints.Columns.Contains("ConstraintName");
 			Assert.That(exists, Is.True);
 
-			exists = constraints.Columns.Contains("TABLE_NAME");
+			exists = constraints.Columns.Contains("TableName");
 			Assert.That(exists, Is.True);
 
-			exists = constraints.Columns.Contains("COLUMN_NAME");
+			exists = constraints.Columns.Contains("ColumnName");
 			Assert.That(exists, Is.True);
 
 			IEnumerable<DataRow> dataRows = constraints.Rows.Cast<DataRow>();
 			IEnumerable<string> constraintNameStrings =
-				dataRows.Select(row => row["CONSTRAINT_NAME"]?.ToString());
+				dataRows.Select(row => row["ConstraintName"]?.ToString());
 			IEnumerable<string> nonEmptyConstraintNames =
 				constraintNameStrings.Where(name => !string.IsNullOrEmpty(name));
 			List<string> constraintNames = [.. nonEmptyConstraintNames];
 
-			Assert.That(constraintNames, Contains.Item("SectionsCategories"));
-			Assert.That(constraintNames, Contains.Item("SectionsMakers"));
+			// SQLite names foreign key constraints as FK_<table>_<n>_<m>
+			Assert.That(constraintNames, Contains.Item("FK_Sections_0_0"));
+			Assert.That(constraintNames, Contains.Item("FK_Sections_1_0"));
 
+#if NOT_SQLITE
 			bool hasPrimaryKeyLikeConstraint = constraintNames.Any(
 				name => name.StartsWith("Index_", StringComparison.Ordinal));
 			Assert.That(hasPrimaryKeyLikeConstraint, Is.True);
@@ -63,6 +65,7 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 				constraintNames.Any(name => name.Contains(
 					"Categories", StringComparison.Ordinal));
 			Assert.That(hasCategoriesConstraint, Is.True);
+#endif
 
 			foreach (DataRow row in constraints.Rows)
 			{

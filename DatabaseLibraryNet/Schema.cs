@@ -106,6 +106,27 @@ namespace DigitalZenWorks.Database.ToolKit
 		}
 
 		/// <summary>
+		/// Gets the constraints from the given table.
+		/// </summary>
+		/// <returns>DataTable.</returns>
+		public DataTable GetIndexes(string tableName)
+		{
+			if (connection.State != ConnectionState.Open)
+			{
+				connection.Open();
+			}
+
+			string[] tableInformation = [null, null, tableName];
+
+			DataTable schemaTable =
+				connection.GetSchema("Indexes", tableInformation);
+
+			connection.Close();
+
+			return schemaTable;
+		}
+
+		/// <summary>
 		/// Gets the primary keys from the given table.
 		/// </summary>
 		/// <param name="tableName">The name of the table.</param>
@@ -374,11 +395,9 @@ namespace DigitalZenWorks.Database.ToolKit
 		{
 			try
 			{
-				string[] tableInformation = [null, null, tableName];
-				DataTable primaryKeys =
-					connection.GetSchema("IndexColumns", tableInformation);
+				DataTable indexes = GetIndexes(tableName);
 
-				foreach (DataRow row in primaryKeys.Rows)
+				foreach (DataRow row in indexes.Rows)
 				{
 					bool exists = row["PRIMARY_KEY"] != DBNull.Value;
 					bool isPrimaryKey = (bool)row["PRIMARY_KEY"];
