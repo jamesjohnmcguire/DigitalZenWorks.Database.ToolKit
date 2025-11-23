@@ -15,7 +15,7 @@ namespace DigitalZenWorks.Database.ToolKit
 	/// operations and error reporting. The constants are intended for internal
 	/// use and help ensure consistency in output formatting throughout
 	/// the application.</remarks>
-	internal class Strings
+	internal sealed class Strings
 	{
 		/// <summary>
 		/// Represents the string value " begin" used to indicate the start
