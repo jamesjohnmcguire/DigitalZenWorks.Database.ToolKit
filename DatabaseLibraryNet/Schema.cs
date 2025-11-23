@@ -302,17 +302,21 @@ namespace DigitalZenWorks.Database.ToolKit
 			return query;
 		}
 
-		private static DataRow GetForeignKeyConstaintsRow(
+		private DataRow GetForeignKeyConstaintsRow(
 			DataTable table, DataRow row)
 		{
 			DataRow newRow = table.NewRow();
 
+			string columnName = GetColumnName();
+			string referencedColumn = GetReferencedColumnName();
+			string referencedTable = GetReferencedTableName();
+
 			newRow["ConstraintType"] = "FOREIGN KEY";
 			newRow["ConstraintName"] = row["CONSTRAINT_NAME"];
 			newRow["TableName"] = row["TABLE_NAME"];
-			newRow["ColumnName"] = row["COLUMN_NAME"];
-			newRow["ReferencedTable"] = row["REFERENCED_TABLE_NAME"];
-			newRow["ReferencedColumn"] = row["REFERENCED_COLUMN_NAME"];
+			newRow["ColumnName"] = row[columnName];
+			newRow["ReferencedTable"] = row[referencedTable];
+			newRow["ReferencedColumn"] = row[referencedColumn];
 
 			return newRow;
 		}
@@ -405,6 +409,18 @@ namespace DigitalZenWorks.Database.ToolKit
 			return table;
 		}
 
+		private string GetColumnName()
+		{
+			string columnName = "COLUMN_NAME";
+
+			if (databaseType == DatabaseType.SQLite)
+			{
+				columnName = "FKEY_FROM_COLUMN";
+			}
+
+			return columnName;
+		}
+
 		private DbConnection GetConnection(
 			DatabaseType databaseType, string connectionText)
 		{
@@ -468,6 +484,30 @@ namespace DigitalZenWorks.Database.ToolKit
 			};
 
 			return query;
+		}
+
+		private string GetReferencedColumnName()
+		{
+			string columnName = "REFERENCED_COLUMN_NAME";
+
+			if (databaseType == DatabaseType.SQLite)
+			{
+				columnName = "FKEY_TO_COLUMN";
+			}
+
+			return columnName;
+		}
+
+		private string GetReferencedTableName()
+		{
+			string columnName = "REFERENCED_TABLE_NAME";
+
+			if (databaseType == DatabaseType.SQLite)
+			{
+				columnName = "FKEY_TO_TABLE";
+			}
+
+			return columnName;
 		}
 	}
 }
