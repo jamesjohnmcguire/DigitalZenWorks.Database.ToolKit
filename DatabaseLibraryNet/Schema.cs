@@ -7,6 +7,8 @@
 namespace DigitalZenWorks.Database.ToolKit
 {
 	using System;
+	using System.Collections.Generic;
+	using System.Collections.ObjectModel;
 	using System.Data;
 	using System.Data.Common;
 	using System.Data.SQLite;
@@ -75,6 +77,150 @@ namespace DigitalZenWorks.Database.ToolKit
 		}
 
 		/// <summary>
+		/// Creates a new Column instance by extracting and formatting column
+		/// metadata from the specified DataRow.
+		/// </summary>
+		/// <remarks>The returned Column reflects the schema information
+		/// present in the DataRow, including type, length, nullability,
+		/// default value, and position. The method expects the DataRow to
+		/// follow a specific schema layout, such as that returned from
+		/// database schema queries.</remarks>
+		/// <param name="row">The DataRow containing column metadata. Must
+		/// include fields such as COLUMN_NAME, DATA_TYPE, and other relevant
+		/// schema information.</param>
+		/// <returns>A Column object populated with properties derived from
+		/// the values in the provided DataRow.</returns>
+		public static Column FormatColumnFromDataRow(DataRow row)
+		{
+			Column column = null;
+
+			if (row != null)
+			{
+				column = new();
+				column.Name = row["COLUMN_NAME"].ToString();
+
+				switch ((int)row["DATA_TYPE"])
+				{
+					case 3: // Number
+						column.ColumnType = ColumnType.Number;
+						break;
+					case 130: // String
+						string flags = row["COLUMN_FLAGS"].ToString();
+
+						if (int.Parse(flags, CultureInfo.InvariantCulture) > 127)
+						{
+							column.ColumnType = ColumnType.Memo;
+						}
+						else
+						{
+							column.ColumnType = ColumnType.String;
+						}
+
+						break;
+					case 7: // Date
+						column.ColumnType = ColumnType.DateTime;
+						break;
+					case 6: // Currency
+						column.ColumnType = ColumnType.Currency;
+						break;
+					case 11: // Yes/No
+						column.ColumnType = ColumnType.YesNo;
+						break;
+				}
+
+				if (!row.IsNull("CHARACTER_MAXIMUM_LENGTH"))
+				{
+					string maxLength =
+						row["CHARACTER_MAXIMUM_LENGTH"].ToString();
+
+					column.Length =
+						int.Parse(maxLength, CultureInfo.InvariantCulture);
+				}
+
+				if (row["IS_NULLABLE"].ToString() == "True")
+				{
+					column.Nullable = true;
+				}
+
+				if (row["COLUMN_HASDEFAULT"].ToString() == "True")
+				{
+					column.DefaultValue = row["COLUMN_DEFAULT"].ToString();
+				}
+
+				string position = row["ORDINAL_POSITION"].ToString();
+				column.Position =
+					int.Parse(position, CultureInfo.InvariantCulture);
+			}
+
+			return column;
+		}
+
+		/// <summary>
+		/// Creates a <see cref="ForeignKey"/> instance that represents the
+		/// foreign key relationship defined by the specified
+		/// <see cref="Relationship"/> object.
+		/// </summary>
+		/// <param name="relationship">The <see cref="Relationship"/> object
+		/// containing the details of the foreign key relationship to be
+		/// represented. Cannot be null.</param>
+		/// <returns>A <see cref="ForeignKey"/> instance initialized with the
+		/// properties of the specified <paramref name="relationship"/>.
+		/// </returns>
+		public static ForeignKey GetForeignKeyRelationship(
+			Relationship relationship)
+		{
+			ForeignKey foreignKey;
+
+			if (relationship == null)
+			{
+				throw new ArgumentNullException(
+					nameof(relationship),
+					"Relationship cannot be null");
+			}
+			else
+			{
+				foreignKey = new (
+					relationship.Name,
+					relationship.ChildTableCol,
+					relationship.ParentTable,
+					relationship.ParentTableCol,
+					relationship.OnDeleteCascade,
+					relationship.OnUpdateCascade);
+			}
+
+			return foreignKey;
+		}
+
+		/// <summary>
+		/// Gets the foreign key relationships.
+		/// </summary>
+		/// <param name="relationships">A set of relationships.</param>
+		/// <returns>The foreign key relationships.</returns>
+		public static ForeignKey[] GetForeignKeyRelationships(
+			Relationship[] relationships)
+		{
+			ForeignKey[] keys = null;
+
+			if (relationships != null)
+			{
+				int count = 0;
+				keys = new ForeignKey[relationships.Length];
+
+				// Add foreign keys to table, using relationships
+				foreach (Relationship relationship in relationships)
+				{
+					ForeignKey foreignKey =
+						GetForeignKeyRelationship(relationship);
+
+					keys[count] = foreignKey;
+					count++;
+				}
+			}
+
+			return keys;
+		}
+
+		/// <summary>
 		/// Dispose.
 		/// </summary>
 		public void Dispose()
@@ -108,6 +254,7 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// <summary>
 		/// Gets the constraints from the given table.
 		/// </summary>
+		/// <param name="tableName">The name of the table.</param>
 		/// <returns>DataTable.</returns>
 		public DataTable GetIndexes(string tableName)
 		{
@@ -146,6 +293,34 @@ namespace DigitalZenWorks.Database.ToolKit
 		}
 
 		/// <summary>
+		/// Retrieves a table definition, including its columns, for the
+		/// specified table name.
+		/// </summary>
+		/// <remarks>The returned <see cref="Table"/> includes all columns as
+		/// defined in the data source. If the table does not exist, the
+		/// result may be an empty table definition.</remarks>
+		/// <param name="tableName">The name of the table to retrieve. Cannot
+		/// be null or empty.</param>
+		/// <returns>A <see cref="Table"/> object representing the specified
+		/// table and its columns.</returns>
+		public Table GetTable(string tableName)
+		{
+			Table table = new(tableName);
+
+			Log.Info("Getting Columns for " + tableName);
+			DataTable dataColumns = GetTableColumns(tableName);
+
+			foreach (DataRow dataColumn in dataColumns.Rows)
+			{
+				Column column = FormatColumnFromDataRow(dataColumn);
+
+				table.AddColumn(column);
+			}
+
+			return table;
+		}
+
+		/// <summary>
 		/// Gets the column names from the given table.
 		/// </summary>
 		/// <param name="tableName">The name of the table.</param>
@@ -174,6 +349,37 @@ namespace DigitalZenWorks.Database.ToolKit
 			{
 				connection?.Close();
 				connection = null;
+			}
+		}
+
+		private static void GetDependenciesRecursive(
+			string key,
+			Dictionary<string, Collection<string>> tableDependencies,
+			Collection<string> orderedDependencies,
+			HashSet<string> visited,
+			HashSet<string> visiting)
+		{
+			if (!visited.Contains(key) && !visiting.Contains(key))
+			{
+				visiting.Add(key);
+
+				if (tableDependencies.TryGetValue(
+					key, out Collection<string> value))
+				{
+					foreach (string dependency in value)
+					{
+						GetDependenciesRecursive(
+							dependency,
+							tableDependencies,
+							orderedDependencies,
+							visited,
+							visiting);
+					}
+				}
+
+				visiting.Remove(key); // Done visiting
+				visited.Add(key);     // Mark as processed
+				orderedDependencies.Add(key); // Add to result (postorder)
 			}
 		}
 
@@ -323,6 +529,35 @@ namespace DigitalZenWorks.Database.ToolKit
 			return query;
 		}
 
+		private static DataRow GetIndexConstaintsRow(
+			DataTable table, DataRow row)
+		{
+			DataRow newRow = table.NewRow();
+
+			newRow["ConstraintType"] = "PRIMARY KEY";
+			newRow["ConstraintName"] = row["INDEX_NAME"];
+			newRow["TableName"] = row["TABLE_NAME"];
+			newRow["ColumnName"] = row["COLUMN_NAME"];
+
+			return newRow;
+		}
+
+		private static Table SetForeignKeys(
+			Table table, List<Relationship> relationships)
+		{
+			table.ForeignKeys.Clear();
+
+			foreach (Relationship relationship in relationships)
+			{
+				ForeignKey foreignKey =
+					GetForeignKeyRelationship(relationship);
+
+				table.ForeignKeys.Add(foreignKey);
+			}
+
+			return table;
+		}
+
 		private DataRow GetForeignKeyConstaintsRow(
 			DataTable table, DataRow row)
 		{
@@ -338,19 +573,6 @@ namespace DigitalZenWorks.Database.ToolKit
 			newRow["ColumnName"] = row[columnName];
 			newRow["ReferencedTable"] = row[referencedTable];
 			newRow["ReferencedColumn"] = row[referencedColumn];
-
-			return newRow;
-		}
-
-		private static DataRow GetIndexConstaintsRow(
-			DataTable table, DataRow row)
-		{
-			DataRow newRow = table.NewRow();
-
-			newRow["ConstraintType"] = "PRIMARY KEY";
-			newRow["ConstraintName"] = row["INDEX_NAME"];
-			newRow["TableName"] = row["TABLE_NAME"];
-			newRow["ColumnName"] = row["COLUMN_NAME"];
 
 			return newRow;
 		}
