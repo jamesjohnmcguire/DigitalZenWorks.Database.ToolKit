@@ -5,18 +5,16 @@
 namespace DigitalZenWorks.Database.ToolKit.Tests
 {
 	using System;
-	using System.Data.Common;
 	using System.Data.SQLite;
 	using System.Globalization;
 	using System.IO;
 	using DigitalZenWorks.Common.Utilities;
 	using NUnit.Framework;
-	using NUnit.Framework.Internal;
 
 	/// <summary>
 	/// Base test support class.
 	/// </summary>
-	internal class BaseTestsSupport : IDisposable
+	internal abstract class BaseTestsSupport : IDisposable
 	{
 		/// <summary>
 		/// database storage object.

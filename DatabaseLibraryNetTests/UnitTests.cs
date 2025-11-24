@@ -2,27 +2,22 @@
 // Copyright © 2006 - 2025 James John McGuire. All Rights Reserved.
 // </copyright>
 
-using Google.Protobuf.WellKnownTypes;
-using MySqlX.XDevAPI.Common;
-using NUnit.Framework;
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Data;
-using System.Data.Common;
-using System.Data.SQLite;
-using System.Globalization;
-using System.IO;
-
-[assembly: CLSCompliant(true)]
-
 namespace DigitalZenWorks.Database.ToolKit.Tests
 {
+	using System;
+	using System.Collections.Generic;
+	using System.Collections.ObjectModel;
+	using System.Data;
+	using System.Data.Common;
+	using System.Globalization;
+	using System.IO;
+	using NUnit.Framework;
+
 	/// <summary>
 	/// Database Unit Testing Class.
 	/// </summary>
 	[TestFixture]
-	internal sealed class TransactionUnitTests : BaseTestsSupport
+	internal sealed class UnitTests : BaseTestsSupport
 	{
 		/// <summary>
 		/// Test to see if Unit Testing is working.
@@ -253,7 +248,7 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 
 			DataRow tempDataRow = Database.GetDataRow(sql);
 
-			if (true == shouldExist)
+			if (shouldExist == true)
 			{
 				Assert.That(tempDataRow, Is.Not.Null);
 			}
