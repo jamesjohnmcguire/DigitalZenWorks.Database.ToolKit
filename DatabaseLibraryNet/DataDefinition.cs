@@ -657,12 +657,11 @@ namespace DigitalZenWorks.Database.ToolKit
 				provider,
 				databaseFile);
 
-			using (DataStorage database =
-				new (DatabaseType.OleDb, connectionString))
-			{
-				ExecuteQueries(database, queries);
-				successCode = true;
-			}
+			using DataStorage database =
+				new (DatabaseType.OleDb, connectionString);
+
+			ExecuteQueries(database, queries);
+			successCode = true;
 
 			return successCode;
 		}
