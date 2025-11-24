@@ -221,6 +221,46 @@ namespace DigitalZenWorks.Database.ToolKit
 		}
 
 		/// <summary>
+		/// Replaces the foreign key definitions of the specified table with
+		/// those derived from the provided relationships.
+		/// </summary>
+		/// <remarks>All existing foreign keys in the table are cleared before
+		/// new ones are added. The method does not modify the input
+		/// relationships list.</remarks>
+		/// <param name="table">The table whose foreign keys will be set or
+		/// updated.</param>
+		/// <param name="relationships">A list of relationships from which
+		/// foreign key definitions will be generated and applied to the table.
+		/// Cannot be null.</param>
+		/// <returns>The table instance with its foreign keys updated to
+		/// reflect the specified relationships.</returns>
+		public static Table SetForeignKeys(
+			Table table, Collection<Relationship> relationships)
+		{
+			if (table == null)
+			{
+				throw new ArgumentNullException(
+					nameof(table),
+					"Table cannot be null");
+			}
+
+			if (relationships != null)
+			{
+				table.ForeignKeys.Clear();
+
+				foreach (Relationship relationship in relationships)
+				{
+					ForeignKey foreignKey =
+						GetForeignKeyRelationship(relationship);
+
+					table.ForeignKeys.Add(foreignKey);
+				}
+			}
+
+			return table;
+		}
+
+		/// <summary>
 		/// Dispose.
 		/// </summary>
 		public void Dispose()
@@ -540,22 +580,6 @@ namespace DigitalZenWorks.Database.ToolKit
 			newRow["ColumnName"] = row["COLUMN_NAME"];
 
 			return newRow;
-		}
-
-		private static Table SetForeignKeys(
-			Table table, List<Relationship> relationships)
-		{
-			table.ForeignKeys.Clear();
-
-			foreach (Relationship relationship in relationships)
-			{
-				ForeignKey foreignKey =
-					GetForeignKeyRelationship(relationship);
-
-				table.ForeignKeys.Add(foreignKey);
-			}
-
-			return table;
 		}
 
 		private DataRow GetForeignKeyConstaintsRow(
