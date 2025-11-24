@@ -2,8 +2,6 @@
 // Copyright © 2006 - 2025 James John McGuire. All Rights Reserved.
 // </copyright>
 
-[assembly: System.CLSCompliant(true)]
-
 namespace DigitalZenWorks.Database.ToolKit.Tests
 {
 	using System;
@@ -11,7 +9,6 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 	using System.Collections.ObjectModel;
 	using System.Data;
 	using System.Data.Common;
-	using System.Data.SQLite;
 	using System.Globalization;
 	using System.IO;
 	using NUnit.Framework;
@@ -20,7 +17,7 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 	/// Database Unit Testing Class.
 	/// </summary>
 	[TestFixture]
-	internal sealed class TransactionUnitTests : BaseTestsSupport
+	internal sealed class UnitTests : BaseTestsSupport
 	{
 		/// <summary>
 		/// Test to see if Unit Testing is working.

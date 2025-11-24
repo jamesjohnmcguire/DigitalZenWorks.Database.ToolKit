@@ -323,7 +323,7 @@ namespace DigitalZenWorks.Database.ToolKit
 				table.ForeignKeys.Add(foreignKey);
 			}
 
-			List<Table> newList = tableDictionary.Values.ToList();
+			List<Table> newList = [.. tableDictionary.Values];
 			Collection<Table> tables = new (newList);
 
 			return tables;
