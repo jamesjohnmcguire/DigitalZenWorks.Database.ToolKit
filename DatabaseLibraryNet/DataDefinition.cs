@@ -207,7 +207,7 @@ namespace DigitalZenWorks.Database.ToolKit
 			Relationship[] relationships)
 		{
 			ForeignKey[] keys =
-				Schema.GetForeignKeyRelationships(relationships);
+				DataStoreStructure.GetForeignKeyRelationships(relationships);
 
 			return keys;
 		}
@@ -250,37 +250,6 @@ namespace DigitalZenWorks.Database.ToolKit
 		}
 
 		/// <summary>
-		/// Gets a list of relationships.
-		/// </summary>
-		/// <param name="oleDbSchema">The OLE database schema.</param>
-		/// <param name="tableName">The table name.</param>
-		/// <returns>A list of relationships.</returns>
-#if NET5_0_OR_GREATER
-		[SupportedOSPlatform("windows")]
-#endif
-		public static Collection<Relationship> GetRelationships(
-			OleDbSchema oleDbSchema, string tableName)
-		{
-			Collection<Relationship> relationships = [];
-
-			if (oleDbSchema != null)
-			{
-				DataTable foreignKeyTable =
-					oleDbSchema.GetForeignKeys(tableName);
-
-				foreach (DataRow foreignKey in foreignKeyTable.Rows)
-				{
-					Relationship relationship =
-						GetRelationship(foreignKey);
-
-					relationships.Add(relationship);
-				}
-			}
-
-			return relationships;
-		}
-
-		/// <summary>
 		/// Get schema.
 		/// </summary>
 		/// <param name="databaseFile">The database file.</param>
@@ -304,7 +273,7 @@ namespace DigitalZenWorks.Database.ToolKit
 				Table table = oleDbSchema.SetPrimaryKey(row);
 
 				Collection<Relationship> newRelationships =
-					GetRelationships(oleDbSchema, tableName);
+					oleDbSchema.GetRelationships(tableName);
 				relationships = [.. relationships, .. newRelationships];
 
 				tableDictionary.Add(tableName, table);
@@ -316,7 +285,7 @@ namespace DigitalZenWorks.Database.ToolKit
 				string name = relationship.ChildTable;
 
 				ForeignKey foreignKey =
-					Schema.GetForeignKeyRelationship(relationship);
+					DataStoreStructure.GetForeignKeyRelationship(relationship);
 
 				Table table = tableDictionary[name];
 
@@ -617,32 +586,6 @@ namespace DigitalZenWorks.Database.ToolKit
 				visited.Add(key);     // Mark as processed
 				orderedDependencies.Add(key); // Add to result (postorder)
 			}
-		}
-
-		private static Relationship GetRelationship(DataRow foreignKey)
-		{
-			Relationship relationship = new ();
-			relationship.Name = foreignKey["FK_NAME"].ToString();
-			relationship.ParentTable =
-				foreignKey["PK_TABLE_NAME"].ToString();
-			relationship.ParentTableCol =
-				foreignKey["PK_COLUMN_NAME"].ToString();
-			relationship.ChildTable =
-				foreignKey["FK_TABLE_NAME"].ToString();
-			relationship.ChildTableCol =
-				foreignKey["FK_COLUMN_NAME"].ToString();
-
-			if (foreignKey["UPDATE_RULE"].ToString() != "NO ACTION")
-			{
-				relationship.OnUpdateCascade = true;
-			}
-
-			if (foreignKey["DELETE_RULE"].ToString() != "NO ACTION")
-			{
-				relationship.OnDeleteCascade = true;
-			}
-
-			return relationship;
 		}
 
 		private static bool ImportSchemaMdb(

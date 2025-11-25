@@ -6,6 +6,7 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 {
 	using System;
 	using System.Collections.Generic;
+	using System.Collections.ObjectModel;
 	using System.Data;
 	using System.Data.SQLite;
 	using System.Globalization;
@@ -27,7 +28,8 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 		{
 			string tableName = "Sections";
 
-			using DataStoreStructure schema = new (DatabaseType.SQLite, DataSource);
+			using DataStoreStructure schema =
+				new (DatabaseType.SQLite, DataSource);
 
 			DataTable constraints =
 				schema.GetConstraints(tableName);
@@ -49,7 +51,8 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 			IEnumerable<string> constraintNameStrings =
 				dataRows.Select(row => row["ConstraintName"]?.ToString());
 			IEnumerable<string> nonEmptyConstraintNames =
-				constraintNameStrings.Where(name => !string.IsNullOrEmpty(name));
+				constraintNameStrings.Where(
+					name => !string.IsNullOrEmpty(name));
 			List<string> constraintNames = [.. nonEmptyConstraintNames];
 
 			// SQLite names foreign key constraints as FK_<table>_<n>_<m>
@@ -72,6 +75,33 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 				tableName = row["TableName"]?.ToString();
 				Assert.That(tableName, Is.EqualTo("Sections"));
 			}
+		}
+
+		/// <summary>
+		/// Get relationships test.
+		/// </summary>
+		[Test]
+		public void GetRelationships()
+		{
+			string dependentTableName = "Addresses";
+
+			using DataStoreStructure schema =
+				new (DatabaseType.SQLite, DataSource);
+
+			Collection<Relationship> relationships =
+				schema.GetRelationships(dependentTableName);
+
+			int count = relationships.Count;
+
+			Assert.That(count, Is.EqualTo(1));
+
+			Relationship relationship = relationships[0];
+
+			string name = relationship.ParentTable;
+			Assert.That(name, Is.EqualTo("Addresses"));
+
+			name = relationship.ChildTable;
+			Assert.That(name, Is.EqualTo("Contacts"));
 		}
 	}
 }
