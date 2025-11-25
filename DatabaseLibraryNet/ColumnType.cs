@@ -15,6 +15,11 @@ namespace DigitalZenWorks.Database.ToolKit
 	public enum ColumnType
 	{
 		/// <summary>
+		/// Represents an unspecified or unrecognized value.
+		/// </summary>
+		Unknown,
+
+		/// <summary>
 		/// MS Access
 		/// Auto increment type.
 		/// </summary>
