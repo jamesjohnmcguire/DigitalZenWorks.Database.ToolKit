@@ -1,5 +1,5 @@
 ﻿/////////////////////////////////////////////////////////////////////////////
-// <copyright file="Schema.cs" company="James John McGuire">
+// <copyright file="DataStoreStructure.cs" company="James John McGuire">
 // Copyright © 2006 - 2025 James John McGuire. All Rights Reserved.
 // </copyright>
 /////////////////////////////////////////////////////////////////////////////
@@ -17,11 +17,11 @@ namespace DigitalZenWorks.Database.ToolKit
 	using Microsoft.Data.SqlClient;
 	using MySql.Data.MySqlClient;
 
-	/// Class <c>Schema.</c>
+	/// Class <c>DataStoreStructure.</c>
 	/// <summary>
 	/// Represents a database schema.
 	/// </summary>
-	public class Schema : IDisposable
+	public class DataStoreStructure : IDisposable
 	{
 		private static readonly ILog Log = LogManager.GetLogger(
 			System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
@@ -37,11 +37,11 @@ namespace DigitalZenWorks.Database.ToolKit
 		private DbConnection connection;
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="Schema"/> class.
+		/// Initializes a new instance of the <see cref="DataStoreStructure"/> class.
 		/// </summary>
 		/// <param name="databaseType">The database type.</param>
 		/// <param name="databaseFile">The database file to use.</param>
-		public Schema(DatabaseType databaseType, string databaseFile)
+		public DataStoreStructure(DatabaseType databaseType, string databaseFile)
 		{
 			this.databaseType = databaseType;
 

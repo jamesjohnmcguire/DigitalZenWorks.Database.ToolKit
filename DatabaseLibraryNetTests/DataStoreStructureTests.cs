@@ -1,4 +1,4 @@
-﻿// <copyright file="SchemaTests.cs" company="James John McGuire">
+﻿// <copyright file="DataStoreStructureTests.cs" company="James John McGuire">
 // Copyright © 2006 - 2025 James John McGuire. All Rights Reserved.
 // </copyright>
 
@@ -14,10 +14,10 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 	using NUnit.Framework;
 
 	/// <summary>
-	/// Schema tests class.
+	/// DataStoreStructure tests class.
 	/// </summary>
 	[TestFixture]
-	internal sealed class SchemaTests : BaseTestsSupport
+	internal sealed class DataStoreStructureTests : BaseTestsSupport
 	{
 		/// <summary>
 		/// Get constaints test.
@@ -27,7 +27,7 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 		{
 			string tableName = "Sections";
 
-			using Schema schema = new (DatabaseType.SQLite, DataSource);
+			using DataStoreStructure schema = new (DatabaseType.SQLite, DataSource);
 
 			DataTable constraints =
 				schema.GetConstraints(tableName);
