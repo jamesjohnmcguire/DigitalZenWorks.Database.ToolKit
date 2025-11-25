@@ -103,5 +103,24 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 			name = relationship.ChildTable;
 			Assert.That(name, Is.EqualTo("Contacts"));
 		}
+
+		/// <summary>
+		/// GetTableColumns test.
+		/// </summary>
+		[Test]
+		public void GetTableColumns()
+		{
+			string tableName = "Addresses";
+
+			using DataStoreStructure schema =
+				new (DatabaseType.SQLite, DataSource);
+
+			DataTable table = schema.GetTableColumns(tableName);
+
+			Assert.That(table, Is.Not.Null);
+
+			string name = table.TableName;
+			Assert.That(name, Is.EqualTo("Columns"));
+		}
 	}
 }
