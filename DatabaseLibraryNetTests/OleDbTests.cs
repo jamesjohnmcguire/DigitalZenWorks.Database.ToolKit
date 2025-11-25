@@ -107,8 +107,7 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 			using OleDbSchema oleDbSchema = new(databaseFile);
 
 			Collection<Relationship> relationships =
-				DataDefinition.GetRelationships(
-					oleDbSchema, dependentTableName);
+				oleDbSchema.GetRelationships(dependentTableName);
 
 			int count = relationships.Count;
 

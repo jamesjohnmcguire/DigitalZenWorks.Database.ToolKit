@@ -292,6 +292,25 @@ namespace DigitalZenWorks.Database.ToolKit
 		}
 
 		/// <summary>
+		/// Gets the foreign keys from the given table.
+		/// </summary>
+		/// <param name="tableName">The name of the table.</param>
+		/// <returns>DataTable.</returns>
+		public DataTable GetForeignKeys(string tableName)
+		{
+			connection.Open();
+
+			string[] testTable = [null, null, tableName];
+
+			DataTable schemaTable =
+				connection.GetSchema("ForeignKeys", testTable);
+
+			connection.Close();
+
+			return schemaTable;
+		}
+
+		/// <summary>
 		/// Gets the constraints from the given table.
 		/// </summary>
 		/// <param name="tableName">The name of the table.</param>
@@ -330,6 +349,27 @@ namespace DigitalZenWorks.Database.ToolKit
 			connection.Close();
 
 			return schemaTable;
+		}
+
+		/// <summary>
+		/// Gets a list of relationships.
+		/// </summary>
+		/// <param name="tableName">The table name.</param>
+		/// <returns>A list of relationships.</returns>
+		public Collection<Relationship> GetRelationships(string tableName)
+		{
+			Collection<Relationship> relationships = [];
+
+			DataTable foreignKeyTable = GetForeignKeys(tableName);
+
+			foreach (DataRow foreignKey in foreignKeyTable.Rows)
+			{
+				Relationship relationship = GetRelationship(foreignKey);
+
+				relationships.Add(relationship);
+			}
+
+			return relationships;
 		}
 
 		/// <summary>
@@ -580,6 +620,32 @@ namespace DigitalZenWorks.Database.ToolKit
 			newRow["ColumnName"] = row["COLUMN_NAME"];
 
 			return newRow;
+		}
+
+		private static Relationship GetRelationship(DataRow foreignKey)
+		{
+			Relationship relationship = new ();
+			relationship.Name = foreignKey["FK_NAME"].ToString();
+			relationship.ParentTable =
+				foreignKey["PK_TABLE_NAME"].ToString();
+			relationship.ParentTableCol =
+				foreignKey["PK_COLUMN_NAME"].ToString();
+			relationship.ChildTable =
+				foreignKey["FK_TABLE_NAME"].ToString();
+			relationship.ChildTableCol =
+				foreignKey["FK_COLUMN_NAME"].ToString();
+
+			if (foreignKey["UPDATE_RULE"].ToString() != "NO ACTION")
+			{
+				relationship.OnUpdateCascade = true;
+			}
+
+			if (foreignKey["DELETE_RULE"].ToString() != "NO ACTION")
+			{
+				relationship.OnDeleteCascade = true;
+			}
+
+			return relationship;
 		}
 
 		private DataRow GetForeignKeyConstaintsRow(
