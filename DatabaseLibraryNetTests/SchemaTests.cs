@@ -73,16 +73,5 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 				Assert.That(tableName, Is.EqualTo("Sections"));
 			}
 		}
-
-		private static string GetTestDatabasePath()
-		{
-			string fileName = Path.GetTempFileName();
-
-			// A 0 byte sized file is created.  Need to remove it.
-			File.Delete(fileName);
-			string databasePath = Path.ChangeExtension(fileName, ".db");
-
-			return databasePath;
-		}
 	}
 }
