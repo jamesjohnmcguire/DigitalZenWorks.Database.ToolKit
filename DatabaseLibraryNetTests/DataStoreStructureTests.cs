@@ -83,7 +83,7 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 		[Test]
 		public void GetRelationships()
 		{
-			string dependentTableName = "Addresses";
+			string dependentTableName = "Sections";
 
 			using DataStoreStructure schema =
 				new (DatabaseType.SQLite, DataSource);
@@ -93,15 +93,15 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 
 			int count = relationships.Count;
 
-			Assert.That(count, Is.EqualTo(1));
+			Assert.That(count, Is.EqualTo(2));
 
 			Relationship relationship = relationships[0];
 
 			string name = relationship.ParentTable;
-			Assert.That(name, Is.EqualTo("Addresses"));
+			Assert.That(name, Is.EqualTo("Sections"));
 
 			name = relationship.ChildTable;
-			Assert.That(name, Is.EqualTo("Contacts"));
+			Assert.That(name, Is.EqualTo("Makers"));
 		}
 
 		/// <summary>
