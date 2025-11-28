@@ -96,15 +96,17 @@ namespace DigitalZenWorks.Database.ToolKit
 
 			if (row != null)
 			{
-				column = new();
+				column = new ();
 				column.Name = row["COLUMN_NAME"].ToString();
 
-				switch ((int)row["DATA_TYPE"])
+				string dataType = row["DATA_TYPE"].ToString();
+
+				switch (dataType)
 				{
-					case 3: // Number
+					case "integer":
 						column.ColumnType = ColumnType.Number;
 						break;
-					case 130: // String
+					case "string":
 						string flags = row["COLUMN_FLAGS"].ToString();
 
 						if (int.Parse(flags, CultureInfo.InvariantCulture) > 127)
@@ -117,14 +119,12 @@ namespace DigitalZenWorks.Database.ToolKit
 						}
 
 						break;
-					case 7: // Date
+					case "date":
+						// Guessing date vs. datetime based on name
 						column.ColumnType = ColumnType.DateTime;
 						break;
-					case 6: // Currency
-						column.ColumnType = ColumnType.Currency;
-						break;
-					case 11: // Yes/No
-						column.ColumnType = ColumnType.YesNo;
+					default:
+						column.ColumnType = ColumnType.Unknown;
 						break;
 				}
 
