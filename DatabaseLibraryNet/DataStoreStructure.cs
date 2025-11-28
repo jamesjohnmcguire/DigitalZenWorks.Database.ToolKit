@@ -373,6 +373,58 @@ namespace DigitalZenWorks.Database.ToolKit
 		}
 
 		/// <summary>
+		/// Retrieves the schema information for all tables in the specified
+		/// database file, including their relationships and foreign keys.
+		/// </summary>
+		/// <remarks>The returned collection includes all tables found in the
+		/// database, with foreign key relationships established based on the
+		/// detected schema. If the database file does not exist or is
+		/// inaccessible, an exception may be thrown.</remarks>
+		/// <param name="databaseFile">The path to the database file for which
+		/// to retrieve schema information. Must refer to a valid and
+		/// accessible database file.</param>
+		/// <returns>A collection of <see cref="Table"/> objects representing
+		/// the tables in the database, each populated with its foreign key
+		/// relationships.</returns>
+		public Collection<Table> GetSchema(string databaseFile)
+		{
+			Dictionary<string, Table> tableDictionary = [];
+			List<Relationship> relationships = [];
+
+			foreach (DataRow row in TableNames.Rows)
+			{
+				object nameRaw = row["TABLE_NAME"];
+				string tableName = nameRaw.ToString();
+
+				Table table = GetTable(tableName);
+
+				Collection<Relationship> newRelationships =
+					GetRelationships(tableName);
+				relationships = [.. relationships, .. newRelationships];
+
+				tableDictionary.Add(tableName, table);
+			}
+
+			// Add foreign keys to table, using relationships
+			foreach (Relationship relationship in relationships)
+			{
+				string name = relationship.ChildTable;
+
+				ForeignKey foreignKey =
+					DataStoreStructure.GetForeignKeyRelationship(relationship);
+
+				Table table = tableDictionary[name];
+
+				table.ForeignKeys.Add(foreignKey);
+			}
+
+			List<Table> newList = [.. tableDictionary.Values];
+			Collection<Table> tables = new (newList);
+
+			return tables;
+		}
+
+		/// <summary>
 		/// Retrieves a table definition, including its columns, for the
 		/// specified table name.
 		/// </summary>
