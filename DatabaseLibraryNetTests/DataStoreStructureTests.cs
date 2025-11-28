@@ -105,6 +105,45 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 		}
 
 		/// <summary>
+		/// Get schema test.
+		/// </summary>
+		[Test]
+		public void GetSchema()
+		{
+			using DataStoreStructure schema =
+				new(DatabaseType.SQLite, DataSource);
+
+			Collection<Table> tables = schema.GetSchema(DataSource);
+
+			int count = tables.Count;
+			Assert.That(count, Is.EqualTo(7));
+
+			foreach (Table table in tables)
+			{
+				Assert.That(table.Name, Is.AnyOf(
+					"Addresses",
+					"Categories",
+					"Contacts",
+					"Makers",
+					"Products",
+					"Sections",
+					"Series"));
+			}
+
+			Table tableItem = tables[0];
+			Assert.That(tableItem.Name, Is.EqualTo("Addresses"));
+
+			count = tableItem.ForeignKeys.Count;
+			Assert.That(count, Is.Zero);
+
+			tableItem = tables[2];
+			Assert.That(tableItem.Name, Is.EqualTo("Contacts"));
+
+			count = tableItem.ForeignKeys.Count;
+			Assert.That(count, Is.EqualTo(1));
+		}
+
+		/// <summary>
 		/// GetTableColumns test.
 		/// </summary>
 		[Test]
