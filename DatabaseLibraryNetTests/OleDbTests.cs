@@ -169,7 +169,7 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 			string tableName = "Addresses";
 			string databaseFile = GetTestMdbFile();
 
-			using OleDbSchema oleDbSchema = new(databaseFile);
+			using OleDbSchema oleDbSchema = new (databaseFile);
 
 			DataTable table = oleDbSchema.GetTableColumns(tableName);
 
