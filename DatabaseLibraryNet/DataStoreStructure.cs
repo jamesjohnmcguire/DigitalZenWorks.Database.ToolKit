@@ -677,22 +677,42 @@ namespace DigitalZenWorks.Database.ToolKit
 		private static Relationship GetRelationship(DataRow foreignKey)
 		{
 			Relationship relationship = new ();
-			relationship.Name = foreignKey["FK_NAME"].ToString();
-			relationship.ParentTable =
-				foreignKey["PK_TABLE_NAME"].ToString();
-			relationship.ParentTableCol =
-				foreignKey["PK_COLUMN_NAME"].ToString();
-			relationship.ChildTable =
-				foreignKey["FK_TABLE_NAME"].ToString();
-			relationship.ChildTableCol =
-				foreignKey["FK_COLUMN_NAME"].ToString();
 
-			if (foreignKey["UPDATE_RULE"].ToString() != "NO ACTION")
+#if OLE_DB
+			string constraintNameKey = "FK_NAME";
+			string tableNameKey = "PK_TABLE_NAME";
+			string columnNameKey = "PK_COLUMN_NAME";
+			string foreignTableNameKey = "FK_TABLE_NAME";
+			string foreignColumnNameKey = "FK_COLUMN_NAME";
+			string updateRuleKey = "UPDATE_RULE";
+			string deleteRuleKey = "DELETE_RULE";
+#else
+			// Using standard (or perhaps Sqlite) keys
+			string constraintNameKey = "CONSTRAINT_NAME";
+			string tableNameKey = "TABLE_NAME";
+			string columnNameKey = "FKEY_FROM_COLUMN";
+			string foreignTableNameKey = "FKEY_TO_TABLE";
+			string foreignColumnNameKey = "FKEY_TO_COLUMN";
+			string updateRuleKey = "FKEY_ON_DELETE";
+			string deleteRuleKey = "FKEY_ON_DELETE";
+#endif
+
+			relationship.Name = foreignKey[constraintNameKey].ToString();
+			relationship.ParentTable =
+				foreignKey[tableNameKey].ToString();
+			relationship.ParentTableCol =
+				foreignKey[columnNameKey].ToString();
+			relationship.ChildTable =
+				foreignKey[foreignTableNameKey].ToString();
+			relationship.ChildTableCol =
+				foreignKey[foreignColumnNameKey].ToString();
+
+			if (foreignKey[updateRuleKey].ToString() != "NO ACTION")
 			{
 				relationship.OnUpdateCascade = true;
 			}
 
-			if (foreignKey["DELETE_RULE"].ToString() != "NO ACTION")
+			if (foreignKey[deleteRuleKey].ToString() != "NO ACTION")
 			{
 				relationship.OnDeleteCascade = true;
 			}
