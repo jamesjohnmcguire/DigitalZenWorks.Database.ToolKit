@@ -37,11 +37,13 @@ namespace DigitalZenWorks.Database.ToolKit
 		private DbConnection connection;
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="DataStoreStructure"/> class.
+		/// Initializes a new instance of the
+		/// <see cref="DataStoreStructure"/> class.
 		/// </summary>
 		/// <param name="databaseType">The database type.</param>
 		/// <param name="databaseFile">The database file to use.</param>
-		public DataStoreStructure(DatabaseType databaseType, string databaseFile)
+		public DataStoreStructure(
+			DatabaseType databaseType, string databaseFile)
 		{
 			this.databaseType = databaseType;
 
