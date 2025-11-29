@@ -113,7 +113,7 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 			using DataStoreStructure schema =
 				new(DatabaseType.SQLite, DataSource);
 
-			Collection<Table> tables = schema.GetSchema(DataSource);
+			Collection<Table> tables = schema.GetSchema();
 
 			int count = tables.Count;
 			Assert.That(count, Is.EqualTo(7));
