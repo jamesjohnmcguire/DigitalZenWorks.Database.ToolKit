@@ -456,9 +456,6 @@ namespace DigitalZenWorks.Database.ToolKit
 		{
 			if (disposing)
 			{
-				connection?.Close();
-				connection = null;
-
 				database?.Close();
 				database?.Dispose();
 				database = null;
