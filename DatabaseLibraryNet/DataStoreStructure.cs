@@ -802,34 +802,6 @@ namespace DigitalZenWorks.Database.ToolKit
 			return columnName;
 		}
 
-		private DbConnection GetConnection(
-			DatabaseType databaseType, string connectionText)
-		{
-			switch (databaseType)
-			{
-				case DatabaseType.MySql:
-					MySqlConnection mySqlConnection = new (connectionText);
-					connection = mySqlConnection;
-					break;
-				case DatabaseType.SQLite:
-					SQLiteConnection sqliteConnection = new (connectionText);
-					connection = sqliteConnection;
-					break;
-				case DatabaseType.SqlServer:
-					SqlConnection sqlConnection = new (connectionText);
-					connection = sqlConnection;
-					break;
-				case DatabaseType.Unknown:
-					break;
-				case DatabaseType.Oracle:
-					break;
-				default:
-					break;
-			}
-
-			return connection;
-		}
-
 		private DataTable GetConstraintsByProvider(string tableName)
 		{
 			string query = GetConstraintQueryByProvider(tableName);
