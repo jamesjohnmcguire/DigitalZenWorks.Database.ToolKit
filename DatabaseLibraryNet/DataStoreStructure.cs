@@ -380,13 +380,10 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// database, with foreign key relationships established based on the
 		/// detected schema. If the database file does not exist or is
 		/// inaccessible, an exception may be thrown.</remarks>
-		/// <param name="databaseFile">The path to the database file for which
-		/// to retrieve schema information. Must refer to a valid and
-		/// accessible database file.</param>
 		/// <returns>A collection of <see cref="Table"/> objects representing
 		/// the tables in the database, each populated with its foreign key
 		/// relationships.</returns>
-		public Collection<Table> GetSchema(string databaseFile)
+		public Collection<Table> GetSchema()
 		{
 			Dictionary<string, Table> tableDictionary = [];
 			List<Relationship> relationships = [];

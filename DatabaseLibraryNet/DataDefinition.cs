@@ -265,7 +265,7 @@ namespace DigitalZenWorks.Database.ToolKit
 			DatabaseType databaseType = GetDatabaseType(databaseFile);
 
 			using DataStoreStructure schema = new (databaseType, databaseFile);
-			Collection<Table> tables = schema.GetSchema(databaseFile);
+			Collection<Table> tables = schema.GetSchema();
 
 			return tables;
 		}
