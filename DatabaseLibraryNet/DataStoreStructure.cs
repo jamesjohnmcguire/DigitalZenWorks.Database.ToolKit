@@ -68,11 +68,7 @@ namespace DigitalZenWorks.Database.ToolKit
 		{
 			get
 			{
-				connection.Open();
-
-				DataTable schemaTable = connection.GetSchema("Tables");
-
-				connection.Close();
+				DataTable schemaTable = GetSchema("Tables", null);
 
 				return schemaTable;
 			}
@@ -278,8 +274,6 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// <returns>DataTable.</returns>
 		public DataTable GetConstraints(string tableName)
 		{
-			connection.Open();
-
 			DataTable constraints = GetBaseConstraints();
 
 			constraints = AddForeignKeyConstraints(
@@ -287,8 +281,6 @@ namespace DigitalZenWorks.Database.ToolKit
 
 			constraints = AddIndexConstraints(
 				tableName, constraints);
-
-			connection.Close();
 
 			return constraints;
 		}
@@ -300,14 +292,9 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// <returns>DataTable.</returns>
 		public DataTable GetForeignKeys(string tableName)
 		{
-			connection.Open();
-
 			string[] testTable = [null, null, tableName];
 
-			DataTable schemaTable =
-				connection.GetSchema("ForeignKeys", testTable);
-
-			connection.Close();
+			DataTable schemaTable = GetSchema("ForeignKeys", testTable);
 
 			return schemaTable;
 		}
@@ -319,17 +306,9 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// <returns>DataTable.</returns>
 		public DataTable GetIndexes(string tableName)
 		{
-			if (connection.State != ConnectionState.Open)
-			{
-				connection.Open();
-			}
-
 			string[] tableInformation = [null, null, tableName];
 
-			DataTable schemaTable =
-				connection.GetSchema("Indexes", tableInformation);
-
-			connection.Close();
+			DataTable schemaTable = GetSchema("Indexes", tableInformation);
 
 			return schemaTable;
 		}
@@ -341,14 +320,9 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// <returns>DataTable.</returns>
 		public DataTable GetPrimaryKeys(string tableName)
 		{
-			connection.Open();
-
 			string[] tableInformation = [null, null, tableName];
 
-			DataTable schemaTable = connection.GetSchema(
-				"PrimaryKeys", tableInformation);
-
-			connection.Close();
+			DataTable schemaTable = GetSchema("PrimaryKeys", tableInformation);
 
 			return schemaTable;
 		}
@@ -458,13 +432,9 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// <returns>DataTable.</returns>
 		public DataTable GetTableColumns(string tableName)
 		{
-			connection.Open();
+			string[] tableInformation = [null, null, tableName];
 
-			string[] testTable = [null, null, tableName];
-
-			DataTable schemaTable = connection.GetSchema("Columns", testTable);
-
-			connection.Close();
+			DataTable schemaTable = GetSchema("Columns", tableInformation);
 
 			return schemaTable;
 		}
@@ -910,6 +880,21 @@ namespace DigitalZenWorks.Database.ToolKit
 			}
 
 			return columnName;
+		}
+
+		private DataTable GetSchema(string tableName, string[] restrictions)
+		{
+			if (connection.State != ConnectionState.Open)
+			{
+				connection.Open();
+			}
+
+			DataTable schemaTable =
+				connection.GetSchema(tableName, restrictions);
+
+			connection.Close();
+
+			return schemaTable;
 		}
 	}
 }
