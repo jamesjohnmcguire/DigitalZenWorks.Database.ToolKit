@@ -147,6 +147,59 @@ namespace DigitalZenWorks.Database.ToolKit
 		public DbConnection Connection { get; private set; }
 
 		/// <summary>
+		/// Generates a database connection string for the specified database
+		/// type and data source.
+		/// </summary>
+		/// <remarks>The returned connection string uses default credentials
+		/// and settings. If an unsupported database type is specified, the
+		/// method returns null.</remarks>
+		/// <param name="databaseType">The type of database for which to
+		/// generate the connection string. Supported values include MySql,
+		/// OleDb, and SQLite.</param>
+		/// <param name="dataSource">The data source identifier, such as a
+		/// server name, file path, or connection endpoint, used to construct
+		/// the connection string. Cannot be null.</param>
+		/// <returns>A connection string formatted for the specified database
+		/// type and data source. Returns null if the database type is not
+		/// supported.</returns>
+		public static string GetConnectionString(
+			DatabaseType databaseType, string dataSource)
+		{
+			string connectionString = null;
+
+			switch (databaseType)
+			{
+				case DatabaseType.MySql:
+					connectionString = $"Server={dataSource};" +
+						"Database=your_database;Uid=your_username;" +
+						"Pwd=your_password;";
+					break;
+				case DatabaseType.OleDb:
+					connectionString = string.Format(
+						CultureInfo.InvariantCulture,
+						"provider={0}; Data Source={1}",
+						"Microsoft.ACE.OLEDB.12.0",
+						dataSource);
+					break;
+				case DatabaseType.SQLite:
+					string connectionBase = "Data Source={0};Version=3;" +
+						"DateTimeFormat=InvariantCulture";
+					connectionString = string.Format(
+						CultureInfo.InvariantCulture,
+						connectionBase,
+						dataSource);
+					break;
+				case DatabaseType.SqlServer:
+				case DatabaseType.Oracle:
+				case DatabaseType.Unknown:
+				default:
+					break;
+			}
+
+			return connectionString;
+		}
+
+		/// <summary>
 		/// Converts a data table to a list.
 		/// </summary>
 		/// <typeparam name="TItem">The type of item.</typeparam>
