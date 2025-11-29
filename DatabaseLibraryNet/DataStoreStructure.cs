@@ -52,14 +52,10 @@ namespace DigitalZenWorks.Database.ToolKit
 		{
 			this.databaseType = databaseType;
 
-			string baseFormat = "Data Source={0}";
+			string connectionString =
+				DataStorage.GetConnectionString(databaseType, databaseFile);
 
-			string connectionString = string.Format(
-				CultureInfo.InvariantCulture,
-				baseFormat,
-				databaseFile);
-
-			database = new(databaseType, connectionString);
+			database = new (databaseType, connectionString);
 			database.Open();
 
 			connection = database.Connection;
