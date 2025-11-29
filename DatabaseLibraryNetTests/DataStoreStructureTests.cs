@@ -116,7 +116,7 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 			Collection<Table> tables = schema.GetSchema();
 
 			int count = tables.Count;
-			Assert.That(count, Is.EqualTo(7));
+			Assert.That(count, Is.EqualTo(8));
 
 			foreach (Table table in tables)
 			{
@@ -127,17 +127,18 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 					"Makers",
 					"Products",
 					"Sections",
-					"Series"));
+					"Series",
+					"sqlite_sequence"));
 			}
 
 			Table tableItem = tables[0];
 			Assert.That(tableItem.Name, Is.EqualTo("Addresses"));
 
 			count = tableItem.ForeignKeys.Count;
-			Assert.That(count, Is.Zero);
+			Assert.That(count, Is.EqualTo(1));
 
-			tableItem = tables[2];
-			Assert.That(tableItem.Name, Is.EqualTo("Contacts"));
+			tableItem = tables[7];
+			Assert.That(tableItem.Name, Is.EqualTo("Products"));
 
 			count = tableItem.ForeignKeys.Count;
 			Assert.That(count, Is.EqualTo(1));
