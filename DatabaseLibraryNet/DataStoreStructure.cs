@@ -37,6 +37,11 @@ namespace DigitalZenWorks.Database.ToolKit
 		private DbConnection connection;
 
 		/// <summary>
+		/// The core database object.
+		/// </summary>
+		private DataStorage database;
+
+		/// <summary>
 		/// Initializes a new instance of the
 		/// <see cref="DataStoreStructure"/> class.
 		/// </summary>
@@ -54,7 +59,10 @@ namespace DigitalZenWorks.Database.ToolKit
 				baseFormat,
 				databaseFile);
 
-			connection = GetConnection(databaseType, connectionString);
+			database = new(databaseType, connectionString);
+			database.Open();
+
+			connection = database.Connection;
 		}
 
 		/// <summary>
@@ -450,6 +458,10 @@ namespace DigitalZenWorks.Database.ToolKit
 			{
 				connection?.Close();
 				connection = null;
+
+				database?.Close();
+				database?.Dispose();
+				database = null;
 			}
 		}
 
