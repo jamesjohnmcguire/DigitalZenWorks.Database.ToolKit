@@ -169,6 +169,82 @@ namespace DigitalZenWorks.Database.ToolKit
 		}
 
 		/// <summary>
+		/// Creates a <see cref="ForeignKey"/> instance that represents the
+		/// foreign key relationship defined by the specified
+		/// <see cref="Relationship"/> object.
+		/// </summary>
+		/// <param name="relationship">The <see cref="Relationship"/> object
+		/// containing the details of the foreign key relationship to be
+		/// represented. Cannot be null.</param>
+		/// <returns>A <see cref="ForeignKey"/> instance initialized with the
+		/// properties of the specified <paramref name="relationship"/>.
+		/// </returns>
+		public static ForeignKey GetForeignKeyRelationship(
+			Relationship relationship)
+		{
+			ForeignKey foreignKey;
+
+			if (relationship == null)
+			{
+				throw new ArgumentNullException(
+					nameof(relationship),
+					"Relationship cannot be null");
+			}
+			else
+			{
+				foreignKey = new (
+					relationship.Name,
+					relationship.ChildTableCol,
+					relationship.ParentTable,
+					relationship.ParentTableCol,
+					relationship.OnDeleteCascade,
+					relationship.OnUpdateCascade);
+			}
+
+			return foreignKey;
+		}
+
+		/// <summary>
+		/// Replaces the foreign key definitions of the specified table with
+		/// those derived from the provided relationships.
+		/// </summary>
+		/// <remarks>All existing foreign keys in the table are cleared before
+		/// new ones are added. The method does not modify the input
+		/// relationships list.</remarks>
+		/// <param name="table">The table whose foreign keys will be set or
+		/// updated.</param>
+		/// <param name="relationships">A list of relationships from which
+		/// foreign key definitions will be generated and applied to the table.
+		/// Cannot be null.</param>
+		/// <returns>The table instance with its foreign keys updated to
+		/// reflect the specified relationships.</returns>
+		public static Table SetForeignKeys(
+			Table table, Collection<Relationship> relationships)
+		{
+			if (table == null)
+			{
+				throw new ArgumentNullException(
+					nameof(table),
+					"Table cannot be null");
+			}
+
+			if (relationships != null)
+			{
+				table.ForeignKeys.Clear();
+
+				foreach (Relationship relationship in relationships)
+				{
+					ForeignKey foreignKey =
+						GetForeignKeyRelationship(relationship);
+
+					table.ForeignKeys.Add(foreignKey);
+				}
+			}
+
+			return table;
+		}
+
+		/// <summary>
 		/// Dispose.
 		/// </summary>
 		public void Dispose()
@@ -253,6 +329,28 @@ namespace DigitalZenWorks.Database.ToolKit
 			}
 
 			return relationships;
+		}
+
+		public Collection<Table> GetSchema()
+		{
+			Collection<Table> tables = [];
+
+			foreach (DataRow row in TableNames.Rows)
+			{
+				object nameRaw = row["TABLE_NAME"];
+				string tableName = nameRaw.ToString();
+
+				Table table = SetPrimaryKey(row);
+
+				Collection<Relationship> relationships =
+					GetRelationships(tableName);
+
+				table = SetForeignKeys(table, relationships);
+
+				tables.Add(table);
+			}
+
+			return tables;
 		}
 
 		/// <summary>
@@ -405,7 +503,7 @@ namespace DigitalZenWorks.Database.ToolKit
 
 		private static Relationship GetRelationship(DataRow foreignKey)
 		{
-			Relationship relationship = new();
+			Relationship relationship = new ();
 			relationship.Name = foreignKey["FK_NAME"].ToString();
 			relationship.ParentTable =
 				foreignKey["PK_TABLE_NAME"].ToString();
