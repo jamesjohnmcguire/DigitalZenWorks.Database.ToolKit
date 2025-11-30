@@ -577,7 +577,7 @@ namespace DigitalZenWorks.Database.ToolKit
 
 			try
 			{
-				using FileStream stream = new FileStream(
+				using FileStream stream = new (
 					databaseFile,
 					FileMode.Open,
 					FileAccess.Read,

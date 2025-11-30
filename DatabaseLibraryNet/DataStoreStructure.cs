@@ -34,7 +34,7 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// <summary>
 		/// Represents a connection to a data source.
 		/// </summary>
-		private DbConnection connection;
+		private readonly DbConnection connection;
 
 		/// <summary>
 		/// The core database object.
