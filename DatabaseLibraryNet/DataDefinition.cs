@@ -276,6 +276,27 @@ namespace DigitalZenWorks.Database.ToolKit
 		}
 
 		/// <summary>
+		/// Retrieves the schema information for all tables in the specified
+		/// database file.
+		/// </summary>
+		/// <param name="databaseFile">The path to the database file from
+		/// which to retrieve schema information. Must refer to a valid and
+		/// accessible database file.</param>
+		/// <returns>A collection of <see cref="Table"/> objects representing
+		/// the tables defined in the database. The collection will be empty
+		/// if no tables are found.</returns>
+#if NET5_0_OR_GREATER
+		[SupportedOSPlatform("windows")]
+#endif
+		public static Collection<Table> GetSchemaOleDb(string databaseFile)
+		{
+			using OleDbSchema schema = new(databaseFile);
+			Collection<Table> tables = schema.GetSchema();
+
+			return tables;
+		}
+
+		/// <summary>
 		/// GetTableDefinitions - returns an array of table definitions.
 		/// </summary>
 		/// <param name="tableDefinitionsFile">The table definitions file.</param>
