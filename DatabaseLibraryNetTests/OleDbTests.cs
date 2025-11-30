@@ -31,7 +31,7 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 			string schemaFile = databaseFile + ".sql";
 
 			bool result =
-				DataDefinition.ExportSchema(databaseFile, schemaFile);
+				DataDefinition.ExportSchemaOleDb(databaseFile, schemaFile);
 
 			Assert.That(result, Is.True);
 
@@ -130,7 +130,8 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 		{
 			string databaseFile = GetTestMdbFile();
 
-			Collection<Table> tables = DataDefinition.GetSchema(databaseFile);
+			Collection<Table> tables =
+				DataDefinition.GetSchemaOleDb(databaseFile);
 
 			int count = tables.Count;
 			Assert.That(count, Is.EqualTo(7));
@@ -187,7 +188,8 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 		{
 			string databaseFile = GetTestMdbFile();
 
-			Collection<Table> tables = DataDefinition.GetSchema(databaseFile);
+			Collection<Table> tables =
+				DataDefinition.GetSchemaOleDb(databaseFile);
 
 			Collection<string> orderedList =
 				DataDefinition.OrderTable(tables);
