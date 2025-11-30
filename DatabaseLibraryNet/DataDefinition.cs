@@ -259,14 +259,8 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// <returns>A collection of <see cref="Table"/> objects representing
 		/// the tables defined in the database. The collection will be empty
 		/// if no tables are found.</returns>
-#if NET5_0_OR_GREATER
-		[SupportedOSPlatform("windows")]
-#endif
 		public static Collection<Table> GetSchema(string databaseFile)
 		{
-			Dictionary<string, Table> tableDictionary = [];
-			List<Relationship> relationships = [];
-
 			DatabaseType databaseType = GetDatabaseType(databaseFile);
 
 			using DataStoreStructure schema = new (databaseType, databaseFile);
