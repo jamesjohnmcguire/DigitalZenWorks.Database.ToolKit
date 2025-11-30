@@ -86,6 +86,62 @@ namespace DigitalZenWorks.Database.ToolKit
 			return successCode;
 		}
 
+		/// Method <c>ExportSchemaOleDb.</c>
+		/// <summary>
+		/// Export all tables to similarly named csv files.
+		/// </summary>
+		/// <returns>A values indicating success or not.</returns>
+		/// <param name="databaseFile">The database file to use.</param>
+		/// <param name="schemaFile">The schema file to export to.</param>
+#if NET5_0_OR_GREATER
+		[SupportedOSPlatform("windows")]
+#endif
+		public static bool ExportSchemaOleDb(
+			string databaseFile, string schemaFile)
+		{
+			bool successCode = false;
+
+			try
+			{
+				Collection<Table> tables = GetSchemaOleDb(databaseFile);
+
+				string schemaText = string.Empty;
+
+				Collection<string> list = OrderTable(tables);
+
+				foreach (string tableName in list)
+				{
+					foreach (Table table in tables)
+					{
+						if (table.Name == tableName)
+						{
+							schemaText += WriteSql(table) +
+								Environment.NewLine;
+							break;
+						}
+					}
+				}
+
+				File.WriteAllText(schemaFile, schemaText);
+
+				successCode = true;
+			}
+			catch (Exception exception) when
+				(exception is ArgumentNullException ||
+				exception is ArgumentException ||
+				exception is InvalidOperationException)
+			{
+				string message = Strings.Exception + exception.ToString();
+				Log.Error(message);
+			}
+			catch
+			{
+				throw;
+			}
+
+			return successCode;
+		}
+
 		/// <summary>
 		/// GetColumnInfo - returns details of a column statement.
 		/// </summary>
