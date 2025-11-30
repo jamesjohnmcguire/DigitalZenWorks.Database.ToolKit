@@ -331,6 +331,17 @@ namespace DigitalZenWorks.Database.ToolKit
 			return relationships;
 		}
 
+		/// <summary>
+		/// Retrieves the database schema as a collection of tables, including
+		/// primary and foreign key information.
+		/// </summary>
+		/// <remarks>Each <see cref="Table"/> in the returned collection
+		/// includes its primary key and foreign key relationships. Use this
+		/// method to obtain a complete representation of the database
+		/// structure for schema inspection or metadata operations.</remarks>
+		/// <returns>A collection of <see cref="Table"/> objects representing
+		/// all tables in the database schema. The collection will be empty if
+		/// no tables are found.</returns>
 		public Collection<Table> GetSchema()
 		{
 			Collection<Table> tables = [];
