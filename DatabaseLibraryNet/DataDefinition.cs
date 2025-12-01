@@ -503,7 +503,7 @@ namespace DigitalZenWorks.Database.ToolKit
 
 					foreach (ForeignKey foreignKeys in table.ForeignKeys)
 					{
-						dependencies.Add(foreignKeys.ParentTable);
+						dependencies.Add(foreignKeys.ChildTable);
 					}
 
 					tableDependencies.Add(name, dependencies);
