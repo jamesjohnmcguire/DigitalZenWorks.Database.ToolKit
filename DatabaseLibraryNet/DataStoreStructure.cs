@@ -183,14 +183,52 @@ namespace DigitalZenWorks.Database.ToolKit
 			{
 				foreignKey = new (
 					relationship.Name,
-					relationship.ChildTableCol,
 					relationship.ParentTable,
 					relationship.ParentTableCol,
+					relationship.ChildTable,
+					relationship.ChildTableCol,
 					relationship.OnDeleteCascade,
 					relationship.OnUpdateCascade);
 			}
 
 			return foreignKey;
+		}
+
+		/// <summary>
+		/// Get ordered dependencies.
+		/// </summary>
+		/// <param name="tableDependencies">A collection of table
+		/// depdenencies.</param>
+		/// <returns>A list of ordered dependencies.</returns>
+		public static Collection<string> GetOrderedDependencies(
+			Dictionary<string, Collection<string>> tableDependencies)
+		{
+			Collection<string> orderedDependencies = [];
+
+			// Tracks previously processed nodes.
+			HashSet<string> visited = [];
+
+			// Tracks nodes in the current recursion stack
+			// (for cycle detection).
+			HashSet<string> visiting = [];
+
+			if (tableDependencies != null)
+			{
+				foreach (string key in tableDependencies.Keys)
+				{
+					if (!visited.Contains(key))
+					{
+						GetDependenciesRecursive(
+							key,
+							tableDependencies,
+							orderedDependencies,
+							visited,
+							visiting);
+					}
+				}
+			}
+
+			return orderedDependencies;
 		}
 
 		public static string GetTableName(DataRow row)

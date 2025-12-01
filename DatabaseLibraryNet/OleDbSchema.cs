@@ -482,6 +482,42 @@ namespace DigitalZenWorks.Database.ToolKit
 
 			return table;
 		}
+
+		/// <summary>
+		/// Order table.
+		/// </summary>
+		/// <param name="tables">The list of tables to order.</param>
+		/// <returns>The ordered list of of tables.</returns>
+		/// <remarks>This orders the list taking dependencies into
+		/// account.</remarks>
+		protected override Collection<string> OrderTable(
+			Collection<Table> tables)
+		{
+			Collection<string> orderedTables = [];
+
+			if (tables != null)
+			{
+				Dictionary<string, Collection<string>> tableDependencies = [];
+
+				foreach (Table table in tables)
+				{
+					Collection<string> dependencies = [];
+					string name = table.Name;
+
+					foreach (ForeignKey foreignKeys in table.ForeignKeys)
+					{
+						dependencies.Add(foreignKeys.ParentTable);
+					}
+
+					tableDependencies.Add(name, dependencies);
+				}
+
+				orderedTables = GetOrderedDependencies(tableDependencies);
+			}
+
+			return orderedTables;
+		}
+
 		// If primary key is an integer, change type to AutoNumber.
 		private static Column SetPrimaryKeyType(Table table)
 		{
