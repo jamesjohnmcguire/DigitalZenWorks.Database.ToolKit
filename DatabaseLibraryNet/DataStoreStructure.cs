@@ -230,14 +230,6 @@ namespace DigitalZenWorks.Database.ToolKit
 			return keys;
 		}
 
-		public static string GetTableName(DataRow row)
-		{
-			object nameRaw = row["TABLE_NAME"];
-			string tableName = nameRaw.ToString();
-
-			return tableName;
-		}
-
 		/// <summary>
 		/// Replaces the foreign key definitions of the specified table with
 		/// those derived from the provided relationships.
@@ -351,10 +343,15 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// Gets a list of relationships.
 		/// </summary>
 		/// <param name="tableName">The table name.</param>
-		/// <returns>A list of relationships.</returns>
-		public Collection<Relationship> GetRelationships(string tableName)
+		/// <param name="relationships">A list of relationships.</param>
+		/// <returns>An updated list of relationships.</returns>
+		public Collection<Relationship> GetRelationships(
+			string tableName, Collection<Relationship> relationships)
 		{
-			Collection<Relationship> relationships = [];
+			if (relationships == null)
+			{
+				relationships = new Collection<Relationship>();
+			}
 
 			DataTable foreignKeyTable = GetForeignKeys(tableName);
 
@@ -382,30 +379,21 @@ namespace DigitalZenWorks.Database.ToolKit
 		public virtual Collection<Table> GetSchema()
 		{
 			Dictionary<string, Table> tableDictionary = [];
-			List<Relationship> relationships = [];
+			Collection<Relationship> relationships = [];
 
 			foreach (DataRow row in TableNames.Rows)
 			{
 				string tableName = GetTableName(row);
 				Table table = GetTable(row);
 				tableDictionary.Add(tableName, table);
+
+				relationships = GetRelationships(tableName, relationships);
 			}
 
-			// Add foreign keys to table, using relationships
-			foreach (Relationship relationship in relationships)
-			{
-				string name = relationship.ChildTable;
+			tableDictionary =
+				SetTablesRelationships(tableDictionary, relationships);
 
-				ForeignKey foreignKey =
-					DataStoreStructure.GetForeignKeyRelationship(relationship);
-
-				Table table = tableDictionary[name];
-
-				table.ForeignKeys.Add(foreignKey);
-			}
-
-			List<Table> newList = [.. tableDictionary.Values];
-			Collection<Table> tables = new (newList);
+			Collection<Table> tables = GetTables(tableDictionary);
 
 			return tables;
 		}
@@ -450,6 +438,116 @@ namespace DigitalZenWorks.Database.ToolKit
 			DataTable schemaTable = GetSchema("Columns", tableInformation);
 
 			return schemaTable;
+		}
+
+		/// <summary>
+		/// Creates a collection containing all tables from the specified
+		/// dictionary.
+		/// </summary>
+		/// <param name="tableDictionary">A dictionary that maps table names
+		/// to <see cref="Table"/> objects. Cannot be <see langword="null"/>.
+		/// </param>
+		/// <returns>A <see cref="Collection{Table}"/> containing all
+		/// <see cref="Table"/> objects from the dictionary. The collection
+		/// will be empty if the dictionary contains no tables.</returns>
+		/// <exception cref="ArgumentNullException">Thrown if
+		/// <paramref name="tableDictionary"/> is <see langword="null"/>.
+		/// </exception>
+		protected static Collection<Table> GetTables(
+			Dictionary<string, Table> tableDictionary)
+		{
+			if (tableDictionary == null)
+			{
+				throw new ArgumentNullException(
+					nameof(tableDictionary),
+					"Table dictionary cannot be null");
+			}
+
+			Dictionary<string, Table>.ValueCollection values =
+				tableDictionary.Values;
+			List<Table> newList = [.. values];
+			Collection<Table> tables = new(newList);
+
+			return tables;
+		}
+
+		/// <summary>
+		/// Order table.
+		/// </summary>
+		/// <param name="tables">The list of tables to order.</param>
+		/// <returns>The ordered list of of tables.</returns>
+		/// <remarks>This orders the list taking dependencies into
+		/// account.</remarks>
+		protected virtual Collection<string> OrderTable(
+			Collection<Table> tables)
+		{
+			Collection<string> orderedTables = [];
+
+			if (tables != null)
+			{
+				Dictionary<string, Collection<string>> tableDependencies = [];
+
+				foreach (Table table in tables)
+				{
+					Collection<string> dependencies = [];
+					string name = table.Name;
+
+					foreach (ForeignKey foreignKeys in table.ForeignKeys)
+					{
+						dependencies.Add(foreignKeys.ParentTable);
+					}
+
+					tableDependencies.Add(name, dependencies);
+				}
+
+				orderedTables = GetOrderedDependencies(tableDependencies);
+			}
+
+			return orderedTables;
+		}
+
+		/// <summary>
+		/// Establishes foreign key relationships between tables in
+		/// the specified dictionary based on the provided collection of
+		/// relationships.
+		/// </summary>
+		/// <remarks>This method updates the tables in the dictionary to
+		/// reflect the foreign key relationships defined in the collection.
+		/// The input dictionary is modified in place; no new dictionary is
+		/// created.</remarks>
+		/// <param name="tableDictionary">A dictionary containing table
+		/// objects, keyed by their names. Cannot be null.</param>
+		/// <param name="relationships">A collection of relationships that
+		/// define foreign key associations between tables. If null, no
+		/// relationships are added.</param>
+		/// <returns>The original dictionary of tables with foreign key
+		/// relationships applied as specified by the relationships
+		/// collection.</returns>
+		/// <exception cref="ArgumentNullException">Thrown if
+		/// <paramref name="tableDictionary"/> is null.</exception>
+		protected Dictionary<string, Table> SetTablesRelationships(
+			Dictionary<string, Table> tableDictionary,
+			Collection<Relationship> relationships)
+		{
+			if (tableDictionary == null)
+			{
+				throw new ArgumentNullException(
+					nameof(tableDictionary),
+					"Table dictionary cannot be null");
+			}
+
+			if (relationships != null)
+			{
+				// Add foreign keys to tables in dictionary,
+				// using relationships.
+				foreach (Relationship relationship in relationships)
+				{
+					Table table = GetTableWithRelationships(
+						tableDictionary, relationship);
+				}
+			}
+
+			return tableDictionary;
 		}
 
 		/// <summary>
@@ -691,6 +789,45 @@ namespace DigitalZenWorks.Database.ToolKit
 			}
 
 			return relationship;
+		}
+
+		/// <summary>
+		/// Retrieves the parent table specified by the relationship and adds
+		/// the corresponding foreign key to its collection.
+		/// </summary>
+		/// <remarks>If the specified relationship or table dictionary is null,
+		/// the method returns null and no changes are made. The foreign key is
+		/// added to the parent table's <c>ForeignKeys</c> collection.
+		/// </remarks>
+		/// <param name="tableDictionary">A dictionary containing table names
+		/// as keys and their corresponding <see cref="Table"/> objects as
+		/// values. Must not be null.</param>
+		/// <param name="relationship">The relationship that defines the
+		/// parent table and foreign key to associate. Must not be null.
+		/// </param>
+		/// <returns>The <see cref="Table"/> object representing the parent
+		/// table with the foreign key added, or <see langword="null"/>
+		/// if <paramref name="tableDictionary"/> or
+		/// <paramref name="relationship"/> is null.</returns>
+		protected virtual Table GetTableWithRelationships(
+			Dictionary<string, Table> tableDictionary,
+			Relationship relationship)
+		{
+			Table table = null;
+
+			if (tableDictionary != null && relationship != null)
+			{
+				string name = relationship.ParentTable;
+
+				ForeignKey foreignKey =
+					GetForeignKeyRelationship(relationship);
+
+				table = tableDictionary[name];
+
+				table.ForeignKeys.Add(foreignKey);
+			}
+
+			return table;
 		}
 
 		private DataRow GetForeignKeyConstaintsRow(
