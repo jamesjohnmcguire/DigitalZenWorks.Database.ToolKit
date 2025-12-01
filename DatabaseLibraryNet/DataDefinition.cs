@@ -869,10 +869,10 @@ namespace DigitalZenWorks.Database.ToolKit
 					constraint,
 					foreignKey.Name,
 					key,
-					foreignKey.ColumnName,
+					foreignKey.ParentColumn,
 					references,
-					foreignKey.ParentTable,
-					foreignKey.ParentTableColumn);
+					foreignKey.ChildTable,
+					foreignKey.ChildColumn);
 			}
 
 			if (foreignKey.CascadeOnDelete)
