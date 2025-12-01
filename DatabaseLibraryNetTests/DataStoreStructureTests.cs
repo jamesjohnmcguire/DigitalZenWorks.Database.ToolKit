@@ -89,7 +89,7 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 				new (DatabaseType.SQLite, DataSource);
 
 			Collection<Relationship> relationships =
-				schema.GetRelationships(dependentTableName);
+				schema.GetRelationships(dependentTableName, null);
 
 			int count = relationships.Count;
 
@@ -111,7 +111,7 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 		public void GetSchema()
 		{
 			using DataStoreStructure schema =
-				new(DatabaseType.SQLite, DataSource);
+				new (DatabaseType.SQLite, DataSource);
 
 			Collection<Table> tables = schema.GetSchema();
 
