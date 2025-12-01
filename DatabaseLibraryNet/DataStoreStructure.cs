@@ -193,6 +193,14 @@ namespace DigitalZenWorks.Database.ToolKit
 			return foreignKey;
 		}
 
+		public static string GetTableName(DataRow row)
+		{
+			object nameRaw = row["TABLE_NAME"];
+			string tableName = nameRaw.ToString();
+
+			return tableName;
+		}
+
 		/// <summary>
 		/// Gets the foreign key relationships.
 		/// </summary>
@@ -220,6 +228,14 @@ namespace DigitalZenWorks.Database.ToolKit
 			}
 
 			return keys;
+		}
+
+		public static string GetTableName(DataRow row)
+		{
+			object nameRaw = row["TABLE_NAME"];
+			string tableName = nameRaw.ToString();
+
+			return tableName;
 		}
 
 		/// <summary>
@@ -414,7 +430,7 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// table and its columns.</returns>
 		public Table GetTable(string tableName)
 		{
-			Table table = new(tableName);
+			Table table = new (tableName);
 
 			Log.Info("Getting Columns for " + tableName);
 			DataTable dataColumns = GetTableColumns(tableName);
@@ -872,6 +888,23 @@ namespace DigitalZenWorks.Database.ToolKit
 			connection.Close();
 
 			return schemaTable;
+		}
+
+		private Table GetTable(DataRow row)
+		{
+			Table table;
+
+			if (row == null)
+			{
+				throw new ArgumentNullException(nameof(row));
+			}
+			else
+			{
+				string tableName = GetTableName(row);
+				table = GetTable(tableName);
+			}
+
+			return table;
 		}
 	}
 }

@@ -392,6 +392,13 @@ namespace DigitalZenWorks.Database.ToolKit
 			return table;
 		}
 
+		public Table GetTable(DataRow row)
+		{
+			Table table = SetPrimaryKey(row);
+
+			return table;
+		}
+
 		/// <summary>
 		/// Gets the column names from the given table.
 		/// </summary>
