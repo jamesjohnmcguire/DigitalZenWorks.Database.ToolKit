@@ -168,7 +168,7 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// <returns>A <see cref="ForeignKey"/> instance initialized with the
 		/// properties of the specified <paramref name="relationship"/>.
 		/// </returns>
-		public static ForeignKey GetForeignKeyRelationship(
+		protected static ForeignKey GetForeignKeyRelationship(
 			Relationship relationship)
 		{
 			ForeignKey foreignKey;
@@ -252,7 +252,7 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// Cannot be null.</param>
 		/// <returns>The table instance with its foreign keys updated to
 		/// reflect the specified relationships.</returns>
-		public static Table SetForeignKeys(
+		public Table SetForeignKeys(
 			Table table, Collection<Relationship> relationships)
 		{
 			if (table == null)
@@ -310,7 +310,7 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// </summary>
 		/// <param name="tableName">The name of the table.</param>
 		/// <returns>DataTable.</returns>
-		public DataTable GetForeignKeys(string tableName)
+		public virtual DataTable GetForeignKeys(string tableName)
 		{
 			string[] testTable = [null, null, tableName];
 
@@ -379,22 +379,15 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// <returns>A collection of <see cref="Table"/> objects representing
 		/// the tables in the database, each populated with its foreign key
 		/// relationships.</returns>
-		public Collection<Table> GetSchema()
+		public virtual Collection<Table> GetSchema()
 		{
 			Dictionary<string, Table> tableDictionary = [];
 			List<Relationship> relationships = [];
 
 			foreach (DataRow row in TableNames.Rows)
 			{
-				object nameRaw = row["TABLE_NAME"];
-				string tableName = nameRaw.ToString();
-
-				Table table = GetTable(tableName);
-
-				Collection<Relationship> newRelationships =
-					GetRelationships(tableName);
-				relationships = [.. relationships, .. newRelationships];
-
+				string tableName = GetTableName(row);
+				Table table = GetTable(row);
 				tableDictionary.Add(tableName, table);
 			}
 
@@ -664,19 +657,10 @@ namespace DigitalZenWorks.Database.ToolKit
 			return newRow;
 		}
 
-		private static Relationship GetRelationship(DataRow foreignKey)
+		protected virtual Relationship GetRelationship(DataRow foreignKey)
 		{
 			Relationship relationship = new ();
 
-#if OLE_DB
-			string constraintNameKey = "FK_NAME";
-			string tableNameKey = "PK_TABLE_NAME";
-			string columnNameKey = "PK_COLUMN_NAME";
-			string foreignTableNameKey = "FK_TABLE_NAME";
-			string foreignColumnNameKey = "FK_COLUMN_NAME";
-			string updateRuleKey = "UPDATE_RULE";
-			string deleteRuleKey = "DELETE_RULE";
-#else
 			// Using standard (or perhaps Sqlite) keys
 			string constraintNameKey = "CONSTRAINT_NAME";
 			string tableNameKey = "TABLE_NAME";
@@ -685,7 +669,6 @@ namespace DigitalZenWorks.Database.ToolKit
 			string foreignColumnNameKey = "FKEY_TO_COLUMN";
 			string updateRuleKey = "FKEY_ON_DELETE";
 			string deleteRuleKey = "FKEY_ON_DELETE";
-#endif
 
 			relationship.Name = foreignKey[constraintNameKey].ToString();
 			relationship.ParentTable =

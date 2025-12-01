@@ -7,6 +7,7 @@
 namespace DigitalZenWorks.Database.ToolKit
 {
 	using System;
+	using System.Collections.Generic;
 	using System.Collections.ObjectModel;
 	using System.Data;
 	using System.Data.OleDb;
@@ -21,7 +22,7 @@ namespace DigitalZenWorks.Database.ToolKit
 #if NET5_0_OR_GREATER
 	[SupportedOSPlatform("windows")]
 #endif
-	public class OleDbSchema : IDisposable
+	public class OleDbSchema : DataStoreStructure, IDisposable
 	{
 		private static readonly ILog Log = LogManager.GetLogger(
 			System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
@@ -36,6 +37,7 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// </summary>
 		/// <param name="databaseFile">The database file to use.</param>
 		public OleDbSchema(string databaseFile)
+			: base(DatabaseType.OleDb, databaseFile)
 		{
 			string baseFormat = "Provider=Microsoft.ACE.OLEDB.12.0" +
 				@";Password="""";User ID=Admin;" + "Data Source={0}" +
@@ -169,42 +171,6 @@ namespace DigitalZenWorks.Database.ToolKit
 		}
 
 		/// <summary>
-		/// Creates a <see cref="ForeignKey"/> instance that represents the
-		/// foreign key relationship defined by the specified
-		/// <see cref="Relationship"/> object.
-		/// </summary>
-		/// <param name="relationship">The <see cref="Relationship"/> object
-		/// containing the details of the foreign key relationship to be
-		/// represented. Cannot be null.</param>
-		/// <returns>A <see cref="ForeignKey"/> instance initialized with the
-		/// properties of the specified <paramref name="relationship"/>.
-		/// </returns>
-		public static ForeignKey GetForeignKeyRelationship(
-			Relationship relationship)
-		{
-			ForeignKey foreignKey;
-
-			if (relationship == null)
-			{
-				throw new ArgumentNullException(
-					nameof(relationship),
-					"Relationship cannot be null");
-			}
-			else
-			{
-				foreignKey = new (
-					relationship.Name,
-					relationship.ChildTableCol,
-					relationship.ParentTable,
-					relationship.ParentTableCol,
-					relationship.OnDeleteCascade,
-					relationship.OnUpdateCascade);
-			}
-
-			return foreignKey;
-		}
-
-		/// <summary>
 		/// Replaces the foreign key definitions of the specified table with
 		/// those derived from the provided relationships.
 		/// </summary>
@@ -277,7 +243,7 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// </summary>
 		/// <param name="tableName">The name of the table.</param>
 		/// <returns>DataTable.</returns>
-		public DataTable GetForeignKeys(string tableName)
+		public override DataTable GetForeignKeys(string tableName)
 		{
 			oleDbConnection.Open();
 
@@ -311,27 +277,6 @@ namespace DigitalZenWorks.Database.ToolKit
 		}
 
 		/// <summary>
-		/// Gets a list of relationships.
-		/// </summary>
-		/// <param name="tableName">The table name.</param>
-		/// <returns>A list of relationships.</returns>
-		public Collection<Relationship> GetRelationships(string tableName)
-		{
-			Collection<Relationship> relationships = [];
-
-			DataTable foreignKeyTable = GetForeignKeys(tableName);
-
-			foreach (DataRow foreignKey in foreignKeyTable.Rows)
-			{
-				Relationship relationship = GetRelationship(foreignKey);
-
-				relationships.Add(relationship);
-			}
-
-			return relationships;
-		}
-
-		/// <summary>
 		/// Retrieves the database schema as a collection of tables, including
 		/// primary and foreign key information.
 		/// </summary>
@@ -342,14 +287,16 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// <returns>A collection of <see cref="Table"/> objects representing
 		/// all tables in the database schema. The collection will be empty if
 		/// no tables are found.</returns>
-		public Collection<Table> GetSchema()
+		public override Collection<Table> GetSchema()
 		{
-			Collection<Table> tables = [];
+			Dictionary<string, Table> tableDictionary = [];
+			Collection<Relationship> relationships = [];
 
 			foreach (DataRow row in TableNames.Rows)
 			{
-				object nameRaw = row["TABLE_NAME"];
-				string tableName = nameRaw.ToString();
+				string tableName = GetTableName(row);
+				Table table = GetTable(row);
+				tableDictionary.Add(tableName, table);
 
 				Table table = SetPrimaryKey(row);
 
@@ -461,8 +408,7 @@ namespace DigitalZenWorks.Database.ToolKit
 			}
 			else
 			{
-				object nameRaw = row["TABLE_NAME"];
-				string tableName = nameRaw.ToString();
+				string tableName = GetTableName(row);
 
 				table = GetTable(tableName);
 
@@ -471,7 +417,7 @@ namespace DigitalZenWorks.Database.ToolKit
 				// TODO: This assumes only a single primary key.  Need to
 				// compensate for composite primary keys.
 				DataRow primaryKeyRow = primaryKeys.Rows[0];
-				nameRaw = primaryKeyRow["COLUMN_NAME"];
+				object nameRaw = primaryKeyRow["COLUMN_NAME"];
 				table.PrimaryKey = nameRaw.ToString();
 
 				// If PK is an integer change type to AutoNumber
@@ -519,25 +465,35 @@ namespace DigitalZenWorks.Database.ToolKit
 			return primaryKey;
 		}
 
-		private static Relationship GetRelationship(DataRow foreignKey)
+		protected override Relationship GetRelationship(DataRow foreignKey)
 		{
-			Relationship relationship = new ();
-			relationship.Name = foreignKey["FK_NAME"].ToString();
-			relationship.ParentTable =
-				foreignKey["PK_TABLE_NAME"].ToString();
-			relationship.ParentTableCol =
-				foreignKey["PK_COLUMN_NAME"].ToString();
-			relationship.ChildTable =
-				foreignKey["FK_TABLE_NAME"].ToString();
-			relationship.ChildTableCol =
-				foreignKey["FK_COLUMN_NAME"].ToString();
+			Relationship relationship = new();
 
-			if (foreignKey["UPDATE_RULE"].ToString() != "NO ACTION")
+			// Note: OleDb seems to have reversed referencing.
+			string constraintNameKey = "FK_NAME";
+			string parentTableNameKey = "FK_TABLE_NAME";
+			string parentColumnNameKey = "FK_COLUMN_NAME";
+			string childTableNameKey = "PK_TABLE_NAME";
+			string childColumnNameKey = "PK_COLUMN_NAME";
+			string updateRuleKey = "UPDATE_RULE";
+			string deleteRuleKey = "DELETE_RULE";
+
+			relationship.Name = foreignKey[constraintNameKey].ToString();
+			relationship.ParentTable =
+				foreignKey[parentTableNameKey].ToString();
+			relationship.ParentTableCol =
+				foreignKey[parentColumnNameKey].ToString();
+			relationship.ChildTable =
+				foreignKey[childTableNameKey].ToString();
+			relationship.ChildTableCol =
+				foreignKey[childColumnNameKey].ToString();
+
+			if (foreignKey[updateRuleKey].ToString() != "NO ACTION")
 			{
 				relationship.OnUpdateCascade = true;
 			}
 
-			if (foreignKey["DELETE_RULE"].ToString() != "NO ACTION")
+			if (foreignKey[deleteRuleKey].ToString() != "NO ACTION")
 			{
 				relationship.OnDeleteCascade = true;
 			}
