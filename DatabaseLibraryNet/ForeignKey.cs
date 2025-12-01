@@ -13,10 +13,10 @@ namespace DigitalZenWorks.Database.ToolKit
 	{
 		private bool cascadeOnDelete;
 		private bool cascadeOnUpdate;
-		private string columnName;
+		private string childColumn;
 		private string name;
 		private string parentTable;
-		private string parentTableColumn;
+		private string parentColumn;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="ForeignKey"/> class.
@@ -38,9 +38,9 @@ namespace DigitalZenWorks.Database.ToolKit
 			bool cascadeUpdate)
 		{
 			this.name = name;
-			this.columnName = columnName;
+			this.childColumn = columnName;
 			this.parentTable = parentTable;
-			this.parentTableColumn = parentTableColumn;
+			this.parentColumn = parentTableColumn;
 			this.cascadeOnDelete = cascadeDelete;
 			this.cascadeOnUpdate = cascadeUpdate;
 		}
@@ -70,6 +70,18 @@ namespace DigitalZenWorks.Database.ToolKit
 		}
 
 		/// <summary>
+		/// Gets or sets the child column name.
+		/// </summary>
+		/// <value>
+		/// Column Name.
+		/// </value>
+		public string ChildColumn
+		{
+			get { return childColumn; }
+			set { childColumn = value; }
+		}
+
+		/// <summary>
 		/// Gets or sets column Name.
 		/// </summary>
 		/// <value>
@@ -77,8 +89,8 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// </value>
 		public string ColumnName
 		{
-			get { return columnName; }
-			set { columnName = value; }
+			get { return childColumn; }
+			set { childColumn = value; }
 		}
 
 		/// <summary>
@@ -91,6 +103,18 @@ namespace DigitalZenWorks.Database.ToolKit
 		{
 			get { return name; }
 			set { name = value; }
+		}
+
+		/// <summary>
+		/// Gets or sets parent Table Column.
+		/// </summary>
+		/// <value>
+		/// Parent Table Column.
+		/// </value>
+		public string ParentColumn
+		{
+			get { return parentColumn; }
+			set { parentColumn = value; }
 		}
 
 		/// <summary>
@@ -113,8 +137,8 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// </value>
 		public string ParentTableColumn
 		{
-			get { return parentTableColumn; }
-			set { parentTableColumn = value; }
+			get { return parentColumn; }
+			set { parentColumn = value; }
 		}
 	}
 }
