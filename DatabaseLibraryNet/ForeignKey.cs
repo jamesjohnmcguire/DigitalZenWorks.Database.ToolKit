@@ -14,6 +14,7 @@ namespace DigitalZenWorks.Database.ToolKit
 		private bool cascadeOnDelete;
 		private bool cascadeOnUpdate;
 		private string childColumn;
+		private string childTable;
 		private string name;
 		private string parentTable;
 		private string parentColumn;
@@ -41,6 +42,36 @@ namespace DigitalZenWorks.Database.ToolKit
 			this.childColumn = columnName;
 			this.parentTable = parentTable;
 			this.parentColumn = parentTableColumn;
+			this.cascadeOnDelete = cascadeDelete;
+			this.cascadeOnUpdate = cascadeUpdate;
+		}
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="ForeignKey"/> class.
+		/// </summary>
+		/// <param name="name">The name of the foreign key.</param>
+		/// <param name="parentTable">The parent table.</param>
+		/// <param name="parentColumn">The parent table column.</param>
+		/// <param name="childTable">The child table.</param>
+		/// <param name="childColumn">The child column name.</param>
+		/// <param name="cascadeDelete">Indicates wheter to use
+		/// cascading deletes.</param>
+		/// <param name="cascadeUpdate">Indicates wheter to use
+		/// cascading updates.</param>
+		public ForeignKey(
+			string name,
+			string parentTable,
+			string parentColumn,
+			string childTable,
+			string childColumn,
+			bool cascadeDelete,
+			bool cascadeUpdate)
+		{
+			this.name = name;
+			this.childTable = childTable;
+			this.childColumn = childColumn;
+			this.parentTable = parentTable;
+			this.parentColumn = parentColumn;
 			this.cascadeOnDelete = cascadeDelete;
 			this.cascadeOnUpdate = cascadeUpdate;
 		}
@@ -79,6 +110,18 @@ namespace DigitalZenWorks.Database.ToolKit
 		{
 			get { return childColumn; }
 			set { childColumn = value; }
+		}
+
+		/// <summary>
+		/// Gets or sets the child table name.
+		/// </summary>
+		/// <value>
+		/// Column Name.
+		/// </value>
+		public string ChildTable
+		{
+			get { return childTable; }
+			set { childTable = value; }
 		}
 
 		/// <summary>
