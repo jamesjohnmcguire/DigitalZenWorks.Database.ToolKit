@@ -116,10 +116,10 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 			Relationship relationship = relationships[0];
 
 			string name = relationship.ParentTable;
-			Assert.That(name, Is.EqualTo("Addresses"));
+			Assert.That(name, Is.EqualTo("Contacts"));
 
 			name = relationship.ChildTable;
-			Assert.That(name, Is.EqualTo("Contacts"));
+			Assert.That(name, Is.EqualTo("Addresses"));
 		}
 
 		/// <summary>

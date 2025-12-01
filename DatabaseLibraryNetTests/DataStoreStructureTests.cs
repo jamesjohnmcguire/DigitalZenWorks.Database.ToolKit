@@ -135,13 +135,13 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 			Assert.That(tableItem.Name, Is.EqualTo("Addresses"));
 
 			count = tableItem.ForeignKeys.Count;
-			Assert.That(count, Is.EqualTo(1));
+			Assert.That(count, Is.Zero);
 
 			tableItem = tables[7];
 			Assert.That(tableItem.Name, Is.EqualTo("Products"));
 
 			count = tableItem.ForeignKeys.Count;
-			Assert.That(count, Is.EqualTo(1));
+			Assert.That(count, Is.EqualTo(3));
 		}
 
 		/// <summary>
