@@ -1,5 +1,16 @@
 ﻿[*.cs]
 
+# Require space after 'new' keyword
+csharp_space_after_keywords_in_control_flow_statements = true
+csharp_space_between_method_call_empty_parameter_list_parentheses = false
+csharp_space_between_method_call_parameter_list_parentheses = false
+csharp_space_after_cast = false
+csharp_space_after_keywords_in_control_flow_statements = true
+csharp_space_between_method_declaration_empty_parameter_list_parentheses = false
+csharp_space_between_method_call_name_and_opening_parenthesis = false
+
+guidelines = 80
+
 # IDE0017: Simplify object initialization
 dotnet_style_object_initializer = false
 
@@ -21,6 +32,8 @@ dotnet_diagnostic.IDE0045.severity = none
 dotnet_diagnostic.IDE0055.severity = none
 
 dotnet_diagnostic.IDE0100.severity = none
+
+dotnet_diagnostic.SA1000.severity = warning
 
 # SA1010: Opening square brackets should be spaced correctly
 dotnet_diagnostic.SA1010.severity = none
