@@ -22,7 +22,7 @@ namespace DigitalZenWorks.Database.ToolKit
 #if NET5_0_OR_GREATER
 	[SupportedOSPlatform("windows")]
 #endif
-	public class OleDbSchema : DataStoreStructure, IDisposable
+	public class OleDbSchema : DataStoreStructure
 	{
 		private static readonly ILog Log = LogManager.GetLogger(
 			System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
@@ -71,152 +71,17 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// <value>
 		/// All table names from the connected database.
 		/// </value>
-		public DataTable TableNames
+		public override DataTable TableNames
 		{
 			get
 			{
-				oleDbConnection.Open();
+				object[] restrictions = [null, null, null, "TABLE"];
 
-				object[] testTable = [null, null, null, "TABLE"];
-
-				DataTable schemaTable = oleDbConnection.GetOleDbSchemaTable(
-					OleDbSchemaGuid.Tables, testTable);
-
-				oleDbConnection.Close();
+				DataTable schemaTable = GetSchema(
+					OleDbSchemaGuid.Tables, restrictions);
 
 				return schemaTable;
 			}
-		}
-
-		/// <summary>
-		/// Creates a new Column instance by extracting and formatting column
-		/// metadata from the specified DataRow.
-		/// </summary>
-		/// <remarks>The returned Column reflects the schema information
-		/// present in the DataRow, including type, length, nullability,
-		/// default value, and position. The method expects the DataRow to
-		/// follow a specific schema layout, such as that returned from
-		/// database schema queries.</remarks>
-		/// <param name="row">The DataRow containing column metadata. Must
-		/// include fields such as COLUMN_NAME, DATA_TYPE, and other relevant
-		/// schema information.</param>
-		/// <returns>A Column object populated with properties derived from
-		/// the values in the provided DataRow.</returns>
-		public static Column FormatColumnFromDataRow(DataRow row)
-		{
-			Column column = null;
-
-			if (row != null)
-			{
-				column = new ();
-				column.Name = row["COLUMN_NAME"].ToString();
-
-				switch ((int)row["DATA_TYPE"])
-				{
-					case 3: // Number
-						column.ColumnType = ColumnType.Number;
-						break;
-					case 130: // String
-						string flags = row["COLUMN_FLAGS"].ToString();
-
-						if (int.Parse(flags, CultureInfo.InvariantCulture) > 127)
-						{
-							column.ColumnType = ColumnType.Memo;
-						}
-						else
-						{
-							column.ColumnType = ColumnType.String;
-						}
-
-						break;
-					case 7: // Date
-						column.ColumnType = ColumnType.DateTime;
-						break;
-					case 6: // Currency
-						column.ColumnType = ColumnType.Currency;
-						break;
-					case 11: // Yes/No
-						column.ColumnType = ColumnType.YesNo;
-						break;
-					case 128: // OLE
-						column.ColumnType = ColumnType.Ole;
-						break;
-				}
-
-				if (!row.IsNull("CHARACTER_MAXIMUM_LENGTH"))
-				{
-					string maxLength =
-						row["CHARACTER_MAXIMUM_LENGTH"].ToString();
-
-					column.Length =
-						int.Parse(maxLength, CultureInfo.InvariantCulture);
-				}
-
-				if (row["IS_NULLABLE"].ToString() == "True")
-				{
-					column.Nullable = true;
-				}
-
-				if (row["COLUMN_HASDEFAULT"].ToString() == "True")
-				{
-					column.DefaultValue = row["COLUMN_DEFAULT"].ToString();
-				}
-
-				string position = row["ORDINAL_POSITION"].ToString();
-				column.Position =
-					int.Parse(position, CultureInfo.InvariantCulture);
-			}
-
-			return column;
-		}
-
-		/// <summary>
-		/// Replaces the foreign key definitions of the specified table with
-		/// those derived from the provided relationships.
-		/// </summary>
-		/// <remarks>All existing foreign keys in the table are cleared before
-		/// new ones are added. The method does not modify the input
-		/// relationships list.</remarks>
-		/// <param name="table">The table whose foreign keys will be set or
-		/// updated.</param>
-		/// <param name="relationships">A list of relationships from which
-		/// foreign key definitions will be generated and applied to the table.
-		/// Cannot be null.</param>
-		/// <returns>The table instance with its foreign keys updated to
-		/// reflect the specified relationships.</returns>
-		public Table SetForeignKeys(
-			Table table, Collection<Relationship> relationships)
-		{
-			if (table == null)
-			{
-				throw new ArgumentNullException(
-					nameof(table),
-					"Table cannot be null");
-			}
-
-			if (relationships != null)
-			{
-				table.ForeignKeys.Clear();
-
-				foreach (Relationship relationship in relationships)
-				{
-					ForeignKey foreignKey =
-						GetForeignKeyRelationship(relationship);
-
-					table.ForeignKeys.Add(foreignKey);
-				}
-			}
-
-			return table;
-		}
-
-		/// <summary>
-		/// Dispose.
-		/// </summary>
-		public void Dispose()
-		{
-			Dispose(true);
-			GC.SuppressFinalize(this);
 		}
 
 		/// <summary>
@@ -224,16 +89,12 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// </summary>
 		/// <param name="tableName">The name of the table.</param>
 		/// <returns>DataTable.</returns>
-		public DataTable GetConstraints(string tableName)
+		public override DataTable GetConstraints(string tableName)
 		{
-			oleDbConnection.Open();
+			object[] restrictions = [null, null, tableName, null, null, null];
 
-			object[] testTable = [null, null, tableName, null, null, null];
-
-			DataTable schemaTable = oleDbConnection.GetOleDbSchemaTable(
-				OleDbSchemaGuid.Constraint_Column_Usage, testTable);
-
-			oleDbConnection.Close();
+			DataTable schemaTable = GetSchema(
+				OleDbSchemaGuid.Constraint_Column_Usage, restrictions);
 
 			return schemaTable;
 		}
@@ -245,14 +106,10 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// <returns>DataTable.</returns>
 		public override DataTable GetForeignKeys(string tableName)
 		{
-			oleDbConnection.Open();
+			object[] restrictions = [null, null, tableName];
 
-			object[] testTable = [null, null, tableName];
-
-			DataTable schemaTable = oleDbConnection.GetOleDbSchemaTable(
-				OleDbSchemaGuid.Foreign_Keys, testTable);
-
-			oleDbConnection.Close();
+			DataTable schemaTable =
+				GetSchema(OleDbSchemaGuid.Foreign_Keys, restrictions);
 
 			return schemaTable;
 		}
@@ -262,16 +119,12 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// </summary>
 		/// <param name="tableName">The name of the table.</param>
 		/// <returns>DataTable.</returns>
-		public DataTable GetPrimaryKeys(string tableName)
+		public override DataTable GetPrimaryKeys(string tableName)
 		{
-			oleDbConnection.Open();
+			object[] restrictions = [null, null, tableName];
 
-			object[] testTable = [null, null, tableName];
-
-			DataTable schemaTable = oleDbConnection.GetOleDbSchemaTable(
-				OleDbSchemaGuid.Primary_Keys, testTable);
-
-			oleDbConnection.Close();
+			DataTable schemaTable =
+				GetSchema(OleDbSchemaGuid.Primary_Keys, restrictions);
 
 			return schemaTable;
 		}
@@ -310,55 +163,16 @@ namespace DigitalZenWorks.Database.ToolKit
 		}
 
 		/// <summary>
-		/// Retrieves a table definition, including its columns, for the
-		/// specified table name.
-		/// </summary>
-		/// <remarks>The returned <see cref="Table"/> includes all columns as
-		/// defined in the data source. If the table does not exist, the
-		/// result may be an empty table definition.</remarks>
-		/// <param name="tableName">The name of the table to retrieve. Cannot
-		/// be null or empty.</param>
-		/// <returns>A <see cref="Table"/> object representing the specified
-		/// table and its columns.</returns>
-		public Table GetTable(string tableName)
-		{
-			Table table = new(tableName);
-
-			Log.Info("Getting Columns for " + tableName);
-			DataTable dataColumns = GetTableColumns(tableName);
-
-			foreach (DataRow dataColumn in dataColumns.Rows)
-			{
-				Column column = FormatColumnFromDataRow(dataColumn);
-
-				table.AddColumn(column);
-			}
-
-			return table;
-		}
-
-		public Table GetTable(DataRow row)
-		{
-			Table table = SetPrimaryKey(row);
-
-			return table;
-		}
-
-		/// <summary>
 		/// Gets the column names from the given table.
 		/// </summary>
 		/// <param name="tableName">The name of the table.</param>
 		/// <returns>DataTable.</returns>
-		public DataTable GetTableColumns(string tableName)
+		public override DataTable GetTableColumns(string tableName)
 		{
-			oleDbConnection.Open();
+			object[] restrictions = [null, null, tableName];
 
-			object[] testTable = [null, null, tableName];
-
-			DataTable schemaTable = oleDbConnection.GetOleDbSchemaTable(
-				OleDbSchemaGuid.Columns, testTable);
-
-			oleDbConnection.Close();
+			DataTable schemaTable =
+				GetSchema(OleDbSchemaGuid.Columns, restrictions);
 
 			return schemaTable;
 		}
@@ -370,14 +184,10 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// <param name="tableName">The name of the table.</param>
 		public DataTable GetTableConstraints(string tableName)
 		{
-			oleDbConnection.Open();
+			object[] restrictions = [null, null, null, null, null, tableName];
 
-			object[] testTable = [null, null, null, null, null, tableName];
-
-			DataTable schemaTable = oleDbConnection.GetOleDbSchemaTable(
-				OleDbSchemaGuid.Table_Constraints, testTable);
-
-			oleDbConnection.Close();
+			DataTable schemaTable =
+				GetSchema(OleDbSchemaGuid.Table_Constraints, restrictions);
 
 			return schemaTable;
 		}
@@ -435,13 +245,123 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// </summary>
 		/// <param name="disposing">Indicates whether the object is
 		/// currently disposing.</param>
-		protected virtual void Dispose(bool disposing)
+		protected override void Dispose(bool disposing)
 		{
+			base.Dispose(disposing);
+
 			if (disposing)
 			{
 				oleDbConnection?.Close();
 				oleDbConnection = null;
 			}
+		}
+
+		/// <summary>
+		/// Determines the column type based on the specified data type name and
+		/// optional flags.
+		/// </summary>
+		/// <param name="dataType">The name of the data type to evaluate. Common
+		/// values include "integer", "string", and "date". Cannot be null.
+		/// </param>
+		/// <param name="flags">Optional flags that influence the column type
+		/// determination. The meaning of specific flag values depends on the
+		/// implementation.</param>
+		/// <returns>A value from the <see cref="ColumnType"/> enumeration that
+		/// represents the inferred column type. Returns <see
+		/// cref="ColumnType.Unknown"/> if the data type is not recognized.
+		/// </returns>
+		protected override ColumnType GetColumnType(
+			string dataType, int flags, int length)
+		{
+			ColumnType columnType = ColumnType.Unknown;
+			int dataTypeValue = int.TryParse(dataType, out int temp) ? temp : 0;
+
+			switch (dataTypeValue)
+			{
+				case 3: // Number
+					columnType = ColumnType.Number;
+					break;
+				case 130: // String
+					if (length > 255)
+					{
+						columnType = ColumnType.Memo;
+					}
+					else
+					{
+						columnType = ColumnType.String;
+					}
+
+					break;
+				case 7: // Date
+					columnType = ColumnType.DateTime;
+					break;
+				case 6: // Currency
+					columnType = ColumnType.Currency;
+					break;
+				case 11: // Yes/No
+					columnType = ColumnType.YesNo;
+					break;
+				case 128: // OLE
+					columnType = ColumnType.Ole;
+					break;
+			}
+
+			return columnType;
+		}
+
+		/// <summary>
+		/// Creates a <see cref="Relationship"/> object representing the foreign
+		/// key relationship described by the specified data row.
+		/// </summary>
+		/// <remarks>The method expects the <paramref name="foreignKey"/> to
+		/// contain specific column names such as "CONSTRAINT_NAME",
+		/// "TABLE_NAME", "FKEY_FROM_COLUMN", "FKEY_TO_TABLE", "FKEY_TO_COLUMN",
+		/// "FKEY_ON_DELETE", and "FKEY_ON_DELETE". If these columns are missing
+		/// or contain unexpected values, the resulting <see
+		/// cref="Relationship"/> may not be fully populated.</remarks>
+		/// <param name="foreignKey">A <see cref="DataRow"/> containing metadata
+		/// about a foreign key constraint. Must include columns for constraint
+		/// name, table names, column names, and update/delete rules.</param>
+		/// <returns>A <see cref="Relationship"/> instance populated with
+		/// information about the foreign key relationship, including
+		/// table and column names, and cascade rules.</returns>
+		protected override Relationship GetRelationship(DataRow foreignKey)
+		{
+			Relationship relationship = new ();
+
+			// Note: OleDb seems to have reversed referencing.
+			string constraintNameKey = "FK_NAME";
+			string parentTableNameKey = "FK_TABLE_NAME";
+			string parentColumnNameKey = "FK_COLUMN_NAME";
+			string childTableNameKey = "PK_TABLE_NAME";
+			string childColumnNameKey = "PK_COLUMN_NAME";
+			string updateRuleKey = "UPDATE_RULE";
+			string deleteRuleKey = "DELETE_RULE";
+
+			if (foreignKey != null)
+			{
+				relationship.Name = foreignKey[constraintNameKey].ToString();
+				relationship.ParentTable =
+					foreignKey[parentTableNameKey].ToString();
+				relationship.ParentTableCol =
+					foreignKey[parentColumnNameKey].ToString();
+				relationship.ChildTable =
+					foreignKey[childTableNameKey].ToString();
+				relationship.ChildTableCol =
+					foreignKey[childColumnNameKey].ToString();
+
+				if (foreignKey[updateRuleKey].ToString() != "NO ACTION")
+				{
+					relationship.OnUpdateCascade = true;
+				}
+
+				if (foreignKey[deleteRuleKey].ToString() != "NO ACTION")
+				{
+					relationship.OnDeleteCascade = true;
+				}
+			}
+
+			return relationship;
 		}
 
 		/// <summary>
@@ -518,12 +438,35 @@ namespace DigitalZenWorks.Database.ToolKit
 			return orderedTables;
 		}
 
+		private DataTable GetSchema(Guid guid, object[] restrictions)
+		{
+			if (oleDbConnection.State != ConnectionState.Open)
+			{
+				oleDbConnection.Open();
+			}
+
+			DataTable schemaTable =
+				oleDbConnection.GetOleDbSchemaTable(guid, restrictions);
+
+			oleDbConnection.Close();
+
+			return schemaTable;
+		}
+
+		private Table GetTable(DataRow row)
+		{
+			Table table = SetPrimaryKey(row);
+
+			return table;
+		}
+
 		// If primary key is an integer, change type to AutoNumber.
 		private static Column SetPrimaryKeyType(Table table)
 		{
 			Column primaryKey = null;
 
 			string primaryKeyName = table.PrimaryKey;
+
 			if (!string.IsNullOrWhiteSpace(primaryKeyName))
 			{
 				primaryKey = table.Columns[primaryKeyName];
@@ -535,42 +478,6 @@ namespace DigitalZenWorks.Database.ToolKit
 			}
 
 			return primaryKey;
-		}
-
-		protected override Relationship GetRelationship(DataRow foreignKey)
-		{
-			Relationship relationship = new();
-
-			// Note: OleDb seems to have reversed referencing.
-			string constraintNameKey = "FK_NAME";
-			string parentTableNameKey = "FK_TABLE_NAME";
-			string parentColumnNameKey = "FK_COLUMN_NAME";
-			string childTableNameKey = "PK_TABLE_NAME";
-			string childColumnNameKey = "PK_COLUMN_NAME";
-			string updateRuleKey = "UPDATE_RULE";
-			string deleteRuleKey = "DELETE_RULE";
-
-			relationship.Name = foreignKey[constraintNameKey].ToString();
-			relationship.ParentTable =
-				foreignKey[parentTableNameKey].ToString();
-			relationship.ParentTableCol =
-				foreignKey[parentColumnNameKey].ToString();
-			relationship.ChildTable =
-				foreignKey[childTableNameKey].ToString();
-			relationship.ChildTableCol =
-				foreignKey[childColumnNameKey].ToString();
-
-			if (foreignKey[updateRuleKey].ToString() != "NO ACTION")
-			{
-				relationship.OnUpdateCascade = true;
-			}
-
-			if (foreignKey[deleteRuleKey].ToString() != "NO ACTION")
-			{
-				relationship.OnDeleteCascade = true;
-			}
-
-			return relationship;
 		}
 	}
 }

@@ -6,16 +6,17 @@
 
 namespace DigitalZenWorks.Database.ToolKit
 {
+	using global::Common.Logging;
+	using Microsoft.Data.SqlClient;
+	using MySql.Data.MySqlClient;
 	using System;
 	using System.Collections.Generic;
 	using System.Collections.ObjectModel;
+	using System.ComponentModel.DataAnnotations;
 	using System.Data;
 	using System.Data.Common;
 	using System.Data.SQLite;
 	using System.Globalization;
-	using global::Common.Logging;
-	using Microsoft.Data.SqlClient;
-	using MySql.Data.MySqlClient;
 
 	/// Class <c>DataStoreStructure.</c>
 	/// <summary>
@@ -68,7 +69,7 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// <value>
 		/// All table names from the connected database.
 		/// </value>
-		public DataTable TableNames
+		public virtual DataTable TableNames
 		{
 			get
 			{
@@ -92,52 +93,23 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// schema information.</param>
 		/// <returns>A Column object populated with properties derived from
 		/// the values in the provided DataRow.</returns>
-		public static Column FormatColumnFromDataRow(DataRow row)
+		public virtual Column FormatColumnFromDataRow(DataRow row)
 		{
 			Column column = null;
 
 			if (row != null)
 			{
 				column = new ();
-				column.Name = row["COLUMN_NAME"].ToString();
 
+				column.Name = row["COLUMN_NAME"].ToString();
 				string dataType = row["DATA_TYPE"].ToString();
 
-				switch (dataType)
-				{
-					case "integer":
-						column.ColumnType = ColumnType.Number;
-						break;
-					case "string":
-						string flags = row["COLUMN_FLAGS"].ToString();
+				string flagsText = row["COLUMN_FLAGS"].ToString();
+				int flags = int.TryParse(dataType, out int temp) ? temp : 0;
+				int length = GetColumnLength(row);
+				column.Length = length;
 
-						if (int.Parse(flags, CultureInfo.InvariantCulture) > 127)
-						{
-							column.ColumnType = ColumnType.Memo;
-						}
-						else
-						{
-							column.ColumnType = ColumnType.String;
-						}
-
-						break;
-					case "date":
-						// Guessing date vs. datetime based on name
-						column.ColumnType = ColumnType.DateTime;
-						break;
-					default:
-						column.ColumnType = ColumnType.Unknown;
-						break;
-				}
-
-				if (!row.IsNull("CHARACTER_MAXIMUM_LENGTH"))
-				{
-					string maxLength =
-						row["CHARACTER_MAXIMUM_LENGTH"].ToString();
-
-					column.Length =
-						int.Parse(maxLength, CultureInfo.InvariantCulture);
-				}
+				column.ColumnType = GetColumnType(dataType, length, flags);
 
 				if (row["IS_NULLABLE"].ToString() == "True")
 				{
@@ -151,7 +123,7 @@ namespace DigitalZenWorks.Database.ToolKit
 
 				string position = row["ORDINAL_POSITION"].ToString();
 				column.Position =
-					int.Parse(position, CultureInfo.InvariantCulture);
+					int.TryParse(position, out temp) ? temp : 0;
 			}
 
 			return column;
@@ -322,7 +294,7 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// </summary>
 		/// <param name="tableName">The name of the table.</param>
 		/// <returns>DataTable.</returns>
-		public DataTable GetConstraints(string tableName)
+		public virtual DataTable GetConstraints(string tableName)
 		{
 			DataTable constraints = GetBaseConstraints();
 
@@ -368,7 +340,7 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// </summary>
 		/// <param name="tableName">The name of the table.</param>
 		/// <returns>DataTable.</returns>
-		public DataTable GetPrimaryKeys(string tableName)
+		public virtual DataTable GetPrimaryKeys(string tableName)
 		{
 			string[] tableInformation = [null, null, tableName];
 
@@ -469,13 +441,42 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// </summary>
 		/// <param name="tableName">The name of the table.</param>
 		/// <returns>DataTable.</returns>
-		public DataTable GetTableColumns(string tableName)
+		public virtual DataTable GetTableColumns(string tableName)
 		{
 			string[] tableInformation = [null, null, tableName];
 
 			DataTable schemaTable = GetSchema("Columns", tableInformation);
 
 			return schemaTable;
+		}
+
+		/// <summary>
+		/// Retrieves the maximum length, in characters, defined for a column
+		/// represented by the specified data row.
+		/// </summary>
+		/// <remarks>If the 'CHARACTER_MAXIMUM_LENGTH' field is null or cannot
+		/// be parsed as an integer, the method returns 0.</remarks>
+		/// <param name="row">The <see cref="System.Data.DataRow"/> containing
+		/// column metadata. Must include the 'CHARACTER_MAXIMUM_LENGTH' field.
+		/// </param>
+		/// <returns>The maximum character length of the column if specified;
+		/// otherwise, 0.</returns>
+		protected virtual int GetColumnLength(DataRow row)
+		{
+			int length = 0;
+
+			ArgumentNullException.ThrowIfNull(row);
+
+			bool test = row.IsNull("CHARACTER_MAXIMUM_LENGTH");
+
+			if (test == false)
+			{
+				string maxLength = row["CHARACTER_MAXIMUM_LENGTH"].ToString();
+
+				length = int.TryParse(maxLength, out int temp) ? temp : 0;
+			}
+
+			return length;
 		}
 
 		/// <summary>
@@ -507,6 +508,47 @@ namespace DigitalZenWorks.Database.ToolKit
 			Collection<Table> tables = new(newList);
 
 			return tables;
+		}
+
+		/// <summary>
+		/// Determines the column type based on the specified data type name and
+		/// optional flags.
+		/// </summary>
+		/// <param name="dataType">The name of the data type to evaluate. Common
+		/// values include "integer", "string", and "date". Cannot be null.
+		/// </param>
+		/// <param name="flags">Optional flags that influence the column type
+		/// determination. The meaning of specific flag values depends on the
+		/// implementation.</param>
+		/// <param name="length">The length of the data type,
+		/// if applicable.</param>
+		/// <returns>A value from the <see cref="ColumnType"/> enumeration that
+		/// represents the inferred column type. Returns <see
+		/// cref="ColumnType.Unknown"/> if the data type is not recognized.
+		/// </returns>
+		protected virtual ColumnType GetColumnType(
+			string dataType, int flags, int length)
+		{
+			ColumnType columnType = ColumnType.Unknown;
+
+			switch (dataType)
+			{
+				case "integer":
+					columnType = ColumnType.Number;
+					break;
+				case "string":
+					columnType = ColumnType.String;
+					break;
+				case "date":
+					// Guessing date vs. datetime based on name
+					columnType = ColumnType.DateTime;
+					break;
+				default:
+					columnType = ColumnType.Unknown;
+					break;
+			}
+
+			return columnType;
 		}
 
 		/// <summary>
@@ -793,6 +835,22 @@ namespace DigitalZenWorks.Database.ToolKit
 			return newRow;
 		}
 
+		/// <summary>
+		/// Creates a <see cref="Relationship"/> object representing the foreign
+		/// key relationship described by the specified data row.
+		/// </summary>
+		/// <remarks>The method expects the <paramref name="foreignKey"/> to
+		/// contain specific column names such as "CONSTRAINT_NAME",
+		/// "TABLE_NAME", "FKEY_FROM_COLUMN", "FKEY_TO_TABLE", "FKEY_TO_COLUMN",
+		/// "FKEY_ON_DELETE", and "FKEY_ON_DELETE". If these columns are missing
+		/// or contain unexpected values, the resulting <see
+		/// cref="Relationship"/> may not be fully populated.</remarks>
+		/// <param name="foreignKey">A <see cref="DataRow"/> containing metadata
+		/// about a foreign key constraint. Must include columns for constraint
+		/// name, table names, column names, and update/delete rules.</param>
+		/// <returns>A <see cref="Relationship"/> instance populated with
+		/// information about the foreign key relationship, including
+		/// table and column names, and cascade rules.</returns>
 		protected virtual Relationship GetRelationship(DataRow foreignKey)
 		{
 			Relationship relationship = new ();
