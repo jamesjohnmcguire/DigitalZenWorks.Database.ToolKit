@@ -18,10 +18,29 @@ namespace DigitalZenWorks.Database.ToolKit
 	/// <summary>
 	/// SQL writer helper class.
 	/// </summary>
-	/// <param name="rowColumnValues">The row column values.</param>
-	public class SqlWriter(string[] rowColumnValues)
+	public class SqlWriter
 	{
-		private readonly string[] rowColumnValues = rowColumnValues;
+		private readonly string[] rowColumnValues;
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="SqlWriter"/> class.
+		/// </summary>
+		public SqlWriter()
+		{
+			rowColumnValues = Array.Empty<string>();
+		}
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="SqlWriter"/> class
+		/// using the specified array of row and column values.
+		/// </summary>
+		/// <param name="rowColumnValues">An array of strings containing the
+		/// values to be written for each row and column. Cannot be null.
+		/// </param>
+		public SqlWriter(string[] rowColumnValues)
+		{
+			this.rowColumnValues = rowColumnValues;
+		}
 
 		/// <summary>
 		/// Create Insert Statement.
