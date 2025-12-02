@@ -9,13 +9,11 @@ namespace DigitalZenWorks.Database.ToolKit
 	using System;
 	using System.Collections.Generic;
 	using System.Collections.ObjectModel;
-	using System.Data;
 	using System.Globalization;
 	using System.IO;
 	using System.Linq;
-	using System.Reflection;
-	using System.Resources;
 	using System.Runtime.Versioning;
+	using System.Text;
 	using global::Common.Logging;
 
 	/// Class <c>DataDefinition.</c>
@@ -46,23 +44,25 @@ namespace DigitalZenWorks.Database.ToolKit
 			{
 				Collection<Table> tables = GetSchema(databaseFile);
 
-				string schemaText = string.Empty;
-
 				Collection<string> list = OrderTable(tables);
+
+				Dictionary<string, Table> tableLookup =
+					tables.ToDictionary(t => t.Name);
+				StringBuilder schemaBuilder = new();
 
 				foreach (string tableName in list)
 				{
-					foreach (Table table in tables)
+					bool exists =
+						tableLookup.TryGetValue(tableName, out Table table);
+
+					if (exists == true)
 					{
-						if (table.Name == tableName)
-						{
-							schemaText += WriteSql(table) +
-								Environment.NewLine;
-							break;
-						}
+						string statement = WriteSql(table);
+						schemaBuilder.AppendLine(statement);
 					}
 				}
 
+				string schemaText = schemaBuilder.ToString();
 				File.WriteAllText(schemaFile, schemaText);
 
 				successCode = true;
@@ -102,23 +102,25 @@ namespace DigitalZenWorks.Database.ToolKit
 			{
 				Collection<Table> tables = GetSchemaOleDb(databaseFile);
 
-				string schemaText = string.Empty;
-
 				Collection<string> list = OrderTable(tables);
+
+				Dictionary<string, Table> tableLookup =
+					tables.ToDictionary(t => t.Name);
+				StringBuilder schemaBuilder = new ();
 
 				foreach (string tableName in list)
 				{
-					foreach (Table table in tables)
+					bool exists =
+						tableLookup.TryGetValue(tableName, out Table table);
+
+					if (exists == true)
 					{
-						if (table.Name == tableName)
-						{
-							schemaText += WriteSql(table) +
-								Environment.NewLine;
-							break;
-						}
+						string statement = WriteSql(table);
+						schemaBuilder.AppendLine(statement);
 					}
 				}
 
+				string schemaText = schemaBuilder.ToString();
 				File.WriteAllText(schemaFile, schemaText);
 
 				successCode = true;
