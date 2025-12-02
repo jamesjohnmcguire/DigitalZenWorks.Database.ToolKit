@@ -182,7 +182,7 @@ namespace DigitalZenWorks.Database.ToolKit
 						dataSource);
 					break;
 				case DatabaseType.SQLite:
-					string connectionBase = "Data Source={0};Version=3;" +
+					const string connectionBase = "Data Source={0};Version=3;" +
 						"DateTimeFormat=InvariantCulture";
 					connectionString = string.Format(
 						CultureInfo.InvariantCulture,
@@ -265,7 +265,7 @@ namespace DigitalZenWorks.Database.ToolKit
 			}
 			catch (Exception exception)
 			{
-				string message = Strings.Exception + exception.ToString();
+				string message = Strings.Exception + exception;
 				Log.Error(message);
 
 				throw;

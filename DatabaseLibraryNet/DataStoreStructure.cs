@@ -759,11 +759,11 @@ namespace DigitalZenWorks.Database.ToolKit
 		{
 			ArgumentNullException.ThrowIfNull(foreignKey);
 
-			string constraint = "CONSTRAINT";
-			string key = "FOREIGN KEY";
-			string references = "REFERENCES";
+			const string constraint = "CONSTRAINT";
+			const string key = "FOREIGN KEY";
+			const string references = "REFERENCES";
 
-			string statement =
+			const string statement =
 				"\t{0} \"{1}\" {2} (\"{3}\") {4} \"{5}\" (\"{6}\")";
 
 			string sql = string.Format(
@@ -820,13 +820,13 @@ namespace DigitalZenWorks.Database.ToolKit
 			Relationship relationship = new ();
 
 			// Using standard (or perhaps Sqlite) keys
-			string constraintNameKey = "CONSTRAINT_NAME";
-			string tableNameKey = "TABLE_NAME";
-			string columnNameKey = "FKEY_FROM_COLUMN";
-			string foreignTableNameKey = "FKEY_TO_TABLE";
-			string foreignColumnNameKey = "FKEY_TO_COLUMN";
-			string updateRuleKey = "FKEY_ON_DELETE";
-			string deleteRuleKey = "FKEY_ON_DELETE";
+			const string constraintNameKey = "CONSTRAINT_NAME";
+			const string tableNameKey = "TABLE_NAME";
+			const string columnNameKey = "FKEY_FROM_COLUMN";
+			const string foreignTableNameKey = "FKEY_TO_TABLE";
+			const string foreignColumnNameKey = "FKEY_TO_COLUMN";
+			const string updateRuleKey = "FKEY_ON_DELETE";
+			const string deleteRuleKey = "FKEY_ON_DELETE";
 
 			relationship.Name = foreignKey[constraintNameKey].ToString();
 			relationship.ParentTable =
@@ -988,12 +988,12 @@ namespace DigitalZenWorks.Database.ToolKit
 
 		private static string GetConstraintQueryMySql(string tableName)
 		{
-			string fields = "CONSTRAINT_TYPE, CONSTRAINT_NAME, TABLE_NAME, " +
-				"COLUMN_NAME, REFERENCED_TABLE_NAME, REFERENCED_COLUMN_NAME";
-
-			string from = "INFORMATION_SCHEMA.KEY_COLUMN_USAGE";
-
-			string union = "UNION SELECT 'PRIMARY KEY' as CONSTRAINT_TYPE, " +
+			const string fields = "CONSTRAINT_TYPE, CONSTRAINT_NAME, " +
+				"TABLE_NAME, COLUMN_NAME, REFERENCED_TABLE_NAME, " +
+				"REFERENCED_COLUMN_NAME";
+			const string from = "INFORMATION_SCHEMA.KEY_COLUMN_USAGE";
+			const string union =
+				"UNION SELECT 'PRIMARY KEY' as CONSTRAINT_TYPE, " +
 				"CONSTRAINT_NAME, TABLE_NAME, COLUMN_NAME, " +
 				"NULL as REFERENCED_TABLE_NAME, " +
 				"NULL as REFERENCED_COLUMN_NAME";
@@ -1009,7 +1009,7 @@ namespace DigitalZenWorks.Database.ToolKit
 
 		private static string GetConstraintQueryOracle(string tableName)
 		{
-			string fields = @"SELECT constraints.CONSTRAINT_TYPE,
+			const string fields = @"SELECT constraints.CONSTRAINT_TYPE,
 				constraints.CONSTRAINT_NAME,
 				constraints.TABLE_NAME,
 				constraintColumns.COLUMN_NAME,
@@ -1017,10 +1017,8 @@ namespace DigitalZenWorks.Database.ToolKit
 				referentialConstraints.TABLE_NAME as REFERENCED_TABLE_NAME,
 				referentialConstraintColumns.COLUMN_NAME as
 				REFERENCED_COLUMN_NAME";
-
-			string from = "ALL_CONSTRAINTS constraints";
-
-			string joins =
+			const string from = "ALL_CONSTRAINTS constraints";
+			const string joins =
 				"LEFT JOIN ALL_CONS_COLUMNS constraintColumns ON " +
 				"constraints.CONSTRAINT_NAME = " +
 				"constraintColumns.CONSTRAINT_NAME " +
@@ -1041,7 +1039,7 @@ namespace DigitalZenWorks.Database.ToolKit
 
 		private static string GetConstraintQueryPostgresSql(string tableName)
 		{
-			string fields = @"SELECT tableConstraints.constraint_type,
+			const string fields = @"SELECT tableConstraints.constraint_type,
 				tableConstraints.constraint_name,
 				tableConstraints.table_name,
 				constraintColumnUsage.column_name,
@@ -1049,10 +1047,10 @@ namespace DigitalZenWorks.Database.ToolKit
 				constraintColumnUsageNext.column_name as
 				referenced_column_name";
 
-			string from =
+			const string from =
 				"information_schema.table_constraints tableConstraints";
 
-			string joins =
+			const string joins =
 				"LEFT JOIN information_schema.constraint_column_usage " +
 				"constraintColumnUsage ON " +
 				"tableConstraints.constraint_name= " +
@@ -1083,18 +1081,16 @@ namespace DigitalZenWorks.Database.ToolKit
 
 		private static string GetConstraintQuerySqlServer(string tableName)
 		{
-			string fields = @"SELECT tableConstraints.CONSTRAINT_TYPE,
+			const string fields = @"SELECT tableConstraints.CONSTRAINT_TYPE,
 				tableConstraints.CONSTRAINT_NAME,
 				tableConstraints.TABLE_NAME,
 				constraintColumnUsage.COLUMN_NAME,
 				rc.UNIQUE_CONSTRAINT_NAME,
 				ccu2.TABLE_NAME as REFERENCED_TABLE_NAME,
 				ccu2.COLUMN_NAME as REFERENCED_COLUMN_NAME";
-
-			string from =
+			const string from =
 				"INFORMATION_SCHEMA.TABLE_CONSTRAINTS tableConstraints";
-
-			string joins =
+			const string joins =
 				"LEFT JOIN INFORMATION_SCHEMA.CONSTRAINT_COLUMN_USAGE " +
 				"constraintColumnUsage ON " +
 				"tableConstraints.CONSTRAINT_NAME = " +

@@ -39,7 +39,7 @@ namespace DigitalZenWorks.Database.ToolKit
 		public OleDbSchema(string databaseFile)
 			: base(DatabaseType.OleDb, databaseFile)
 		{
-			string baseFormat = "Provider=Microsoft.ACE.OLEDB.12.0" +
+			const string baseFormat = "Provider=Microsoft.ACE.OLEDB.12.0" +
 				@";Password="""";User ID=Admin;" + "Data Source={0}" +
 				";Mode=Share Deny None;" +
 				@"Extended Properties="""";" +
@@ -443,11 +443,12 @@ namespace DigitalZenWorks.Database.ToolKit
 		{
 			ArgumentNullException.ThrowIfNull(foreignKey);
 
-			string constraint = "CONSTRAINT";
-			string key = "FOREIGN KEY";
-			string references = "REFERENCES";
+			const string constraint = "CONSTRAINT";
+			const string key = "FOREIGN KEY";
+			const string references = "REFERENCES";
 
-			string statement = "\t{0} [{1}] {2} ([{3}]) {4} [{5}] ([{6}])";
+			const string statement =
+				"\t{0} [{1}] {2} ([{3}]) {4} [{5}] ([{6}])";
 
 			string sql = string.Format(
 				CultureInfo.InvariantCulture,
@@ -501,13 +502,13 @@ namespace DigitalZenWorks.Database.ToolKit
 			Relationship relationship = new ();
 
 			// Note: OleDb seems to have reversed referencing.
-			string constraintNameKey = "FK_NAME";
-			string parentTableNameKey = "FK_TABLE_NAME";
-			string parentColumnNameKey = "FK_COLUMN_NAME";
-			string childTableNameKey = "PK_TABLE_NAME";
-			string childColumnNameKey = "PK_COLUMN_NAME";
-			string updateRuleKey = "UPDATE_RULE";
-			string deleteRuleKey = "DELETE_RULE";
+			const string constraintNameKey = "FK_NAME";
+			const string parentTableNameKey = "FK_TABLE_NAME";
+			const string parentColumnNameKey = "FK_COLUMN_NAME";
+			const string childTableNameKey = "PK_TABLE_NAME";
+			const string childColumnNameKey = "PK_COLUMN_NAME";
+			const string updateRuleKey = "UPDATE_RULE";
+			const string deleteRuleKey = "DELETE_RULE";
 
 			if (foreignKey != null)
 			{
@@ -578,7 +579,7 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// Order table.
 		/// </summary>
 		/// <param name="tables">The list of tables to order.</param>
-		/// <returns>The ordered list of of tables.</returns>
+		/// <returns>The ordered list of tables.</returns>
 		/// <remarks>This orders the list taking dependencies into
 		/// account.</remarks>
 		protected override Collection<string> OrderTable(

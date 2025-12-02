@@ -72,11 +72,14 @@ namespace DigitalZenWorks.Database.ToolKit
 				exception is ArgumentException ||
 				exception is InvalidOperationException)
 			{
-				string message = Strings.Exception + exception.ToString();
+				string message = Strings.Exception + exception;
 				Log.Error(message);
 			}
-			catch
+			catch (Exception exception)
 			{
+				string message = Strings.Exception + exception;
+				Log.Error(message);
+
 				throw;
 			}
 
@@ -130,11 +133,14 @@ namespace DigitalZenWorks.Database.ToolKit
 				exception is ArgumentException ||
 				exception is InvalidOperationException)
 			{
-				string message = Strings.Exception + exception.ToString();
+				string message = Strings.Exception + exception;
 				Log.Error(message);
 			}
-			catch
+			catch (Exception exception)
 			{
+				string message = Strings.Exception + exception;
+				Log.Error(message);
+
 				throw;
 			}
 
@@ -153,9 +159,9 @@ namespace DigitalZenWorks.Database.ToolKit
 			if (!string.IsNullOrWhiteSpace(dataDefinition))
 			{
 #if NETCOREAPP1_0_OR_GREATER
-				char check = '(';
+				const char check = '(';
 #else
-				string check = "(";
+				const string check = "(";
 #endif
 
 				int splitIndex = dataDefinition.IndexOf(
@@ -378,7 +384,7 @@ namespace DigitalZenWorks.Database.ToolKit
 
 			if (!string.IsNullOrWhiteSpace(dataDefinition))
 			{
-				char separators = '(';
+				const char separators = '(';
 				string[] tableParts = dataDefinition.Split(separators);
 
 				string[] tableNameParts = tableParts[0].Split(['[', ']', '`']);
@@ -421,7 +427,7 @@ namespace DigitalZenWorks.Database.ToolKit
 						extension.Equals(
 							".accdb", StringComparison.OrdinalIgnoreCase))
 					{
-						string provider = "Microsoft.ACE.OLEDB.12.0";
+						const string provider = "Microsoft.ACE.OLEDB.12.0";
 						string connectionString = string.Format(
 							CultureInfo.InvariantCulture,
 							"provider={0}; Data Source={1}",
@@ -444,12 +450,12 @@ namespace DigitalZenWorks.Database.ToolKit
 				exception is OutOfMemoryException ||
 				exception is System.Data.OleDb.OleDbException)
 			{
-				string message = Strings.Exception + exception.ToString();
+				string message = Strings.Exception + exception;
 				Log.Error(message);
 			}
 			catch (Exception exception)
 			{
-				string message = Strings.Exception + exception.ToString();
+				string message = Strings.Exception + exception;
 				Log.Error(message);
 
 				throw;
@@ -486,7 +492,7 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// Order table.
 		/// </summary>
 		/// <param name="tables">The list of tables to order.</param>
-		/// <returns>The ordered list of of tables.</returns>
+		/// <returns>The ordered list of tables.</returns>
 		/// <remarks>This orders the list taking dependencies into
 		/// account.</remarks>
 		public static Collection<string> OrderTable(
@@ -560,12 +566,12 @@ namespace DigitalZenWorks.Database.ToolKit
 					exception is OutOfMemoryException ||
 					exception is System.Data.OleDb.OleDbException)
 				{
-					string message = Strings.Exception + exception.ToString();
+					string message = Strings.Exception + exception;
 					Log.Error(message);
 				}
 				catch (Exception exception)
 				{
-					string message = Strings.Exception + exception.ToString();
+					string message = Strings.Exception + exception;
 					Log.Error(message);
 
 					throw;
@@ -592,7 +598,7 @@ namespace DigitalZenWorks.Database.ToolKit
 			catch (Exception exception) when
 				(exception is ArgumentNullException)
 			{
-				Log.Error(Strings.Exception + exception.ToString());
+				Log.Error(Strings.Exception + exception);
 			}
 
 			return header;
@@ -769,7 +775,7 @@ namespace DigitalZenWorks.Database.ToolKit
 		{
 			bool successCode = false;
 
-			string provider = "Microsoft.ACE.OLEDB.12.0";
+			const string provider = "Microsoft.ACE.OLEDB.12.0";
 			string connectionString = string.Format(
 				CultureInfo.InvariantCulture,
 				"provider={0}; Data Source={1}",
@@ -860,10 +866,11 @@ namespace DigitalZenWorks.Database.ToolKit
 			}
 			else
 			{
-				string constraint = "CONSTRAINT";
-				string key = "FOREIGN KEY";
-				string references = "REFERENCES";
-				string statement = "{0} `{1}` {2} (`{3}`) {4} `{5}` (`{6}`)";
+				const string constraint = "CONSTRAINT";
+				const string key = "FOREIGN KEY";
+				const string references = "REFERENCES";
+				const string statement =
+					"{0} `{1}` {2} (`{3}`) {4} `{5}` (`{6}`)";
 
 				sql = string.Format(
 					CultureInfo.InvariantCulture,
