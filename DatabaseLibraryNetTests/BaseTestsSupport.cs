@@ -74,6 +74,27 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 		}
 
 		/// <summary>
+		/// Retrieves the file path to the embedded SQL test file used for unit
+		/// testing.
+		/// </summary>
+		/// <remarks>This method is intended for use in test scenarios where
+		/// access to the embedded SQL script is required. The returned file
+		/// path can be used to read or execute the test SQL statements.
+		/// </remarks>
+		/// <returns>A string containing the file path to the embedded SQL test
+		/// file. The path will be valid if the resource exists; otherwise, it
+		/// may be empty or invalid.</returns>
+		protected static string GetTestSqlFile()
+		{
+			string resource = "DigitalZenWorks.Database.ToolKit.Tests." +
+				"Products.Sqlite.Test.sql";
+
+			string filePath = GetEmbeddedResourceFile(resource, "sql");
+
+			return filePath;
+		}
+
+		/// <summary>
 		/// Dispose method.
 		/// </summary>
 		/// <param name="disposing">True to release both managed and unmanaged
@@ -118,16 +139,6 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 			string databasePath = Path.ChangeExtension(fileName, ".db");
 
 			return databasePath;
-		}
-
-		private static string GetTestSqlFile()
-		{
-			string resource = "DigitalZenWorks.Database.ToolKit.Tests." +
-				"Products.Sqlite.Test.sql";
-
-			string filePath = GetEmbeddedResourceFile(resource, "sql");
-
-			return filePath;
 		}
 
 		private void GetDatabase()

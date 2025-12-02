@@ -21,6 +21,26 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 	internal sealed class DataStoreStructureTests : BaseTestsSupport
 	{
 		/// <summary>
+		/// Export schema test.
+		/// </summary>
+		[Test]
+		public void ExportSchema()
+		{
+			string schemaFile = DataSource + ".sql";
+
+			bool result =
+				DataDefinition.ExportSchema(DataSource, schemaFile);
+
+			Assert.That(result, Is.True);
+
+			string compareSqlFile = GetTestSqlFile();
+			string compareText = File.ReadAllText(compareSqlFile);
+
+			string text = File.ReadAllText(schemaFile);
+			Assert.That(text, Is.EqualTo(compareText));
+		}
+
+		/// <summary>
 		/// Get constaints test.
 		/// </summary>
 		[Test]
@@ -161,6 +181,38 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 
 			string name = table.TableName;
 			Assert.That(name, Is.EqualTo("Columns"));
+		}
+
+		/// <summary>
+		/// Order table test.
+		/// </summary>
+		[Test]
+		public void OrderTable()
+		{
+			Collection<Table> tables = DataDefinition.GetSchema(DataSource);
+
+			Collection<string> orderedList = DataDefinition.OrderTable(tables);
+
+			string tableName = orderedList[0];
+			Assert.That(tableName, Is.EqualTo("Addresses"));
+
+			tableName = orderedList[1];
+			Assert.That(tableName, Is.EqualTo("Categories"));
+
+			tableName = orderedList[2];
+			Assert.That(tableName, Is.EqualTo("Contacts"));
+
+			tableName = orderedList[3];
+			Assert.That(tableName, Is.EqualTo("Makers"));
+
+			tableName = orderedList[4];
+			Assert.That(tableName, Is.EqualTo("Sections"));
+
+			tableName = orderedList[5];
+			Assert.That(tableName, Is.EqualTo("Series"));
+
+			tableName = orderedList[6];
+			Assert.That(tableName, Is.EqualTo("Products"));
 		}
 	}
 }

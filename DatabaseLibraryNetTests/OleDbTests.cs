@@ -191,8 +191,7 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 			Collection<Table> tables =
 				DataDefinition.GetSchemaOleDb(databaseFile);
 
-			Collection<string> orderedList =
-				DataDefinition.OrderTable(tables);
+			Collection<string> orderedList = DataDefinition.OrderTable(tables);
 
 			string tableName = orderedList[0];
 			Assert.That(tableName, Is.EqualTo("Addresses"));
