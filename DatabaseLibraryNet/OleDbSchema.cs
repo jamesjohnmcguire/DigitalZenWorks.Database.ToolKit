@@ -266,6 +266,8 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// <param name="flags">Optional flags that influence the column type
 		/// determination. The meaning of specific flag values depends on the
 		/// implementation.</param>
+		/// <param name="length">The length of the data type,
+		/// if applicable.</param>
 		/// <returns>A value from the <see cref="ColumnType"/> enumeration that
 		/// represents the inferred column type. Returns <see
 		/// cref="ColumnType.Unknown"/> if the data type is not recognized.
@@ -438,6 +440,26 @@ namespace DigitalZenWorks.Database.ToolKit
 			return orderedTables;
 		}
 
+		// If primary key is an integer, change type to AutoNumber.
+		private static Column SetPrimaryKeyType(Table table)
+		{
+			Column primaryKey = null;
+
+			string primaryKeyName = table.PrimaryKey;
+
+			if (!string.IsNullOrWhiteSpace(primaryKeyName))
+			{
+				primaryKey = table.Columns[primaryKeyName];
+
+				if (primaryKey.ColumnType == ColumnType.Number)
+				{
+					primaryKey.ColumnType = ColumnType.AutoNumber;
+				}
+			}
+
+			return primaryKey;
+		}
+
 		private DataTable GetSchema(Guid guid, object[] restrictions)
 		{
 			if (oleDbConnection.State != ConnectionState.Open)
@@ -458,26 +480,6 @@ namespace DigitalZenWorks.Database.ToolKit
 			Table table = SetPrimaryKey(row);
 
 			return table;
-		}
-
-		// If primary key is an integer, change type to AutoNumber.
-		private static Column SetPrimaryKeyType(Table table)
-		{
-			Column primaryKey = null;
-
-			string primaryKeyName = table.PrimaryKey;
-
-			if (!string.IsNullOrWhiteSpace(primaryKeyName))
-			{
-				primaryKey = table.Columns[primaryKeyName];
-
-				if (primaryKey.ColumnType == ColumnType.Number)
-				{
-					primaryKey.ColumnType = ColumnType.AutoNumber;
-				}
-			}
-
-			return primaryKey;
 		}
 	}
 }

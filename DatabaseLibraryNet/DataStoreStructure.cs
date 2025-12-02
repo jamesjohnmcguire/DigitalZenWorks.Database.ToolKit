@@ -6,17 +6,12 @@
 
 namespace DigitalZenWorks.Database.ToolKit
 {
-	using global::Common.Logging;
-	using Microsoft.Data.SqlClient;
-	using MySql.Data.MySqlClient;
 	using System;
 	using System.Collections.Generic;
 	using System.Collections.ObjectModel;
-	using System.ComponentModel.DataAnnotations;
 	using System.Data;
 	using System.Data.Common;
-	using System.Data.SQLite;
-	using System.Globalization;
+	using global::Common.Logging;
 
 	/// Class <c>DataStoreStructure.</c>
 	/// <summary>
@@ -80,90 +75,32 @@ namespace DigitalZenWorks.Database.ToolKit
 		}
 
 		/// <summary>
-		/// Creates a new Column instance by extracting and formatting column
-		/// metadata from the specified DataRow.
+		/// Gets the foreign key relationships.
 		/// </summary>
-		/// <remarks>The returned Column reflects the schema information
-		/// present in the DataRow, including type, length, nullability,
-		/// default value, and position. The method expects the DataRow to
-		/// follow a specific schema layout, such as that returned from
-		/// database schema queries.</remarks>
-		/// <param name="row">The DataRow containing column metadata. Must
-		/// include fields such as COLUMN_NAME, DATA_TYPE, and other relevant
-		/// schema information.</param>
-		/// <returns>A Column object populated with properties derived from
-		/// the values in the provided DataRow.</returns>
-		public virtual Column FormatColumnFromDataRow(DataRow row)
+		/// <param name="relationships">A set of relationships.</param>
+		/// <returns>The foreign key relationships.</returns>
+		public static ForeignKey[] GetForeignKeyRelationships(
+			Relationship[] relationships)
 		{
-			Column column = null;
+			ForeignKey[] keys = null;
 
-			if (row != null)
+			if (relationships != null)
 			{
-				column = new ();
+				int count = 0;
+				keys = new ForeignKey[relationships.Length];
 
-				column.Name = row["COLUMN_NAME"].ToString();
-				string dataType = row["DATA_TYPE"].ToString();
-
-				string flagsText = row["COLUMN_FLAGS"].ToString();
-				int flags = int.TryParse(dataType, out int temp) ? temp : 0;
-				int length = GetColumnLength(row);
-				column.Length = length;
-
-				column.ColumnType = GetColumnType(dataType, length, flags);
-
-				if (row["IS_NULLABLE"].ToString() == "True")
+				// Add foreign keys to table, using relationships
+				foreach (Relationship relationship in relationships)
 				{
-					column.Nullable = true;
+					ForeignKey foreignKey =
+						GetForeignKeyRelationship(relationship);
+
+					keys[count] = foreignKey;
+					count++;
 				}
-
-				if (row["COLUMN_HASDEFAULT"].ToString() == "True")
-				{
-					column.DefaultValue = row["COLUMN_DEFAULT"].ToString();
-				}
-
-				string position = row["ORDINAL_POSITION"].ToString();
-				column.Position =
-					int.TryParse(position, out temp) ? temp : 0;
 			}
 
-			return column;
-		}
-
-		/// <summary>
-		/// Creates a <see cref="ForeignKey"/> instance that represents the
-		/// foreign key relationship defined by the specified
-		/// <see cref="Relationship"/> object.
-		/// </summary>
-		/// <param name="relationship">The <see cref="Relationship"/> object
-		/// containing the details of the foreign key relationship to be
-		/// represented. Cannot be null.</param>
-		/// <returns>A <see cref="ForeignKey"/> instance initialized with the
-		/// properties of the specified <paramref name="relationship"/>.
-		/// </returns>
-		protected static ForeignKey GetForeignKeyRelationship(
-			Relationship relationship)
-		{
-			ForeignKey foreignKey;
-
-			if (relationship == null)
-			{
-				throw new ArgumentNullException(
-					nameof(relationship),
-					"Relationship cannot be null");
-			}
-			else
-			{
-				foreignKey = new (
-					relationship.Name,
-					relationship.ParentTable,
-					relationship.ParentTableCol,
-					relationship.ChildTable,
-					relationship.ChildTableCol,
-					relationship.OnDeleteCascade,
-					relationship.OnUpdateCascade);
-			}
-
-			return foreignKey;
+			return keys;
 		}
 
 		/// <summary>
@@ -203,41 +140,23 @@ namespace DigitalZenWorks.Database.ToolKit
 			return orderedDependencies;
 		}
 
+		/// <summary>
+		/// Retrieves the table name from the specified <see cref="DataRow"/>
+		/// instance.
+		/// </summary>
+		/// <param name="row">The <see cref="DataRow"/> containing a value for
+		/// the "TABLE_NAME" column. Must not be null and must contain the
+		/// "TABLE_NAME" column.</param>
+		/// <returns>A string representing the table name extracted from the
+		/// "TABLE_NAME" column of the provided <see cref="DataRow"/>.</returns>
 		public static string GetTableName(DataRow row)
 		{
+			ArgumentNullException.ThrowIfNull(row);
+
 			object nameRaw = row["TABLE_NAME"];
 			string tableName = nameRaw.ToString();
 
 			return tableName;
-		}
-
-		/// <summary>
-		/// Gets the foreign key relationships.
-		/// </summary>
-		/// <param name="relationships">A set of relationships.</param>
-		/// <returns>The foreign key relationships.</returns>
-		public static ForeignKey[] GetForeignKeyRelationships(
-			Relationship[] relationships)
-		{
-			ForeignKey[] keys = null;
-
-			if (relationships != null)
-			{
-				int count = 0;
-				keys = new ForeignKey[relationships.Length];
-
-				// Add foreign keys to table, using relationships
-				foreach (Relationship relationship in relationships)
-				{
-					ForeignKey foreignKey =
-						GetForeignKeyRelationship(relationship);
-
-					keys[count] = foreignKey;
-					count++;
-				}
-			}
-
-			return keys;
 		}
 
 		/// <summary>
@@ -254,7 +173,7 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// Cannot be null.</param>
 		/// <returns>The table instance with its foreign keys updated to
 		/// reflect the specified relationships.</returns>
-		public Table SetForeignKeys(
+		public static Table SetForeignKeys(
 			Table table, Collection<Relationship> relationships)
 		{
 			if (table == null)
@@ -278,6 +197,56 @@ namespace DigitalZenWorks.Database.ToolKit
 			}
 
 			return table;
+		}
+
+		/// <summary>
+		/// Creates a new Column instance by extracting and formatting column
+		/// metadata from the specified DataRow.
+		/// </summary>
+		/// <remarks>The returned Column reflects the schema information
+		/// present in the DataRow, including type, length, nullability,
+		/// default value, and position. The method expects the DataRow to
+		/// follow a specific schema layout, such as that returned from
+		/// database schema queries.</remarks>
+		/// <param name="row">The DataRow containing column metadata. Must
+		/// include fields such as COLUMN_NAME, DATA_TYPE, and other relevant
+		/// schema information.</param>
+		/// <returns>A Column object populated with properties derived from
+		/// the values in the provided DataRow.</returns>
+		public virtual Column FormatColumnFromDataRow(DataRow row)
+		{
+			Column column = null;
+
+			if (row != null)
+			{
+				column = new ();
+
+				column.Name = row["COLUMN_NAME"].ToString();
+				string dataType = row["DATA_TYPE"].ToString();
+
+				string flagsText = row["COLUMN_FLAGS"].ToString();
+				int flags = int.TryParse(flagsText, out int temp) ? temp : 0;
+				int length = GetColumnLength(row);
+				column.Length = length;
+
+				column.ColumnType = GetColumnType(dataType, length, flags);
+
+				if (row["IS_NULLABLE"].ToString() == "True")
+				{
+					column.Nullable = true;
+				}
+
+				if (row["COLUMN_HASDEFAULT"].ToString() == "True")
+				{
+					column.DefaultValue = row["COLUMN_DEFAULT"].ToString();
+				}
+
+				string position = row["ORDINAL_POSITION"].ToString();
+				column.Position =
+					int.TryParse(position, out temp) ? temp : 0;
+			}
+
+			return column;
 		}
 
 		/// <summary>
@@ -358,10 +327,7 @@ namespace DigitalZenWorks.Database.ToolKit
 		public Collection<Relationship> GetRelationships(
 			string tableName, Collection<Relationship> relationships)
 		{
-			if (relationships == null)
-			{
-				relationships = new Collection<Relationship>();
-			}
+			relationships ??= [];
 
 			DataTable foreignKeyTable = GetForeignKeys(tableName);
 
@@ -451,32 +417,40 @@ namespace DigitalZenWorks.Database.ToolKit
 		}
 
 		/// <summary>
-		/// Retrieves the maximum length, in characters, defined for a column
-		/// represented by the specified data row.
+		/// Creates a <see cref="ForeignKey"/> instance that represents the
+		/// foreign key relationship defined by the specified
+		/// <see cref="Relationship"/> object.
 		/// </summary>
-		/// <remarks>If the 'CHARACTER_MAXIMUM_LENGTH' field is null or cannot
-		/// be parsed as an integer, the method returns 0.</remarks>
-		/// <param name="row">The <see cref="System.Data.DataRow"/> containing
-		/// column metadata. Must include the 'CHARACTER_MAXIMUM_LENGTH' field.
-		/// </param>
-		/// <returns>The maximum character length of the column if specified;
-		/// otherwise, 0.</returns>
-		protected virtual int GetColumnLength(DataRow row)
+		/// <param name="relationship">The <see cref="Relationship"/> object
+		/// containing the details of the foreign key relationship to be
+		/// represented. Cannot be null.</param>
+		/// <returns>A <see cref="ForeignKey"/> instance initialized with the
+		/// properties of the specified <paramref name="relationship"/>.
+		/// </returns>
+		protected static ForeignKey GetForeignKeyRelationship(
+			Relationship relationship)
 		{
-			int length = 0;
+			ForeignKey foreignKey;
 
-			ArgumentNullException.ThrowIfNull(row);
-
-			bool test = row.IsNull("CHARACTER_MAXIMUM_LENGTH");
-
-			if (test == false)
+			if (relationship == null)
 			{
-				string maxLength = row["CHARACTER_MAXIMUM_LENGTH"].ToString();
-
-				length = int.TryParse(maxLength, out int temp) ? temp : 0;
+				throw new ArgumentNullException(
+					nameof(relationship),
+					"Relationship cannot be null");
+			}
+			else
+			{
+				foreignKey = new(
+					relationship.Name,
+					relationship.ParentTable,
+					relationship.ParentTableCol,
+					relationship.ChildTable,
+					relationship.ChildTableCol,
+					relationship.OnDeleteCascade,
+					relationship.OnUpdateCascade);
 			}
 
-			return length;
+			return foreignKey;
 		}
 
 		/// <summary>
@@ -511,6 +485,50 @@ namespace DigitalZenWorks.Database.ToolKit
 		}
 
 		/// <summary>
+		/// Dispose.
+		/// </summary>
+		/// <param name="disposing">Indicates whether the object is
+		/// currently disposing.</param>
+		protected virtual void Dispose(bool disposing)
+		{
+			if (disposing)
+			{
+				database?.Close();
+				database?.Dispose();
+				database = null;
+			}
+		}
+
+		/// <summary>
+		/// Retrieves the maximum length, in characters, defined for a column
+		/// represented by the specified data row.
+		/// </summary>
+		/// <remarks>If the 'CHARACTER_MAXIMUM_LENGTH' field is null or cannot
+		/// be parsed as an integer, the method returns 0.</remarks>
+		/// <param name="row">The <see cref="System.Data.DataRow"/> containing
+		/// column metadata. Must include the 'CHARACTER_MAXIMUM_LENGTH' field.
+		/// </param>
+		/// <returns>The maximum character length of the column if specified;
+		/// otherwise, 0.</returns>
+		protected virtual int GetColumnLength(DataRow row)
+		{
+			int length = 0;
+
+			ArgumentNullException.ThrowIfNull(row);
+
+			bool test = row.IsNull("CHARACTER_MAXIMUM_LENGTH");
+
+			if (test == false)
+			{
+				string maxLength = row["CHARACTER_MAXIMUM_LENGTH"].ToString();
+
+				length = int.TryParse(maxLength, out int temp) ? temp : 0;
+			}
+
+			return length;
+		}
+
+		/// <summary>
 		/// Determines the column type based on the specified data type name and
 		/// optional flags.
 		/// </summary>
@@ -529,26 +547,109 @@ namespace DigitalZenWorks.Database.ToolKit
 		protected virtual ColumnType GetColumnType(
 			string dataType, int flags, int length)
 		{
-			ColumnType columnType = ColumnType.Unknown;
-
-			switch (dataType)
+			var columnType = dataType switch
 			{
-				case "integer":
-					columnType = ColumnType.Number;
-					break;
-				case "string":
-					columnType = ColumnType.String;
-					break;
-				case "date":
-					// Guessing date vs. datetime based on name
-					columnType = ColumnType.DateTime;
-					break;
-				default:
-					columnType = ColumnType.Unknown;
-					break;
+				"integer" => ColumnType.Number,
+				"string" => ColumnType.String,
+
+				// Guessing date vs. datetime based on name
+				"date" => ColumnType.DateTime,
+				_ => ColumnType.Unknown,
+			};
+			return columnType;
+		}
+
+		/// <summary>
+		/// Creates a <see cref="Relationship"/> object representing the foreign
+		/// key relationship described by the specified data row.
+		/// </summary>
+		/// <remarks>The method expects the <paramref name="foreignKey"/> to
+		/// contain specific column names such as "CONSTRAINT_NAME",
+		/// "TABLE_NAME", "FKEY_FROM_COLUMN", "FKEY_TO_TABLE", "FKEY_TO_COLUMN",
+		/// "FKEY_ON_DELETE", and "FKEY_ON_DELETE". If these columns are missing
+		/// or contain unexpected values, the resulting <see
+		/// cref="Relationship"/> may not be fully populated.</remarks>
+		/// <param name="foreignKey">A <see cref="DataRow"/> containing metadata
+		/// about a foreign key constraint. Must include columns for constraint
+		/// name, table names, column names, and update/delete rules.</param>
+		/// <returns>A <see cref="Relationship"/> instance populated with
+		/// information about the foreign key relationship, including
+		/// table and column names, and cascade rules.</returns>
+		protected virtual Relationship GetRelationship(DataRow foreignKey)
+		{
+			ArgumentNullException.ThrowIfNull(foreignKey);
+
+			Relationship relationship = new();
+
+			// Using standard (or perhaps Sqlite) keys
+			string constraintNameKey = "CONSTRAINT_NAME";
+			string tableNameKey = "TABLE_NAME";
+			string columnNameKey = "FKEY_FROM_COLUMN";
+			string foreignTableNameKey = "FKEY_TO_TABLE";
+			string foreignColumnNameKey = "FKEY_TO_COLUMN";
+			string updateRuleKey = "FKEY_ON_DELETE";
+			string deleteRuleKey = "FKEY_ON_DELETE";
+
+			relationship.Name = foreignKey[constraintNameKey].ToString();
+			relationship.ParentTable =
+				foreignKey[tableNameKey].ToString();
+			relationship.ParentTableCol =
+				foreignKey[columnNameKey].ToString();
+			relationship.ChildTable =
+				foreignKey[foreignTableNameKey].ToString();
+			relationship.ChildTableCol =
+				foreignKey[foreignColumnNameKey].ToString();
+
+			if (foreignKey[updateRuleKey].ToString() != "NO ACTION")
+			{
+				relationship.OnUpdateCascade = true;
 			}
 
-			return columnType;
+			if (foreignKey[deleteRuleKey].ToString() != "NO ACTION")
+			{
+				relationship.OnDeleteCascade = true;
+			}
+
+			return relationship;
+		}
+
+		/// <summary>
+		/// Retrieves the parent table specified by the relationship and adds
+		/// the corresponding foreign key to its collection.
+		/// </summary>
+		/// <remarks>If the specified relationship or table dictionary is null,
+		/// the method returns null and no changes are made. The foreign key is
+		/// added to the parent table's <c>ForeignKeys</c> collection.
+		/// </remarks>
+		/// <param name="tableDictionary">A dictionary containing table names
+		/// as keys and their corresponding <see cref="Table"/> objects as
+		/// values. Must not be null.</param>
+		/// <param name="relationship">The relationship that defines the
+		/// parent table and foreign key to associate. Must not be null.
+		/// </param>
+		/// <returns>The <see cref="Table"/> object representing the parent
+		/// table with the foreign key added, or <see langword="null"/>
+		/// if <paramref name="tableDictionary"/> or
+		/// <paramref name="relationship"/> is null.</returns>
+		protected virtual Table GetTableWithRelationships(
+			Dictionary<string, Table> tableDictionary,
+			Relationship relationship)
+		{
+			Table table = null;
+
+			if (tableDictionary != null && relationship != null)
+			{
+				string name = relationship.ParentTable;
+
+				ForeignKey foreignKey =
+					GetForeignKeyRelationship(relationship);
+
+				table = tableDictionary[name];
+
+				table.ForeignKeys.Add(foreignKey);
+			}
+
+			return table;
 		}
 
 		/// <summary>
@@ -622,7 +723,8 @@ namespace DigitalZenWorks.Database.ToolKit
 				// using relationships.
 				foreach (Relationship relationship in relationships)
 				{
-					Table table = GetTableWithRelationships(
+					// Will modify tableDictionary in place.
+					GetTableWithRelationships(
 						tableDictionary, relationship);
 				}
 			}
@@ -630,55 +732,9 @@ namespace DigitalZenWorks.Database.ToolKit
 			return tableDictionary;
 		}
 
-		/// <summary>
-		/// Dispose.
-		/// </summary>
-		/// <param name="disposing">Indicates whether the object is
-		/// currently disposing.</param>
-		protected virtual void Dispose(bool disposing)
-		{
-			if (disposing)
-			{
-				database?.Close();
-				database?.Dispose();
-				database = null;
-			}
-		}
-
-		private static void GetDependenciesRecursive(
-			string key,
-			Dictionary<string, Collection<string>> tableDependencies,
-			Collection<string> orderedDependencies,
-			HashSet<string> visited,
-			HashSet<string> visiting)
-		{
-			if (!visited.Contains(key) && !visiting.Contains(key))
-			{
-				visiting.Add(key);
-
-				if (tableDependencies.TryGetValue(
-					key, out Collection<string> value))
-				{
-					foreach (string dependency in value)
-					{
-						GetDependenciesRecursive(
-							dependency,
-							tableDependencies,
-							orderedDependencies,
-							visited,
-							visiting);
-					}
-				}
-
-				visiting.Remove(key); // Done visiting
-				visited.Add(key);     // Mark as processed
-				orderedDependencies.Add(key); // Add to result (postorder)
-			}
-		}
-
 		private static DataTable GetBaseConstraints()
 		{
-			DataTable table = new ();
+			DataTable table = new();
 
 			Type stringType = typeof(string);
 
@@ -822,6 +878,37 @@ namespace DigitalZenWorks.Database.ToolKit
 			return query;
 		}
 
+		private static void GetDependenciesRecursive(
+			string key,
+			Dictionary<string, Collection<string>> tableDependencies,
+			Collection<string> orderedDependencies,
+			HashSet<string> visited,
+			HashSet<string> visiting)
+		{
+			if (!visited.Contains(key) && !visiting.Contains(key))
+			{
+				visiting.Add(key);
+
+				if (tableDependencies.TryGetValue(
+					key, out Collection<string> value))
+				{
+					foreach (string dependency in value)
+					{
+						GetDependenciesRecursive(
+							dependency,
+							tableDependencies,
+							orderedDependencies,
+							visited,
+							visiting);
+					}
+				}
+
+				visiting.Remove(key); // Done visiting
+				visited.Add(key);     // Mark as processed
+				orderedDependencies.Add(key); // Add to result (postorder)
+			}
+		}
+
 		private static DataRow GetIndexConstaintsRow(
 			DataTable table, DataRow row)
 		{
@@ -831,116 +918,6 @@ namespace DigitalZenWorks.Database.ToolKit
 			newRow["ConstraintName"] = row["INDEX_NAME"];
 			newRow["TableName"] = row["TABLE_NAME"];
 			newRow["ColumnName"] = row["COLUMN_NAME"];
-
-			return newRow;
-		}
-
-		/// <summary>
-		/// Creates a <see cref="Relationship"/> object representing the foreign
-		/// key relationship described by the specified data row.
-		/// </summary>
-		/// <remarks>The method expects the <paramref name="foreignKey"/> to
-		/// contain specific column names such as "CONSTRAINT_NAME",
-		/// "TABLE_NAME", "FKEY_FROM_COLUMN", "FKEY_TO_TABLE", "FKEY_TO_COLUMN",
-		/// "FKEY_ON_DELETE", and "FKEY_ON_DELETE". If these columns are missing
-		/// or contain unexpected values, the resulting <see
-		/// cref="Relationship"/> may not be fully populated.</remarks>
-		/// <param name="foreignKey">A <see cref="DataRow"/> containing metadata
-		/// about a foreign key constraint. Must include columns for constraint
-		/// name, table names, column names, and update/delete rules.</param>
-		/// <returns>A <see cref="Relationship"/> instance populated with
-		/// information about the foreign key relationship, including
-		/// table and column names, and cascade rules.</returns>
-		protected virtual Relationship GetRelationship(DataRow foreignKey)
-		{
-			Relationship relationship = new ();
-
-			// Using standard (or perhaps Sqlite) keys
-			string constraintNameKey = "CONSTRAINT_NAME";
-			string tableNameKey = "TABLE_NAME";
-			string columnNameKey = "FKEY_FROM_COLUMN";
-			string foreignTableNameKey = "FKEY_TO_TABLE";
-			string foreignColumnNameKey = "FKEY_TO_COLUMN";
-			string updateRuleKey = "FKEY_ON_DELETE";
-			string deleteRuleKey = "FKEY_ON_DELETE";
-
-			relationship.Name = foreignKey[constraintNameKey].ToString();
-			relationship.ParentTable =
-				foreignKey[tableNameKey].ToString();
-			relationship.ParentTableCol =
-				foreignKey[columnNameKey].ToString();
-			relationship.ChildTable =
-				foreignKey[foreignTableNameKey].ToString();
-			relationship.ChildTableCol =
-				foreignKey[foreignColumnNameKey].ToString();
-
-			if (foreignKey[updateRuleKey].ToString() != "NO ACTION")
-			{
-				relationship.OnUpdateCascade = true;
-			}
-
-			if (foreignKey[deleteRuleKey].ToString() != "NO ACTION")
-			{
-				relationship.OnDeleteCascade = true;
-			}
-
-			return relationship;
-		}
-
-		/// <summary>
-		/// Retrieves the parent table specified by the relationship and adds
-		/// the corresponding foreign key to its collection.
-		/// </summary>
-		/// <remarks>If the specified relationship or table dictionary is null,
-		/// the method returns null and no changes are made. The foreign key is
-		/// added to the parent table's <c>ForeignKeys</c> collection.
-		/// </remarks>
-		/// <param name="tableDictionary">A dictionary containing table names
-		/// as keys and their corresponding <see cref="Table"/> objects as
-		/// values. Must not be null.</param>
-		/// <param name="relationship">The relationship that defines the
-		/// parent table and foreign key to associate. Must not be null.
-		/// </param>
-		/// <returns>The <see cref="Table"/> object representing the parent
-		/// table with the foreign key added, or <see langword="null"/>
-		/// if <paramref name="tableDictionary"/> or
-		/// <paramref name="relationship"/> is null.</returns>
-		protected virtual Table GetTableWithRelationships(
-			Dictionary<string, Table> tableDictionary,
-			Relationship relationship)
-		{
-			Table table = null;
-
-			if (tableDictionary != null && relationship != null)
-			{
-				string name = relationship.ParentTable;
-
-				ForeignKey foreignKey =
-					GetForeignKeyRelationship(relationship);
-
-				table = tableDictionary[name];
-
-				table.ForeignKeys.Add(foreignKey);
-			}
-
-			return table;
-		}
-
-		private DataRow GetForeignKeyConstaintsRow(
-			DataTable table, DataRow row)
-		{
-			DataRow newRow = table.NewRow();
-
-			string columnName = GetColumnName();
-			string referencedColumn = GetReferencedColumnName();
-			string referencedTable = GetReferencedTableName();
-
-			newRow["ConstraintType"] = "FOREIGN KEY";
-			newRow["ConstraintName"] = row["CONSTRAINT_NAME"];
-			newRow["TableName"] = row["TABLE_NAME"];
-			newRow["ColumnName"] = row[columnName];
-			newRow["ReferencedTable"] = row[referencedTable];
-			newRow["ReferencedColumn"] = row[referencedColumn];
 
 			return newRow;
 		}
@@ -1065,6 +1042,25 @@ namespace DigitalZenWorks.Database.ToolKit
 			};
 
 			return query;
+		}
+
+		private DataRow GetForeignKeyConstaintsRow(
+			DataTable table, DataRow row)
+		{
+			DataRow newRow = table.NewRow();
+
+			string columnName = GetColumnName();
+			string referencedColumn = GetReferencedColumnName();
+			string referencedTable = GetReferencedTableName();
+
+			newRow["ConstraintType"] = "FOREIGN KEY";
+			newRow["ConstraintName"] = row["CONSTRAINT_NAME"];
+			newRow["TableName"] = row["TABLE_NAME"];
+			newRow["ColumnName"] = row[columnName];
+			newRow["ReferencedTable"] = row[referencedTable];
+			newRow["ReferencedColumn"] = row[referencedColumn];
+
+			return newRow;
 		}
 
 		private string GetReferencedColumnName()
