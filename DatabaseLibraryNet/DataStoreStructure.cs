@@ -1036,7 +1036,7 @@ namespace DigitalZenWorks.Database.ToolKit
 					GetConstraintQuerySqlServer(tableName),
 
 				_ => throw new NotSupportedException(
-					$"Provider not supported for constraint queries")
+					"Provider not supported for constraint queries")
 			};
 
 			return query;

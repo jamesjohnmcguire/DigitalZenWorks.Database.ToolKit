@@ -39,14 +39,17 @@ namespace DigitalZenWorks.Database.ToolKit
 		public OleDbSchema(string databaseFile)
 			: base(DatabaseType.OleDb, databaseFile)
 		{
+			Log.Info("Initializing OleDbSchema.");
+
+			const string password = "\"\"";
 			const string baseFormat = "Provider=Microsoft.ACE.OLEDB.12.0" +
-				@";Password="""";User ID=Admin;" + "Data Source={0}" +
+				";Password={0};User ID=Admin;" + "Data Source={1}" +
 				";Mode=Share Deny None;" +
-				@"Extended Properties="""";" +
-				@"Jet OLEDB:System database="""";" +
-				@"Jet OLEDB:Registry Path="""";" +
-				@"Jet OLEDB:Database Password="""";Jet OLEDB:Engine Type=5;" +
-				@"Jet OLEDB:New Database Password="""";" +
+				"Extended Properties={0};" +
+				"Jet OLEDB:System database={0};" +
+				"Jet OLEDB:Registry Path={0};" +
+				"Jet OLEDB:Database Password={0};Jet OLEDB:Engine Type=5;" +
+				"Jet OLEDB:New Database Password={0};" +
 				"Jet OLEDB:Database Locking Mode=1;" +
 				"Jet OLEDB:Global Partial Bulk Ops=2;" +
 				"Jet OLEDB:Global Bulk Transactions=1;" +
@@ -59,6 +62,7 @@ namespace DigitalZenWorks.Database.ToolKit
 			string connectionString = string.Format(
 				CultureInfo.InvariantCulture,
 				baseFormat,
+				password,
 				databaseFile);
 
 			oleDbConnection = new OleDbConnection(connectionString);
