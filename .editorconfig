@@ -46,3 +46,6 @@ dotnet_diagnostic.SA1305.severity = none
 
 # SA1413: Use Trailing Commas In MultiLine Initializers
 dotnet_diagnostic.SA1413.severity = none
+
+# RCS1254: Normalize formatting of call chain
+dotnet_diagnostic.RCS1254.severity = warning
