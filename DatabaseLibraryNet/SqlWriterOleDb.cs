@@ -49,18 +49,26 @@ namespace DigitalZenWorks.Database.ToolKit
 				sql += GetColumnSql(column);
 			}
 
+			bool isPrimaryKeyAdded = false;
+
 			if (!string.IsNullOrWhiteSpace(table.PrimaryKey))
 			{
 				sql += string.Format(
 					CultureInfo.InvariantCulture,
-					"\tCONSTRAINT PrimaryKey PRIMARY KEY ([{0}]),{1}",
-					table.PrimaryKey,
-					Environment.NewLine);
+					"\tCONSTRAINT PrimaryKey PRIMARY KEY ([{0}])",
+					table.PrimaryKey);
+
+				isPrimaryKeyAdded = true;
 			}
 
 			for (int index = 0; index < table.ForeignKeys.Count; index++)
 			{
 				ForeignKey foreignKey = table.ForeignKeys[index];
+
+				if (index == 0 && isPrimaryKeyAdded == true)
+				{
+					sql += "," + Environment.NewLine;
+				}
 
 				bool isLast = false;
 
@@ -224,9 +232,8 @@ namespace DigitalZenWorks.Database.ToolKit
 			if (isLast == false)
 			{
 				sql += ",";
+				sql += Environment.NewLine;
 			}
-
-			sql += Environment.NewLine;
 
 			return sql;
 		}
