@@ -45,15 +45,9 @@ namespace DigitalZenWorks.Database.ToolKit
 				Collection<Table> tables = GetSchema(databaseFile);
 				tables = OrderTables(tables);
 
-				StringBuilder schemaBuilder = new ();
+				SqlWriter sqlWriter = new ();
+				string schemaText = sqlWriter.GetTablesCreateStatements(tables);
 
-				foreach (Table table in tables)
-				{
-					string statement = WriteSql(table);
-					schemaBuilder.AppendLine(statement);
-				}
-
-				string schemaText = schemaBuilder.ToString();
 				File.WriteAllText(schemaFile, schemaText);
 
 				successCode = true;
@@ -97,15 +91,9 @@ namespace DigitalZenWorks.Database.ToolKit
 				Collection<Table> tables = GetSchemaOleDb(databaseFile);
 				tables = OrderTables(tables);
 
-				StringBuilder schemaBuilder = new ();
+				SqlWriterOleDb sqlWriter = new ();
+				string schemaText = sqlWriter.GetTablesCreateStatements(tables);
 
-				foreach (Table table in tables)
-				{
-					string statement = WriteSql(table);
-					schemaBuilder.AppendLine(statement);
-				}
-
-				string schemaText = schemaBuilder.ToString();
 				File.WriteAllText(schemaFile, schemaText);
 
 				successCode = true;
