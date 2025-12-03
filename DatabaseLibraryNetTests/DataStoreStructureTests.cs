@@ -191,27 +191,34 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 		{
 			Collection<Table> tables = DataDefinition.GetSchema(DataSource);
 
-			Collection<string> orderedList = DataDefinition.OrderTables(tables);
+			Collection<Table> orderedList = DataDefinition.OrderTables(tables);
 
-			string tableName = orderedList[0];
+			Table table = orderedList[0];
+			string tableName = table.Name;
 			Assert.That(tableName, Is.EqualTo("Addresses"));
 
-			tableName = orderedList[1];
+			table = orderedList[1];
+			tableName = table.Name;
 			Assert.That(tableName, Is.EqualTo("Categories"));
 
-			tableName = orderedList[2];
+			table = orderedList[2];
+			tableName = table.Name;
 			Assert.That(tableName, Is.EqualTo("Contacts"));
 
-			tableName = orderedList[3];
+			table = orderedList[3];
+			tableName = table.Name;
 			Assert.That(tableName, Is.EqualTo("Makers"));
 
-			tableName = orderedList[4];
+			table = orderedList[4];
+			tableName = table.Name;
 			Assert.That(tableName, Is.EqualTo("Sections"));
 
-			tableName = orderedList[5];
+			table = orderedList[5];
+			tableName = table.Name;
 			Assert.That(tableName, Is.EqualTo("Series"));
 
-			tableName = orderedList[6];
+			table = orderedList[6];
+			tableName = table.Name;
 			Assert.That(tableName, Is.EqualTo("Products"));
 		}
 	}

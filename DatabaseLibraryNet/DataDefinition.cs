@@ -44,22 +44,16 @@ namespace DigitalZenWorks.Database.ToolKit
 			{
 				Collection<Table> tables = GetSchema(databaseFile);
 
-				Collection<string> list = OrderTables(tables);
+				tables = OrderTables(tables);
 
 				Dictionary<string, Table> tableLookup =
 					tables.ToDictionary(t => t.Name);
-				StringBuilder schemaBuilder = new();
+				StringBuilder schemaBuilder = new ();
 
-				foreach (string tableName in list)
+				foreach (Table table in tables)
 				{
-					bool exists =
-						tableLookup.TryGetValue(tableName, out Table table);
-
-					if (exists == true)
-					{
-						string statement = WriteSql(table);
-						schemaBuilder.AppendLine(statement);
-					}
+					string statement = WriteSql(table);
+					schemaBuilder.AppendLine(statement);
 				}
 
 				string schemaText = schemaBuilder.ToString();
@@ -105,22 +99,16 @@ namespace DigitalZenWorks.Database.ToolKit
 			{
 				Collection<Table> tables = GetSchemaOleDb(databaseFile);
 
-				Collection<string> list = OrderTables(tables);
+				tables = OrderTables(tables);
 
 				Dictionary<string, Table> tableLookup =
 					tables.ToDictionary(t => t.Name);
 				StringBuilder schemaBuilder = new ();
 
-				foreach (string tableName in list)
+				foreach (Table table in tables)
 				{
-					bool exists =
-						tableLookup.TryGetValue(tableName, out Table table);
-
-					if (exists == true)
-					{
-						string statement = WriteSql(table);
-						schemaBuilder.AppendLine(statement);
-					}
+					string statement = WriteSql(table);
+					schemaBuilder.AppendLine(statement);
 				}
 
 				string schemaText = schemaBuilder.ToString();
@@ -498,9 +486,16 @@ namespace DigitalZenWorks.Database.ToolKit
 		public static Collection<string> OrderTable(
 			Collection<Table> tables)
 		{
-			Collection<string> orderedTables = OrderTables(tables);
+			Collection<string> orderedTableNames = [];
 
-			return orderedTables;
+			Collection<Table> orderedTables = OrderTables(tables);
+
+			foreach (Table table in orderedTables)
+			{
+				orderedTableNames.Add(table.Name);
+			}
+
+			return orderedTableNames;
 		}
 
 		/// <summary>
@@ -510,19 +505,22 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// <returns>The ordered list of tables.</returns>
 		/// <remarks>This orders the list taking dependencies into
 		/// account.</remarks>
-		public static Collection<string> OrderTables(
+		public static Collection<Table> OrderTables(
 			Collection<Table> tables)
 		{
-			Collection<string> orderedTables = [];
+			Collection<Table> orderedTables = [];
 
 			if (tables != null)
 			{
 				Dictionary<string, Collection<string>> tableDependencies = [];
+				Dictionary<string, Table> tablesByName = [];
 
 				foreach (Table table in tables)
 				{
-					Collection<string> dependencies = [];
 					string name = table.Name;
+					tablesByName[name] = table;
+
+					Collection<string> dependencies = [];
 
 					foreach (ForeignKey foreignKeys in table.ForeignKeys)
 					{
@@ -532,7 +530,16 @@ namespace DigitalZenWorks.Database.ToolKit
 					tableDependencies.Add(name, dependencies);
 				}
 
-				orderedTables = GetOrderedDependencies(tableDependencies);
+				Collection<string> orderedNames =
+					GetOrderedDependencies(tableDependencies);
+
+				foreach (string tableName in orderedNames)
+				{
+					if (tablesByName.TryGetValue(tableName, out Table table))
+					{
+						orderedTables.Add(table);
+					}
+				}
 			}
 
 			return orderedTables;
