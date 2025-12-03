@@ -184,14 +184,14 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 		/// Order table test.
 		/// </summary>
 		[Test]
-		public void OrderTable()
+		public void OrderTables()
 		{
 			string databaseFile = GetTestMdbFile();
 
 			Collection<Table> tables =
 				DataDefinition.GetSchemaOleDb(databaseFile);
 
-			Collection<string> orderedList = DataDefinition.OrderTable(tables);
+			Collection<string> orderedList = DataDefinition.OrderTables(tables);
 
 			string tableName = orderedList[0];
 			Assert.That(tableName, Is.EqualTo("Addresses"));

@@ -44,7 +44,7 @@ namespace DigitalZenWorks.Database.ToolKit
 			{
 				Collection<Table> tables = GetSchema(databaseFile);
 
-				Collection<string> list = OrderTable(tables);
+				Collection<string> list = OrderTables(tables);
 
 				Dictionary<string, Table> tableLookup =
 					tables.ToDictionary(t => t.Name);
@@ -105,7 +105,7 @@ namespace DigitalZenWorks.Database.ToolKit
 			{
 				Collection<Table> tables = GetSchemaOleDb(databaseFile);
 
-				Collection<string> list = OrderTable(tables);
+				Collection<string> list = OrderTables(tables);
 
 				Dictionary<string, Table> tableLookup =
 					tables.ToDictionary(t => t.Name);
@@ -496,6 +496,21 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// <remarks>This orders the list taking dependencies into
 		/// account.</remarks>
 		public static Collection<string> OrderTable(
+			Collection<Table> tables)
+		{
+			Collection<string> orderedTables = OrderTables(tables);
+
+			return orderedTables;
+		}
+
+		/// <summary>
+		/// Order tables.
+		/// </summary>
+		/// <param name="tables">The list of tables to order.</param>
+		/// <returns>The ordered list of tables.</returns>
+		/// <remarks>This orders the list taking dependencies into
+		/// account.</remarks>
+		public static Collection<string> OrderTables(
 			Collection<Table> tables)
 		{
 			Collection<string> orderedTables = [];

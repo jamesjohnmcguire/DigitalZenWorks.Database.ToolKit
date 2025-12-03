@@ -187,11 +187,11 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 		/// Order table test.
 		/// </summary>
 		[Test]
-		public void OrderTable()
+		public void OrderTables()
 		{
 			Collection<Table> tables = DataDefinition.GetSchema(DataSource);
 
-			Collection<string> orderedList = DataDefinition.OrderTable(tables);
+			Collection<string> orderedList = DataDefinition.OrderTables(tables);
 
 			string tableName = orderedList[0];
 			Assert.That(tableName, Is.EqualTo("Addresses"));
