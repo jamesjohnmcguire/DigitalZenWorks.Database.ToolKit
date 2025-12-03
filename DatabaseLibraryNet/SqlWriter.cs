@@ -391,71 +391,6 @@ namespace DigitalZenWorks.Database.ToolKit
 		}
 
 		/// <summary>
-		/// Generates a SQL CREATE TABLE statement for the specified table
-		/// definition.
-		/// </summary>
-		/// <remarks>The generated SQL statement includes all columns in ordinal
-		/// position order, as well as primary key and foreign key constraints
-		/// if specified in the table definition. The output uses double quotes
-		/// for table and column names to ensure compatibility with the ANSI
-		/// standard syntax.</remarks>
-		/// <param name="table">The table structure containing column
-		/// definitions, primary key, and foreign keys to be used in the
-		/// generated SQL statement. Cannot be null.</param>
-		/// <returns>A string containing the SQL CREATE TABLE statement that
-		/// defines the table, its columns, primary key, and foreign key
-		/// constraints.</returns>
-		public virtual string GetCreateTableStatement(Table table)
-		{
-			ArgumentNullException.ThrowIfNull(table);
-
-			string sql = string.Format(
-				CultureInfo.InvariantCulture,
-				"CREATE TABLE `{0}` ({1}",
-				table.Name,
-				Environment.NewLine);
-
-			SortedList<int, Column> columns = GetOrdinalSortedColumns(table);
-
-			foreach (KeyValuePair<int, Column> entry in columns)
-			{
-				Column column = entry.Value;
-
-				sql += GetColumnSql(column);
-			}
-
-			if (!string.IsNullOrWhiteSpace(table.PrimaryKey))
-			{
-				sql += string.Format(
-					CultureInfo.InvariantCulture,
-					"\tCONSTRAINT PrimaryKey PRIMARY KEY (\"{0}\"),{1}",
-					table.PrimaryKey,
-					Environment.NewLine);
-			}
-
-			for (int index = 0; index < table.ForeignKeys.Count; index++)
-			{
-				ForeignKey foreignKey = table.ForeignKeys[index];
-
-				bool isLast = false;
-
-				if (index == table.ForeignKeys.Count - 1)
-				{
-					isLast = true;
-				}
-
-				sql += GetForeignKeySql(foreignKey, isLast);
-			}
-
-			sql += string.Format(
-				CultureInfo.InvariantCulture,
-				"{0});{0}",
-				Environment.NewLine);
-
-			return sql;
-		}
-
-		/// <summary>
 		/// Get date.
 		/// </summary>
 		/// <param name="column">The column index to check.</param>
@@ -508,6 +443,71 @@ namespace DigitalZenWorks.Database.ToolKit
 				defaultValue);
 
 			return dataItem;
+		}
+
+		/// <summary>
+		/// Generates a SQL CREATE TABLE statement for the specified table
+		/// definition.
+		/// </summary>
+		/// <remarks>The generated SQL statement includes all columns in ordinal
+		/// position order, as well as primary key and foreign key constraints
+		/// if specified in the table definition. The output uses double quotes
+		/// for table and column names to ensure compatibility with the ANSI
+		/// standard syntax.</remarks>
+		/// <param name="table">The table structure containing column
+		/// definitions, primary key, and foreign keys to be used in the
+		/// generated SQL statement. Cannot be null.</param>
+		/// <returns>A string containing the SQL CREATE TABLE statement that
+		/// defines the table, its columns, primary key, and foreign key
+		/// constraints.</returns>
+		public virtual string GetTableCreateStatement(Table table)
+		{
+			ArgumentNullException.ThrowIfNull(table);
+
+			string sql = string.Format(
+				CultureInfo.InvariantCulture,
+				"CREATE TABLE `{0}` ({1}",
+				table.Name,
+				Environment.NewLine);
+
+			SortedList<int, Column> columns = GetOrdinalSortedColumns(table);
+
+			foreach (KeyValuePair<int, Column> entry in columns)
+			{
+				Column column = entry.Value;
+
+				sql += GetColumnSql(column);
+			}
+
+			if (!string.IsNullOrWhiteSpace(table.PrimaryKey))
+			{
+				sql += string.Format(
+					CultureInfo.InvariantCulture,
+					"\tCONSTRAINT PrimaryKey PRIMARY KEY (\"{0}\"),{1}",
+					table.PrimaryKey,
+					Environment.NewLine);
+			}
+
+			for (int index = 0; index < table.ForeignKeys.Count; index++)
+			{
+				ForeignKey foreignKey = table.ForeignKeys[index];
+
+				bool isLast = false;
+
+				if (index == table.ForeignKeys.Count - 1)
+				{
+					isLast = true;
+				}
+
+				sql += GetForeignKeySql(foreignKey, isLast);
+			}
+
+			sql += string.Format(
+				CultureInfo.InvariantCulture,
+				"{0});{0}",
+				Environment.NewLine);
+
+			return sql;
 		}
 
 		/// <summary>

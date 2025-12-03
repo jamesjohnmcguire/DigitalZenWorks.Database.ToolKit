@@ -30,7 +30,7 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// <returns>A string containing the SQL CREATE TABLE statement that
 		/// defines the table, its columns, primary key, and foreign key
 		/// constraints.</returns>
-		public override string GetCreateTableStatement(Table table)
+		public override string GetTableCreateStatement(Table table)
 		{
 			ArgumentNullException.ThrowIfNull(table);
 
