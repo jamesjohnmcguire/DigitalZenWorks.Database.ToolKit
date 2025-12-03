@@ -10,6 +10,7 @@ namespace DigitalZenWorks.Database.ToolKit
 {
 	using System;
 	using System.Collections.Generic;
+	using System.Collections.ObjectModel;
 	using System.Globalization;
 	using System.IO;
 	using System.Text;
@@ -508,6 +509,39 @@ namespace DigitalZenWorks.Database.ToolKit
 				Environment.NewLine);
 
 			return sql;
+		}
+
+		/// <summary>
+		/// Generates SQL CREATE TABLE statements for the specified collection
+		/// of tables.
+		/// </summary>
+		/// <param name="tables">A collection of <see cref="Table"/> objects for
+		/// which to generate CREATE TABLE statements. If
+		/// <paramref name="tables"/> is <see langword="null"/>, an empty string
+		/// is returned.</param>
+		/// <returns>A string containing the SQL CREATE TABLE statements for
+		/// each table in the collection, separated by line breaks.
+		/// Returns an empty string if <paramref name="tables"/> is
+		/// <see langword="null"/> or the collection is empty.</returns>
+		public virtual string GetTablesCreateStatements(
+			Collection<Table> tables)
+		{
+			string sqlStatements = string.Empty;
+
+			if (tables != null)
+			{
+				StringBuilder schemaBuilder = new();
+
+				foreach (Table table in tables)
+				{
+					string statement = GetTableCreateStatement(table);
+					schemaBuilder.AppendLine(statement);
+				}
+
+				sqlStatements = schemaBuilder.ToString();
+			}
+
+			return sqlStatements;
 		}
 
 		/// <summary>
