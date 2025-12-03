@@ -43,11 +43,8 @@ namespace DigitalZenWorks.Database.ToolKit
 			try
 			{
 				Collection<Table> tables = GetSchema(databaseFile);
-
 				tables = OrderTables(tables);
 
-				Dictionary<string, Table> tableLookup =
-					tables.ToDictionary(t => t.Name);
 				StringBuilder schemaBuilder = new ();
 
 				foreach (Table table in tables)
@@ -98,11 +95,8 @@ namespace DigitalZenWorks.Database.ToolKit
 			try
 			{
 				Collection<Table> tables = GetSchemaOleDb(databaseFile);
-
 				tables = OrderTables(tables);
 
-				Dictionary<string, Table> tableLookup =
-					tables.ToDictionary(t => t.Name);
 				StringBuilder schemaBuilder = new ();
 
 				foreach (Table table in tables)
