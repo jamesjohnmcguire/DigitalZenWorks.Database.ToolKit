@@ -232,6 +232,11 @@ namespace DigitalZenWorks.Database.ToolKit
 
 				column.ColumnType = GetColumnType(dataType, length, flags);
 
+				if (row["PRIMARY_KEY"].ToString() == "True")
+				{
+					column.Primary = true;
+				}
+
 				if (row["IS_NULLABLE"].ToString() == "True")
 				{
 					column.Nullable = true;

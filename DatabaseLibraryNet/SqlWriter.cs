@@ -671,6 +671,11 @@ namespace DigitalZenWorks.Database.ToolKit
 				sql += " IDENTITY";
 			}
 
+			if (column.Primary == true)
+			{
+				sql += " PRIMARY KEY AUTOINCREMENT";
+			}
+
 			if (!string.IsNullOrWhiteSpace(column.DefaultValue))
 			{
 				sql += " DEFAULT " + column.DefaultValue;
