@@ -480,7 +480,9 @@ namespace DigitalZenWorks.Database.ToolKit
 			Dictionary<string, Table>.ValueCollection values =
 				tableDictionary.Values;
 			List<Table> newList = [.. values];
-			Collection<Table> tables = new(newList);
+			Collection<Table> tables = new (newList);
+
+			tables = RemoveSystemsTables(tables);
 
 			return tables;
 		}
@@ -918,6 +920,25 @@ namespace DigitalZenWorks.Database.ToolKit
 			newRow["ColumnName"] = row["COLUMN_NAME"];
 
 			return newRow;
+		}
+
+		private static Collection<Table> RemoveSystemsTables(
+			Collection<Table> tables)
+		{
+			// If more than one system table needs to be removed,
+			// this should be changed to a loop that collects
+			// all tables to remove first.
+			foreach (Table table in tables)
+			{
+				if (table.Name.Equals(
+					"sqlite_sequence", StringComparison.OrdinalIgnoreCase))
+				{
+					tables.Remove(table);
+					break;
+				}
+			}
+
+			return tables;
 		}
 
 		private DataTable AddForeignKeyConstraints(
