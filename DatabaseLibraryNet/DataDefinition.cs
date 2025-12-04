@@ -888,14 +888,22 @@ namespace DigitalZenWorks.Database.ToolKit
 					foreignKey.ChildColumn);
 			}
 
-			if (foreignKey.CascadeOnDelete)
+			if (foreignKey.OnDeleteAction == ConstraintAction.Cascade)
 			{
 				sql += " ON DELETE CASCADE";
 			}
+			else if (foreignKey.OnDeleteAction == ConstraintAction.SetNull)
+			{
+				sql += " ON DELETE SET NULL";
+			}
 
-			if (foreignKey.CascadeOnUpdate)
+			if (foreignKey.OnUpdateAction == ConstraintAction.Cascade)
 			{
 				sql += " ON UPDATE CASCADE";
+			}
+			else if (foreignKey.OnUpdateAction == ConstraintAction.SetNull)
+			{
+				sql += " ON UPDATE SET NULL";
 			}
 
 			return sql;

@@ -13,11 +13,11 @@ namespace DigitalZenWorks.Database.ToolKit
 	{
 		private string child;
 		private string childColumn;
-		private bool deleteCascade;
 		private string name;
+		private ConstraintAction onDeleteAction;
+		private ConstraintAction onUpdateAction;
 		private string parent;
 		private string parentColumn;
-		private bool updateCascade;
 
 		/// <summary>
 		/// Gets or sets name.
@@ -70,23 +70,33 @@ namespace DigitalZenWorks.Database.ToolKit
 		}
 
 		/// <summary>
-		/// Gets or sets a value indicating whether indicates whether update cascades.
+		/// Gets or sets the action to take when a referenced row is updated in
+		/// the parent table.
 		/// </summary>
-		/// <value>Indicates whether update cascades.</value>
-		public bool OnUpdateCascade
+		/// <remarks>Use this property to specify how updates to parent table
+		/// rows affect related rows in the child table. Common actions include
+		/// cascading the update, setting related values to null, or restricting
+		/// the update. The available actions are defined by the
+		/// <see cref="ConstraintAction"/> enumeration.</remarks>
+		public ConstraintAction OnUpdateAction
 		{
-			get { return updateCascade; }
-			set { updateCascade = value; }
+			get { return onUpdateAction; }
+			set { onUpdateAction = value; }
 		}
 
 		/// <summary>
-		/// Gets or sets a value indicating whether indicates whether delete cascades.
+		/// Gets or sets the action to perform when a related row is deleted in
+		/// the parent table.
 		/// </summary>
-		/// <value>Indicates whether delete cascades.</value>
-		public bool OnDeleteCascade
+		/// <remarks>Use this property to specify how deletions in the parent
+		/// table affect related rows in the child table. Common actions include
+		/// cascading the delete, setting related values to null, or restricting
+		/// the delete operation. The available actions are defined by the
+		/// <see cref="ConstraintAction"/> enumeration.</remarks>
+		public ConstraintAction OnDeleteAction
 		{
-			get { return deleteCascade; }
-			set { deleteCascade = value; }
+			get { return onDeleteAction; }
+			set { onDeleteAction = value; }
 		}
 	}
 }

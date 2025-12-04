@@ -11,11 +11,11 @@ namespace DigitalZenWorks.Database.ToolKit
 	/// </summary>
 	public class ForeignKey
 	{
-		private bool cascadeOnDelete;
-		private bool cascadeOnUpdate;
 		private string childColumn;
 		private string childTable;
 		private string name;
+		private ConstraintAction onDeleteAction;
+		private ConstraintAction onUpdateAction;
 		private string parentTable;
 		private string parentColumn;
 
@@ -26,24 +26,22 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// <param name="columnName">The column name.</param>
 		/// <param name="parentTable">The parent table.</param>
 		/// <param name="parentTableColumn">The parent table column.</param>
-		/// <param name="cascadeDelete">Indicates wheter to use
-		/// cascading deletes.</param>
-		/// <param name="cascadeUpdate">Indicates wheter to use
-		/// cascading updates.</param>
+		/// <param name="onDeleteAction">The on delete action.</param>
+		/// <param name="onUpdateAction">The on update action.</param>
 		public ForeignKey(
 			string name,
 			string columnName,
 			string parentTable,
 			string parentTableColumn,
-			bool cascadeDelete,
-			bool cascadeUpdate)
+			ConstraintAction onDeleteAction,
+			ConstraintAction onUpdateAction)
 		{
 			this.name = name;
 			this.childColumn = columnName;
 			this.parentTable = parentTable;
 			this.parentColumn = parentTableColumn;
-			this.cascadeOnDelete = cascadeDelete;
-			this.cascadeOnUpdate = cascadeUpdate;
+			this.onDeleteAction = onDeleteAction;
+			this.onUpdateAction = onUpdateAction;
 		}
 
 		/// <summary>
@@ -54,50 +52,54 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// <param name="parentColumn">The parent table column.</param>
 		/// <param name="childTable">The child table.</param>
 		/// <param name="childColumn">The child column name.</param>
-		/// <param name="cascadeDelete">Indicates wheter to use
-		/// cascading deletes.</param>
-		/// <param name="cascadeUpdate">Indicates wheter to use
-		/// cascading updates.</param>
+		/// <param name="onDeleteAction">The on delete action.</param>
+		/// <param name="onUpdateAction">The on update action.</param>
 		public ForeignKey(
 			string name,
 			string parentTable,
 			string parentColumn,
 			string childTable,
 			string childColumn,
-			bool cascadeDelete,
-			bool cascadeUpdate)
+			ConstraintAction onDeleteAction,
+			ConstraintAction onUpdateAction)
 		{
 			this.name = name;
 			this.childTable = childTable;
 			this.childColumn = childColumn;
 			this.parentTable = parentTable;
 			this.parentColumn = parentColumn;
-			this.cascadeOnDelete = cascadeDelete;
-			this.cascadeOnUpdate = cascadeUpdate;
+			this.onDeleteAction = onDeleteAction;
+			this.onUpdateAction = onUpdateAction;
 		}
 
 		/// <summary>
-		/// Gets or sets a value indicating whether cascade On Delete.
+		/// Gets or sets the action to perform when a related row is deleted in
+		/// the parent table.
 		/// </summary>
-		/// <value>
-		/// A value indicating whether cascade On Delete.
-		/// </value>
-		public bool CascadeOnDelete
+		/// <remarks>Use this property to specify how deletions in the parent
+		/// table affect related rows in the child table. Common actions include
+		/// cascading the delete, setting related values to null, or restricting
+		/// the delete operation. The available actions are defined by the
+		/// <see cref="ConstraintAction"/> enumeration.</remarks>
+		public ConstraintAction OnDeleteAction
 		{
-			get { return cascadeOnDelete; }
-			set { cascadeOnDelete = value; }
+			get { return onDeleteAction; }
+			set { onDeleteAction = value; }
 		}
 
 		/// <summary>
-		/// Gets or sets a value indicating whether cascade On Update.
+		/// Gets or sets the action to take when a referenced row is updated in
+		/// the parent table.
 		/// </summary>
-		/// <value>
-		/// A value indicating whether cascade On Update.
-		/// </value>
-		public bool CascadeOnUpdate
+		/// <remarks>Use this property to specify how updates to parent table
+		/// rows affect related rows in the child table. Common actions include
+		/// cascading the update, setting related values to null, or restricting
+		/// the update. The available actions are defined by the
+		/// <see cref="ConstraintAction"/> enumeration.</remarks>
+		public ConstraintAction OnUpdateAction
 		{
-			get { return cascadeOnUpdate; }
-			set { cascadeOnUpdate = value; }
+			get { return onUpdateAction; }
+			set { onUpdateAction = value; }
 		}
 
 		/// <summary>

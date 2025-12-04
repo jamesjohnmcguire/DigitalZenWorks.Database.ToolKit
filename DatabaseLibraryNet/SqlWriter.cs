@@ -749,14 +749,22 @@ namespace DigitalZenWorks.Database.ToolKit
 				foreignKey.ChildTable,
 				foreignKey.ChildColumn);
 
-			if (foreignKey.CascadeOnDelete)
+			if (foreignKey.OnDeleteAction == ConstraintAction.Cascade)
 			{
 				sql += " ON DELETE CASCADE";
 			}
-
-			if (foreignKey.CascadeOnUpdate)
+			else if (foreignKey.OnDeleteAction == ConstraintAction.SetNull)
 			{
-				sql += " ON UPDATE CASCADE";
+				sql += " SET NULL";
+			}
+
+			if (foreignKey.OnUpdateAction == ConstraintAction.Cascade)
+			{
+				sql += " ON DELETE CASCADE";
+			}
+			else if (foreignKey.OnUpdateAction == ConstraintAction.SetNull)
+			{
+				sql += " SET NULL";
 			}
 
 			if (isLast == false)

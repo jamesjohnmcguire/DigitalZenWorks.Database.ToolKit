@@ -356,14 +356,34 @@ namespace DigitalZenWorks.Database.ToolKit
 				relationship.ChildTableCol =
 					foreignKey[childColumnNameKey].ToString();
 
-				if (foreignKey[updateRuleKey].ToString() != "NO ACTION")
+				string onAction = foreignKey[deleteRuleKey].ToString();
+
+				if (onAction.Equals("CASCADE", StringComparison.Ordinal))
 				{
-					relationship.OnUpdateCascade = true;
+					relationship.OnDeleteAction = ConstraintAction.Cascade;
+				}
+				else if (onAction.Equals("SET NULL", StringComparison.Ordinal))
+				{
+					relationship.OnDeleteAction = ConstraintAction.Cascade;
+				}
+				else
+				{
+					relationship.OnDeleteAction = ConstraintAction.NoAction;
 				}
 
-				if (foreignKey[deleteRuleKey].ToString() != "NO ACTION")
+				onAction = foreignKey[updateRuleKey].ToString();
+
+				if (onAction.Equals("CASCADE", StringComparison.Ordinal))
 				{
-					relationship.OnDeleteCascade = true;
+					relationship.OnUpdateAction = ConstraintAction.Cascade;
+				}
+				else if (onAction.Equals("SET NULL", StringComparison.Ordinal))
+				{
+					relationship.OnUpdateAction = ConstraintAction.Cascade;
+				}
+				else
+				{
+					relationship.OnUpdateAction = ConstraintAction.NoAction;
 				}
 			}
 

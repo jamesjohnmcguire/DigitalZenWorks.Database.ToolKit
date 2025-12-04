@@ -447,8 +447,8 @@ namespace DigitalZenWorks.Database.ToolKit
 					relationship.ParentTableCol,
 					relationship.ChildTable,
 					relationship.ChildTableCol,
-					relationship.OnDeleteCascade,
-					relationship.OnUpdateCascade);
+					relationship.OnDeleteAction,
+					relationship.OnUpdateAction);
 			}
 
 			return foreignKey;
@@ -591,7 +591,7 @@ namespace DigitalZenWorks.Database.ToolKit
 			const string columnNameKey = "FKEY_FROM_COLUMN";
 			const string foreignTableNameKey = "FKEY_TO_TABLE";
 			const string foreignColumnNameKey = "FKEY_TO_COLUMN";
-			const string updateRuleKey = "FKEY_ON_DELETE";
+			const string updateRuleKey = "FKEY_ON_UPDATE";
 			const string deleteRuleKey = "FKEY_ON_DELETE";
 
 			relationship.Name = foreignKey[constraintNameKey].ToString();
@@ -604,14 +604,34 @@ namespace DigitalZenWorks.Database.ToolKit
 			relationship.ChildTableCol =
 				foreignKey[foreignColumnNameKey].ToString();
 
-			if (foreignKey[updateRuleKey].ToString() != "NO ACTION")
+			string onAction = foreignKey[deleteRuleKey].ToString();
+
+			if (onAction.Equals("CASCADE", StringComparison.Ordinal))
 			{
-				relationship.OnUpdateCascade = true;
+				relationship.OnDeleteAction = ConstraintAction.Cascade;
+			}
+			else if (onAction.Equals("SET NULL", StringComparison.Ordinal))
+			{
+				relationship.OnDeleteAction = ConstraintAction.Cascade;
+			}
+			else
+			{
+				relationship.OnDeleteAction = ConstraintAction.NoAction;
 			}
 
-			if (foreignKey[deleteRuleKey].ToString() != "NO ACTION")
+			onAction = foreignKey[updateRuleKey].ToString();
+
+			if (onAction.Equals("CASCADE", StringComparison.Ordinal))
 			{
-				relationship.OnDeleteCascade = true;
+				relationship.OnUpdateAction = ConstraintAction.Cascade;
+			}
+			else if (onAction.Equals("SET NULL", StringComparison.Ordinal))
+			{
+				relationship.OnUpdateAction = ConstraintAction.Cascade;
+			}
+			else
+			{
+				relationship.OnUpdateAction = ConstraintAction.NoAction;
 			}
 
 			return relationship;
