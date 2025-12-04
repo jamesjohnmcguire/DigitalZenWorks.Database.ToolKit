@@ -1,13 +1,13 @@
 CREATE TABLE [Addresses] (
 	[id] INTEGER NOT NULL IDENTITY,
 	[stateId] INTEGER DEFAULT 0,
-	[label] VARCHAR(50),
+	[label] VARCHAR(255),
 	CONSTRAINT PrimaryKey PRIMARY KEY ([id])
 );
 
 CREATE TABLE [Categories] (
 	[id] INTEGER NOT NULL IDENTITY,
-	[name] VARCHAR(50),
+	[name] VARCHAR(255),
 	[parentId] INTEGER DEFAULT NULL,
 	CONSTRAINT PrimaryKey PRIMARY KEY ([id]),
 	CONSTRAINT [CategoriesCategories] FOREIGN KEY ([parentId]) REFERENCES [Categories] ([id]) ON DELETE CASCADE ON UPDATE CASCADE
@@ -16,14 +16,14 @@ CREATE TABLE [Categories] (
 CREATE TABLE [Contacts] (
 	[id] INTEGER NOT NULL IDENTITY,
 	[addressId] INTEGER DEFAULT NULL,
-	[label] VARCHAR(50),
+	[label] VARCHAR(255),
 	CONSTRAINT PrimaryKey PRIMARY KEY ([id]),
 	CONSTRAINT [FK_Contacts] FOREIGN KEY ([idAddresses]) REFERENCES [Addresses] ([id]) ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 CREATE TABLE [Makers] (
 	[id] INTEGER NOT NULL IDENTITY,
-	[name] VARCHAR(50),
+	[name] VARCHAR(255),
 	CONSTRAINT PrimaryKey PRIMARY KEY ([id])
 );
 
@@ -31,7 +31,7 @@ CREATE TABLE [Sections] (
 	[id] INTEGER NOT NULL IDENTITY,
 	[categoryId] INTEGER DEFAULT NULL,
 	[makerId] INTEGER DEFAULT NULL,
-	[label] VARCHAR(50),
+	[label] VARCHAR(255),
 	CONSTRAINT PrimaryKey PRIMARY KEY ([id]),
 	CONSTRAINT [SectionsCategories] FOREIGN KEY ([categoryId]) REFERENCES [Categories] ([id]) ON DELETE CASCADE ON UPDATE CASCADE,
 	CONSTRAINT [SectionsMakers] FOREIGN KEY ([makerId]) REFERENCES [Makers] ([id]) ON DELETE CASCADE ON UPDATE CASCADE
@@ -40,7 +40,7 @@ CREATE TABLE [Sections] (
 CREATE TABLE [Series] (
 	[id] INTEGER NOT NULL IDENTITY,
 	[makerId] INTEGER DEFAULT NULL,
-	[label] VARCHAR(50),
+	[label] VARCHAR(255),
 	CONSTRAINT PrimaryKey PRIMARY KEY ([id]),
 	CONSTRAINT [SeriesMakers] FOREIGN KEY ([makerId]) REFERENCES [Makers] ([id]) ON DELETE CASCADE ON UPDATE CASCADE
 );
@@ -50,7 +50,7 @@ CREATE TABLE [Products] (
 	[makerId] INTEGER DEFAULT NULL,
 	[sectionId] INTEGER DEFAULT NULL,
 	[seriesId] INTEGER DEFAULT NULL,
-	[label] VARCHAR(50),
+	[label] VARCHAR(255),
 	CONSTRAINT PrimaryKey PRIMARY KEY ([id]),
 	CONSTRAINT [ProductsMakers] FOREIGN KEY ([makerId]) REFERENCES [Makers] ([id]) ON DELETE CASCADE ON UPDATE CASCADE,
 	CONSTRAINT [ProductsSections] FOREIGN KEY ([sectionId]) REFERENCES [Sections] ([id]) ON DELETE CASCADE ON UPDATE CASCADE,
