@@ -27,10 +27,13 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// <param name="table">The table structure containing column
 		/// definitions, primary key, and foreign keys to be used in the
 		/// generated SQL statement. Cannot be null.</param>
+		/// <param name="isLast">A value indicating whether this is the last
+		/// table.</param>
 		/// <returns>A string containing the SQL CREATE TABLE statement that
 		/// defines the table, its columns, primary key, and foreign key
 		/// constraints.</returns>
-		public override string GetTableCreateStatement(Table table)
+		public override string GetTableCreateStatement(
+			Table table, bool isLast = false)
 		{
 			ArgumentNullException.ThrowIfNull(table);
 
@@ -70,20 +73,25 @@ namespace DigitalZenWorks.Database.ToolKit
 					sql += "," + Environment.NewLine;
 				}
 
-				bool isLast = false;
+				bool isLastKey = false;
 
 				if (index == table.ForeignKeys.Count - 1)
 				{
-					isLast = true;
+					isLastKey = true;
 				}
 
-				sql += GetForeignKeySql(foreignKey, isLast);
+				sql += GetForeignKeySql(foreignKey, isLastKey);
 			}
 
 			sql += string.Format(
 				CultureInfo.InvariantCulture,
-				"{0});{0}",
+				"{0});",
 				Environment.NewLine);
+
+			if (isLast == false)
+			{
+				sql += Environment.NewLine;
+			}
 
 			return sql;
 		}
@@ -225,16 +233,16 @@ namespace DigitalZenWorks.Database.ToolKit
 			}
 			else if (foreignKey.OnDeleteAction == ConstraintAction.SetNull)
 			{
-				sql += " SET NULL";
+				sql += " ON DELETE SET NULL";
 			}
 
 			if (foreignKey.OnUpdateAction == ConstraintAction.Cascade)
 			{
-				sql += " ON DELETE CASCADE";
+				sql += " ON UPDATE CASCADE";
 			}
 			else if (foreignKey.OnUpdateAction == ConstraintAction.SetNull)
 			{
-				sql += " SET NULL";
+				sql += " ON UPDATE SET NULL";
 			}
 
 			if (isLast == false)

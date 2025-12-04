@@ -458,16 +458,19 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// <param name="table">The table structure containing column
 		/// definitions, primary key, and foreign keys to be used in the
 		/// generated SQL statement. Cannot be null.</param>
+		/// <param name="isLast">A value indicating whether this is the last
+		/// table.</param>
 		/// <returns>A string containing the SQL CREATE TABLE statement that
 		/// defines the table, its columns, primary key, and foreign key
 		/// constraints.</returns>
-		public virtual string GetTableCreateStatement(Table table)
+		public virtual string GetTableCreateStatement(
+			Table table, bool isLast = false)
 		{
 			ArgumentNullException.ThrowIfNull(table);
 
 			string sql = string.Format(
 				CultureInfo.InvariantCulture,
-				"CREATE TABLE \"{0}\" ({1}",
+				"CREATE TABLE \"{0}\"{1}({1}",
 				table.Name,
 				Environment.NewLine);
 
@@ -501,20 +504,25 @@ namespace DigitalZenWorks.Database.ToolKit
 					sql += "," + Environment.NewLine;
 				}
 
-				bool isLast = false;
+				bool isLastKey = false;
 
 				if (index == table.ForeignKeys.Count - 1)
 				{
-					isLast = true;
+					isLastKey = true;
 				}
 
-				sql += GetForeignKeySql(foreignKey, isLast);
+				sql += GetForeignKeySql(foreignKey, isLastKey);
 			}
 
 			sql += string.Format(
 				CultureInfo.InvariantCulture,
-				"{0});{0}",
+				"{0});",
 				Environment.NewLine);
+
+			if (isLast == false)
+			{
+				sql += Environment.NewLine;
+			}
 
 			return sql;
 		}
@@ -540,9 +548,18 @@ namespace DigitalZenWorks.Database.ToolKit
 			{
 				StringBuilder schemaBuilder = new ();
 
-				foreach (Table table in tables)
+				for (int index = 0; index < tables.Count; index++)
 				{
-					string statement = GetTableCreateStatement(table);
+					Table table = tables[index];
+
+					bool isLast = false;
+
+					if (index == tables.Count - 1)
+					{
+						isLast = true;
+					}
+
+					string statement = GetTableCreateStatement(table, isLast);
 					schemaBuilder.AppendLine(statement);
 				}
 
