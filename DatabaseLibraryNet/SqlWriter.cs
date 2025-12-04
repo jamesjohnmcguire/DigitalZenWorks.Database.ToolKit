@@ -467,7 +467,7 @@ namespace DigitalZenWorks.Database.ToolKit
 
 			string sql = string.Format(
 				CultureInfo.InvariantCulture,
-				"CREATE TABLE `{0}` ({1}",
+				"CREATE TABLE \"{0}\" ({1}",
 				table.Name,
 				Environment.NewLine);
 
