@@ -315,7 +315,7 @@ namespace DigitalZenWorks.Database.ToolKit
 #endif
 		public static Collection<Table> GetSchemaOleDb(string databaseFile)
 		{
-			using OleDbSchema oleDbSchema = new(databaseFile);
+			using OleDbSchema oleDbSchema = new (databaseFile);
 			Collection<Table> tables = oleDbSchema.GetSchema();
 
 			return tables;
