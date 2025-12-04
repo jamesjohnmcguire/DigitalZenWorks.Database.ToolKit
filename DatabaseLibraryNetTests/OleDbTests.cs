@@ -21,13 +21,73 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 	[TestFixture]
 	internal sealed class OleDbTests
 	{
+		private string databaseFile;
+		private string sqlSchemaFile;
+
+		/// <summary>
+		/// Gets the database file used by the tests.
+		/// </summary>
+		public string DatabaseFile
+		{
+			get { return databaseFile; }
+		}
+
+		/// <summary>
+		/// Gets the SQL schema file used by the tests.
+		/// </summary>
+		public string SqlSchemaFile
+		{
+			get { return sqlSchemaFile; }
+		}
+
+		/// <summary>
+		/// The one time setup method.
+		/// </summary>
+		[OneTimeSetUp]
+		public void OneTimeSetUp()
+		{
+			string fileName = Path.GetTempFileName();
+
+			// A 0 byte sized file is created.  Need to remove it.
+			File.Delete(fileName);
+			databaseFile = Path.ChangeExtension(fileName, "accdb");
+
+			bool result =
+				DatabaseUtilities.CreateAccessDatabaseFile(databaseFile);
+			Assert.That(result, Is.True);
+
+			bool exists = File.Exists(databaseFile);
+			Assert.That(exists, Is.True);
+
+			sqlSchemaFile = GetTestSqlFile();
+
+			result = DataDefinition.ImportSchema(sqlSchemaFile, databaseFile);
+			Assert.That(result, Is.True);
+		}
+
+		/// <summary>
+		/// One time tear down method.
+		/// </summary>
+		[OneTimeTearDown]
+		public void OneTimeTearDown()
+		{
+			if (File.Exists(databaseFile))
+			{
+				File.Delete(databaseFile);
+			}
+
+			if (File.Exists(sqlSchemaFile))
+			{
+				File.Delete(sqlSchemaFile);
+			}
+		}
+
 		/// <summary>
 		/// Export schema test.
 		/// </summary>
 		[Test]
-		public static void ExportSchema()
+		public void ExportSchema()
 		{
-			string databaseFile = GetTestMdbFile();
 			string schemaFile = databaseFile + ".sql";
 
 			bool result =
@@ -46,12 +106,11 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 		/// Get constaints test.
 		/// </summary>
 		[Test]
-		public static void GetConstraints()
+		public void GetConstraints()
 		{
 			string tableName = "Sections";
-			string databaseFile = GetTestMdbFile();
 
-			using OleDbSchema oleDbSchema = new(databaseFile);
+			using OleDbSchema oleDbSchema = new (databaseFile);
 
 			DataTable constraints =
 				oleDbSchema.GetConstraints(tableName);
@@ -76,12 +135,10 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 				constraintNameStrings.Where(name => !string.IsNullOrEmpty(name));
 			List<string> constraintNames = [.. nonEmptyConstraintNames];
 
+			Assert.That(constraintNames, Contains.Item("PrimaryKey"));
+
 			Assert.That(constraintNames, Contains.Item("SectionsCategories"));
 			Assert.That(constraintNames, Contains.Item("SectionsMakers"));
-
-			bool hasPrimaryKeyLikeConstraint = constraintNames.Any(
-				name => name.StartsWith("Index_", StringComparison.Ordinal));
-			Assert.That(hasPrimaryKeyLikeConstraint, Is.True);
 
 			bool hasCategoriesConstraint =
 				constraintNames.Any(name => name.Contains(
@@ -99,12 +156,11 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 		/// Get relationships test.
 		/// </summary>
 		[Test]
-		public static void GetRelationships()
+		public void GetRelationships()
 		{
 			string dependentTableName = "Addresses";
-			string databaseFile = GetTestMdbFile();
 
-			using OleDbSchema oleDbSchema = new(databaseFile);
+			using OleDbSchema oleDbSchema = new (databaseFile);
 
 			Collection<Relationship> relationships =
 				oleDbSchema.GetRelationships(dependentTableName, null);
@@ -126,10 +182,8 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 		/// Get schema test.
 		/// </summary>
 		[Test]
-		public static void GetSchema()
+		public void GetSchema()
 		{
-			string databaseFile = GetTestMdbFile();
-
 			Collection<Table> tables =
 				DataDefinition.GetSchemaOleDb(databaseFile);
 
@@ -168,7 +222,6 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 		public void GetTableColumns()
 		{
 			string tableName = "Addresses";
-			string databaseFile = GetTestMdbFile();
 
 			using OleDbSchema oleDbSchema = new (databaseFile);
 
@@ -186,8 +239,6 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 		[Test]
 		public void OrderTables()
 		{
-			string databaseFile = GetTestMdbFile();
-
 			Collection<Table> tables =
 				DataDefinition.GetSchemaOleDb(databaseFile);
 
@@ -238,16 +289,6 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 
 			result = File.Exists(filePath);
 			Assert.That(result, Is.True);
-
-			return filePath;
-		}
-
-		private static string GetTestMdbFile()
-		{
-			string resource =
-				"DigitalZenWorks.Database.ToolKit.Tests.Products.Test.accdb";
-
-			string filePath = GetEmbeddedResourceFile(resource, "accdb");
 
 			return filePath;
 		}
