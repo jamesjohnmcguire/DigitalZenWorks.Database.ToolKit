@@ -772,16 +772,16 @@ namespace DigitalZenWorks.Database.ToolKit
 			}
 			else if (foreignKey.OnDeleteAction == ConstraintAction.SetNull)
 			{
-				sql += " SET NULL";
+				sql += " ON DELETE SET NULL";
 			}
 
 			if (foreignKey.OnUpdateAction == ConstraintAction.Cascade)
 			{
-				sql += " ON DELETE CASCADE";
+				sql += " ON UPDATE CASCADE";
 			}
 			else if (foreignKey.OnUpdateAction == ConstraintAction.SetNull)
 			{
-				sql += " SET NULL";
+				sql += " ON UPDATE SET NULL";
 			}
 
 			if (isLast == false)
