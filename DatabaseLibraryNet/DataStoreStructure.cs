@@ -615,7 +615,7 @@ namespace DigitalZenWorks.Database.ToolKit
 			}
 			else if (onAction.Equals("SET NULL", StringComparison.Ordinal))
 			{
-				relationship.OnDeleteAction = ConstraintAction.Cascade;
+				relationship.OnDeleteAction = ConstraintAction.SetNull;
 			}
 			else
 			{
@@ -630,7 +630,7 @@ namespace DigitalZenWorks.Database.ToolKit
 			}
 			else if (onAction.Equals("SET NULL", StringComparison.Ordinal))
 			{
-				relationship.OnUpdateAction = ConstraintAction.Cascade;
+				relationship.OnUpdateAction = ConstraintAction.SetNull;
 			}
 			else
 			{
