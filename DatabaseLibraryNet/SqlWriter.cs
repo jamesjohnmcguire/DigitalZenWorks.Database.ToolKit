@@ -492,13 +492,14 @@ namespace DigitalZenWorks.Database.ToolKit
 				sql += GetColumnSql(column, isLastColumn);
 			}
 
-			for (int index = 0; index < foreignKeys.Count; index++)
+			// These seem to be in reverse order.
+			for (int index = foreignKeys.Count - 1; index >= 0; index--)
 			{
 				ForeignKey foreignKey = foreignKeys[index];
 
 				bool isLastKey = false;
 
-				if (index == foreignKeys.Count - 1)
+				if (index == 0)
 				{
 					isLastKey = true;
 				}
