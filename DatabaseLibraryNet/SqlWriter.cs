@@ -589,16 +589,17 @@ namespace DigitalZenWorks.Database.ToolKit
 
 			string columnType = column.ColumnType switch
 			{
-				ColumnType.Number => " INTEGER",
 				ColumnType.AutoNumber => " INTEGER",
+				ColumnType.Currency => " CURRENCY",
+				ColumnType.DateTime => " DATETIME",
+				ColumnType.Memo => " MEMO",
+				ColumnType.Number => " INTEGER",
+				ColumnType.Ole => " OLEOBJECT",
 				ColumnType.String => string.Format(
 					CultureInfo.InvariantCulture,
 					" VARCHAR({0})",
 					column.Length),
-				ColumnType.Memo => " MEMO",
-				ColumnType.DateTime => " DATETIME",
-				ColumnType.Currency => " CURRENCY",
-				ColumnType.Ole => " OLEOBJECT",
+				ColumnType.Text => " TEXT",
 				ColumnType.YesNo => " OLEOBJECT",
 				_ => string.Empty,
 			};

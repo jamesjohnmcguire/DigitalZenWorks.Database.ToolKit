@@ -557,11 +557,12 @@ namespace DigitalZenWorks.Database.ToolKit
 		{
 			ColumnType columnType = dataType switch
 			{
-				"integer" => ColumnType.Number,
-				"string" => ColumnType.String,
-
 				// Guessing date vs. datetime based on name
 				"date" => ColumnType.DateTime,
+				"integer" => ColumnType.Number,
+				"string" => ColumnType.String,
+				"text" => ColumnType.Text,
+
 				_ => ColumnType.Unknown,
 			};
 
