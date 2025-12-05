@@ -8,6 +8,7 @@ namespace DigitalZenWorks.Database.ToolKit
 {
 	using System;
 	using System.Collections.Generic;
+	using System.Collections.ObjectModel;
 	using System.Globalization;
 
 	/// <summary>
@@ -37,6 +38,8 @@ namespace DigitalZenWorks.Database.ToolKit
 		{
 			ArgumentNullException.ThrowIfNull(table);
 
+			Collection<ForeignKey> foreignKeys = table.ForeignKeys;
+
 			string sql = string.Format(
 				CultureInfo.InvariantCulture,
 				"CREATE TABLE [{0}] ({1}",
@@ -49,7 +52,7 @@ namespace DigitalZenWorks.Database.ToolKit
 			{
 				Column column = entry.Value;
 
-				sql += GetColumnSql(column);
+				sql += GetColumnSql(column, false);
 			}
 
 			bool isPrimaryKeyAdded = false;
@@ -64,9 +67,9 @@ namespace DigitalZenWorks.Database.ToolKit
 				isPrimaryKeyAdded = true;
 			}
 
-			for (int index = 0; index < table.ForeignKeys.Count; index++)
+			for (int index = 0; index < foreignKeys.Count; index++)
 			{
-				ForeignKey foreignKey = table.ForeignKeys[index];
+				ForeignKey foreignKey = foreignKeys[index];
 
 				if (index == 0 && isPrimaryKeyAdded == true)
 				{
@@ -75,7 +78,7 @@ namespace DigitalZenWorks.Database.ToolKit
 
 				bool isLastKey = false;
 
-				if (index == table.ForeignKeys.Count - 1)
+				if (index == foreignKeys.Count - 1)
 				{
 					isLastKey = true;
 				}
@@ -106,9 +109,12 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// and ends with a comma and newline.</remarks>
 		/// <param name="column">The column for which to generate the SQL
 		/// definition. Cannot be null.</param>
+		/// <param name="isLast">Indicates whether this column is the last
+		/// in the list. If <see langword="false"/>, a comma is appended to the
+		/// SQL statement.</param>
 		/// <returns>A string containing the SQL definition for the column,
 		/// formatted for inclusion in a CREATE TABLE statement.</returns>
-		protected override string GetColumnSql(Column column)
+		protected override string GetColumnSql(Column column, bool isLast)
 		{
 			ArgumentNullException.ThrowIfNull(column);
 
@@ -137,7 +143,12 @@ namespace DigitalZenWorks.Database.ToolKit
 				sql += " DEFAULT " + column.DefaultValue;
 			}
 
-			sql += "," + Environment.NewLine;
+			if (isLast == false)
+			{
+				sql += ",";
+			}
+
+			sql += Environment.NewLine;
 
 			return sql;
 		}

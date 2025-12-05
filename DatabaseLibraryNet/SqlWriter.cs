@@ -468,6 +468,8 @@ namespace DigitalZenWorks.Database.ToolKit
 		{
 			ArgumentNullException.ThrowIfNull(table);
 
+			Collection<ForeignKey> foreignKeys = table.ForeignKeys;
+
 			string sql = string.Format(
 				CultureInfo.InvariantCulture,
 				"CREATE TABLE \"{0}\"{1}({1}",
@@ -476,11 +478,18 @@ namespace DigitalZenWorks.Database.ToolKit
 
 			SortedList<int, Column> columns = GetOrdinalSortedColumns(table);
 
-			foreach (KeyValuePair<int, Column> entry in columns)
+			for (int index = 0; index < columns.Count; index++)
 			{
-				Column column = entry.Value;
+				Column column = columns.Values[index];
 
-				sql += GetColumnSql(column);
+				bool isLastColumn = false;
+
+				if (index == columns.Count - 1 && foreignKeys.Count == 0)
+				{
+					isLastColumn = true;
+				}
+
+				sql += GetColumnSql(column, isLastColumn);
 			}
 
 			bool isPrimaryKeyAdded = false;
@@ -495,9 +504,9 @@ namespace DigitalZenWorks.Database.ToolKit
 				isPrimaryKeyAdded = true;
 			}
 
-			for (int index = 0; index < table.ForeignKeys.Count; index++)
+			for (int index = 0; index < foreignKeys.Count; index++)
 			{
-				ForeignKey foreignKey = table.ForeignKeys[index];
+				ForeignKey foreignKey = foreignKeys[index];
 
 				if (index == 0 && isPrimaryKeyAdded == true)
 				{
@@ -506,7 +515,7 @@ namespace DigitalZenWorks.Database.ToolKit
 
 				bool isLastKey = false;
 
-				if (index == table.ForeignKeys.Count - 1)
+				if (index == foreignKeys.Count - 1)
 				{
 					isLastKey = true;
 				}
@@ -646,9 +655,12 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// and ends with a comma and newline.</remarks>
 		/// <param name="column">The column for which to generate the SQL
 		/// definition. Cannot be null.</param>
+		/// <param name="isLast">Indicates whether this column is the last
+		/// in the list. If <see langword="false"/>, a comma is appended to the
+		/// SQL statement.</param>
 		/// <returns>A string containing the SQL definition for the column,
 		/// formatted for inclusion in a CREATE TABLE statement.</returns>
-		protected virtual string GetColumnSql(Column column)
+		protected virtual string GetColumnSql(Column column, bool isLast)
 		{
 			ArgumentNullException.ThrowIfNull(column);
 
@@ -681,7 +693,12 @@ namespace DigitalZenWorks.Database.ToolKit
 				sql += " DEFAULT " + column.DefaultValue;
 			}
 
-			sql += "," + Environment.NewLine;
+			if (isLast == false)
+			{
+				sql += ",";
+			}
+
+			sql += Environment.NewLine;
 
 			return sql;
 		}
