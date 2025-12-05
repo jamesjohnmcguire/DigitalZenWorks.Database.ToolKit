@@ -661,11 +661,6 @@ namespace DigitalZenWorks.Database.ToolKit
 				sql += " UNIQUE";
 			}
 
-			if (!column.Nullable)
-			{
-				sql += " NOT NULL";
-			}
-
 			if (column.ColumnType == ColumnType.AutoNumber)
 			{
 				sql += " IDENTITY";
@@ -674,6 +669,10 @@ namespace DigitalZenWorks.Database.ToolKit
 			if (column.Primary == true)
 			{
 				sql += " PRIMARY KEY AUTOINCREMENT";
+			}
+			else if (column.Nullable == false)
+			{
+				sql += " NOT NULL";
 			}
 
 			if (!string.IsNullOrWhiteSpace(column.DefaultValue))
