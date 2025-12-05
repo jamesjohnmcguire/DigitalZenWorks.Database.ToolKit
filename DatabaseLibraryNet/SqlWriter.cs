@@ -492,26 +492,9 @@ namespace DigitalZenWorks.Database.ToolKit
 				sql += GetColumnSql(column, isLastColumn);
 			}
 
-			bool isPrimaryKeyAdded = false;
-
-			if (!string.IsNullOrWhiteSpace(table.PrimaryKey))
-			{
-				sql += string.Format(
-					CultureInfo.InvariantCulture,
-					"\tCONSTRAINT PrimaryKey PRIMARY KEY (\"{0}\")",
-					table.PrimaryKey);
-
-				isPrimaryKeyAdded = true;
-			}
-
 			for (int index = 0; index < foreignKeys.Count; index++)
 			{
 				ForeignKey foreignKey = foreignKeys[index];
-
-				if (index == 0 && isPrimaryKeyAdded == true)
-				{
-					sql += "," + Environment.NewLine;
-				}
 
 				bool isLastKey = false;
 

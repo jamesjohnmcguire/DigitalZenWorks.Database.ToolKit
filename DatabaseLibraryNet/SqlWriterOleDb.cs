@@ -57,12 +57,11 @@ namespace DigitalZenWorks.Database.ToolKit
 
 			bool isPrimaryKeyAdded = false;
 
-			if (!string.IsNullOrWhiteSpace(table.PrimaryKey))
+			string primaryKeys = GetPrimaryKeysSql(columns);
+
+			if (!string.IsNullOrWhiteSpace(primaryKeys))
 			{
-				sql += string.Format(
-					CultureInfo.InvariantCulture,
-					"\tCONSTRAINT PrimaryKey PRIMARY KEY ([{0}])",
-					table.PrimaryKey);
+				sql += primaryKeys;
 
 				isPrimaryKeyAdded = true;
 			}
@@ -133,7 +132,8 @@ namespace DigitalZenWorks.Database.ToolKit
 				sql += " NOT NULL";
 			}
 
-			if (column.ColumnType == ColumnType.AutoNumber)
+			if (column.Primary == true ||
+				column.ColumnType == ColumnType.AutoNumber)
 			{
 				sql += " IDENTITY";
 			}
@@ -260,6 +260,37 @@ namespace DigitalZenWorks.Database.ToolKit
 			{
 				sql += ",";
 				sql += Environment.NewLine;
+			}
+
+			return sql;
+		}
+
+		private string GetPrimaryKeysSql(SortedList<int, Column> columns)
+		{
+			string sql = string.Empty;
+
+			bool isFirst = true;
+
+			foreach (KeyValuePair<int, Column> entry in columns)
+			{
+				Column column = entry.Value;
+
+				if (column.Primary == true)
+				{
+					if (isFirst == true)
+					{
+						isFirst = false;
+					}
+					else
+					{
+						sql += "," + Environment.NewLine;
+					}
+
+					sql += string.Format(
+						CultureInfo.InvariantCulture,
+						"\tCONSTRAINT PrimaryKey PRIMARY KEY ([{0}])",
+						column.Name);
+				}
 			}
 
 			return sql;

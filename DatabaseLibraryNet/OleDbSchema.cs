@@ -32,6 +32,8 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// </summary>
 		private OleDbConnection oleDbConnection;
 
+		private HashSet<string> primaryKeyNames;
+
 		/// <summary>
 		/// Initializes a new instance of the <see cref="OleDbSchema"/> class.
 		/// </summary>
@@ -167,6 +169,36 @@ namespace DigitalZenWorks.Database.ToolKit
 		}
 
 		/// <summary>
+		/// Retrieves a table definition, including its columns, for the
+		/// specified table name.
+		/// </summary>
+		/// <remarks>The returned <see cref="Table"/> includes all columns as
+		/// defined in the data source. If the table does not exist, the
+		/// result may be an empty table definition.</remarks>
+		/// <param name="tableName">The name of the table to retrieve. Cannot
+		/// be null or empty.</param>
+		/// <returns>A <see cref="Table"/> object representing the specified
+		/// table and its columns.</returns>
+		public override Table GetTable(string tableName)
+		{
+			primaryKeyNames = GetPrivateKeyNames(tableName);
+
+			Table table = new (tableName);
+
+			Log.Info("Getting Columns for " + tableName);
+			DataTable dataColumns = GetTableColumns(tableName);
+
+			foreach (DataRow dataColumn in dataColumns.Rows)
+			{
+				Column column = FormatColumnFromDataRow(dataColumn);
+
+				table.AddColumn(column);
+			}
+
+			return table;
+		}
+
+		/// <summary>
 		/// Gets the column names from the given table.
 		/// </summary>
 		/// <param name="tableName">The name of the table.</param>
@@ -194,54 +226,6 @@ namespace DigitalZenWorks.Database.ToolKit
 				GetSchema(OleDbSchemaGuid.Table_Constraints, restrictions);
 
 			return schemaTable;
-		}
-
-		/// <summary>
-		/// Sets the primary key for the specified table based on the
-		/// information provided in the given data row.
-		/// </summary>
-		/// <remarks>If the primary key column is of integer type, its type is
-		/// set to AutoNumber. This method currently supports only single
-		/// -column primary keys; composite primary keys are
-		/// not handled.</remarks>
-		/// <param name="row">The data row containing table metadata,
-		/// including the table name and primary key information. Must not be
-		/// null and must contain valid 'TABLE_NAME' and 'COLUMN_NAME'
-		/// fields.</param>
-		/// <returns>A Table object with its PrimaryKey property set according
-		/// to the primary key defined in the data row.</returns>
-		public Table SetPrimaryKey(DataRow row)
-		{
-			Table table;
-
-			if (row == null)
-			{
-				throw new ArgumentNullException(nameof(row));
-			}
-			else
-			{
-				string tableName = GetTableName(row);
-
-				table = GetTable(tableName);
-
-				DataTable primaryKeys = GetPrimaryKeys(tableName);
-
-				// TODO: This assumes only a single primary key.  Need to
-				// compensate for composite primary keys.
-				DataRow primaryKeyRow = primaryKeys.Rows[0];
-				object nameRaw = primaryKeyRow["COLUMN_NAME"];
-				table.PrimaryKey = nameRaw.ToString();
-
-				// If PK is an integer change type to AutoNumber
-				Column primaryKey = SetPrimaryKeyType(table);
-
-				if (primaryKey != null)
-				{
-					table.Columns[table.PrimaryKey] = primaryKey;
-				}
-			}
-
-			return table;
 		}
 
 		/// <summary>
@@ -430,6 +414,38 @@ namespace DigitalZenWorks.Database.ToolKit
 		}
 
 		/// <summary>
+		/// Determines whether the specified column is marked as a primary key.
+		/// </summary>
+		/// <remarks>The method checks the value of the "PRIMARY_KEY" field in
+		/// the provided <see cref="DataRow"/>. The comparison is case-sensitive
+		/// and expects the value to be exactly "True" to indicate a primary
+		/// key.</remarks>
+		/// <param name="column">The <see cref="DataRow"/> representing the
+		/// column to evaluate. Cannot be null.</param>
+		/// <returns>true if the column is designated as a primary key;
+		/// otherwise, false.</returns>
+		protected override bool IsPrimaryKey(DataRow column)
+		{
+			bool isPrimaryKey = false;
+
+			ArgumentNullException.ThrowIfNull(column);
+
+			if (column.Table.Columns.Contains("COLUMN_NAME"))
+			{
+				string columnName = column["COLUMN_NAME"].ToString();
+
+				bool exists = primaryKeyNames.Contains(columnName);
+
+				if (exists == true)
+				{
+					isPrimaryKey = true;
+				}
+			}
+
+			return isPrimaryKey;
+		}
+
+		/// <summary>
 		/// Order table.
 		/// </summary>
 		/// <param name="tables">The list of tables to order.</param>
@@ -484,6 +500,22 @@ namespace DigitalZenWorks.Database.ToolKit
 			return primaryKey;
 		}
 
+		private HashSet<string> GetPrivateKeyNames(string tableName)
+		{
+			DataTable primaryKeys = GetPrimaryKeys(tableName);
+
+			primaryKeyNames = new ();
+
+			foreach (DataRow row in primaryKeys.Rows)
+			{
+				string primaryKeyName = row["COLUMN_NAME"].ToString();
+
+				primaryKeyNames.Add(primaryKeyName);
+			}
+
+			return primaryKeyNames;
+		}
+
 		private DataTable GetSchema(Guid guid, object[] restrictions)
 		{
 			if (oleDbConnection.State != ConnectionState.Open)
@@ -497,13 +529,6 @@ namespace DigitalZenWorks.Database.ToolKit
 			oleDbConnection.Close();
 
 			return schemaTable;
-		}
-
-		private Table GetTable(DataRow row)
-		{
-			Table table = SetPrimaryKey(row);
-
-			return table;
 		}
 	}
 }

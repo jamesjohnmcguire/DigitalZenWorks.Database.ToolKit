@@ -232,10 +232,7 @@ namespace DigitalZenWorks.Database.ToolKit
 
 				column.ColumnType = GetColumnType(dataType, length, flags);
 
-				if (row["PRIMARY_KEY"].ToString() == "True")
-				{
-					column.Primary = true;
-				}
+				column.Primary = IsPrimaryKey(row);
 
 				if (row["IS_NULLABLE"].ToString() == "True")
 				{
@@ -391,7 +388,7 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// be null or empty.</param>
 		/// <returns>A <see cref="Table"/> object representing the specified
 		/// table and its columns.</returns>
-		public Table GetTable(string tableName)
+		public virtual Table GetTable(string tableName)
 		{
 			Table table = new (tableName);
 
@@ -644,6 +641,32 @@ namespace DigitalZenWorks.Database.ToolKit
 		}
 
 		/// <summary>
+		/// Retrieves the table associated with the specified data row.
+		/// </summary>
+		/// <param name="row">The data row for which to retrieve the
+		/// corresponding table. Cannot be null.</param>
+		/// <returns>The table that corresponds to the specified data row.
+		/// </returns>
+		/// <exception cref="ArgumentNullException">Thrown if
+		/// <paramref name="row"/> is null.</exception>
+		protected virtual Table GetTable(DataRow row)
+		{
+			Table table;
+
+			if (row == null)
+			{
+				throw new ArgumentNullException(nameof(row));
+			}
+			else
+			{
+				string tableName = GetTableName(row);
+				table = GetTable(tableName);
+			}
+
+			return table;
+		}
+
+		/// <summary>
 		/// Retrieves the parent table specified by the relationship and adds
 		/// the corresponding foreign key to its collection.
 		/// </summary>
@@ -680,6 +703,36 @@ namespace DigitalZenWorks.Database.ToolKit
 			}
 
 			return table;
+		}
+
+		/// <summary>
+		/// Determines whether the specified column is marked as a primary key.
+		/// </summary>
+		/// <remarks>The method checks the value of the "PRIMARY_KEY" field in
+		/// the provided <see cref="DataRow"/>. The comparison is case-sensitive
+		/// and expects the value to be exactly "True" to indicate a primary
+		/// key.</remarks>
+		/// <param name="column">The <see cref="DataRow"/> representing the
+		/// column to evaluate. Cannot be null.</param>
+		/// <returns>true if the column is designated as a primary key;
+		/// otherwise, false.</returns>
+		protected virtual bool IsPrimaryKey(DataRow column)
+		{
+			bool isPrimaryKey = false;
+
+			ArgumentNullException.ThrowIfNull(column);
+
+			if (column.Table.Columns.Contains("PRIMARY_KEY"))
+			{
+				string primaryKeyText = column["PRIMARY_KEY"].ToString();
+
+				if (primaryKeyText.Equals("True", StringComparison.Ordinal))
+				{
+					isPrimaryKey = true;
+				}
+			}
+
+			return isPrimaryKey;
 		}
 
 		/// <summary>
@@ -1145,23 +1198,6 @@ namespace DigitalZenWorks.Database.ToolKit
 			connection.Close();
 
 			return schemaTable;
-		}
-
-		private Table GetTable(DataRow row)
-		{
-			Table table;
-
-			if (row == null)
-			{
-				throw new ArgumentNullException(nameof(row));
-			}
-			else
-			{
-				string tableName = GetTableName(row);
-				table = GetTable(tableName);
-			}
-
-			return table;
 		}
 	}
 }
