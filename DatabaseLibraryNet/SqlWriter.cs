@@ -506,10 +506,12 @@ namespace DigitalZenWorks.Database.ToolKit
 				sql += GetForeignKeySql(foreignKey, isLastKey);
 			}
 
-			sql += string.Format(
-				CultureInfo.InvariantCulture,
-				"{0});",
-				Environment.NewLine);
+			if (foreignKeys.Count > 0)
+			{
+				sql += Environment.NewLine;
+			}
+
+			sql += ");";
 
 			if (isLast == false)
 			{
