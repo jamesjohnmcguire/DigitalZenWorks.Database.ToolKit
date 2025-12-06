@@ -185,7 +185,7 @@ namespace DigitalZenWorks.Database.ToolKit
 					dataItem = dataItem.Trim('\'');
 				}
 
-				Regex unescapedApostropheRegex = new (@"(?<!')'(?!')");
+				Regex unescapedApostropheRegex = new(@"(?<!')'(?!')");
 
 				bool isUnescaped = unescapedApostropheRegex.IsMatch(dataItem);
 
@@ -353,7 +353,7 @@ namespace DigitalZenWorks.Database.ToolKit
 		{
 			if (buffers != null)
 			{
-				StringBuilder builder = new ();
+				StringBuilder builder = new();
 
 				foreach (IList<string> buffer in buffers)
 				{

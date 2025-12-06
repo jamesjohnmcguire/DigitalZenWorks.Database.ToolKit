@@ -36,7 +36,7 @@ namespace DigitalZenWorks.Database.ToolKit
 		private static readonly ILog Log = LogManager.GetLogger(
 			System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-		private static readonly ResourceManager StringTable = new (
+		private static readonly ResourceManager StringTable = new(
 			"DigitalZenWorks.Database.ToolKit.Resources",
 			Assembly.GetExecutingAssembly());
 
@@ -878,7 +878,7 @@ namespace DigitalZenWorks.Database.ToolKit
 					if (databaseType == DatabaseType.SQLite)
 					{
 						SQLiteParameter parameter =
-							new (DbType.String, keyPairValue);
+							new(DbType.String, keyPairValue);
 						result = parameters.Add(parameter);
 					}
 					else

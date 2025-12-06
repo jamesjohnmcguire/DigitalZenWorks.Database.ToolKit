@@ -26,7 +26,7 @@ namespace DigitalZenWorks.Database.ToolKit
 		private static readonly ILog Log = LogManager.GetLogger(
 			System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-		private static readonly ResourceManager StringTable = new (
+		private static readonly ResourceManager StringTable = new(
 			"DigitalZenWorks.Database.ToolKit.Resources",
 			Assembly.GetExecutingAssembly());
 

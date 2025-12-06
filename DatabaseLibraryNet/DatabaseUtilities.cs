@@ -164,7 +164,7 @@ namespace DigitalZenWorks.Database.ToolKit
 							string csvFile = csvPath + tableName + ".csv";
 
 							// Create the CSV file.
-							using StreamWriter file = new (csvFile, false);
+							using StreamWriter file = new(csvFile, false);
 							ExportDataTableToCsv(tableData, file);
 						}
 						catch (Exception exception) when

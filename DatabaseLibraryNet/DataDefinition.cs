@@ -30,7 +30,7 @@ namespace DigitalZenWorks.Database.ToolKit
 		private static readonly ILog Log = LogManager.GetLogger(
 			System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-		private static readonly ResourceManager StringTable = new (
+		private static readonly ResourceManager StringTable = new(
 			"DigitalZenWorks.Database.ToolKit.Resources",
 			Assembly.GetExecutingAssembly());
 
@@ -316,7 +316,7 @@ namespace DigitalZenWorks.Database.ToolKit
 			Dictionary<string, Table> tableDictionary = [];
 			List<Relationship> relationships = [];
 
-			using OleDbSchema oleDbSchema = new (databaseFile);
+			using OleDbSchema oleDbSchema = new(databaseFile);
 			DataTable tableNames = oleDbSchema.TableNames;
 
 			foreach (DataRow row in tableNames.Rows)
@@ -347,7 +347,7 @@ namespace DigitalZenWorks.Database.ToolKit
 			}
 
 			List<Table> newList = [.. tableDictionary.Values];
-			Collection<Table> tables = new (newList);
+			Collection<Table> tables = new(newList);
 
 			return tables;
 		}
@@ -594,7 +594,7 @@ namespace DigitalZenWorks.Database.ToolKit
 
 		private static Column FormatColumnFromDataRow(DataRow row)
 		{
-			Column column = new ();
+			Column column = new();
 			column.Name = row["COLUMN_NAME"].ToString();
 
 			switch ((int)row["DATA_TYPE"])
@@ -736,7 +736,7 @@ namespace DigitalZenWorks.Database.ToolKit
 		private static ForeignKey GetForeignKeyRelationship(
 			Relationship relationship)
 		{
-			ForeignKey foreignKey = new (
+			ForeignKey foreignKey = new(
 				relationship.Name,
 				relationship.ChildTableCol,
 				relationship.ParentTable,
@@ -749,7 +749,7 @@ namespace DigitalZenWorks.Database.ToolKit
 
 		private static Relationship GetRelationship(DataRow foreignKey)
 		{
-			Relationship relationship = new ();
+			Relationship relationship = new();
 			relationship.Name = foreignKey["FK_NAME"].ToString();
 			relationship.ParentTable =
 				foreignKey["PK_TABLE_NAME"].ToString();
@@ -779,7 +779,7 @@ namespace DigitalZenWorks.Database.ToolKit
 		private static Table GetTable(
 			OleDbSchema oleDbSchema, string tableName)
 		{
-			Table table = new (tableName);
+			Table table = new(tableName);
 
 			Log.Info("Getting Columns for " + tableName);
 			DataTable dataColumns =
@@ -808,7 +808,7 @@ namespace DigitalZenWorks.Database.ToolKit
 				databaseFile);
 
 			using (DataStorage database =
-				new (DatabaseType.OleDb, connectionString))
+				new(DatabaseType.OleDb, connectionString))
 			{
 				ExecuteQueries(database, queries);
 				successCode = true;
