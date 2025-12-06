@@ -11,63 +11,36 @@ namespace DigitalZenWorks.Database.ToolKit
 	/// </summary>
 	public class Relationship
 	{
-		private string child;
-		private string childColumn;
-		private string name;
-		private ConstraintAction onDeleteAction;
-		private ConstraintAction onUpdateAction;
-		private string parent;
-		private string parentColumn;
 
 		/// <summary>
 		/// Gets or sets name.
 		/// </summary>
 		/// <value>The name.</value>
-		public string Name
-		{
-			get { return name; }
-			set { name = value; }
-		}
+		public string Name { get; set; }
 
 		/// <summary>
 		/// Gets or sets parent Table.
 		/// </summary>
 		/// <value>The Parent Table.</value>
-		public string ParentTable
-		{
-			get { return parent; }
-			set { parent = value; }
-		}
+		public string ParentTable { get; set; }
 
 		/// <summary>
 		/// Gets or sets parent Table Column.
 		/// </summary>
 		/// <value>The Parent Table Column.</value>
-		public string ParentTableCol
-		{
-			get { return parentColumn; }
-			set { parentColumn = value; }
-		}
+		public string ParentTableCol { get; set; }
 
 		/// <summary>
 		/// Gets or sets child Table.
 		/// </summary>
 		/// <value>The Child Table.</value>
-		public string ChildTable
-		{
-			get { return child; }
-			set { child = value; }
-		}
+		public string ChildTable { get; set; }
 
 		/// <summary>
 		/// Gets or sets child Table Column.
 		/// </summary>
 		/// <value>The Child Table Column.</value>
-		public string ChildTableCol
-		{
-			get { return childColumn; }
-			set { childColumn = value; }
-		}
+		public string ChildTableCol { get; set; }
 
 		/// <summary>
 		/// Gets or sets the action to take when a referenced row is updated in
@@ -78,11 +51,7 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// cascading the update, setting related values to null, or restricting
 		/// the update. The available actions are defined by the
 		/// <see cref="ConstraintAction"/> enumeration.</remarks>
-		public ConstraintAction OnUpdateAction
-		{
-			get { return onUpdateAction; }
-			set { onUpdateAction = value; }
-		}
+		public ConstraintAction OnUpdateAction { get; set; }
 
 		/// <summary>
 		/// Gets or sets the action to perform when a related row is deleted in
@@ -93,10 +62,6 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// cascading the delete, setting related values to null, or restricting
 		/// the delete operation. The available actions are defined by the
 		/// <see cref="ConstraintAction"/> enumeration.</remarks>
-		public ConstraintAction OnDeleteAction
-		{
-			get { return onDeleteAction; }
-			set { onDeleteAction = value; }
-		}
+		public ConstraintAction OnDeleteAction { get; set; }
 	}
 }

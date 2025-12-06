@@ -86,7 +86,7 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 		/// may be empty or invalid.</returns>
 		protected static string GetTestSqlFile()
 		{
-			string resource = "DigitalZenWorks.Database.ToolKit.Tests." +
+			const string resource = "DigitalZenWorks.Database.ToolKit.Tests." +
 				"Products.Sqlite.Test.sql";
 
 			string filePath = GetEmbeddedResourceFile(resource, "sql");
@@ -147,7 +147,7 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 
 			SQLiteConnection.CreateFile(dataSource);
 
-			string connectionBase = "Data Source={0};Version=3;" +
+			const string connectionBase = "Data Source={0};Version=3;" +
 				"DateTimeFormat=InvariantCulture";
 
 			string connectionString = string.Format(

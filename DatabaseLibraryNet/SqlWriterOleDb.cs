@@ -265,7 +265,7 @@ namespace DigitalZenWorks.Database.ToolKit
 			return sql;
 		}
 
-		private string GetPrimaryKeysSql(SortedList<int, Column> columns)
+		private static string GetPrimaryKeysSql(SortedList<int, Column> columns)
 		{
 			string sql = string.Empty;
 

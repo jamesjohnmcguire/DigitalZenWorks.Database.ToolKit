@@ -11,13 +11,6 @@ namespace DigitalZenWorks.Database.ToolKit
 	/// </summary>
 	public class ForeignKey
 	{
-		private string childColumn;
-		private string childTable;
-		private string name;
-		private ConstraintAction onDeleteAction;
-		private ConstraintAction onUpdateAction;
-		private string parentTable;
-		private string parentColumn;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="ForeignKey"/> class.
@@ -36,12 +29,12 @@ namespace DigitalZenWorks.Database.ToolKit
 			ConstraintAction onDeleteAction,
 			ConstraintAction onUpdateAction)
 		{
-			this.name = name;
-			this.childColumn = columnName;
-			this.parentTable = parentTable;
-			this.parentColumn = parentTableColumn;
-			this.onDeleteAction = onDeleteAction;
-			this.onUpdateAction = onUpdateAction;
+			this.Name = name;
+			this.ChildColumn = columnName;
+			this.ParentTable = parentTable;
+			this.ParentColumn = parentTableColumn;
+			this.OnDeleteAction = onDeleteAction;
+			this.OnUpdateAction = onUpdateAction;
 		}
 
 		/// <summary>
@@ -63,13 +56,13 @@ namespace DigitalZenWorks.Database.ToolKit
 			ConstraintAction onDeleteAction,
 			ConstraintAction onUpdateAction)
 		{
-			this.name = name;
-			this.childTable = childTable;
-			this.childColumn = childColumn;
-			this.parentTable = parentTable;
-			this.parentColumn = parentColumn;
-			this.onDeleteAction = onDeleteAction;
-			this.onUpdateAction = onUpdateAction;
+			this.Name = name;
+			this.ChildTable = childTable;
+			this.ChildColumn = childColumn;
+			this.ParentTable = parentTable;
+			this.ParentColumn = parentColumn;
+			this.OnDeleteAction = onDeleteAction;
+			this.OnUpdateAction = onUpdateAction;
 		}
 
 		/// <summary>
@@ -81,11 +74,7 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// cascading the delete, setting related values to null, or restricting
 		/// the delete operation. The available actions are defined by the
 		/// <see cref="ConstraintAction"/> enumeration.</remarks>
-		public ConstraintAction OnDeleteAction
-		{
-			get { return onDeleteAction; }
-			set { onDeleteAction = value; }
-		}
+		public ConstraintAction OnDeleteAction { get; set; }
 
 		/// <summary>
 		/// Gets or sets the action to take when a referenced row is updated in
@@ -96,11 +85,7 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// cascading the update, setting related values to null, or restricting
 		/// the update. The available actions are defined by the
 		/// <see cref="ConstraintAction"/> enumeration.</remarks>
-		public ConstraintAction OnUpdateAction
-		{
-			get { return onUpdateAction; }
-			set { onUpdateAction = value; }
-		}
+		public ConstraintAction OnUpdateAction { get; set; }
 
 		/// <summary>
 		/// Gets or sets the child column name.
@@ -108,11 +93,7 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// <value>
 		/// Column Name.
 		/// </value>
-		public string ChildColumn
-		{
-			get { return childColumn; }
-			set { childColumn = value; }
-		}
+		public string ChildColumn { get; set; }
 
 		/// <summary>
 		/// Gets or sets the child table name.
@@ -120,11 +101,7 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// <value>
 		/// Column Name.
 		/// </value>
-		public string ChildTable
-		{
-			get { return childTable; }
-			set { childTable = value; }
-		}
+		public string ChildTable { get; set; }
 
 		/// <summary>
 		/// Gets or sets column Name.
@@ -134,8 +111,8 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// </value>
 		public string ColumnName
 		{
-			get { return childColumn; }
-			set { childColumn = value; }
+			get { return ChildColumn; }
+			set { ChildColumn = value; }
 		}
 
 		/// <summary>
@@ -144,11 +121,7 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// <value>
 		/// Foreign Key Name.
 		/// </value>
-		public string Name
-		{
-			get { return name; }
-			set { name = value; }
-		}
+		public string Name { get; set; }
 
 		/// <summary>
 		/// Gets or sets parent Table Column.
@@ -156,11 +129,7 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// <value>
 		/// Parent Table Column.
 		/// </value>
-		public string ParentColumn
-		{
-			get { return parentColumn; }
-			set { parentColumn = value; }
-		}
+		public string ParentColumn { get; set; }
 
 		/// <summary>
 		/// Gets or sets parent Table.
@@ -168,11 +137,7 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// <value>
 		/// Parent Table.
 		/// </value>
-		public string ParentTable
-		{
-			get { return parentTable; }
-			set { parentTable = value; }
-		}
+		public string ParentTable { get; set; }
 
 		/// <summary>
 		/// Gets or sets parent Table Column.
@@ -182,8 +147,8 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// </value>
 		public string ParentTableColumn
 		{
-			get { return parentColumn; }
-			set { parentColumn = value; }
+			get { return ParentColumn; }
+			set { ParentColumn = value; }
 		}
 	}
 }

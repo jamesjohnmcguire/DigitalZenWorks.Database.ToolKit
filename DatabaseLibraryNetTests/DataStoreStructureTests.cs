@@ -103,7 +103,7 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 		[Test]
 		public void GetRelationships()
 		{
-			string dependentTableName = "Sections";
+			const string dependentTableName = "Sections";
 
 			using DataStoreStructure schema =
 				new (DatabaseType.SQLite, DataSource);
@@ -169,7 +169,7 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 		[Test]
 		public void GetTableColumns()
 		{
-			string tableName = "Addresses";
+			const string tableName = "Addresses";
 
 			using DataStoreStructure schema =
 				new (DatabaseType.SQLite, DataSource);

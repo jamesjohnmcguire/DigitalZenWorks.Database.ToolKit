@@ -34,7 +34,7 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 		[Test]
 		public static void BasicTest()
 		{
-			bool alwaysTrue = true;
+			const bool alwaysTrue = true;
 
 			Assert.That(alwaysTrue, Is.True);
 		}
@@ -231,8 +231,7 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 			string description = "Unit Test - Time: " + DateTime.Now;
 
 			string sqlQueryCommand = "INSERT INTO TestTable " +
-							@"(Description) VALUES " +
-							@"('" + description + "')";
+							"(Description) VALUES ('" + description + "')";
 
 			int rowId = database.Insert(sqlQueryCommand);
 
@@ -258,7 +257,7 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 		[Test]
 		public void SelectTest()
 		{
-			string query = "SELECT * FROM TestTable";
+			const string query = "SELECT * FROM TestTable";
 
 			DataSet dataSet = database.GetDataSet(query);
 
@@ -290,7 +289,7 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 		public void UpdateWithParameters()
 		{
 			string description = "Unit Test - Time: " + DateTime.Now;
-			string query = "UPDATE TestTable SET [Description] = ?";
+			const string query = "UPDATE TestTable SET [Description] = ?";
 
 			Dictionary<string, object> parameters = [];
 			parameters.Add("[Description]", description);

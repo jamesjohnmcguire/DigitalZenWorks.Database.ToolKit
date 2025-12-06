@@ -24,12 +24,6 @@ namespace DigitalZenWorks.Database.ToolKit
 		private static readonly ILog Log = LogManager.GetLogger(
 			System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-		private readonly Dictionary<string, Column> columns = [];
-		private readonly Collection<ForeignKey> foreignKeys = [];
-
-		private string name = string.Empty;
-		private string primaryKey = string.Empty;
-
 		/// <summary>
 		/// Initializes a new instance of the <see cref="Table"/> class.
 		/// </summary>
@@ -53,10 +47,7 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// <value>
 		/// Represents the columns.
 		/// </value>
-		public Dictionary<string, Column> Columns
-		{
-			get { return columns; }
-		}
+		public Dictionary<string, Column> Columns { get; } = [];
 
 		/// <summary>
 		/// Gets represents the foreign keys.
@@ -64,10 +55,7 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// <value>
 		/// Represents the foreign keys.
 		/// </value>
-		public Collection<ForeignKey> ForeignKeys
-		{
-			get { return foreignKeys; }
-		}
+		public Collection<ForeignKey> ForeignKeys { get; } = [];
 
 		/// <summary>
 		/// Gets or sets represents a table name.
@@ -75,11 +63,7 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// <value>
 		/// Represents a table name.
 		/// </value>
-		public string Name
-		{
-			get { return name; }
-			set { name = value; }
-		}
+		public string Name { get; set; } = string.Empty;
 
 		/// <summary>
 		/// Gets or sets represents the primary key.
@@ -87,11 +71,7 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// <value>
 		/// Represents the primary key.
 		/// </value>
-		public string PrimaryKey
-		{
-			get { return primaryKey; }
-			set { primaryKey = value; }
-		}
+		public string PrimaryKey { get; set; } = string.Empty;
 
 		/// <summary>
 		/// Writes out the table information.

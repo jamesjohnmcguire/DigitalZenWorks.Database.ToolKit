@@ -158,7 +158,7 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 		[Test]
 		public void GetRelationships()
 		{
-			string dependentTableName = "Addresses";
+			const string dependentTableName = "Addresses";
 
 			using OleDbSchema oleDbSchema = new (databaseFile);
 
@@ -221,7 +221,7 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 		[Test]
 		public void GetTableColumns()
 		{
-			string tableName = "Addresses";
+			const string tableName = "Addresses";
 
 			using OleDbSchema oleDbSchema = new (databaseFile);
 
@@ -295,7 +295,7 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 
 		private static string GetTestSqlFile()
 		{
-			string resource = "DigitalZenWorks.Database.ToolKit.Tests." +
+			const string resource = "DigitalZenWorks.Database.ToolKit.Tests." +
 				"Products.Access.Test.sql";
 
 			string filePath = GetEmbeddedResourceFile(resource, "sql");

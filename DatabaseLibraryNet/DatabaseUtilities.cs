@@ -96,7 +96,7 @@ namespace DigitalZenWorks.Database.ToolKit
 		public static bool ExportToCsv(
 			string databaseFile, string csvPath)
 		{
-			bool returnCode = false;
+			const bool returnCode = false;
 
 			DatabaseType databaseType;
 			string connectionString;
@@ -105,7 +105,7 @@ namespace DigitalZenWorks.Database.ToolKit
 			if (extension.Equals(".mdb", StringComparison.OrdinalIgnoreCase) ||
 				extension.Equals(".accdb", StringComparison.OrdinalIgnoreCase))
 			{
-				string provider = "Microsoft.ACE.OLEDB.12.0";
+				const string provider = "Microsoft.ACE.OLEDB.12.0";
 				connectionString = string.Format(
 					CultureInfo.InvariantCulture,
 					"provider={0}; Data Source={1}",
@@ -119,7 +119,7 @@ namespace DigitalZenWorks.Database.ToolKit
 				extension.Equals(
 					".sqlite", StringComparison.OrdinalIgnoreCase))
 			{
-				string connectionBase = "Data Source={0};Version=3;" +
+				const string connectionBase = "Data Source={0};Version=3;" +
 					"DateTimeFormat=InvariantCulture";
 
 				connectionString = string.Format(
@@ -135,50 +135,48 @@ namespace DigitalZenWorks.Database.ToolKit
 			}
 
 			// Open the database
-			using (DataStorage database =
-				new DataStorage(databaseType, connectionString))
+			using DataStorage database = new (databaseType, connectionString);
+
+			// Get all the table names
+			DataTable tableNames = database.SchemaTable;
+
+			if (tableNames != null)
 			{
-				// Get all the table names
-				DataTable tableNames = database.SchemaTable;
-
-				if (tableNames != null)
+				// for each table, select all the data
+				foreach (DataRow table in tableNames.Rows)
 				{
-					// for each table, select all the data
-					foreach (DataRow table in tableNames.Rows)
+					try
 					{
-						try
-						{
-							var objectName = table["TABLE_NAME"];
-							string tableName = objectName.ToString();
+						var objectName = table["TABLE_NAME"];
+						string tableName = objectName.ToString();
 
-							// export the table
-							string sqlQuery = "SELECT * FROM " + tableName;
-							DataTable tableData =
-								database.GetDataTable(sqlQuery);
+						// export the table
+						string sqlQuery = "SELECT * FROM " + tableName;
+						DataTable tableData =
+							database.GetDataTable(sqlQuery);
 
-							string csvFile = csvPath + tableName + ".csv";
+						string csvFile = csvPath + tableName + ".csv";
 
-							// Create the CSV file.
-							using StreamWriter file = new(csvFile, false);
-							ExportDataTableToCsv(tableData, file);
-						}
-						catch (Exception exception) when
-							(exception is ArgumentException ||
-							exception is ArgumentNullException ||
-							exception is DirectoryNotFoundException ||
-							exception is IOException ||
-							exception is PathTooLongException ||
-							exception is SecurityException ||
-							exception is UnauthorizedAccessException)
-						{
-							Log.Error(exception.ToString());
-						}
-						catch (Exception exception)
-						{
-							Log.Error(exception.ToString());
+						// Create the CSV file.
+						using StreamWriter file = new(csvFile, false);
+						ExportDataTableToCsv(tableData, file);
+					}
+					catch (Exception exception) when
+						(exception is ArgumentException ||
+						exception is ArgumentNullException ||
+						exception is DirectoryNotFoundException ||
+						exception is IOException ||
+						exception is PathTooLongException ||
+						exception is SecurityException ||
+						exception is UnauthorizedAccessException)
+					{
+						Log.Error(exception.ToString());
+					}
+					catch (Exception exception)
+					{
+						Log.Error(exception.ToString());
 
-							throw;
-						}
+						throw;
 					}
 				}
 

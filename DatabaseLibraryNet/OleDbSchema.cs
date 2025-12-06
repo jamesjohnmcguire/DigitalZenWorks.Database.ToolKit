@@ -480,31 +480,11 @@ namespace DigitalZenWorks.Database.ToolKit
 			return orderedTables;
 		}
 
-		// If primary key is an integer, change type to AutoNumber.
-		private static Column SetPrimaryKeyType(Table table)
-		{
-			Column primaryKey = null;
-
-			string primaryKeyName = table.PrimaryKey;
-
-			if (!string.IsNullOrWhiteSpace(primaryKeyName))
-			{
-				primaryKey = table.Columns[primaryKeyName];
-
-				if (primaryKey.ColumnType == ColumnType.Number)
-				{
-					primaryKey.ColumnType = ColumnType.AutoNumber;
-				}
-			}
-
-			return primaryKey;
-		}
-
 		private HashSet<string> GetPrivateKeyNames(string tableName)
 		{
 			DataTable primaryKeys = GetPrimaryKeys(tableName);
 
-			primaryKeyNames = new ();
+			primaryKeyNames = [];
 
 			foreach (DataRow row in primaryKeys.Rows)
 			{
