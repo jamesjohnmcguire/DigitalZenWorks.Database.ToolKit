@@ -820,7 +820,7 @@ namespace DigitalZenWorks.Database.ToolKit
 		private static IReadOnlyList<string> GetSqlQueryStatements(
 			string queriesText)
 		{
-			char[] separator = new[] { ';' };
+			char[] separator = [';'];
 			string[] splitQueries = queriesText.Split(
 				separator, StringSplitOptions.RemoveEmptyEntries);
 
@@ -829,7 +829,7 @@ namespace DigitalZenWorks.Database.ToolKit
 			IEnumerable<string> nonEmptyQueries =
 				trimmedQueries.Where(q => !string.IsNullOrWhiteSpace(q));
 
-			IReadOnlyList<string> queries = nonEmptyQueries.ToList();
+			IReadOnlyList<string> queries = [.. nonEmptyQueries];
 
 			return queries;
 		}

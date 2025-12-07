@@ -658,7 +658,7 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// <returns>object item.</returns>
 		public int Insert(string sql, IDictionary<string, object> values)
 		{
-			int returnCode = 0;
+			int returnCode;
 
 			try
 			{

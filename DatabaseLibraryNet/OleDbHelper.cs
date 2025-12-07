@@ -39,7 +39,7 @@ namespace DigitalZenWorks.Database.ToolKit
 			string password = null,
 			bool readOnly = false)
 		{
-			StringBuilder builder = new StringBuilder();
+			StringBuilder builder = new();
 			builder.AppendFormat(
 				CultureInfo.InvariantCulture, "Provider={0};", provider);
 			builder.AppendFormat(
