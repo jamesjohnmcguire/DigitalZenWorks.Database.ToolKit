@@ -11,7 +11,6 @@ namespace DigitalZenWorks.Database.ToolKit
 	/// </summary>
 	public class Relationship
 	{
-
 		/// <summary>
 		/// Gets or sets name.
 		/// </summary>

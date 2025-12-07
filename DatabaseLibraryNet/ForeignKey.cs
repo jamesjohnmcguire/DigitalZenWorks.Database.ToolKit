@@ -11,7 +11,6 @@ namespace DigitalZenWorks.Database.ToolKit
 	/// </summary>
 	public class ForeignKey
 	{
-
 		/// <summary>
 		/// Initializes a new instance of the <see cref="ForeignKey"/> class.
 		/// </summary>

@@ -65,8 +65,7 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// </summary>
 		public DataStorage()
 		{
-			if ((ConfigurationManager.ConnectionStrings != null) &&
-				(ConfigurationManager.ConnectionStrings.Count > 0))
+			if (ConfigurationManager.ConnectionStrings?.Count > 0)
 			{
 				connectionText =
 					ConfigurationManager.ConnectionStrings[0].ConnectionString;
@@ -314,7 +313,7 @@ namespace DigitalZenWorks.Database.ToolKit
 
 			DataTable tables = SchemaTable;
 
-			if (tables != null && tables.Rows.Count > 0)
+			if (tables?.Rows.Count > 0)
 			{
 				canQuery = true;
 			}
@@ -449,7 +448,7 @@ namespace DigitalZenWorks.Database.ToolKit
 
 			DataTable dataTable = GetDataTable(sql, values);
 
-			if (dataTable != null && dataTable.Rows.Count > 0)
+			if (dataTable?.Rows.Count > 0)
 			{
 				row = dataTable.Rows[0];
 			}
@@ -538,7 +537,7 @@ namespace DigitalZenWorks.Database.ToolKit
 			{
 				RollbackTransaction();
 
-				string message = Strings.Exception + exception.ToString();
+				string message = Strings.Exception + exception;
 				Log.Error(message);
 
 				message = Strings.Command + sql;
@@ -548,7 +547,7 @@ namespace DigitalZenWorks.Database.ToolKit
 			{
 				RollbackTransaction();
 
-				string message = Strings.Exception + exception.ToString();
+				string message = Strings.Exception + exception;
 				Log.Error(message);
 
 				message = Strings.Command + sql;
@@ -591,12 +590,11 @@ namespace DigitalZenWorks.Database.ToolKit
 		{
 			DataTable dataTable = null;
 
-			using (DataSet dataSet = GetDataSet(sql, values))
+			using DataSet dataSet = GetDataSet(sql, values);
+
+			if (dataSet?.Tables.Count > 0)
 			{
-				if (dataSet != null && dataSet.Tables.Count > 0)
-				{
-					dataTable = dataSet.Tables[0];
-				}
+				dataTable = dataSet.Tables[0];
 			}
 
 			return dataTable;
@@ -691,7 +689,7 @@ namespace DigitalZenWorks.Database.ToolKit
 			{
 				RollbackTransaction();
 
-				string message = Strings.Exception + exception.ToString();
+				string message = Strings.Exception + exception;
 				Log.Error(message);
 
 				message = Strings.Command + sql;
@@ -1038,7 +1036,7 @@ namespace DigitalZenWorks.Database.ToolKit
 			{
 				RollbackTransaction();
 
-				string message = Strings.Exception + exception.ToString();
+				string message = Strings.Exception + exception;
 				Log.Error(message);
 
 				message = Strings.Command + sql;
@@ -1130,7 +1128,7 @@ namespace DigitalZenWorks.Database.ToolKit
 			{
 				RollbackTransaction();
 
-				string message = Strings.Exception + exception.ToString();
+				string message = Strings.Exception + exception;
 				Log.Error(message);
 
 				throw;
