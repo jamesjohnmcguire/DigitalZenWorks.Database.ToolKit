@@ -181,7 +181,7 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// table and its columns.</returns>
 		public override Table GetTable(string tableName)
 		{
-			primaryKeyNames = GetPrivateKeyNames(tableName);
+			primaryKeyNames = GetPrimaryKeyNames(tableName);
 
 			Table table = new (tableName);
 
@@ -480,7 +480,7 @@ namespace DigitalZenWorks.Database.ToolKit
 			return orderedTables;
 		}
 
-		private HashSet<string> GetPrivateKeyNames(string tableName)
+		private HashSet<string> GetPrimaryKeyNames(string tableName)
 		{
 			DataTable primaryKeys = GetPrimaryKeys(tableName);
 
