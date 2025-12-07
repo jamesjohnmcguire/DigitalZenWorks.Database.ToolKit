@@ -24,64 +24,6 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 		private string sqlSchemaFile;
 
 		/// <summary>
-		/// Gets the database file used by the tests.
-		/// </summary>
-		public string DatabaseFile
-		{
-			get { return databaseFile; }
-		}
-
-		/// <summary>
-		/// Gets the SQL schema file used by the tests.
-		/// </summary>
-		public string SqlSchemaFile
-		{
-			get { return sqlSchemaFile; }
-		}
-
-		/// <summary>
-		/// The one time setup method.
-		/// </summary>
-		[OneTimeSetUp]
-		public void OneTimeSetUp()
-		{
-			string fileName = Path.GetTempFileName();
-
-			// A 0 byte sized file is created.  Need to remove it.
-			File.Delete(fileName);
-			databaseFile = Path.ChangeExtension(fileName, "accdb");
-
-			bool result =
-				DatabaseUtilities.CreateAccessDatabaseFile(databaseFile);
-			Assert.That(result, Is.True);
-
-			bool exists = File.Exists(databaseFile);
-			Assert.That(exists, Is.True);
-
-			sqlSchemaFile = GetTestSqlFile();
-
-			result = DataDefinition.ImportSchema(sqlSchemaFile, databaseFile);
-			Assert.That(result, Is.True);
-		}
-
-		/// <summary>
-		/// One time tear down method.
-		/// </summary>
-		[OneTimeTearDown]
-		public void OneTimeTearDown()
-		{
-			if (File.Exists(databaseFile))
-			{
-				File.Delete(databaseFile);
-			}
-
-			if (File.Exists(sqlSchemaFile))
-			{
-				File.Delete(sqlSchemaFile);
-			}
-		}
-
-		/// <summary>
 		/// Export schema test.
 		/// </summary>
 		[Test]
