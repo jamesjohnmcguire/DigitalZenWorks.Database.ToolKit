@@ -9,6 +9,7 @@ namespace DigitalZenWorks.Database.ToolKit
 	using System;
 	using System.Collections.Generic;
 	using System.Collections.ObjectModel;
+	using System.Data.Common;
 	using System.Globalization;
 	using System.IO;
 	using System.Linq;
@@ -378,6 +379,67 @@ namespace DigitalZenWorks.Database.ToolKit
 		{
 			bool successCode = false;
 
+			if (!File.Exists(schemaFile))
+			{
+				string message = $"Schema file not found: {schemaFile}";
+				throw new FileNotFoundException(message, schemaFile);
+			}
+			else
+			{
+				try
+				{
+					string fileContents = File.ReadAllText(schemaFile);
+
+					IReadOnlyList<string> queries =
+						GetSqlQueryStatements(fileContents);
+					DatabaseType databaseType = GetDatabaseType(databaseFile);
+
+					string connectionString = DataStorage.GetConnectionString(
+						databaseType, databaseFile);
+
+					using DataStorage database =
+						new(databaseType, connectionString);
+
+					successCode = ExecuteQueries(database, queries);
+				}
+				catch (Exception exception) when
+					(exception is ArgumentNullException ||
+					exception is ArgumentException ||
+					exception is FileNotFoundException ||
+					exception is DirectoryNotFoundException ||
+					exception is IOException ||
+					exception is OutOfMemoryException ||
+					exception is System.Data.OleDb.OleDbException)
+				{
+					string message = Strings.Exception + exception;
+					Log.Error(message);
+				}
+				catch (Exception exception)
+				{
+					string message = Strings.Exception + exception;
+					Log.Error(message);
+
+					throw;
+				}
+			}
+
+			return successCode;
+		}
+
+		/// <summary>
+		/// Creates a file with the given schema.
+		/// </summary>
+		/// <param name="schemaFile">The schema file.</param>
+		/// <param name="databaseFile">The database file.</param>
+		/// <returns>A values indicating success or not.</returns>
+#if NET5_0_OR_GREATER
+		[SupportedOSPlatform("windows")]
+#endif
+		public static bool ImportSchemaOleDb(
+			string schemaFile, string databaseFile)
+		{
+			bool successCode = false;
+
 			try
 			{
 				if (File.Exists(schemaFile))
@@ -553,34 +615,46 @@ namespace DigitalZenWorks.Database.ToolKit
 			return found;
 		}
 
-		private static void ExecuteQueries(
-			DataStorage database, string[] queries)
+		private static bool ExecuteQueries(
+			DataStorage database, IReadOnlyList<string> queries)
 		{
-			foreach (string sqlQuery in queries)
+			bool result = false;
+
+			ArgumentNullException.ThrowIfNull(database);
+
+			if (queries != null)
 			{
-				try
+				foreach (string sqlQuery in queries)
 				{
-					string message = Strings.Command + sqlQuery;
-					Log.Info(message);
+					try
+					{
+						string message = Strings.Command + sqlQuery;
+						Log.Info(message);
 
-					database.ExecuteNonQuery(sqlQuery);
-				}
-				catch (Exception exception) when
-					(exception is ArgumentNullException ||
-					exception is OutOfMemoryException ||
-					exception is System.Data.OleDb.OleDbException)
-				{
-					string message = Strings.Exception + exception;
-					Log.Error(message);
-				}
-				catch (Exception exception)
-				{
-					string message = Strings.Exception + exception;
-					Log.Error(message);
+						database.ExecuteNonQuery(sqlQuery);
+					}
+					catch (Exception exception) when
+						(exception is ArgumentNullException ||
+						exception is OutOfMemoryException ||
+						exception is DbException ||
+						exception is System.Data.OleDb.OleDbException)
+					{
+						string message = Strings.Exception + exception;
+						Log.Error(message);
+					}
+					catch (Exception exception)
+					{
+						string message = Strings.Exception + exception;
+						Log.Error(message);
 
-					throw;
+						throw;
+					}
 				}
+
+				result = true;
 			}
+
+			return result;
 		}
 
 		private static byte[] GetDatabaseFileHeaderBytes(string databaseFile)
@@ -743,23 +817,36 @@ namespace DigitalZenWorks.Database.ToolKit
 			}
 		}
 
-		private static bool ImportSchemaMdb(
-			string[] queries, string databaseFile)
+		private static IReadOnlyList<string> GetSqlQueryStatements(
+			string queriesText)
 		{
-			bool successCode = false;
+			char[] separator = new[] { ';' };
+			string[] splitQueries = queriesText.Split(
+				separator, StringSplitOptions.RemoveEmptyEntries);
 
-			const string provider = "Microsoft.ACE.OLEDB.12.0";
-			string connectionString = string.Format(
-				CultureInfo.InvariantCulture,
-				"provider={0}; Data Source={1}",
-				provider,
-				databaseFile);
+			IEnumerable<string> trimmedQueries =
+				splitQueries.Select(q => q.Trim());
+			IEnumerable<string> nonEmptyQueries =
+				trimmedQueries.Where(q => !string.IsNullOrWhiteSpace(q));
+
+			IReadOnlyList<string> queries = nonEmptyQueries.ToList();
+
+			return queries;
+		}
+
+#if NET5_0_OR_GREATER
+		[SupportedOSPlatform("windows")]
+#endif
+		private static bool ImportSchemaMdb(
+			IReadOnlyList<string> queries, string databaseFile)
+		{
+			string connectionString =
+				OleDbHelper.BuildConnectionString(databaseFile);
 
 			using DataStorage database =
 				new (DatabaseType.OleDb, connectionString);
 
-			ExecuteQueries(database, queries);
-			successCode = true;
+			bool successCode = OleDbHelper.ExecuteQueries(database, queries);
 
 			return successCode;
 		}

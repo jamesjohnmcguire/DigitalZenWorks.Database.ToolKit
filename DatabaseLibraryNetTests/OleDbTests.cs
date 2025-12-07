@@ -262,7 +262,7 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 			sqlSchemaFile = GetTestSqlFile();
 
 			bool result =
-				DataDefinition.ImportSchema(sqlSchemaFile, databaseFile);
+				DataDefinition.ImportSchemaOleDb(sqlSchemaFile, databaseFile);
 			Assert.That(result, Is.True);
 		}
 	}
