@@ -154,6 +154,7 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 				dataSource);
 
 			database = new DataStorage(DatabaseType.SQLite, connectionString);
+			Assert.That(database, Is.Not.Null);
 		}
 
 		/// <summary>
