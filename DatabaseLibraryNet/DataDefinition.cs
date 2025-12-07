@@ -460,12 +460,14 @@ namespace DigitalZenWorks.Database.ToolKit
 						extension.Equals(
 							".accdb", StringComparison.OrdinalIgnoreCase))
 					{
-						const string provider = "Microsoft.ACE.OLEDB.12.0";
 						string connectionString =
-							OleDbHelper.BuildConnectionString(
-								databaseFile, provider);
+							OleDbHelper.BuildConnectionString(databaseFile);
 
-						successCode = ImportSchemaMdb(queries, databaseFile);
+						using DataStorage database =
+							new(DatabaseType.OleDb, connectionString);
+
+						successCode =
+							OleDbHelper.ExecuteQueries(database, queries);
 					}
 					else
 					{
@@ -835,23 +837,6 @@ namespace DigitalZenWorks.Database.ToolKit
 			IReadOnlyList<string> queries = [.. nonEmptyQueries];
 
 			return queries;
-		}
-
-#if NET5_0_OR_GREATER
-		[SupportedOSPlatform("windows")]
-#endif
-		private static bool ImportSchemaMdb(
-			IReadOnlyList<string> queries, string databaseFile)
-		{
-			string connectionString =
-				OleDbHelper.BuildConnectionString(databaseFile);
-
-			using DataStorage database =
-				new (DatabaseType.OleDb, connectionString);
-
-			bool successCode = OleDbHelper.ExecuteQueries(database, queries);
-
-			return successCode;
 		}
 	}
 }
