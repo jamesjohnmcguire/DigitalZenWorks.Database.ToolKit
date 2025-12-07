@@ -136,39 +136,6 @@ namespace DigitalZenWorks.Database.ToolKit
 		}
 
 		/// <summary>
-		/// Retrieves the database schema as a collection of tables, including
-		/// primary and foreign key information.
-		/// </summary>
-		/// <remarks>Each <see cref="Table"/> in the returned collection
-		/// includes its primary key and foreign key relationships. Use this
-		/// method to obtain a complete representation of the database
-		/// structure for schema inspection or metadata operations.</remarks>
-		/// <returns>A collection of <see cref="Table"/> objects representing
-		/// all tables in the database schema. The collection will be empty if
-		/// no tables are found.</returns>
-		public override Collection<Table> GetSchema()
-		{
-			Dictionary<string, Table> tableDictionary = [];
-			Collection<Relationship> relationships = [];
-
-			foreach (DataRow row in TableNames.Rows)
-			{
-				string tableName = GetTableName(row);
-				Table table = GetTable(row);
-				tableDictionary.Add(tableName, table);
-
-				relationships = GetRelationships(tableName, relationships);
-			}
-
-			tableDictionary =
-				SetTablesRelationships(tableDictionary, relationships);
-
-			Collection<Table> tables = GetTables(tableDictionary);
-
-			return tables;
-		}
-
-		/// <summary>
 		/// Retrieves a table definition, including its columns, for the
 		/// specified table name.
 		/// </summary>
@@ -372,45 +339,6 @@ namespace DigitalZenWorks.Database.ToolKit
 			}
 
 			return relationship;
-		}
-
-		/// <summary>
-		/// Retrieves the parent table specified by the relationship and adds
-		/// the corresponding foreign key to its collection.
-		/// </summary>
-		/// <remarks>If the specified relationship or table dictionary is null,
-		/// the method returns null and no changes are made. The foreign key is
-		/// added to the parent table's <c>ForeignKeys</c> collection.
-		/// </remarks>
-		/// <param name="tableDictionary">A dictionary containing table names
-		/// as keys and their corresponding <see cref="Table"/> objects as
-		/// values. Must not be null.</param>
-		/// <param name="relationship">The relationship that defines the
-		/// parent table and foreign key to associate. Must not be null.
-		/// </param>
-		/// <returns>The <see cref="Table"/> object representing the parent
-		/// table with the foreign key added, or <see langword="null"/>
-		/// if <paramref name="tableDictionary"/> or
-		/// <paramref name="relationship"/> is null.</returns>
-		protected override Table GetTableWithRelationships(
-			Dictionary<string, Table> tableDictionary,
-			Relationship relationship)
-		{
-			Table table = null;
-
-			if (tableDictionary != null && relationship != null)
-			{
-				string name = relationship.ParentTable;
-
-				ForeignKey foreignKey =
-					GetForeignKeyRelationship(relationship);
-
-				table = tableDictionary[name];
-
-				table.ForeignKeys.Add(foreignKey);
-			}
-
-			return table;
 		}
 
 		/// <summary>
