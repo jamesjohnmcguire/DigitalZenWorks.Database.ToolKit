@@ -4,19 +4,14 @@
 
 namespace DigitalZenWorks.Database.ToolKit.Tests
 {
-	using DigitalZenWorks.Common.Utilities;
-	using MySqlX.XDevAPI.Common;
-	using NUnit.Framework;
 	using System;
 	using System.Collections.Generic;
 	using System.Collections.ObjectModel;
 	using System.Data;
-	using System.Data.Common;
-	using System.Data.SQLite;
-	using System.Globalization;
 	using System.IO;
 	using System.Linq;
 	using System.Runtime.Versioning;
+	using NUnit.Framework;
 
 	/// <summary>
 	/// Ole db tests class.
