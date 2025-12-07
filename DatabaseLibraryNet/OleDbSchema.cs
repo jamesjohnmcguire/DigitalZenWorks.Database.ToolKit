@@ -12,6 +12,7 @@ namespace DigitalZenWorks.Database.ToolKit
 	using System.Data;
 	using System.Data.OleDb;
 	using System.Globalization;
+	using System.IO;
 	using System.Runtime.Versioning;
 	using global::Common.Logging;
 
@@ -88,6 +89,69 @@ namespace DigitalZenWorks.Database.ToolKit
 
 				return schemaTable;
 			}
+		}
+
+		/// <summary>
+		/// Creates a file with the given schema.
+		/// </summary>
+		/// <param name="schemaFile">The schema file.</param>
+		/// <param name="databaseFile">The database file.</param>
+		/// <returns>A values indicating success or not.</returns>
+		public static bool ImportSchema(
+			string schemaFile, string databaseFile)
+		{
+			bool successCode = false;
+
+			if (!File.Exists(schemaFile))
+			{
+				string message = $"Schema file not found: {schemaFile}";
+				throw new FileNotFoundException(message, schemaFile);
+			}
+			else
+			{
+				try
+				{
+					string fileContents = File.ReadAllText(schemaFile);
+					IReadOnlyList<string> queries =
+						GetSqlQueryStatements(fileContents);
+
+					bool isValid =
+						OleDbHelper.ValidateAccessDatabaseFile(databaseFile);
+
+					if (isValid == true)
+					{
+						string connectionString =
+							OleDbHelper.BuildConnectionString(databaseFile);
+
+						using DataStorage database =
+							new(DatabaseType.OleDb, connectionString);
+
+						successCode =
+							OleDbHelper.ExecuteQueries(database, queries);
+					}
+				}
+				catch (Exception exception) when
+					(exception is ArgumentNullException ||
+					exception is ArgumentException ||
+					exception is FileNotFoundException ||
+					exception is DirectoryNotFoundException ||
+					exception is IOException ||
+					exception is OutOfMemoryException ||
+					exception is System.Data.OleDb.OleDbException)
+				{
+					string message = Strings.Exception + exception;
+					Log.Error(message);
+				}
+				catch (Exception exception)
+				{
+					string message = Strings.Exception + exception;
+					Log.Error(message);
+
+					throw;
+				}
+			}
+
+			return successCode;
 		}
 
 		/// <summary>

@@ -11,7 +11,7 @@ namespace DigitalZenWorks.Database.ToolKit
 	using System.Collections.ObjectModel;
 	using System.Data;
 	using System.Data.Common;
-	using System.Globalization;
+	using System.Linq;
 	using global::Common.Logging;
 
 	/// Class <c>DataStoreStructure.</c>
@@ -139,6 +139,30 @@ namespace DigitalZenWorks.Database.ToolKit
 			}
 
 			return orderedDependencies;
+		}
+
+		/// <summary>
+		/// Gets the SQL query statements from the provided text.
+		/// </summary>
+		/// <param name="queriesText">The queries text.</param>
+		/// <returns>The list of queries.</returns>
+		public static IReadOnlyList<string> GetSqlQueryStatements(
+			string queriesText)
+		{
+			ArgumentNullException.ThrowIfNull(queriesText);
+
+			char[] separator = [';'];
+			string[] splitQueries = queriesText.Split(
+				separator, StringSplitOptions.RemoveEmptyEntries);
+
+			IEnumerable<string> trimmedQueries =
+				splitQueries.Select(q => q.Trim());
+			IEnumerable<string> nonEmptyQueries =
+				trimmedQueries.Where(q => !string.IsNullOrWhiteSpace(q));
+
+			IReadOnlyList<string> queries = [.. nonEmptyQueries];
+
+			return queries;
 		}
 
 		/// <summary>

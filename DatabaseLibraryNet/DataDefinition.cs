@@ -231,6 +231,129 @@ namespace DigitalZenWorks.Database.ToolKit
 		}
 
 		/// <summary>
+		/// Get database file header bytes.
+		/// </summary>
+		/// <param name="databaseFile">The database file.</param>
+		/// <returns>The database header bytes.</returns>
+		public static byte[] GetDatabaseFileHeaderBytes(string databaseFile)
+		{
+			byte[] header = null;
+
+			try
+			{
+				using FileStream stream = new(
+					databaseFile,
+					FileMode.Open,
+					FileAccess.Read,
+					FileShare.ReadWrite);
+
+				// Read enough bytes to check all signatures
+				header = new byte[32];
+				int bytesRead = stream.Read(header, 0, header.Length);
+			}
+			catch (Exception exception) when
+				(exception is ArgumentNullException)
+			{
+				Log.Error(Strings.Exception + exception);
+			}
+
+			return header;
+		}
+
+		/// <summary>
+		/// Get database type by file extension.
+		/// </summary>
+		/// <param name="databaseFile">The database file.</param>
+		/// <returns>The database type.</returns>
+		public static DatabaseType GetDatabaseTypeByExtension(
+			string databaseFile)
+		{
+			string extension = Path.GetExtension(databaseFile);
+#pragma warning disable CA1308
+			extension = extension.ToLowerInvariant();
+#pragma warning restore CA1308
+
+			DatabaseType databaseType = extension switch
+			{
+				".db" or ".sqlite" or ".sqlite3" or ".db3" or ".sdb" =>
+					DatabaseType.SQLite,
+				".mdb" or ".accdb" => DatabaseType.OleDb,
+				".mdf" => DatabaseType.SqlServer,
+				_ => DatabaseType.Unknown
+			};
+
+			return databaseType;
+		}
+
+		/// <summary>
+		/// Get database type by file header bytes.
+		/// </summary>
+		/// <param name="header">The header bytes.</param>
+		/// <returns>The database type.</returns>
+		public static DatabaseType GetDatabaseTypeByFileHeaderBytes(
+			byte[] header)
+		{
+			DatabaseType databaseType = DatabaseType.Unknown;
+
+			if (header == null || header.Length < 4)
+			{
+				databaseType = DatabaseType.Unknown;
+			}
+			else if (header.Length >= 16 &&
+				header[0] == 0x53 && header[1] == 0x51 &&
+				header[2] == 0x4C && header[3] == 0x69 &&
+				header[4] == 0x74 && header[5] == 0x65 &&
+				header[6] == 0x20 && header[7] == 0x66 &&
+				header[8] == 0x6F && header[9] == 0x72 &&
+				header[10] == 0x6D && header[11] == 0x61 &&
+				header[12] == 0x74 && header[13] == 0x20 &&
+				header[14] == 0x33)
+			{
+				// SQLite: "SQLite format 3\0" (starts at byte 0)
+				databaseType = DatabaseType.SQLite;
+			}
+			else if (header.Length >= 20 &&
+				header[0] == 0x00 && header[1] == 0x01 &&
+				header[2] == 0x00 && header[3] == 0x00 &&
+				header[4] == 0x53 && header[5] == 0x74 &&
+				header[6] == 0x61 && header[7] == 0x6E &&
+				header[8] == 0x64 && header[9] == 0x61 &&
+				header[10] == 0x72 && header[11] == 0x64 &&
+				header[12] == 0x20 && header[13] == 0x41 &&
+				header[14] == 0x43 && header[15] == 0x45)
+			{
+				// MS Access 2007+ (.accdb): 0x00, 0x01, 0x00, 0x00,
+				// "Standard ACE DB"
+				databaseType = DatabaseType.OleDb;
+			}
+			else if (header.Length >= 20 &&
+				header[0] == 0x00 && header[1] == 0x01 &&
+				header[2] == 0x00 && header[3] == 0x00 &&
+				header[4] == 0x53 && header[5] == 0x74 &&
+				header[6] == 0x61 && header[7] == 0x6E &&
+				header[8] == 0x64 && header[9] == 0x61 &&
+				header[10] == 0x72 && header[11] == 0x64 &&
+				header[12] == 0x20 && header[13] == 0x4A &&
+				header[14] == 0x65 && header[15] == 0x74)
+			{
+				// MS Access 97-2003 (.mdb): 0x00, 0x01, 0x00, 0x00,
+				// "Standard Jet DB"
+				databaseType = DatabaseType.OleDb;
+			}
+			else if (header[0] == 0x01 && header[1] == 0x0F &&
+				header[2] == 0x00 && header[3] == 0x00)
+			{
+				// SQL Server .mdf: 0x01, 0x0F, 0x00, 0x00
+				// (page header signature)
+				databaseType = DatabaseType.SqlServer;
+			}
+
+			// Firebird/Interbase: Check for specific page size markers
+			// This is trickier and might need extension fallback
+			return databaseType;
+		}
+
+		/// <summary>
 		/// Gets the foreign key relationships.
 		/// </summary>
 		/// <param name="relationships">A set of relationships.</param>
@@ -391,7 +514,7 @@ namespace DigitalZenWorks.Database.ToolKit
 					string fileContents = File.ReadAllText(schemaFile);
 
 					IReadOnlyList<string> queries =
-						GetSqlQueryStatements(fileContents);
+						DataStoreStructure.GetSqlQueryStatements(fileContents);
 					DatabaseType databaseType = GetDatabaseType(databaseFile);
 
 					string connectionString = DataStorage.GetConnectionString(
@@ -410,81 +533,6 @@ namespace DigitalZenWorks.Database.ToolKit
 					exception is IOException ||
 					exception is OutOfMemoryException ||
 					exception is DbException)
-				{
-					string message = Strings.Exception + exception;
-					Log.Error(message);
-				}
-				catch (Exception exception)
-				{
-					string message = Strings.Exception + exception;
-					Log.Error(message);
-
-					throw;
-				}
-			}
-
-			return successCode;
-		}
-
-		/// <summary>
-		/// Creates a file with the given schema.
-		/// </summary>
-		/// <param name="schemaFile">The schema file.</param>
-		/// <param name="databaseFile">The database file.</param>
-		/// <returns>A values indicating success or not.</returns>
-#if NET5_0_OR_GREATER
-		[SupportedOSPlatform("windows")]
-#endif
-		public static bool ImportSchemaOleDb(
-			string schemaFile, string databaseFile)
-		{
-			bool successCode = false;
-
-			if (!File.Exists(schemaFile))
-			{
-				string message = $"Schema file not found: {schemaFile}";
-				throw new FileNotFoundException(message, schemaFile);
-			}
-			else
-			{
-				try
-				{
-					string fileContents = File.ReadAllText(schemaFile);
-					IReadOnlyList<string> queries =
-						GetSqlQueryStatements(fileContents);
-
-					string extension = Path.GetExtension(databaseFile);
-
-					if (extension.Equals(
-							".mdb", StringComparison.OrdinalIgnoreCase) ||
-						extension.Equals(
-							".accdb", StringComparison.OrdinalIgnoreCase))
-					{
-						string connectionString =
-							OleDbHelper.BuildConnectionString(databaseFile);
-
-						using DataStorage database =
-							new(DatabaseType.OleDb, connectionString);
-
-						successCode =
-							OleDbHelper.ExecuteQueries(database, queries);
-					}
-					else
-					{
-						string message =
-							$"Unsupported database file extension: {extension}";
-						throw new ArgumentException(
-							message, nameof(databaseFile));
-					}
-				}
-				catch (Exception exception) when
-					(exception is ArgumentNullException ||
-					exception is ArgumentException ||
-					exception is FileNotFoundException ||
-					exception is DirectoryNotFoundException ||
-					exception is IOException ||
-					exception is OutOfMemoryException ||
-					exception is System.Data.OleDb.OleDbException)
 				{
 					string message = Strings.Exception + exception;
 					Log.Error(message);
@@ -662,31 +710,6 @@ namespace DigitalZenWorks.Database.ToolKit
 			return result;
 		}
 
-		private static byte[] GetDatabaseFileHeaderBytes(string databaseFile)
-		{
-			byte[] header = null;
-
-			try
-			{
-				using FileStream stream = new (
-					databaseFile,
-					FileMode.Open,
-					FileAccess.Read,
-					FileShare.ReadWrite);
-
-				// Read enough bytes to check all signatures
-				header = new byte[32];
-				int bytesRead = stream.Read(header, 0, header.Length);
-			}
-			catch (Exception exception) when
-				(exception is ArgumentNullException)
-			{
-				Log.Error(Strings.Exception + exception);
-			}
-
-			return header;
-		}
-
 		private static DatabaseType GetDatabaseType(string databaseFile)
 		{
 			DatabaseType databaseType = DatabaseType.Unknown;
@@ -704,89 +727,6 @@ namespace DigitalZenWorks.Database.ToolKit
 					databaseType = GetDatabaseTypeByExtension(databaseFile);
 				}
 			}
-
-			return databaseType;
-		}
-
-		private static DatabaseType GetDatabaseTypeByFileHeaderBytes(
-			byte[] header)
-		{
-			DatabaseType databaseType = DatabaseType.Unknown;
-
-			if (header == null || header.Length < 4)
-			{
-				databaseType = DatabaseType.Unknown;
-			}
-			else if (header.Length >= 16 &&
-				header[0] == 0x53 && header[1] == 0x51 &&
-				header[2] == 0x4C && header[3] == 0x69 &&
-				header[4] == 0x74 && header[5] == 0x65 &&
-				header[6] == 0x20 && header[7] == 0x66 &&
-				header[8] == 0x6F && header[9] == 0x72 &&
-				header[10] == 0x6D && header[11] == 0x61 &&
-				header[12] == 0x74 && header[13] == 0x20 &&
-				header[14] == 0x33)
-			{
-				// SQLite: "SQLite format 3\0" (starts at byte 0)
-				databaseType = DatabaseType.SQLite;
-			}
-			else if (header.Length >= 20 &&
-				header[0] == 0x00 && header[1] == 0x01 &&
-				header[2] == 0x00 && header[3] == 0x00 &&
-				header[4] == 0x53 && header[5] == 0x74 &&
-				header[6] == 0x61 && header[7] == 0x6E &&
-				header[8] == 0x64 && header[9] == 0x61 &&
-				header[10] == 0x72 && header[11] == 0x64 &&
-				header[12] == 0x20 && header[13] == 0x41 &&
-				header[14] == 0x43 && header[15] == 0x45)
-			{
-				// MS Access 2007+ (.accdb): 0x00, 0x01, 0x00, 0x00,
-				// "Standard ACE DB"
-				databaseType = DatabaseType.OleDb;
-			}
-			else if (header.Length >= 20 &&
-				header[0] == 0x00 && header[1] == 0x01 &&
-				header[2] == 0x00 && header[3] == 0x00 &&
-				header[4] == 0x53 && header[5] == 0x74 &&
-				header[6] == 0x61 && header[7] == 0x6E &&
-				header[8] == 0x64 && header[9] == 0x61 &&
-				header[10] == 0x72 && header[11] == 0x64 &&
-				header[12] == 0x20 && header[13] == 0x4A &&
-				header[14] == 0x65 && header[15] == 0x74)
-			{
-				// MS Access 97-2003 (.mdb): 0x00, 0x01, 0x00, 0x00,
-				// "Standard Jet DB"
-				databaseType = DatabaseType.OleDb;
-			}
-			else if (header[0] == 0x01 && header[1] == 0x0F &&
-				header[2] == 0x00 && header[3] == 0x00)
-			{
-				// SQL Server .mdf: 0x01, 0x0F, 0x00, 0x00
-				// (page header signature)
-				databaseType = DatabaseType.SqlServer;
-			}
-
-			// Firebird/Interbase: Check for specific page size markers
-			// This is trickier and might need extension fallback
-			return databaseType;
-		}
-
-		private static DatabaseType GetDatabaseTypeByExtension(
-			string databaseFile)
-		{
-			string extension = Path.GetExtension(databaseFile);
-#pragma warning disable CA1308
-			extension = extension.ToLowerInvariant();
-#pragma warning restore CA1308
-
-			DatabaseType databaseType = extension switch
-			{
-				".db" or ".sqlite" or ".sqlite3" or ".db3" or ".sdb" =>
-					DatabaseType.SQLite,
-				".mdb" or ".accdb" => DatabaseType.OleDb,
-				".mdf" => DatabaseType.SqlServer,
-				_ => DatabaseType.Unknown
-			};
 
 			return databaseType;
 		}
@@ -820,23 +760,6 @@ namespace DigitalZenWorks.Database.ToolKit
 				visited.Add(key);     // Mark as processed
 				orderedDependencies.Add(key); // Add to result (postorder)
 			}
-		}
-
-		private static IReadOnlyList<string> GetSqlQueryStatements(
-			string queriesText)
-		{
-			char[] separator = [';'];
-			string[] splitQueries = queriesText.Split(
-				separator, StringSplitOptions.RemoveEmptyEntries);
-
-			IEnumerable<string> trimmedQueries =
-				splitQueries.Select(q => q.Trim());
-			IEnumerable<string> nonEmptyQueries =
-				trimmedQueries.Where(q => !string.IsNullOrWhiteSpace(q));
-
-			IReadOnlyList<string> queries = [.. nonEmptyQueries];
-
-			return queries;
 		}
 	}
 }

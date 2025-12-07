@@ -192,8 +192,7 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 				DatabaseUtilities.CreateAccessDatabaseFile(databaseFile);
 			Assert.That(result, Is.True);
 
-			result =
-				DataDefinition.ImportSchemaOleDb(sqlFile, databaseFile);
+			result = OleDbSchema.ImportSchema(sqlFile, databaseFile);
 
 			Assert.That(result, Is.True);
 		}
@@ -285,8 +284,7 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 		{
 			sqlSchemaFile = GetTestSqlFile();
 
-			bool result =
-				DataDefinition.ImportSchemaOleDb(sqlSchemaFile, databaseFile);
+			bool result = OleDbSchema.ImportSchema(sqlSchemaFile, databaseFile);
 			Assert.That(result, Is.True);
 		}
 	}
