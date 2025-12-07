@@ -74,22 +74,27 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 		}
 
 		/// <summary>
-		/// Retrieves the file path to the embedded SQL test file used for unit
-		/// testing.
+		/// Get embedded resource file.
 		/// </summary>
-		/// <remarks>This method is intended for use in test scenarios where
-		/// access to the embedded SQL script is required. The returned file
-		/// path can be used to read or execute the test SQL statements.
-		/// </remarks>
-		/// <returns>A string containing the file path to the embedded SQL test
-		/// file. The path will be valid if the resource exists; otherwise, it
-		/// may be empty or invalid.</returns>
-		protected static string GetTestSqlFile()
+		/// <param name="resource">The resource.</param>
+		/// <param name="extension">The file extension.</param>
+		/// <returns>The file path to the resource.</returns>
+		protected static string GetEmbeddedResourceFile(
+			string resource, string extension)
 		{
-			const string resource = "DigitalZenWorks.Database.ToolKit.Tests." +
-				"Products.Sqlite.Test.sql";
+			string fileName = Path.GetTempFileName();
 
-			string filePath = GetEmbeddedResourceFile(resource, "sql");
+			// A 0 byte sized file is created.  Need to remove it.
+			File.Delete(fileName);
+			string filePath = Path.ChangeExtension(fileName, extension);
+
+			bool result = FileUtils.CreateFileFromEmbeddedResource(
+				resource, filePath);
+
+			Assert.That(result, Is.True);
+
+			result = File.Exists(filePath);
+			Assert.That(result, Is.True);
 
 			return filePath;
 		}
@@ -110,38 +115,31 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 			disposed = true;
 		}
 
-		private static string GetEmbeddedResourceFile(
-			string resource, string extension)
+		/// <summary>
+		/// Retrieves the file path to the embedded SQL test file used for unit
+		/// testing.
+		/// </summary>
+		/// <remarks>This method is intended for use in test scenarios where
+		/// access to the embedded SQL script is required. The returned file
+		/// path can be used to read or execute the test SQL statements.
+		/// </remarks>
+		/// <returns>A string containing the file path to the embedded SQL test
+		/// file. The path will be valid if the resource exists; otherwise, it
+		/// may be empty or invalid.</returns>
+		protected virtual string GetTestSqlFile()
 		{
-			string fileName = Path.GetTempFileName();
+			const string resource = "DigitalZenWorks.Database.ToolKit.Tests." +
+				"Products.Sqlite.Test.sql";
 
-			// A 0 byte sized file is created.  Need to remove it.
-			File.Delete(fileName);
-			string filePath = Path.ChangeExtension(fileName, extension);
-
-			bool result = FileUtils.CreateFileFromEmbeddedResource(
-				resource, filePath);
-
-			Assert.That(result, Is.True);
-
-			result = File.Exists(filePath);
-			Assert.That(result, Is.True);
+			string filePath = GetEmbeddedResourceFile(resource, "sql");
 
 			return filePath;
 		}
 
-		private static string GetTestDatabasePath()
-		{
-			string fileName = Path.GetTempFileName();
-
-			// A 0 byte sized file is created.  Need to remove it.
-			File.Delete(fileName);
-			string databasePath = Path.ChangeExtension(fileName, ".db");
-
-			return databasePath;
-		}
-
-		private void GetDatabase()
+		/// <summary>
+		/// Gets the database.
+		/// </summary>
+		protected virtual void GetDatabase()
 		{
 			dataSource = GetTestDatabasePath();
 
@@ -158,13 +156,27 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 			database = new DataStorage(DatabaseType.SQLite, connectionString);
 		}
 
-		private void SetupSchema()
+		/// <summary>
+		/// Setup the database schema.
+		/// </summary>
+		protected virtual void SetupSchema()
 		{
 			string sqlFile = GetTestSqlFile();
 			string sql = File.ReadAllText(sqlFile);
 
 			bool result = database.ExecuteNonQuery(sql);
 			Assert.That(result, Is.True);
+		}
+
+		private static string GetTestDatabasePath()
+		{
+			string fileName = Path.GetTempFileName();
+
+			// A 0 byte sized file is created.  Need to remove it.
+			File.Delete(fileName);
+			string databasePath = Path.ChangeExtension(fileName, ".db");
+
+			return databasePath;
 		}
 	}
 }

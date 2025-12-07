@@ -4,22 +4,26 @@
 
 namespace DigitalZenWorks.Database.ToolKit.Tests
 {
+	using DigitalZenWorks.Common.Utilities;
+	using MySqlX.XDevAPI.Common;
+	using NUnit.Framework;
 	using System;
 	using System.Collections.Generic;
 	using System.Collections.ObjectModel;
 	using System.Data;
+	using System.Data.Common;
+	using System.Data.SQLite;
+	using System.Globalization;
 	using System.IO;
 	using System.Linq;
 	using System.Runtime.Versioning;
-	using DigitalZenWorks.Common.Utilities;
-	using NUnit.Framework;
 
 	/// <summary>
 	/// Ole db tests class.
 	/// </summary>
 	[SupportedOSPlatform("windows")]
 	[TestFixture]
-	internal sealed class OleDbTests
+	internal sealed class OleDbTests : BaseTestsSupport
 	{
 		private string databaseFile;
 		private string sqlSchemaFile;
@@ -273,27 +277,37 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 			Assert.That(tableName, Is.EqualTo("Products"));
 		}
 
-		private static string GetEmbeddedResourceFile(
-			string resource, string extension)
+		/// <summary>
+		/// Gets the database.
+		/// </summary>
+		protected override void GetDatabase()
 		{
 			string fileName = Path.GetTempFileName();
 
 			// A 0 byte sized file is created.  Need to remove it.
 			File.Delete(fileName);
-			string filePath = Path.ChangeExtension(fileName, extension);
+			databaseFile = Path.ChangeExtension(fileName, "accdb");
 
-			bool result = FileUtils.CreateFileFromEmbeddedResource(
-				resource, filePath);
-
+			bool result =
+				DatabaseUtilities.CreateAccessDatabaseFile(databaseFile);
 			Assert.That(result, Is.True);
 
-			result = File.Exists(filePath);
-			Assert.That(result, Is.True);
-
-			return filePath;
+			bool exists = File.Exists(databaseFile);
+			Assert.That(exists, Is.True);
 		}
 
-		private static string GetTestSqlFile()
+		/// <summary>
+		/// Retrieves the file path to the embedded SQL test file used for unit
+		/// testing.
+		/// </summary>
+		/// <remarks>This method is intended for use in test scenarios where
+		/// access to the embedded SQL script is required. The returned file
+		/// path can be used to read or execute the test SQL statements.
+		/// </remarks>
+		/// <returns>A string containing the file path to the embedded SQL test
+		/// file. The path will be valid if the resource exists; otherwise, it
+		/// may be empty or invalid.</returns>
+		protected override string GetTestSqlFile()
 		{
 			const string resource = "DigitalZenWorks.Database.ToolKit.Tests." +
 				"Products.Access.Test.sql";
@@ -301,6 +315,18 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 			string filePath = GetEmbeddedResourceFile(resource, "sql");
 
 			return filePath;
+		}
+
+		/// <summary>
+		/// Setup the database schema.
+		/// </summary>
+		protected override void SetupSchema()
+		{
+			sqlSchemaFile = GetTestSqlFile();
+
+			bool result =
+				DataDefinition.ImportSchema(sqlSchemaFile, databaseFile);
+			Assert.That(result, Is.True);
 		}
 	}
 }
