@@ -4,12 +4,10 @@
 
 namespace DigitalZenWorks.Database.ToolKit.Tests
 {
-	using System;
 	using System.Collections.Generic;
 	using System.Collections.ObjectModel;
 	using System.Data;
 	using System.Data.SQLite;
-	using System.Globalization;
 	using System.IO;
 	using System.Linq;
 	using NUnit.Framework;
@@ -180,6 +178,24 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 
 			string name = table.TableName;
 			Assert.That(name, Is.EqualTo("Columns"));
+		}
+
+		/// <summary>
+		/// Import schema test.
+		/// </summary>
+		[Test]
+		public void ImportSchema()
+		{
+			string sqlFile = GetTestSqlFile();
+
+			string newDataSource = GetTestDatabasePath();
+
+			SQLiteConnection.CreateFile(newDataSource);
+
+			bool result =
+				DataDefinition.ImportSchema(sqlFile, newDataSource);
+
+			Assert.That(result, Is.True);
 		}
 
 		/// <summary>

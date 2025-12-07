@@ -175,6 +175,30 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 		}
 
 		/// <summary>
+		/// Import schema test.
+		/// </summary>
+		[Test]
+		public void ImportSchema()
+		{
+			string sqlFile = GetTestSqlFile();
+
+			string fileName = Path.GetTempFileName();
+
+			// A 0 byte sized file is created.  Need to remove it.
+			File.Delete(fileName);
+			databaseFile = Path.ChangeExtension(fileName, "accdb");
+
+			bool result =
+				DatabaseUtilities.CreateAccessDatabaseFile(databaseFile);
+			Assert.That(result, Is.True);
+
+			result =
+				DataDefinition.ImportSchemaOleDb(sqlFile, databaseFile);
+
+			Assert.That(result, Is.True);
+		}
+
+		/// <summary>
 		/// Order table test.
 		/// </summary>
 		[Test]

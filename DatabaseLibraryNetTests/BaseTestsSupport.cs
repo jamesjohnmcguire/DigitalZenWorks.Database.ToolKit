@@ -61,7 +61,10 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 				database.Shutdown();
 			}
 
-			File.Delete(dataSource);
+			if (dataSource != null)
+			{
+				File.Delete(dataSource);
+			}
 		}
 
 		/// <summary>
@@ -97,6 +100,21 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 			Assert.That(result, Is.True);
 
 			return filePath;
+		}
+
+		/// <summary>
+		/// Gets a temporary file path for a test database.
+		/// </summary>
+		/// <returns>The file path to the test database.</returns>
+		protected static string GetTestDatabasePath()
+		{
+			string fileName = Path.GetTempFileName();
+
+			// A 0 byte sized file is created.  Need to remove it.
+			File.Delete(fileName);
+			string databasePath = Path.ChangeExtension(fileName, ".db");
+
+			return databasePath;
 		}
 
 		/// <summary>
@@ -167,17 +185,6 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 
 			bool result = database.ExecuteNonQuery(sql);
 			Assert.That(result, Is.True);
-		}
-
-		private static string GetTestDatabasePath()
-		{
-			string fileName = Path.GetTempFileName();
-
-			// A 0 byte sized file is created.  Need to remove it.
-			File.Delete(fileName);
-			string databasePath = Path.ChangeExtension(fileName, ".db");
-
-			return databasePath;
 		}
 	}
 }
