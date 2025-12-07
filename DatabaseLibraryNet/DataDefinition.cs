@@ -409,7 +409,7 @@ namespace DigitalZenWorks.Database.ToolKit
 					exception is DirectoryNotFoundException ||
 					exception is IOException ||
 					exception is OutOfMemoryException ||
-					exception is System.Data.OleDb.OleDbException)
+					exception is DbException)
 				{
 					string message = Strings.Exception + exception;
 					Log.Error(message);
@@ -440,17 +440,18 @@ namespace DigitalZenWorks.Database.ToolKit
 		{
 			bool successCode = false;
 
-			try
+			if (!File.Exists(schemaFile))
 			{
-				if (File.Exists(schemaFile))
+				string message = $"Schema file not found: {schemaFile}";
+				throw new FileNotFoundException(message, schemaFile);
+			}
+			else
+			{
+				try
 				{
 					string fileContents = File.ReadAllText(schemaFile);
-
-					string[] stringSeparators = ["\r\n\r\n"];
-					string[] queries = fileContents.Split(
-						stringSeparators,
-						32000,
-						StringSplitOptions.RemoveEmptyEntries);
+					IReadOnlyList<string> queries =
+						GetSqlQueryStatements(fileContents);
 
 					string extension = Path.GetExtension(databaseFile);
 
@@ -460,37 +461,39 @@ namespace DigitalZenWorks.Database.ToolKit
 							".accdb", StringComparison.OrdinalIgnoreCase))
 					{
 						const string provider = "Microsoft.ACE.OLEDB.12.0";
-						string connectionString = string.Format(
-							CultureInfo.InvariantCulture,
-							"provider={0}; Data Source={1}",
-							provider,
-							databaseFile);
+						string connectionString =
+							OleDbHelper.BuildConnectionString(
+								databaseFile, provider);
+
 						successCode = ImportSchemaMdb(queries, databaseFile);
 					}
 					else
 					{
-						throw new NotImplementedException();
+						string message =
+							$"Unsupported database file extension: {extension}";
+						throw new ArgumentException(
+							message, nameof(databaseFile));
 					}
 				}
-			}
-			catch (Exception exception) when
-				(exception is ArgumentNullException ||
-				exception is ArgumentException ||
-				exception is FileNotFoundException ||
-				exception is DirectoryNotFoundException ||
-				exception is IOException ||
-				exception is OutOfMemoryException ||
-				exception is System.Data.OleDb.OleDbException)
-			{
-				string message = Strings.Exception + exception;
-				Log.Error(message);
-			}
-			catch (Exception exception)
-			{
-				string message = Strings.Exception + exception;
-				Log.Error(message);
+				catch (Exception exception) when
+					(exception is ArgumentNullException ||
+					exception is ArgumentException ||
+					exception is FileNotFoundException ||
+					exception is DirectoryNotFoundException ||
+					exception is IOException ||
+					exception is OutOfMemoryException ||
+					exception is System.Data.OleDb.OleDbException)
+				{
+					string message = Strings.Exception + exception;
+					Log.Error(message);
+				}
+				catch (Exception exception)
+				{
+					string message = Strings.Exception + exception;
+					Log.Error(message);
 
-				throw;
+					throw;
+				}
 			}
 
 			return successCode;
