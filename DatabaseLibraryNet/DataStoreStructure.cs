@@ -185,6 +185,53 @@ namespace DigitalZenWorks.Database.ToolKit
 		}
 
 		/// <summary>
+		/// Order table.
+		/// </summary>
+		/// <param name="tables">The list of tables to order.</param>
+		/// <returns>The ordered list of tables.</returns>
+		/// <remarks>This orders the list taking dependencies into
+		/// account.</remarks>
+		public static Collection<Table> OrderTables(
+			Collection<Table> tables)
+		{
+			Collection<Table> orderedTables = [];
+
+			if (tables != null)
+			{
+				Dictionary<string, Collection<string>> tableDependencies = [];
+				Dictionary<string, Table> tablesByName = [];
+
+				foreach (Table table in tables)
+				{
+					string name = table.Name;
+					tablesByName[name] = table;
+
+					Collection<string> dependencies = [];
+
+					foreach (ForeignKey foreignKeys in table.ForeignKeys)
+					{
+						dependencies.Add(foreignKeys.ChildTable);
+					}
+
+					tableDependencies.Add(name, dependencies);
+				}
+
+				Collection<string> orderedNames =
+					GetOrderedDependencies(tableDependencies);
+
+				foreach (string tableName in orderedNames)
+				{
+					if (tablesByName.TryGetValue(tableName, out Table table))
+					{
+						orderedTables.Add(table);
+					}
+				}
+			}
+
+			return orderedTables;
+		}
+
+		/// <summary>
 		/// Replaces the foreign key definitions of the specified table with
 		/// those derived from the provided relationships.
 		/// </summary>
@@ -757,41 +804,6 @@ namespace DigitalZenWorks.Database.ToolKit
 			}
 
 			return isPrimaryKey;
-		}
-
-		/// <summary>
-		/// Order table.
-		/// </summary>
-		/// <param name="tables">The list of tables to order.</param>
-		/// <returns>The ordered list of tables.</returns>
-		/// <remarks>This orders the list taking dependencies into
-		/// account.</remarks>
-		protected virtual Collection<string> OrderTable(
-			Collection<Table> tables)
-		{
-			Collection<string> orderedTables = [];
-
-			if (tables != null)
-			{
-				Dictionary<string, Collection<string>> tableDependencies = [];
-
-				foreach (Table table in tables)
-				{
-					Collection<string> dependencies = [];
-					string name = table.Name;
-
-					foreach (ForeignKey foreignKeys in table.ForeignKeys)
-					{
-						dependencies.Add(foreignKeys.ParentTable);
-					}
-
-					tableDependencies.Add(name, dependencies);
-				}
-
-				orderedTables = GetOrderedDependencies(tableDependencies);
-			}
-
-			return orderedTables;
 		}
 
 		/// <summary>
