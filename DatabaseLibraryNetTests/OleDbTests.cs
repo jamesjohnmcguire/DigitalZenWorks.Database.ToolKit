@@ -31,7 +31,8 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 		{
 			string schemaFile = databaseFile + ".sql";
 
-			bool result = OleDbSchema.ExportSchema(databaseFile, schemaFile);
+			bool result =
+				DataDefinitionOleDb.ExportSchema(databaseFile, schemaFile);
 
 			Assert.That(result, Is.True);
 
@@ -191,7 +192,7 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 				DatabaseUtilities.CreateAccessDatabaseFile(databaseFile);
 			Assert.That(result, Is.True);
 
-			result = OleDbSchema.ImportSchema(sqlFile, databaseFile);
+			result = DataDefinitionOleDb.ImportSchema(sqlFile, databaseFile);
 
 			Assert.That(result, Is.True);
 		}
@@ -283,7 +284,8 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 		{
 			sqlSchemaFile = GetTestSqlFile();
 
-			bool result = OleDbSchema.ImportSchema(sqlSchemaFile, databaseFile);
+			bool result =
+				DataDefinitionOleDb.ImportSchema(sqlSchemaFile, databaseFile);
 			Assert.That(result, Is.True);
 		}
 	}
