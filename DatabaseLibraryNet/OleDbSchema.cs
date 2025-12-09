@@ -91,6 +91,51 @@ namespace DigitalZenWorks.Database.ToolKit
 			}
 		}
 
+		/// Method <c>ExportSchema.</c>
+		/// <summary>
+		/// Export all tables to similarly named csv files.
+		/// </summary>
+		/// <returns>A values indicating success or not.</returns>
+		/// <param name="databaseFile">The database file to use.</param>
+		/// <param name="schemaFile">The schema file to export to.</param>
+		public static bool ExportSchema(
+			string databaseFile, string schemaFile)
+		{
+			bool successCode = false;
+
+			try
+			{
+				using OleDbSchema schema = new(databaseFile);
+				Collection<Table> tables = schema.GetSchema();
+
+				tables = OrderTables(tables);
+
+				SqlWriterOleDb sqlWriter = new();
+				string schemaText = sqlWriter.GetTablesCreateStatements(tables);
+
+				File.WriteAllText(schemaFile, schemaText);
+
+				successCode = true;
+			}
+			catch (Exception exception) when
+				(exception is ArgumentNullException ||
+				exception is ArgumentException ||
+				exception is InvalidOperationException)
+			{
+				string message = Strings.Exception + exception;
+				Log.Error(message);
+			}
+			catch (Exception exception)
+			{
+				string message = Strings.Exception + exception;
+				Log.Error(message);
+
+				throw;
+			}
+
+			return successCode;
+		}
+
 		/// <summary>
 		/// Creates a file with the given schema.
 		/// </summary>

@@ -31,8 +31,7 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 		{
 			string schemaFile = databaseFile + ".sql";
 
-			bool result =
-				DataDefinition.ExportSchemaOleDb(databaseFile, schemaFile);
+			bool result = OleDbSchema.ExportSchema(databaseFile, schemaFile);
 
 			Assert.That(result, Is.True);
 
