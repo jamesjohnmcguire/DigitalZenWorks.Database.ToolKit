@@ -126,7 +126,7 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 		public void GetSchema()
 		{
 			Collection<Table> tables =
-				DataDefinition.GetSchemaOleDb(databaseFile);
+				DataDefinitionOleDb.GetSchema(databaseFile);
 
 			int count = tables.Count;
 			Assert.That(count, Is.EqualTo(7));
@@ -204,7 +204,7 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 		public void OrderTables()
 		{
 			Collection<Table> tables =
-				DataDefinition.GetSchemaOleDb(databaseFile);
+				DataDefinitionOleDb.GetSchema(databaseFile);
 
 			Collection<Table> orderedList = DataDefinition.OrderTables(tables);
 
