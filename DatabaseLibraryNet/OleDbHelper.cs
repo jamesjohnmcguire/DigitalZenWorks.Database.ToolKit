@@ -12,6 +12,8 @@ namespace DigitalZenWorks.Database.ToolKit
 	using System.Runtime.Versioning;
 	using System.Text;
 
+#nullable enable
+
 	/// <summary>
 	/// The OLE DB helper class.
 	/// </summary>
@@ -31,29 +33,21 @@ namespace DigitalZenWorks.Database.ToolKit
 		public static string BuildConnectionString(
 			string databaseFile,
 			string provider = "Microsoft.ACE.OLEDB.12.0",
-			string password = null,
+			string? password = null,
 			bool readOnly = false)
 		{
-			StringBuilder builder = new();
-			builder.AppendFormat(
-				CultureInfo.InvariantCulture, "Provider={0};", provider);
-			builder.AppendFormat(
-				CultureInfo.InvariantCulture, "Data Source={0};", databaseFile);
+			string connectionString =
+				$"Provider={provider};Data Source={databaseFile};";
 
 			if (!string.IsNullOrEmpty(password))
 			{
-				builder.AppendFormat(
-					CultureInfo.InvariantCulture,
-					"Jet OLEDB:Database Password={0};",
-					password);
+				connectionString += $"Jet OLEDB:Database Password={password};";
 			}
 
-			if (readOnly)
+			if (readOnly == true)
 			{
-				builder.Append("Mode=Read;");
+				connectionString += "Mode=Read;";
 			}
-
-			string connectionString = builder.ToString();
 
 			return connectionString;
 		}
