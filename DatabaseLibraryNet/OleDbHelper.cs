@@ -7,13 +7,10 @@
 namespace DigitalZenWorks.Database.ToolKit
 {
 	using System;
-	using System.Collections.Generic;
-	using System.Data.Common;
 	using System.Globalization;
 	using System.IO;
 	using System.Runtime.Versioning;
 	using System.Text;
-	using global::Common.Logging;
 
 	/// <summary>
 	/// The OLE DB helper class.
@@ -23,9 +20,6 @@ namespace DigitalZenWorks.Database.ToolKit
 #endif
 	public static class OleDbHelper
 	{
-		private static readonly ILog Log = LogManager.GetLogger(
-			System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
-
 		/// <summary>
 		/// Builds the connection string.
 		/// </summary>
@@ -60,6 +54,7 @@ namespace DigitalZenWorks.Database.ToolKit
 			}
 
 			string connectionString = builder.ToString();
+
 			return connectionString;
 		}
 
@@ -73,7 +68,7 @@ namespace DigitalZenWorks.Database.ToolKit
 		{
 			bool result = false;
 
-			DatabaseType databaseType = DatabaseType.Unknown;
+			DatabaseType databaseType;
 
 			bool exists = File.Exists(databaseFile);
 
@@ -93,7 +88,7 @@ namespace DigitalZenWorks.Database.ToolKit
 
 				if (databaseType != DatabaseType.OleDb)
 				{
-					string message =
+					const string message =
 						"Database type is not supported for OleDb import.";
 					throw new ArgumentException(
 						message, nameof(databaseFile));

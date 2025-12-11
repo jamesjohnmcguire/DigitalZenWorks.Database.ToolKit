@@ -1023,7 +1023,7 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// </summary>
 		private bool Initialize(bool forceReset = false)
 		{
-			bool returnValue = false;
+			bool returnValue;
 
 			try
 			{
@@ -1037,10 +1037,7 @@ namespace DigitalZenWorks.Database.ToolKit
 					}
 				}
 
-				if (Connection == null)
-				{
-					Connection = GetConnection(databaseType, connectionText);
-				}
+				Connection ??= GetConnection(databaseType, connectionText);
 
 				if ((Connection != null) &&
 					(Connection.State != ConnectionState.Open))

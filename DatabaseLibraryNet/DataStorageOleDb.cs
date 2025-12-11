@@ -73,6 +73,46 @@ namespace DigitalZenWorks.Database.ToolKit
 		}
 
 		/// <summary>
+		/// Adds parameters to the command.
+		/// </summary>
+		/// <param name="command">The command to use.</param>
+		/// <param name="values">The list of values.</param>
+		/// <returns>An updated collection of values.</returns>
+		public static OleDbParameterCollection AddParameters(
+			OleDbCommand command, IDictionary<string, object> values)
+		{
+			ArgumentNullException.ThrowIfNull(command);
+
+			OleDbParameterCollection parameters = command.Parameters;
+
+			if (values != null)
+			{
+				foreach (KeyValuePair<string, object> valuePair in values)
+				{
+					string name = "@" + valuePair.Key;
+					OleDbParameter parameter;
+
+					if (valuePair.Value == null)
+					{
+						parameter = parameters.AddWithValue(name, DBNull.Value);
+					}
+					else
+					{
+						parameter =
+							parameters.AddWithValue(name, valuePair.Value);
+					}
+
+					if (parameter == null)
+					{
+						Log.Warn("Parameters.AddWithValue returns null");
+					}
+				}
+			}
+
+			return parameters;
+		}
+
+		/// <summary>
 		/// Generates a database connection string for the OleDb database
 		/// type and data source.
 		/// </summary>
@@ -142,34 +182,6 @@ namespace DigitalZenWorks.Database.ToolKit
 				[null, null, null, "TABLE"]);
 
 			return tables;
-		}
-
-		private static OleDbParameterCollection AddParameters(
-			OleDbCommand command, IDictionary<string, object> values)
-		{
-			OleDbParameterCollection parameters = command.Parameters;
-
-			foreach (KeyValuePair<string, object> valuePair in values)
-			{
-				string name = "@" + valuePair.Key;
-				OleDbParameter parameter;
-
-				if (valuePair.Value == null)
-				{
-					parameter = parameters.AddWithValue(name, DBNull.Value);
-				}
-				else
-				{
-					parameter = parameters.AddWithValue(name, valuePair.Value);
-				}
-
-				if (parameter == null)
-				{
-					Log.Warn("Parameters.AddWithValue returns null");
-				}
-			}
-
-			return parameters;
 		}
 	}
 }
