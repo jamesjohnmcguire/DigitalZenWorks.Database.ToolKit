@@ -797,7 +797,7 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// <param name="databaseType">The database type.</param>
 		/// <param name="connectionText">The connection text.</param>
 		/// <returns>A DbConnection object or null.</returns>
-		protected virtual DbConnection GetConnection(
+		protected virtual DbConnection GetConnectionObject(
 			DatabaseType databaseType, string connectionText)
 		{
 			DbConnection connection = null;
@@ -1037,7 +1037,7 @@ namespace DigitalZenWorks.Database.ToolKit
 					}
 				}
 
-				Connection ??= GetConnection(databaseType, connectionText);
+				Connection ??= GetConnectionObject(databaseType, connectionText);
 
 				if ((Connection != null) &&
 					(Connection.State != ConnectionState.Open))

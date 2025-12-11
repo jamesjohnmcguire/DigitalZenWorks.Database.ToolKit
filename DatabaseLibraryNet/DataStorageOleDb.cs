@@ -159,14 +159,12 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// <param name="databaseType">The database type.</param>
 		/// <param name="connectionText">The connection text.</param>
 		/// <returns>A DbConnection object or null.</returns>
-		protected override DbConnection GetConnection(
+		protected override DbConnection GetConnectionObject(
 			DatabaseType databaseType, string connectionText)
 		{
-			DbConnection connection = null;
-
 			// Two statements help in debugging problems
 			oleDbConnection = new OleDbConnection(connectionText);
-			connection = oleDbConnection;
+			DbConnection connection = oleDbConnection;
 
 			return connection;
 		}
