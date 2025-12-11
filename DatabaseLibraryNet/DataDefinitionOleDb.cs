@@ -121,8 +121,8 @@ namespace DigitalZenWorks.Database.ToolKit
 						string connectionString =
 							OleDbHelper.BuildConnectionString(databaseFile);
 
-						using DataStorage database =
-							new(DatabaseType.OleDb, connectionString);
+						using DataStorageOleDb database =
+							new(connectionString);
 
 						successCode =
 							OleDbHelper.ExecuteQueries(database, queries);
