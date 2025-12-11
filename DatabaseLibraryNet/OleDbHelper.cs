@@ -64,53 +64,6 @@ namespace DigitalZenWorks.Database.ToolKit
 		}
 
 		/// <summary>
-		/// Executes the queries.
-		/// </summary>
-		/// <param name="database">The database object.</param>
-		/// <param name="queries">The list of queries.</param>
-		/// <returns>True if successful, false otherwise.</returns>
-		public static bool ExecuteQueries(
-			DataStorage database, IReadOnlyList<string> queries)
-		{
-			bool result = false;
-
-			ArgumentNullException.ThrowIfNull(database);
-
-			if (queries != null)
-			{
-				foreach (string sqlQuery in queries)
-				{
-					try
-					{
-						string message = Strings.Command + sqlQuery;
-						Log.Info(message);
-
-						database.ExecuteNonQuery(sqlQuery);
-					}
-					catch (Exception exception) when
-						(exception is ArgumentNullException ||
-						exception is OutOfMemoryException ||
-						exception is System.Data.OleDb.OleDbException)
-					{
-						string message = Strings.Exception + exception;
-						Log.Error(message);
-					}
-					catch (Exception exception)
-					{
-						string message = Strings.Exception + exception;
-						Log.Error(message);
-
-						throw;
-					}
-				}
-
-				result = true;
-			}
-
-			return result;
-		}
-
-		/// <summary>
 		/// Validates the Access database file.
 		/// </summary>
 		/// <param name="databaseFile">The database file.</param>

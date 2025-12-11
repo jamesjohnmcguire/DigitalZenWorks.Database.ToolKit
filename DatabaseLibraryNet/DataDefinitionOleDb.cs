@@ -121,11 +121,10 @@ namespace DigitalZenWorks.Database.ToolKit
 						string connectionString =
 							OleDbHelper.BuildConnectionString(databaseFile);
 
-						using DataStorageOleDb database =
-							new(connectionString);
+						using DataStorageOleDb database = new(connectionString);
 
 						successCode =
-							OleDbHelper.ExecuteQueries(database, queries);
+							DataDefinition.ExecuteNonQueries(database, queries);
 					}
 				}
 				catch (Exception exception) when

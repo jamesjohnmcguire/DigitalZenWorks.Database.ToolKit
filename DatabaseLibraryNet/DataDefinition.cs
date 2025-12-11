@@ -29,6 +29,54 @@ namespace DigitalZenWorks.Database.ToolKit
 		private static readonly ILog Log = LogManager.GetLogger(
 			System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
+		/// <summary>
+		/// Execute a set of non-query commands.
+		/// </summary>
+		/// <param name="database">The database object.</param>
+		/// <param name="queries">The list of queries.</param>
+		/// <returns>A value indicating success or not.</returns>
+		public static bool ExecuteNonQueries(
+			DataStorage database, IReadOnlyList<string> queries)
+		{
+			bool result = false;
+
+			ArgumentNullException.ThrowIfNull(database);
+
+			if (queries != null)
+			{
+				foreach (string sqlQuery in queries)
+				{
+					try
+					{
+						string message = Strings.Command + sqlQuery;
+						Log.Info(message);
+
+						database.ExecuteNonQuery(sqlQuery);
+					}
+					catch (Exception exception) when
+						(exception is ArgumentNullException ||
+						exception is OutOfMemoryException ||
+						exception is DbException ||
+						exception is System.Data.OleDb.OleDbException)
+					{
+						string message = Strings.Exception + exception;
+						Log.Error(message);
+					}
+					catch (Exception exception)
+					{
+						string message = Strings.Exception + exception;
+						Log.Error(message);
+
+						throw;
+					}
+				}
+
+				result = true;
+			}
+
+			return result;
+		}
+
 		/// Method <c>ExportSchema.</c>
 		/// <summary>
 		/// Export all tables to similarly named csv files.
@@ -448,15 +496,8 @@ namespace DigitalZenWorks.Database.ToolKit
 
 					IReadOnlyList<string> queries =
 						DataStoreStructure.GetSqlQueryStatements(fileContents);
-					DatabaseType databaseType = GetDatabaseType(databaseFile);
 
-					string connectionString = DataStorage.GetConnectionString(
-						databaseType, databaseFile);
-
-					using DataStorage database =
-						new(databaseType, connectionString);
-
-					successCode = ExecuteQueries(database, queries);
+					successCode = ExecuteNonQueries(databaseFile, queries);
 				}
 				catch (Exception exception) when
 					(exception is ArgumentNullException ||
@@ -570,43 +611,22 @@ namespace DigitalZenWorks.Database.ToolKit
 			return found;
 		}
 
-		private static bool ExecuteQueries(
-			DataStorage database, IReadOnlyList<string> queries)
+		private static bool ExecuteNonQueries(
+			string databaseFile, IReadOnlyList<string> queries)
 		{
 			bool result = false;
 
-			ArgumentNullException.ThrowIfNull(database);
-
 			if (queries != null)
 			{
-				foreach (string sqlQuery in queries)
-				{
-					try
-					{
-						string message = Strings.Command + sqlQuery;
-						Log.Info(message);
+				DatabaseType databaseType = GetDatabaseType(databaseFile);
 
-						database.ExecuteNonQuery(sqlQuery);
-					}
-					catch (Exception exception) when
-						(exception is ArgumentNullException ||
-						exception is OutOfMemoryException ||
-						exception is DbException ||
-						exception is System.Data.OleDb.OleDbException)
-					{
-						string message = Strings.Exception + exception;
-						Log.Error(message);
-					}
-					catch (Exception exception)
-					{
-						string message = Strings.Exception + exception;
-						Log.Error(message);
+				string connectionString = DataStorage.GetConnectionString(
+					databaseType, databaseFile);
 
-						throw;
-					}
-				}
+				using DataStorage database =
+					new(databaseType, connectionString);
 
-				result = true;
+				result = ExecuteNonQueries(database, queries);
 			}
 
 			return result;
