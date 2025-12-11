@@ -20,10 +20,16 @@ namespace DigitalZenWorks.Database.ToolKit
 	/// Class for OleDb database access independent of the underlying
 	/// transport.
 	/// </summary>
+	/// <remarks>
+	/// Initializes a new instance of the <see cref="DataStorageOleDb"/>
+	/// class.
+	/// </remarks>
+	/// <param name="connectionString">The connection string.</param>
 #if NET5_0_OR_GREATER
 	[SupportedOSPlatform("windows")]
 #endif
-	public class DataStorageOleDb : DataStorage
+	public class DataStorageOleDb(string connectionString)
+		: DataStorage(DatabaseType.OleDb, connectionString)
 	{
 		/// <summary>
 		/// Diagnostics object.
@@ -35,16 +41,6 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// Ole Database Connection Object.
 		/// </summary>
 		private OleDbConnection oleDbConnection;
-
-		/// <summary>
-		/// Initializes a new instance of the <see cref="DataStorageOleDb"/>
-		/// class.
-		/// </summary>
-		/// <param name="connectionString">The connection string.</param>
-		public DataStorageOleDb(string connectionString)
-			: base(DatabaseType.OleDb, connectionString)
-		{
-		}
 
 		/// <summary>
 		/// Gets the database command object.
