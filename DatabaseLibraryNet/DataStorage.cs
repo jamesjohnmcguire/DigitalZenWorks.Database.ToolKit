@@ -192,7 +192,7 @@ namespace DigitalZenWorks.Database.ToolKit
 				return dataAdapter;
 			}
 
-			set;
+			set => dataAdapter = value;
 		}
 
 		/// <summary>
