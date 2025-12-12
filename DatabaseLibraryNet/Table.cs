@@ -6,11 +6,10 @@
 
 namespace DigitalZenWorks.Database.ToolKit
 {
-	using System;
 	using System.Collections.Generic;
 	using System.Collections.ObjectModel;
 	using System.Data;
-	using System.Globalization;
+	using System.Text;
 	using global::Common.Logging;
 
 	/// <summary>
@@ -42,36 +41,36 @@ namespace DigitalZenWorks.Database.ToolKit
 		}
 
 		/// <summary>
-		/// Gets represents the columns.
+		/// Gets the columns.
 		/// </summary>
 		/// <value>
-		/// Represents the columns.
+		/// The columns.
 		/// </value>
 		public Dictionary<string, Column> Columns { get; } = [];
 
 		/// <summary>
-		/// Gets represents the foreign keys.
+		/// Gets the foreign keys.
 		/// </summary>
 		/// <value>
-		/// Represents the foreign keys.
+		/// The foreign keys.
 		/// </value>
 		public Collection<ForeignKey> ForeignKeys { get; } = [];
 
 		/// <summary>
-		/// Gets or sets represents a table name.
+		/// Gets or sets the table name.
 		/// </summary>
 		/// <value>
-		/// Represents a table name.
+		/// The table name.
 		/// </value>
 		public string Name { get; set; } = string.Empty;
 
 		/// <summary>
-		/// Gets or sets represents the primary key.
+		/// Gets or sets the primary key.
 		/// </summary>
 		/// <value>
-		/// Represents the primary key.
+		/// The primary key.
 		/// </value>
-		public string PrimaryKey { get; set; } = string.Empty;
+		public string PrimaryKey { get; set; }
 
 		/// <summary>
 		/// Writes out the table information.
@@ -84,27 +83,70 @@ namespace DigitalZenWorks.Database.ToolKit
 
 			if (table != null)
 			{
-				string message = Strings.Table + table.TableName;
-				Log.Info(message);
+				Dictionary<string, Column> columns = [];
 
-				output =
-					Strings.Table + table.TableName + Environment.NewLine;
-
-				foreach (DataColumn column in table.Columns)
+				foreach (DataColumn dataColumn in table.Columns)
 				{
-					message = Strings.TabDash + column.ColumnName;
-					Log.Info(message);
+					Column column = new();
+					column.Name = dataColumn.ColumnName;
 
-					output += message + Environment.NewLine;
+					foreach (DataColumn primaryKeyColumn in table.PrimaryKey)
+					{
+						if (dataColumn.ColumnName ==
+							primaryKeyColumn.ColumnName)
+						{
+							column.Primary = true;
+						}
+					}
+
+					columns.Add(dataColumn.ColumnName, column);
 				}
 
-				message = Strings.PrimaryKey + table.PrimaryKey;
-				Log.Info(message);
-
-				output += message + Environment.NewLine;
+				output = Dump(table.TableName, columns);
 			}
 
 			return output;
+		}
+
+		/// <summary>
+		/// Writes out the table information.
+		/// </summary>
+		/// <param name="tableName">The name of the table.</param>
+		/// <param name="columns">The columns of the table.</param>
+		/// <returns>A text of table information.</returns>
+		public static string Dump(
+			string tableName, Dictionary<string, Column> columns)
+		{
+			StringBuilder output = new();
+			string message = $"{Strings.Table}{tableName}";
+			output.AppendLine(message);
+			Log.Info(message);
+
+			string primaryKey = string.Empty;
+
+			if (columns != null)
+			{
+				foreach (KeyValuePair<string, Column> column in columns)
+				{
+					Column columnValue = column.Value;
+
+					message = $"{Strings.TabDash}{columnValue.Name}";
+					output.AppendLine(message);
+					Log.Info(message);
+
+					if (columnValue.Primary == true)
+					{
+						primaryKey = columnValue.Name;
+					}
+				}
+			}
+
+			message = $"{Strings.PrimaryKey}{primaryKey}";
+			output.AppendLine(message);
+			Log.Info(message);
+
+			string result = output.ToString();
+			return result;
 		}
 
 		/// <summary>
@@ -122,44 +164,10 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// <summary>
 		/// Writes out the table information.
 		/// </summary>
-		/// <returns>DataTable.</returns>
+		/// <returns>A text of table information.</returns>
 		public string Dump()
 		{
-			string message;
-			string output =
-				Strings.Table + Name + Environment.NewLine;
-			Log.Info(output);
-
-			foreach (KeyValuePair<string, Column> column in Columns)
-			{
-				Column columnValue = column.Value;
-				string name = columnValue.Name;
-
-				message = Strings.TabDash + name;
-				Log.Info(message);
-
-				output += message + Environment.NewLine;
-			}
-
-			message = Strings.PrimaryKey + PrimaryKey;
-			Log.Info(message);
-
-			output += message + Environment.NewLine;
-
-			foreach (ForeignKey foreignKey in ForeignKeys)
-			{
-				string format = string.Format(
-					CultureInfo.InvariantCulture,
-					"{0} {1} {2}",
-					foreignKey.Name,
-					foreignKey.ColumnName,
-					foreignKey.ParentTable);
-
-				message = Strings.ForeignKey + format;
-				Log.Info(message);
-
-				output += message + Environment.NewLine;
-			}
+			string output = Dump(Name, Columns);
 
 			return output;
 		}
