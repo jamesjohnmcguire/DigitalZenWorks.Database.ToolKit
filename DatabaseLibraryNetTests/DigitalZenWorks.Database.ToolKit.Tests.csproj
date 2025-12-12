@@ -43,7 +43,6 @@
 		<EmbeddedResource Include="Products.Access.Test.sql" />
 		<EmbeddedResource Include="Products.Sqlite.Test.sql" />
 		<AdditionalFiles Include="stylecop.json" />
-		<EmbeddedResource Include="test.mdb" />
 	</ItemGroup>
 
 </Project>
