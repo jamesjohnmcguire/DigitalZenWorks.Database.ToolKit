@@ -98,7 +98,7 @@ namespace DigitalZenWorks.Database.ToolKit
 						databaseFilePath);
 					break;
 				case DatabaseType.SQLite:
-					string connectionBase = "Data Source={0};Version=3;" +
+					const string connectionBase = "Data Source={0};Version=3;" +
 						"DateTimeFormat=InvariantCulture";
 					connectionString = string.Format(
 						CultureInfo.InvariantCulture,
@@ -218,7 +218,7 @@ namespace DigitalZenWorks.Database.ToolKit
 
 			string sql = string.Format(
 				CultureInfo.InvariantCulture,
-				@"DELETE FROM {0} WHERE {1} ='{2}'",
+				"DELETE FROM {0} WHERE {1} ='{2}'",
 				tableName,
 				idColumn,
 				id);
@@ -238,7 +238,7 @@ namespace DigitalZenWorks.Database.ToolKit
 			DataTable tableList;
 			string sql = string.Format(
 				CultureInfo.InvariantCulture,
-				@"SELECT * FROM {0} ORDER BY id",
+				"SELECT * FROM {0} ORDER BY id",
 				table);
 
 			tableList = Database.GetDataTable(sql);
@@ -258,7 +258,7 @@ namespace DigitalZenWorks.Database.ToolKit
 
 			string sql = string.Format(
 				CultureInfo.InvariantCulture,
-				@"SELECT * FROM {0} WHERE {1}",
+				"SELECT * FROM {0} WHERE {1}",
 				table,
 				where);
 
@@ -339,11 +339,8 @@ namespace DigitalZenWorks.Database.ToolKit
 		{
 			if (disposing)
 			{
-				if (Database != null)
-				{
-					Database.Close();
-					Database = null;
-				}
+				Database?.Close();
+				Database = null;
 			}
 		}
 	}
