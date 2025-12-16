@@ -7,10 +7,9 @@
 namespace DigitalZenWorks.Database.ToolKit
 {
 	using System;
-	using System.Globalization;
 	using System.IO;
 	using System.Runtime.Versioning;
-	using System.Text;
+	using DigitalZenWorks.Common.Utilities;
 
 #nullable enable
 
@@ -50,6 +49,19 @@ namespace DigitalZenWorks.Database.ToolKit
 			}
 
 			return connectionString;
+		}
+
+		/// Method <c>CreateAccessDatabaseFile.</c>
+		/// <summary>
+		/// Creates an empty MDB (MS Jet / Access database) file.
+		/// </summary>
+		/// <param name="filePath">The file path of the database.</param>
+		/// <returns>A values indicating success or not.</returns>
+		public static bool CreateAccessDatabaseFile(string filePath)
+		{
+			return FileUtils.CreateFileFromEmbeddedResource(
+				"DigitalZenWorks.Database.ToolKit.template.accdb",
+				filePath);
 		}
 
 		/// Method <c>ExportToCsv.</c>

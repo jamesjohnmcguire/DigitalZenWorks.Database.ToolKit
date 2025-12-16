@@ -24,23 +24,18 @@ namespace DigitalZenWorks.Database.ToolKit
 		private static readonly ILog Log = LogManager.GetLogger(
 			System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-		/// Method <c>CreateAccessDatabaseFile.</c>
 		/// <summary>
-		/// Creates an empty MDB (MS Jet / Access database) file.
+		/// Export database to similarly named csv file.
 		/// </summary>
-		/// <param name="filePath">The file path of the database.</param>
+		/// <param name="database">The database file to use.</param>
+		/// <param name="csvPath">The csv file to export to.</param>
 		/// <returns>A values indicating success or not.</returns>
-		public static bool CreateAccessDatabaseFile(string filePath)
-		{
-			return FileUtils.CreateFileFromEmbeddedResource(
-				"DigitalZenWorks.Database.ToolKit.template.accdb",
-				filePath);
-		}
-
 		public static bool ExportDatabaseToCsv(
 			DataStorage database, string csvPath)
 		{
 			bool returnCode = false;
+
+			ArgumentNullException.ThrowIfNull(database);
 
 			// Get all the table names
 			DataTable tableNames = database.SchemaTable;

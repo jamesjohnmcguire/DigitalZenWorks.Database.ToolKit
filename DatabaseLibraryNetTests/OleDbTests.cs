@@ -189,7 +189,7 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 			databaseFile = Path.ChangeExtension(fileName, "accdb");
 
 			bool result =
-				DatabaseUtilities.CreateAccessDatabaseFile(databaseFile);
+				OleDbHelper.CreateAccessDatabaseFile(databaseFile);
 			Assert.That(result, Is.True);
 
 			result = DataDefinitionOleDb.ImportSchema(sqlFile, databaseFile);
@@ -249,7 +249,7 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 			databaseFile = Path.ChangeExtension(fileName, "accdb");
 
 			bool result =
-				DatabaseUtilities.CreateAccessDatabaseFile(databaseFile);
+				OleDbHelper.CreateAccessDatabaseFile(databaseFile);
 			Assert.That(result, Is.True);
 
 			bool exists = File.Exists(databaseFile);
