@@ -263,6 +263,32 @@ namespace DigitalZenWorks.Database.ToolKit
 		}
 
 		/// <summary>
+		/// Get database type.
+		/// </summary>
+		/// <param name="databaseFile">The database file.</param>
+		/// <returns>The database type.</returns>
+		public static DatabaseType GetDatabaseType(string databaseFile)
+		{
+			DatabaseType databaseType = DatabaseType.Unknown;
+
+			bool exists = File.Exists(databaseFile);
+
+			if (exists == true)
+			{
+				byte[] header = GetDatabaseFileHeaderBytes(databaseFile);
+				databaseType = GetDatabaseTypeByFileHeaderBytes(header);
+
+				// Fallback to extension-based detection
+				if (databaseType == DatabaseType.Unknown)
+				{
+					databaseType = GetDatabaseTypeByExtension(databaseFile);
+				}
+			}
+
+			return databaseType;
+		}
+
+		/// <summary>
 		/// Get database type by file extension.
 		/// </summary>
 		/// <param name="databaseFile">The database file.</param>
@@ -630,27 +656,6 @@ namespace DigitalZenWorks.Database.ToolKit
 			}
 
 			return result;
-		}
-
-		private static DatabaseType GetDatabaseType(string databaseFile)
-		{
-			DatabaseType databaseType = DatabaseType.Unknown;
-
-			bool exists = File.Exists(databaseFile);
-
-			if (exists == true)
-			{
-				byte[] header = GetDatabaseFileHeaderBytes(databaseFile);
-				databaseType = GetDatabaseTypeByFileHeaderBytes(header);
-
-				// Fallback to extension-based detection
-				if (databaseType == DatabaseType.Unknown)
-				{
-					databaseType = GetDatabaseTypeByExtension(databaseFile);
-				}
-			}
-
-			return databaseType;
 		}
 
 		private static void GetDependenciesRecursive(
