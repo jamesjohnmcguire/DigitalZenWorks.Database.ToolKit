@@ -37,14 +37,56 @@ namespace DigitalZenWorks.Database.ToolKit
 				filePath);
 		}
 
+		public static bool ExportDatabaseToCsv(
+			DataStorage database, string csvPath)
+		{
+			bool returnCode = false;
+
+			// Get all the table names
+			DataTable tableNames = database.SchemaTable;
+
+			if (tableNames != null)
+			{
+				// for each table, select all the data
+				foreach (DataRow table in tableNames.Rows)
+				{
+					try
+					{
+						ExportDataRowToCsv(database, table, csvPath);
+					}
+					catch (Exception exception) when
+						(exception is ArgumentException ||
+						exception is ArgumentNullException ||
+						exception is DirectoryNotFoundException ||
+						exception is IOException ||
+						exception is PathTooLongException ||
+						exception is SecurityException ||
+						exception is UnauthorizedAccessException)
+					{
+						Log.Error(exception.ToString());
+					}
+					catch (Exception exception)
+					{
+						Log.Error(exception.ToString());
+
+						throw;
+					}
+				}
+			}
+
+			returnCode = true;
+
+			return returnCode;
+		}
+
 		/// <summary>
 		/// Export the data table to csv file.
 		/// </summary>
 		/// <param name="table">The table to export.</param>
-		/// <param name="file">The file to export to.</param>
+		/// <param name="csvfile">The file to export to.</param>
 		/// <returns>Indicates whether the action was successful.</returns>
 		public static bool ExportDataTableToCsv(
-			DataTable table, TextWriter file)
+			DataTable table, string csvfile)
 		{
 			bool returnCode = false;
 
@@ -52,8 +94,10 @@ namespace DigitalZenWorks.Database.ToolKit
 				GeneralUtilities.CallingMethod() + ": " + Strings.Begin;
 			Log.Info(message);
 
-			if (table != null && file != null)
+			if (table != null)
 			{
+				using StreamWriter file = new(csvfile, false);
+
 				// First write the headers.
 				int columnCount = table.Columns.Count;
 
@@ -96,92 +140,38 @@ namespace DigitalZenWorks.Database.ToolKit
 		public static bool ExportToCsv(
 			string databaseFile, string csvPath)
 		{
-			const bool returnCode = false;
+			bool returnCode = false;
 
-			DatabaseType databaseType;
-			string connectionString;
-			string extension = Path.GetExtension(databaseFile);
+			DatabaseType databaseType =
+				DataDefinition.GetDatabaseType(databaseFile);
+			string connectionString =
+				DataStorage.GetConnectionString(databaseType, databaseFile);
 
-			if (extension.Equals(".mdb", StringComparison.OrdinalIgnoreCase) ||
-				extension.Equals(".accdb", StringComparison.OrdinalIgnoreCase))
-			{
-				const string provider = "Microsoft.ACE.OLEDB.12.0";
-				connectionString = string.Format(
-					CultureInfo.InvariantCulture,
-					"provider={0}; Data Source={1}",
-					provider,
-					databaseFile);
-
-				databaseType = DatabaseType.OleDb;
-			}
-			else if (extension.Equals(
-					".db", StringComparison.OrdinalIgnoreCase) ||
-				extension.Equals(
-					".sqlite", StringComparison.OrdinalIgnoreCase))
-			{
-				const string connectionBase = "Data Source={0};Version=3;" +
-					"DateTimeFormat=InvariantCulture";
-
-				connectionString = string.Format(
-					CultureInfo.InvariantCulture,
-					connectionBase,
-					databaseFile);
-
-				databaseType = DatabaseType.SQLite;
-			}
-			else
-			{
-				throw new NotImplementedException();
-			}
-
-			// Open the database
 			using DataStorage database = new (databaseType, connectionString);
 
-			// Get all the table names
-			DataTable tableNames = database.SchemaTable;
+			returnCode = ExportDatabaseToCsv(database, csvPath);
 
-			if (tableNames != null)
-			{
-				// for each table, select all the data
-				foreach (DataRow table in tableNames.Rows)
-				{
-					try
-					{
-						var objectName = table["TABLE_NAME"];
-						string tableName = objectName.ToString();
+			database.Shutdown();
 
-						// export the table
-						string sqlQuery = "SELECT * FROM " + tableName;
-						DataTable tableData =
-							database.GetDataTable(sqlQuery);
+			return returnCode;
+		}
 
-						string csvFile = csvPath + tableName + ".csv";
+		private static bool ExportDataRowToCsv(
+			DataStorage database, DataRow row, string csvPath)
+		{
+			bool returnCode = false;
 
-						// Create the CSV file.
-						using StreamWriter file = new(csvFile, false);
-						ExportDataTableToCsv(tableData, file);
-					}
-					catch (Exception exception) when
-						(exception is ArgumentException ||
-						exception is ArgumentNullException ||
-						exception is DirectoryNotFoundException ||
-						exception is IOException ||
-						exception is PathTooLongException ||
-						exception is SecurityException ||
-						exception is UnauthorizedAccessException)
-					{
-						Log.Error(exception.ToString());
-					}
-					catch (Exception exception)
-					{
-						Log.Error(exception.ToString());
+			object objectName = row["TABLE_NAME"];
+			string tableName = objectName.ToString();
 
-						throw;
-					}
-				}
+			// export the table
+			string sqlQuery = "SELECT * FROM " + tableName;
+			DataTable tableData = database.GetDataTable(sqlQuery);
 
-				database.Shutdown();
-			}
+			string csvFile = csvPath + tableName + ".csv";
+
+			ExportDataTableToCsv(tableData, csvFile);
+			returnCode = true;
 
 			return returnCode;
 		}

@@ -52,6 +52,33 @@ namespace DigitalZenWorks.Database.ToolKit
 			return connectionString;
 		}
 
+		/// Method <c>ExportToCsv.</c>
+		/// <summary>
+		/// Export all tables to similarly named csv files.
+		/// </summary>
+		/// <param name="databaseFile">The database file to use.</param>
+		/// <param name="csvPath">The csv file to export to.</param>
+		/// <returns>A values indicating success or not.</returns>
+		public static bool ExportToCsv(
+			string databaseFile, string csvPath)
+		{
+			bool returnCode = false;
+
+			DatabaseType databaseType =
+				DataDefinition.GetDatabaseType(databaseFile);
+			string connectionString =
+				DataStorage.GetConnectionString(databaseType, databaseFile);
+
+			using DataStorageOleDb database = new(connectionString);
+
+			returnCode =
+				DatabaseUtilities.ExportDatabaseToCsv(database, csvPath);
+
+			database.Shutdown();
+
+			return returnCode;
+		}
+
 		/// <summary>
 		/// Validates the Access database file.
 		/// </summary>
