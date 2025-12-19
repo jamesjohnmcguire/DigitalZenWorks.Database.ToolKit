@@ -10,11 +10,7 @@ namespace DigitalZenWorks.Database.ToolKit
 	using System.Collections.Generic;
 	using System.Collections.ObjectModel;
 	using System.Data.Common;
-	using System.Globalization;
 	using System.IO;
-	using System.Linq;
-	using System.Runtime.Versioning;
-	using System.Text;
 	using global::Common.Logging;
 
 	/// Class <c>DataDefinition.</c>
@@ -509,42 +505,10 @@ namespace DigitalZenWorks.Database.ToolKit
 		{
 			bool successCode = false;
 
-			if (!File.Exists(schemaFile))
-			{
-				string message = $"Schema file not found: {schemaFile}";
-				throw new FileNotFoundException(message, schemaFile);
-			}
-			else
-			{
-				try
-				{
-					string fileContents = File.ReadAllText(schemaFile);
+			IReadOnlyList<string> queries =
+				GetQueriesFromSqlFile(schemaFile);
 
-					IReadOnlyList<string> queries =
-						DataStoreStructure.GetSqlQueryStatements(fileContents);
-
-					successCode = ExecuteNonQueries(databaseFile, queries);
-				}
-				catch (Exception exception) when
-					(exception is ArgumentNullException ||
-					exception is ArgumentException ||
-					exception is FileNotFoundException ||
-					exception is DirectoryNotFoundException ||
-					exception is IOException ||
-					exception is OutOfMemoryException ||
-					exception is DbException)
-				{
-					string message = Strings.Exception + exception;
-					Log.Error(message);
-				}
-				catch (Exception exception)
-				{
-					string message = Strings.Exception + exception;
-					Log.Error(message);
-
-					throw;
-				}
-			}
+			successCode = ExecuteNonQueries(databaseFile, queries);
 
 			return successCode;
 		}
@@ -609,6 +573,53 @@ namespace DigitalZenWorks.Database.ToolKit
 				DataStoreStructure.OrderTables(tables);
 
 			return orderedTables;
+		}
+
+		/// <summary>
+		/// Creates a file with the given schema.
+		/// </summary>
+		/// <param name="schemaFile">The schema file.</param>
+		/// <returns>A values indicating success or not.</returns>
+		public static IReadOnlyList<string> GetQueriesFromSqlFile(
+			string schemaFile)
+		{
+			IReadOnlyList<string> queries = null;
+
+			if (!File.Exists(schemaFile))
+			{
+				string message = $"Schema file not found: {schemaFile}";
+				throw new FileNotFoundException(message, schemaFile);
+			}
+			else
+			{
+				try
+				{
+					string fileContents = File.ReadAllText(schemaFile);
+
+					queries =
+						DataStoreStructure.GetSqlQueryStatements(fileContents);
+				}
+				catch (Exception exception) when
+					(exception is ArgumentNullException ||
+					exception is ArgumentException ||
+					exception is FileNotFoundException ||
+					exception is DirectoryNotFoundException ||
+					exception is IOException ||
+					exception is OutOfMemoryException)
+				{
+					string message = Strings.Exception + exception;
+					Log.Error(message);
+				}
+				catch (Exception exception)
+				{
+					string message = Strings.Exception + exception;
+					Log.Error(message);
+
+					throw;
+				}
+			}
+
+			return queries;
 		}
 
 		private static bool CompareColumnType(

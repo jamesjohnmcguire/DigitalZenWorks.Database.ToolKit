@@ -100,52 +100,21 @@ namespace DigitalZenWorks.Database.ToolKit
 		{
 			bool successCode = false;
 
-			if (!File.Exists(schemaFile))
+			bool isValid =
+				OleDbHelper.ValidateAccessDatabaseFile(databaseFile);
+
+			if (isValid == true)
 			{
-				string message = $"Schema file not found: {schemaFile}";
-				throw new FileNotFoundException(message, schemaFile);
-			}
-			else
-			{
-				try
-				{
-					string fileContents = File.ReadAllText(schemaFile);
-					IReadOnlyList<string> queries =
-						DataStoreStructure.GetSqlQueryStatements(fileContents);
+				IReadOnlyList<string> queries =
+				DataDefinition.GetQueriesFromSqlFile(schemaFile);
 
-					bool isValid =
-						OleDbHelper.ValidateAccessDatabaseFile(databaseFile);
+				string connectionString =
+					OleDbHelper.BuildConnectionString(databaseFile);
 
-					if (isValid == true)
-					{
-						string connectionString =
-							OleDbHelper.BuildConnectionString(databaseFile);
+				using DataStorageOleDb database = new(connectionString);
 
-						using DataStorageOleDb database = new(connectionString);
-
-						successCode =
-							DataDefinition.ExecuteNonQueries(database, queries);
-					}
-				}
-				catch (Exception exception) when
-					(exception is ArgumentNullException ||
-					exception is ArgumentException ||
-					exception is FileNotFoundException ||
-					exception is DirectoryNotFoundException ||
-					exception is IOException ||
-					exception is OutOfMemoryException ||
-					exception is System.Data.OleDb.OleDbException)
-				{
-					string message = Strings.Exception + exception;
-					Log.Error(message);
-				}
-				catch (Exception exception)
-				{
-					string message = Strings.Exception + exception;
-					Log.Error(message);
-
-					throw;
-				}
+				successCode =
+					DataDefinition.ExecuteNonQueries(database, queries);
 			}
 
 			return successCode;
