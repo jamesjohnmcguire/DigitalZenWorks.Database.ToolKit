@@ -50,20 +50,7 @@ namespace DigitalZenWorks.Database.ToolKit
 			"please use DataObjectsBase(DatabaseType, string) instead.")]
 		public DataObjectsBase(string dataSource)
 		{
-			if (!File.Exists(dataSource))
-			{
-				dataSource = Environment.GetFolderPath(
-					Environment.SpecialFolder.ApplicationData) +
-					"\\" + dataSource;
-			}
-
-			string connectionString = string.Format(
-				CultureInfo.InvariantCulture,
-				"provider={0}; Data Source={1}",
-				"Microsoft.ACE.OLEDB.12.0",
-				dataSource);
-
-			Database = new DataStorage(DatabaseType.OleDb, connectionString);
+			throw new NotImplementedException();
 		}
 
 		/// <summary>
@@ -176,11 +163,10 @@ namespace DigitalZenWorks.Database.ToolKit
 		public string DatabaseFilePath { get; }
 
 		/// <summary>
-		/// Gets the core database object.
+		/// Gets or sets the core database object.
 		/// </summary>
 		/// <value>Represents the core database object.</value>
-		[CLSCompliantAttribute(false)]
-		public DataStorage Database { get; private set; }
+		public DataStorage Database { get; protected set; }
 
 		/// <summary>
 		/// Gets the database type.
