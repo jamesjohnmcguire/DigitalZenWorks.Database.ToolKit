@@ -8,10 +8,7 @@ namespace DigitalZenWorks.Database.ToolKit
 {
 	using System;
 	using System.Data;
-	using System.Globalization;
 	using System.IO;
-	using System.Reflection;
-	using System.Resources;
 	using System.Security;
 	using DigitalZenWorks.Common.Utilities;
 	using global::Common.Logging;
@@ -45,27 +42,7 @@ namespace DigitalZenWorks.Database.ToolKit
 				// for each table, select all the data
 				foreach (DataRow table in tableNames.Rows)
 				{
-					try
-					{
-						ExportDataRowToCsv(database, table, csvPath);
-					}
-					catch (Exception exception) when
-						(exception is ArgumentException ||
-						exception is ArgumentNullException ||
-						exception is DirectoryNotFoundException ||
-						exception is IOException ||
-						exception is PathTooLongException ||
-						exception is SecurityException ||
-						exception is UnauthorizedAccessException)
-					{
-						Log.Error(exception.ToString());
-					}
-					catch (Exception exception)
-					{
-						Log.Error(exception.ToString());
-
-						throw;
-					}
+					ExportDataRowToCsv(database, table, csvPath);
 				}
 			}
 
@@ -142,7 +119,7 @@ namespace DigitalZenWorks.Database.ToolKit
 			string connectionString =
 				DataStorage.GetConnectionString(databaseType, databaseFile);
 
-			using DataStorage database = new (databaseType, connectionString);
+			using DataStorage database = new(databaseType, connectionString);
 
 			returnCode = ExportDatabaseToCsv(database, csvPath);
 
@@ -156,16 +133,37 @@ namespace DigitalZenWorks.Database.ToolKit
 		{
 			bool returnCode = false;
 
-			object objectName = row["TABLE_NAME"];
-			string tableName = objectName.ToString();
+			try
+			{
+				object objectName = row["TABLE_NAME"];
+				string tableName = objectName.ToString();
 
-			// export the table
-			string sqlQuery = "SELECT * FROM " + tableName;
-			DataTable tableData = database.GetDataTable(sqlQuery);
+				// export the table
+				string sqlQuery = "SELECT * FROM " + tableName;
+				DataTable tableData = database.GetDataTable(sqlQuery);
 
-			string csvFile = csvPath + tableName + ".csv";
+				string csvFile = csvPath + tableName + ".csv";
 
-			ExportDataTableToCsv(tableData, csvFile);
+				ExportDataTableToCsv(tableData, csvFile);
+			}
+			catch (Exception exception) when
+				(exception is ArgumentException ||
+				exception is ArgumentNullException ||
+				exception is DirectoryNotFoundException ||
+				exception is IOException ||
+				exception is PathTooLongException ||
+				exception is SecurityException ||
+				exception is UnauthorizedAccessException)
+			{
+				Log.Error(exception.ToString());
+			}
+			catch (Exception exception)
+			{
+				Log.Error(exception.ToString());
+
+				throw;
+			}
+
 			returnCode = true;
 
 			return returnCode;
