@@ -9,13 +9,8 @@ namespace DigitalZenWorks.Database.ToolKit
 	using System;
 	using System.Collections.Generic;
 	using System.Collections.ObjectModel;
-	using System.Data;
-	using System.Globalization;
+	using System.Data.Common;
 	using System.IO;
-	using System.Linq;
-	using System.Reflection;
-	using System.Resources;
-	using System.Runtime.Versioning;
 	using global::Common.Logging;
 
 	/// Class <c>DataDefinition.</c>
@@ -30,9 +25,52 @@ namespace DigitalZenWorks.Database.ToolKit
 		private static readonly ILog Log = LogManager.GetLogger(
 			System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-		private static readonly ResourceManager StringTable = new(
-			"DigitalZenWorks.Database.ToolKit.Resources",
-			Assembly.GetExecutingAssembly());
+		/// <summary>
+		/// Execute a set of non-query commands.
+		/// </summary>
+		/// <param name="database">The database object.</param>
+		/// <param name="queries">The list of queries.</param>
+		/// <returns>A value indicating success or not.</returns>
+		public static bool ExecuteNonQueries(
+			DataStorage database, IReadOnlyList<string> queries)
+		{
+			bool result = false;
+
+			ArgumentNullException.ThrowIfNull(database);
+
+			if (queries != null)
+			{
+				foreach (string sqlQuery in queries)
+				{
+					try
+					{
+						string message = Strings.Command + sqlQuery;
+						Log.Info(message);
+
+						database.ExecuteNonQuery(sqlQuery);
+					}
+					catch (Exception exception) when
+						(exception is ArgumentNullException ||
+						exception is OutOfMemoryException ||
+						exception is DbException)
+					{
+						string message = Strings.Exception + exception;
+						Log.Error(message);
+					}
+					catch (Exception exception)
+					{
+						string message = Strings.Exception + exception;
+						Log.Error(message);
+
+						throw;
+					}
+				}
+
+				result = true;
+			}
+
+			return result;
+		}
 
 		/// Method <c>ExportSchema.</c>
 		/// <summary>
@@ -41,9 +79,6 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// <returns>A values indicating success or not.</returns>
 		/// <param name="databaseFile">The database file to use.</param>
 		/// <param name="schemaFile">The schema file to export to.</param>
-#if NET5_0_OR_GREATER
-		[SupportedOSPlatform("windows")]
-#endif
 		public static bool ExportSchema(
 			string databaseFile, string schemaFile)
 		{
@@ -52,23 +87,10 @@ namespace DigitalZenWorks.Database.ToolKit
 			try
 			{
 				Collection<Table> tables = GetSchema(databaseFile);
+				tables = OrderTables(tables);
 
-				string schemaText = string.Empty;
-
-				Collection<string> list = OrderTable(tables);
-
-				foreach (string tableName in list)
-				{
-					foreach (Table table in tables)
-					{
-						if (table.Name == tableName)
-						{
-							schemaText += WriteSql(table) +
-								Environment.NewLine;
-							break;
-						}
-					}
-				}
+				SqlWriter sqlWriter = new ();
+				string schemaText = sqlWriter.GetTablesCreateStatements(tables);
 
 				File.WriteAllText(schemaFile, schemaText);
 
@@ -79,13 +101,14 @@ namespace DigitalZenWorks.Database.ToolKit
 				exception is ArgumentException ||
 				exception is InvalidOperationException)
 			{
-				Log.Error(CultureInfo.InvariantCulture, m => m(
-					StringTable.GetString(
-						"EXCEPTION", CultureInfo.InvariantCulture) +
-						exception));
+				string message = Strings.Exception + exception;
+				Log.Error(message);
 			}
-			catch
+			catch (Exception exception)
 			{
+				string message = Strings.Exception + exception;
+				Log.Error(message);
+
 				throw;
 			}
 
@@ -104,9 +127,9 @@ namespace DigitalZenWorks.Database.ToolKit
 			if (!string.IsNullOrWhiteSpace(dataDefinition))
 			{
 #if NETCOREAPP1_0_OR_GREATER
-				char check = '(';
+				const char check = '(';
 #else
-				string check = "(";
+				const string check = "(";
 #endif
 
 				int splitIndex = dataDefinition.IndexOf(
@@ -197,13 +220,160 @@ namespace DigitalZenWorks.Database.ToolKit
 
 			if (columnType == ColumnType.Other)
 			{
-				Log.Warn(CultureInfo.InvariantCulture, m => m(
-					StringTable.GetString(
-						"WARNING_OTHER", CultureInfo.InvariantCulture) +
-						column));
+				string message = Strings.WarningOther + column;
+				Log.Warn(message);
 			}
 
 			return columnType;
+		}
+
+		/// <summary>
+		/// Get database file header bytes.
+		/// </summary>
+		/// <param name="databaseFile">The database file.</param>
+		/// <returns>The database header bytes.</returns>
+		public static byte[] GetDatabaseFileHeaderBytes(string databaseFile)
+		{
+			byte[] header = null;
+
+			try
+			{
+				using FileStream stream = new(
+					databaseFile,
+					FileMode.Open,
+					FileAccess.Read,
+					FileShare.ReadWrite);
+
+				// Read enough bytes to check all signatures
+				header = new byte[32];
+				int bytesRead = stream.Read(header, 0, header.Length);
+			}
+			catch (Exception exception) when
+				(exception is ArgumentNullException)
+			{
+				Log.Error(Strings.Exception + exception);
+			}
+
+			return header;
+		}
+
+		/// <summary>
+		/// Get database type.
+		/// </summary>
+		/// <param name="databaseFile">The database file.</param>
+		/// <returns>The database type.</returns>
+		public static DatabaseType GetDatabaseType(string databaseFile)
+		{
+			DatabaseType databaseType = DatabaseType.Unknown;
+
+			bool exists = File.Exists(databaseFile);
+
+			if (exists == true)
+			{
+				byte[] header = GetDatabaseFileHeaderBytes(databaseFile);
+				databaseType = GetDatabaseTypeByFileHeaderBytes(header);
+
+				// Fallback to extension-based detection
+				if (databaseType == DatabaseType.Unknown)
+				{
+					databaseType = GetDatabaseTypeByExtension(databaseFile);
+				}
+			}
+
+			return databaseType;
+		}
+
+		/// <summary>
+		/// Get database type by file extension.
+		/// </summary>
+		/// <param name="databaseFile">The database file.</param>
+		/// <returns>The database type.</returns>
+		public static DatabaseType GetDatabaseTypeByExtension(
+			string databaseFile)
+		{
+			string extension = Path.GetExtension(databaseFile);
+#pragma warning disable CA1308
+			extension = extension.ToLowerInvariant();
+#pragma warning restore CA1308
+
+			DatabaseType databaseType = extension switch
+			{
+				".db" or ".sqlite" or ".sqlite3" or ".db3" or ".sdb" =>
+					DatabaseType.SQLite,
+				".mdb" or ".accdb" => DatabaseType.OleDb,
+				".mdf" => DatabaseType.SqlServer,
+				_ => DatabaseType.Unknown
+			};
+
+			return databaseType;
+		}
+
+		/// <summary>
+		/// Get database type by file header bytes.
+		/// </summary>
+		/// <param name="header">The header bytes.</param>
+		/// <returns>The database type.</returns>
+		public static DatabaseType GetDatabaseTypeByFileHeaderBytes(
+			byte[] header)
+		{
+			DatabaseType databaseType = DatabaseType.Unknown;
+
+			if (header == null || header.Length < 4)
+			{
+				databaseType = DatabaseType.Unknown;
+			}
+			else if (header.Length >= 16 &&
+				header[0] == 0x53 && header[1] == 0x51 &&
+				header[2] == 0x4C && header[3] == 0x69 &&
+				header[4] == 0x74 && header[5] == 0x65 &&
+				header[6] == 0x20 && header[7] == 0x66 &&
+				header[8] == 0x6F && header[9] == 0x72 &&
+				header[10] == 0x6D && header[11] == 0x61 &&
+				header[12] == 0x74 && header[13] == 0x20 &&
+				header[14] == 0x33)
+			{
+				// SQLite: "SQLite format 3\0" (starts at byte 0)
+				databaseType = DatabaseType.SQLite;
+			}
+			else if (header.Length >= 20 &&
+				header[0] == 0x00 && header[1] == 0x01 &&
+				header[2] == 0x00 && header[3] == 0x00 &&
+				header[4] == 0x53 && header[5] == 0x74 &&
+				header[6] == 0x61 && header[7] == 0x6E &&
+				header[8] == 0x64 && header[9] == 0x61 &&
+				header[10] == 0x72 && header[11] == 0x64 &&
+				header[12] == 0x20 && header[13] == 0x41 &&
+				header[14] == 0x43 && header[15] == 0x45)
+			{
+				// MS Access 2007+ (.accdb): 0x00, 0x01, 0x00, 0x00,
+				// "Standard ACE DB"
+				databaseType = DatabaseType.OleDb;
+			}
+			else if (header.Length >= 20 &&
+				header[0] == 0x00 && header[1] == 0x01 &&
+				header[2] == 0x00 && header[3] == 0x00 &&
+				header[4] == 0x53 && header[5] == 0x74 &&
+				header[6] == 0x61 && header[7] == 0x6E &&
+				header[8] == 0x64 && header[9] == 0x61 &&
+				header[10] == 0x72 && header[11] == 0x64 &&
+				header[12] == 0x20 && header[13] == 0x4A &&
+				header[14] == 0x65 && header[15] == 0x74)
+			{
+				// MS Access 97-2003 (.mdb): 0x00, 0x01, 0x00, 0x00,
+				// "Standard Jet DB"
+				databaseType = DatabaseType.OleDb;
+			}
+			else if (header[0] == 0x01 && header[1] == 0x0F &&
+				header[2] == 0x00 && header[3] == 0x00)
+			{
+				// SQL Server .mdf: 0x01, 0x0F, 0x00, 0x00
+				// (page header signature)
+				databaseType = DatabaseType.SqlServer;
+			}
+
+			// Firebird/Interbase: Check for specific page size markers
+			// This is trickier and might need extension fallback
+			return databaseType;
 		}
 
 		/// <summary>
@@ -214,23 +384,8 @@ namespace DigitalZenWorks.Database.ToolKit
 		public static ForeignKey[] GetForeignKeyRelationships(
 			Relationship[] relationships)
 		{
-			ForeignKey[] keys = null;
-
-			if (relationships != null)
-			{
-				int count = 0;
-				keys = new ForeignKey[relationships.Length];
-
-				// Add foreign keys to table, using relationships
-				foreach (Relationship relationship in relationships)
-				{
-					ForeignKey foreignKey =
-						GetForeignKeyRelationship(relationship);
-
-					keys[count] = foreignKey;
-					count++;
-				}
-			}
+			ForeignKey[] keys =
+				DataStoreStructure.GetForeignKeyRelationships(relationships);
 
 			return keys;
 		}
@@ -273,81 +428,21 @@ namespace DigitalZenWorks.Database.ToolKit
 		}
 
 		/// <summary>
-		/// Gets a list of relationships.
+		/// Retrieves the schema information for all tables in the specified
+		/// database file.
 		/// </summary>
-		/// <param name="oleDbSchema">The OLE database schema.</param>
-		/// <param name="tableName">The table name.</param>
-		/// <returns>A list of relationships.</returns>
-#if NET5_0_OR_GREATER
-		[SupportedOSPlatform("windows")]
-#endif
-		public static Collection<Relationship> GetRelationships(
-			OleDbSchema oleDbSchema, string tableName)
-		{
-			Collection<Relationship> relationships = [];
-
-			if (oleDbSchema != null)
-			{
-				DataTable foreignKeyTable =
-					oleDbSchema.GetForeignKeys(tableName);
-
-				foreach (DataRow foreignKey in foreignKeyTable.Rows)
-				{
-					Relationship relationship =
-						GetRelationship(foreignKey);
-
-					relationships.Add(relationship);
-				}
-			}
-
-			return relationships;
-		}
-
-		/// <summary>
-		/// Get schema.
-		/// </summary>
-		/// <param name="databaseFile">The database file.</param>
-		/// <returns>The schema of the dabase file.</returns>
-#if NET5_0_OR_GREATER
-		[SupportedOSPlatform("windows")]
-#endif
+		/// <param name="databaseFile">The path to the database file from
+		/// which to retrieve schema information. Must refer to a valid and
+		/// accessible database file.</param>
+		/// <returns>A collection of <see cref="Table"/> objects representing
+		/// the tables defined in the database. The collection will be empty
+		/// if no tables are found.</returns>
 		public static Collection<Table> GetSchema(string databaseFile)
 		{
-			Dictionary<string, Table> tableDictionary = [];
-			List<Relationship> relationships = [];
+			DatabaseType databaseType = GetDatabaseType(databaseFile);
 
-			using OleDbSchema oleDbSchema = new(databaseFile);
-			DataTable tableNames = oleDbSchema.TableNames;
-
-			foreach (DataRow row in tableNames.Rows)
-			{
-				object nameRaw = row["TABLE_NAME"];
-				string tableName = nameRaw.ToString();
-
-				Table table = SetPrimaryKey(oleDbSchema, row);
-
-				Collection<Relationship> newRelationships =
-					GetRelationships(oleDbSchema, tableName);
-				relationships = [.. relationships, .. newRelationships];
-
-				tableDictionary.Add(tableName, table);
-			}
-
-			// Add foreign keys to table, using relationships
-			foreach (Relationship relationship in relationships)
-			{
-				string name = relationship.ChildTable;
-
-				ForeignKey foreignKey =
-					GetForeignKeyRelationship(relationship);
-
-				Table table = tableDictionary[name];
-
-				table.ForeignKeys.Add(foreignKey);
-			}
-
-			List<Table> newList = [.. tableDictionary.Values];
-			Collection<Table> tables = new(newList);
+			using DataStoreStructure schema = new (databaseType, databaseFile);
+			Collection<Table> tables = schema.GetSchema();
 
 			return tables;
 		}
@@ -385,7 +480,7 @@ namespace DigitalZenWorks.Database.ToolKit
 
 			if (!string.IsNullOrWhiteSpace(dataDefinition))
 			{
-				char separators = '(';
+				const char separators = '(';
 				string[] tableParts = dataDefinition.Split(separators);
 
 				string[] tableNameParts = tableParts[0].Split(['[', ']', '`']);
@@ -409,62 +504,10 @@ namespace DigitalZenWorks.Database.ToolKit
 		{
 			bool successCode = false;
 
-			try
-			{
-				if (File.Exists(schemaFile))
-				{
-					string fileContents = File.ReadAllText(schemaFile);
+			IReadOnlyList<string> queries =
+				GetQueriesFromSqlFile(schemaFile);
 
-					string[] stringSeparators = ["\r\n\r\n"];
-					string[] queries = fileContents.Split(
-						stringSeparators,
-						32000,
-						StringSplitOptions.RemoveEmptyEntries);
-
-					string extension = Path.GetExtension(databaseFile);
-
-					if (extension.Equals(
-							".mdb", StringComparison.OrdinalIgnoreCase) ||
-						extension.Equals(
-							".accdb", StringComparison.OrdinalIgnoreCase))
-					{
-						string provider = "Microsoft.ACE.OLEDB.12.0";
-						string connectionString = string.Format(
-							CultureInfo.InvariantCulture,
-							"provider={0}; Data Source={1}",
-							provider,
-							databaseFile);
-						successCode = ImportSchemaMdb(queries, databaseFile);
-					}
-					else
-					{
-						throw new NotImplementedException();
-					}
-				}
-			}
-			catch (Exception exception) when
-				(exception is ArgumentNullException ||
-				exception is ArgumentException ||
-				exception is FileNotFoundException ||
-				exception is DirectoryNotFoundException ||
-				exception is IOException ||
-				exception is OutOfMemoryException ||
-				exception is System.Data.OleDb.OleDbException)
-			{
-				Log.Error(CultureInfo.InvariantCulture, m => m(
-					StringTable.GetString(
-						"EXCEPTION",
-						CultureInfo.InvariantCulture) + exception));
-			}
-			catch (Exception exception)
-			{
-				Log.Error(CultureInfo.InvariantCulture, m => m(
-					StringTable.GetString(
-						"EXCEPTION",
-						CultureInfo.InvariantCulture) + exception));
-
-				throw;
-			}
+			successCode = ExecuteNonQueries(databaseFile, queries);
 
 			return successCode;
 		}
@@ -497,35 +540,85 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// Order table.
 		/// </summary>
 		/// <param name="tables">The list of tables to order.</param>
-		/// <returns>The ordered list of of tables.</returns>
+		/// <returns>The ordered list of tables.</returns>
 		/// <remarks>This orders the list taking dependencies into
 		/// account.</remarks>
 		public static Collection<string> OrderTable(
 			Collection<Table> tables)
 		{
-			Collection<string> orderedTables = [];
+			Collection<string> orderedTableNames = [];
 
-			if (tables != null)
+			Collection<Table> orderedTables = OrderTables(tables);
+
+			foreach (Table table in orderedTables)
 			{
-				Dictionary<string, Collection<string>> tableDependencies = [];
-
-				foreach (Table table in tables)
-				{
-					Collection<string> dependencies = [];
-					string name = table.Name;
-
-					foreach (ForeignKey foreignKeys in table.ForeignKeys)
-					{
-						dependencies.Add(foreignKeys.ParentTable);
-					}
-
-					tableDependencies.Add(name, dependencies);
-				}
-
-				orderedTables = GetOrderedDependencies(tableDependencies);
+				orderedTableNames.Add(table.Name);
 			}
 
+			return orderedTableNames;
+		}
+
+		/// <summary>
+		/// Order tables.
+		/// </summary>
+		/// <param name="tables">The list of tables to order.</param>
+		/// <returns>The ordered list of tables.</returns>
+		/// <remarks>This orders the list taking dependencies into
+		/// account.</remarks>
+		public static Collection<Table> OrderTables(
+			Collection<Table> tables)
+		{
+			Collection<Table> orderedTables =
+				DataStoreStructure.OrderTables(tables);
+
 			return orderedTables;
+		}
+
+		/// <summary>
+		/// Creates a file with the given schema.
+		/// </summary>
+		/// <param name="schemaFile">The schema file.</param>
+		/// <returns>A values indicating success or not.</returns>
+		public static IReadOnlyList<string> GetQueriesFromSqlFile(
+			string schemaFile)
+		{
+			IReadOnlyList<string> queries = null;
+
+			if (!File.Exists(schemaFile))
+			{
+				string message = $"Schema file not found: {schemaFile}";
+				throw new FileNotFoundException(message, schemaFile);
+			}
+			else
+			{
+				try
+				{
+					string fileContents = File.ReadAllText(schemaFile);
+
+					queries =
+						DataStoreStructure.GetSqlQueryStatements(fileContents);
+				}
+				catch (Exception exception) when
+					(exception is ArgumentNullException ||
+					exception is ArgumentException ||
+					exception is FileNotFoundException ||
+					exception is DirectoryNotFoundException ||
+					exception is IOException ||
+					exception is OutOfMemoryException)
+				{
+					string message = Strings.Exception + exception;
+					Log.Error(message);
+				}
+				catch (Exception exception)
+				{
+					string message = Strings.Exception + exception;
+					Log.Error(message);
+
+					throw;
+				}
+			}
+
+			return queries;
 		}
 
 		private static bool CompareColumnType(
@@ -554,121 +647,25 @@ namespace DigitalZenWorks.Database.ToolKit
 			return found;
 		}
 
-		private static void ExecuteQueries(
-			DataStorage database, string[] queries)
+		private static bool ExecuteNonQueries(
+			string databaseFile, IReadOnlyList<string> queries)
 		{
-			foreach (string sqlQuery in queries)
+			bool result = false;
+
+			if (queries != null)
 			{
-				try
-				{
-					string command = StringTable.GetString(
-						"COMMAND", CultureInfo.InvariantCulture);
-					string message = command + sqlQuery;
-					Log.Info(message);
+				DatabaseType databaseType = GetDatabaseType(databaseFile);
 
-					database.ExecuteNonQuery(sqlQuery);
-				}
-				catch (Exception exception) when
-					(exception is ArgumentNullException ||
-					exception is OutOfMemoryException ||
-					exception is System.Data.OleDb.OleDbException)
-				{
-					string command = StringTable.GetString(
-						"EXCEPTION", CultureInfo.InvariantCulture);
-					string message = command + exception;
+				string connectionString = DataStorage.GetConnectionString(
+					databaseType, databaseFile);
 
-					Log.Error(message);
-				}
-				catch (Exception exception)
-				{
-					string command = StringTable.GetString(
-						"EXCEPTION", CultureInfo.InvariantCulture);
-					string message = command + exception;
+				using DataStorage database =
+					new(databaseType, connectionString);
 
-					Log.Error(message);
-
-					throw;
-				}
-			}
-		}
-
-		private static Column FormatColumnFromDataRow(DataRow row)
-		{
-			Column column = new();
-			column.Name = row["COLUMN_NAME"].ToString();
-
-			switch ((int)row["DATA_TYPE"])
-			{
-				case 3: // Number
-				{
-					column.ColumnType = ColumnType.Number;
-					break;
-				}
-
-				case 130: // String
-				{
-					string flags = row["COLUMN_FLAGS"].ToString();
-
-					if (int.Parse(flags, CultureInfo.InvariantCulture) > 127)
-					{
-						column.ColumnType = ColumnType.Memo;
-					}
-					else
-					{
-						column.ColumnType = ColumnType.String;
-					}
-
-					break;
-				}
-
-				case 7: // Date
-				{
-					column.ColumnType = ColumnType.DateTime;
-					break;
-				}
-
-				case 6: // Currency
-				{
-					column.ColumnType = ColumnType.Currency;
-					break;
-				}
-
-				case 11: // Yes/No
-				{
-					column.ColumnType = ColumnType.YesNo;
-					break;
-				}
-
-				case 128: // OLE
-				{
-					column.ColumnType = ColumnType.Ole;
-					break;
-				}
+				result = ExecuteNonQueries(database, queries);
 			}
 
-			if (!row.IsNull("CHARACTER_MAXIMUM_LENGTH"))
-			{
-				string maxLength = row["CHARACTER_MAXIMUM_LENGTH"].ToString();
-
-				column.Length =
-					int.Parse(maxLength, CultureInfo.InvariantCulture);
-			}
-
-			if (row["IS_NULLABLE"].ToString() == "True")
-			{
-				column.Nullable = true;
-			}
-
-			if (row["COLUMN_HASDEFAULT"].ToString() == "True")
-			{
-				column.DefaultValue = row["COLUMN_DEFAULT"].ToString();
-			}
-
-			string position = row["ORDINAL_POSITION"].ToString();
-			column.Position =
-				int.Parse(position, CultureInfo.InvariantCulture);
-
-			return column;
+			return result;
 		}
 
 		private static void GetDependenciesRecursive(
@@ -700,347 +697,6 @@ namespace DigitalZenWorks.Database.ToolKit
 				visited.Add(key);     // Mark as processed
 				orderedDependencies.Add(key); // Add to result (postorder)
 			}
-		}
-
-		private static void GetDependenciesRecursive(
-			string key,
-			Dictionary<string, List<string>> tableDependencies,
-			List<string> orderedDependencies,
-			HashSet<string> visited,
-			HashSet<string> visiting)
-		{
-			if (!visited.Contains(key) && !visiting.Contains(key))
-			{
-				visiting.Add(key);
-
-				if (tableDependencies.TryGetValue(
-					key, out List<string> value))
-				{
-					foreach (string dependency in value)
-					{
-						GetDependenciesRecursive(
-							dependency,
-							tableDependencies,
-							orderedDependencies,
-							visited,
-							visiting);
-					}
-				}
-
-				visiting.Remove(key); // Done visiting
-				visited.Add(key);     // Mark as processed
-				orderedDependencies.Add(key); // Add to result (postorder)
-			}
-		}
-
-		private static ForeignKey GetForeignKeyRelationship(
-			Relationship relationship)
-		{
-			ForeignKey foreignKey = new(
-				relationship.Name,
-				relationship.ChildTableCol,
-				relationship.ParentTable,
-				relationship.ParentTableCol,
-				relationship.OnDeleteCascade,
-				relationship.OnUpdateCascade);
-
-			return foreignKey;
-		}
-
-		private static Relationship GetRelationship(DataRow foreignKey)
-		{
-			Relationship relationship = new();
-			relationship.Name = foreignKey["FK_NAME"].ToString();
-			relationship.ParentTable =
-				foreignKey["PK_TABLE_NAME"].ToString();
-			relationship.ParentTableCol =
-				foreignKey["PK_COLUMN_NAME"].ToString();
-			relationship.ChildTable =
-				foreignKey["FK_TABLE_NAME"].ToString();
-			relationship.ChildTableCol =
-				foreignKey["FK_COLUMN_NAME"].ToString();
-
-			if (foreignKey["UPDATE_RULE"].ToString() != "NO ACTION")
-			{
-				relationship.OnUpdateCascade = true;
-			}
-
-			if (foreignKey["DELETE_RULE"].ToString() != "NO ACTION")
-			{
-				relationship.OnDeleteCascade = true;
-			}
-
-			return relationship;
-		}
-
-#if NET5_0_OR_GREATER
-		[SupportedOSPlatform("windows")]
-#endif
-		private static Table GetTable(
-			OleDbSchema oleDbSchema, string tableName)
-		{
-			Table table = new(tableName);
-
-			Log.Info("Getting Columns for " + tableName);
-			DataTable dataColumns =
-				oleDbSchema.GetTableColumns(tableName);
-
-			foreach (DataRow dataColumn in dataColumns.Rows)
-			{
-				Column column = FormatColumnFromDataRow(dataColumn);
-
-				table.AddColumn(column);
-			}
-
-			return table;
-		}
-
-		private static bool ImportSchemaMdb(
-			string[] queries, string databaseFile)
-		{
-			bool successCode = false;
-
-			string provider = "Microsoft.ACE.OLEDB.12.0";
-			string connectionString = string.Format(
-				CultureInfo.InvariantCulture,
-				"provider={0}; Data Source={1}",
-				provider,
-				databaseFile);
-
-			using (DataStorage database =
-				new(DatabaseType.OleDb, connectionString))
-			{
-				ExecuteQueries(database, queries);
-				successCode = true;
-			}
-
-			return successCode;
-		}
-
-#if NET5_0_OR_GREATER
-		[SupportedOSPlatform("windows")]
-#endif
-		private static Table SetPrimaryKey(
-			OleDbSchema oleDbSchema, DataRow row)
-		{
-			object nameRaw = row["TABLE_NAME"];
-			string tableName = nameRaw.ToString();
-
-			Table table = GetTable(oleDbSchema, tableName);
-
-			DataTable primaryKeys =
-				oleDbSchema.GetPrimaryKeys(tableName);
-
-			// TODO: This assumes only a single primary key.  Need to
-			// compensate for composite primary keys.
-			DataRow primaryKeyRow = primaryKeys.Rows[0];
-			nameRaw = primaryKeyRow["COLUMN_NAME"];
-			table.PrimaryKey = nameRaw.ToString();
-
-			// If PK is an integer change type to AutoNumber
-			Column primaryKey = SetPrimaryKeyType(table);
-
-			if (primaryKey != null)
-			{
-				table.Columns[table.PrimaryKey] = primaryKey;
-			}
-
-			return table;
-		}
-
-		// If primary key is an integer, change type to AutoNumber.
-		private static Column SetPrimaryKeyType(Table table)
-		{
-			Column primaryKey = null;
-
-			string primaryKeyName = table.PrimaryKey;
-			if (!string.IsNullOrWhiteSpace(primaryKeyName))
-			{
-				primaryKey = table.Columns[primaryKeyName];
-
-				if (primaryKey.ColumnType == ColumnType.Number)
-				{
-					primaryKey.ColumnType = ColumnType.AutoNumber;
-				}
-			}
-
-			return primaryKey;
-		}
-
-#if NET5_0_OR_GREATER
-		[SupportedOSPlatform("windows")]
-#endif
-		private static Table SetForeignKeys(
-			Table table, List<Relationship> relationships)
-		{
-			table.ForeignKeys.Clear();
-
-			foreach (Relationship relationship in relationships)
-			{
-				ForeignKey foreignKey =
-					GetForeignKeyRelationship(relationship);
-
-				table.ForeignKeys.Add(foreignKey);
-			}
-
-			return table;
-		}
-
-		// Write the SQL for a column
-		private static string WriteColumnSql(Column column)
-		{
-			string sql = string.Empty;
-
-			sql += "`" + column.Name + "`";
-
-			switch (column.ColumnType)
-			{
-				case ColumnType.Number:
-				case ColumnType.AutoNumber:
-					sql += " INTEGER";
-					break;
-				case ColumnType.String:
-					sql += string.Format(
-						CultureInfo.InvariantCulture,
-						" VARCHAR({0})",
-						column.Length);
-					break;
-				case ColumnType.Memo:
-					sql += " MEMO";
-					break;
-				case ColumnType.DateTime:
-					sql += " DATETIME";
-					break;
-				case ColumnType.Currency:
-					sql += " CURRENCY";
-					break;
-				case ColumnType.Ole:
-					sql += " OLEOBJECT";
-					break;
-				case ColumnType.YesNo:
-					sql += " OLEOBJECT";
-					break;
-			}
-
-			if (column.Unique)
-			{
-				sql += " UNIQUE";
-			}
-
-			if (!column.Nullable)
-			{
-				sql += " NOT NULL";
-			}
-
-			if (column.ColumnType == ColumnType.AutoNumber)
-			{
-				sql += " IDENTITY";
-			}
-
-			if (!string.IsNullOrWhiteSpace(column.DefaultValue))
-			{
-				sql += " DEFAULT " + column.DefaultValue;
-			}
-
-			return sql;
-		}
-
-		// Write the SQL for a Foreign Key constraint
-		private static string WriteForeignKeySql(ForeignKey foreignKey)
-		{
-			string sql;
-
-			if (foreignKey.ColumnName == foreignKey.ParentTableColumn)
-			{
-				sql = string.Format(
-					CultureInfo.InvariantCulture,
-					"CONSTRAINT `{0}` FOREIGN KEY (`{1}`) REFERENCES `{2}`",
-					foreignKey.Name,
-					foreignKey.ColumnName,
-					foreignKey.ParentTable);
-			}
-			else
-			{
-				string constraint = "CONSTRAINT";
-				string key = "FOREIGN KEY";
-				string references = "REFERENCES";
-				string statement = "{0} `{1}` {2} (`{3}`) {4} `{5}` (`{6}`)";
-
-				sql = string.Format(
-					CultureInfo.InvariantCulture,
-					statement,
-					constraint,
-					foreignKey.Name,
-					key,
-					foreignKey.ColumnName,
-					references,
-					foreignKey.ParentTable,
-					foreignKey.ParentTableColumn);
-			}
-
-			if (foreignKey.CascadeOnDelete)
-			{
-				sql += " ON DELETE CASCADE";
-			}
-
-			if (foreignKey.CascadeOnUpdate)
-			{
-				sql += " ON UPDATE CASCADE";
-			}
-
-			return sql;
-		}
-
-		// Take a Table structure and output the SQL commands
-		private static string WriteSql(Table table)
-		{
-			string sql = string.Empty;
-
-			sql += string.Format(
-				CultureInfo.InvariantCulture,
-				"CREATE TABLE `{0}` ({1}",
-				table.Name,
-				Environment.NewLine);
-
-			// Sort Columns into ordinal positions
-			SortedList<int, Column> columns = [];
-
-			foreach (KeyValuePair<string, Column> entry in table.Columns)
-			{
-				Column column = entry.Value;
-				columns.Add(column.Position, column);
-			}
-
-			foreach (KeyValuePair<int, Column> entry in columns)
-			{
-				sql += "\t" + WriteColumnSql((Column)entry.Value) + "," +
-					Environment.NewLine;
-			}
-
-			if (!string.IsNullOrWhiteSpace(table.PrimaryKey))
-			{
-				sql += string.Format(
-					CultureInfo.InvariantCulture,
-					"\tCONSTRAINT PrimaryKey PRIMARY KEY (`{0}`),{1}",
-					table.PrimaryKey,
-					Environment.NewLine);
-			}
-
-			foreach (ForeignKey foreignKey in table.ForeignKeys)
-			{
-				sql += "\t" + WriteForeignKeySql(foreignKey) + "," +
-					Environment.NewLine;
-			}
-
-			// Remove trailing ','
-			sql = sql[..^3];
-
-			sql += string.Format(
-				CultureInfo.InvariantCulture,
-				"{0});{0}",
-				Environment.NewLine);
-
-			return sql;
 		}
 	}
 }

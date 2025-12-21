@@ -158,11 +158,8 @@ namespace DigitalZenWorks.Database.ToolKit
 		{
 			if (disposing)
 			{
-				if (connection != null)
-				{
-					connection.Dispose();
-					connection = null;
-				}
+				connection?.Dispose();
+				connection = null;
 			}
 		}
 

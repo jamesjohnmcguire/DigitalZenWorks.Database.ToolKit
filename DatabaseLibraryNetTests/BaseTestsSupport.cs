@@ -61,7 +61,10 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 				database.Shutdown();
 			}
 
-			File.Delete(dataSource);
+			if (dataSource != null)
+			{
+				File.Delete(dataSource);
+			}
 		}
 
 		/// <summary>
@@ -74,22 +77,12 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 		}
 
 		/// <summary>
-		/// Dispose method.
+		/// Get embedded resource file.
 		/// </summary>
-		/// <param name="disposing">True to release both managed and unmanaged
-		/// resources; false to release only unmanaged resources.</param>
-		protected virtual void Dispose(bool disposing)
-		{
-			if (disposing == true && disposed == false)
-			{
-				database?.Close();
-				database = null;
-			}
-
-			disposed = true;
-		}
-
-		private static string GetEmbeddedResourceFile(
+		/// <param name="resource">The resource.</param>
+		/// <param name="extension">The file extension.</param>
+		/// <returns>The file path to the resource.</returns>
+		protected static string GetEmbeddedResourceFile(
 			string resource, string extension)
 		{
 			string fileName = Path.GetTempFileName();
@@ -109,7 +102,11 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 			return filePath;
 		}
 
-		private static string GetTestDatabasePath()
+		/// <summary>
+		/// Gets a temporary file path for a test database.
+		/// </summary>
+		/// <returns>The file path to the test database.</returns>
+		protected static string GetTestDatabasePath()
 		{
 			string fileName = Path.GetTempFileName();
 
@@ -120,9 +117,36 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 			return databasePath;
 		}
 
-		private static string GetTestSqlFile()
+		/// <summary>
+		/// Dispose method.
+		/// </summary>
+		/// <param name="disposing">True to release both managed and unmanaged
+		/// resources; false to release only unmanaged resources.</param>
+		protected virtual void Dispose(bool disposing)
 		{
-			string resource = "DigitalZenWorks.Database.ToolKit.Tests." +
+			if (disposing == true && disposed == false)
+			{
+				database?.Close();
+				database = null;
+			}
+
+			disposed = true;
+		}
+
+		/// <summary>
+		/// Retrieves the file path to the embedded SQL test file used for unit
+		/// testing.
+		/// </summary>
+		/// <remarks>This method is intended for use in test scenarios where
+		/// access to the embedded SQL script is required. The returned file
+		/// path can be used to read or execute the test SQL statements.
+		/// </remarks>
+		/// <returns>A string containing the file path to the embedded SQL test
+		/// file. The path will be valid if the resource exists; otherwise, it
+		/// may be empty or invalid.</returns>
+		protected virtual string GetTestSqlFile()
+		{
+			const string resource = "DigitalZenWorks.Database.ToolKit.Tests." +
 				"Products.Sqlite.Test.sql";
 
 			string filePath = GetEmbeddedResourceFile(resource, "sql");
@@ -130,13 +154,16 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 			return filePath;
 		}
 
-		private void GetDatabase()
+		/// <summary>
+		/// Gets the database.
+		/// </summary>
+		protected virtual void GetDatabase()
 		{
 			dataSource = GetTestDatabasePath();
 
 			SQLiteConnection.CreateFile(dataSource);
 
-			string connectionBase = "Data Source={0};Version=3;" +
+			const string connectionBase = "Data Source={0};Version=3;" +
 				"DateTimeFormat=InvariantCulture";
 
 			string connectionString = string.Format(
@@ -145,9 +172,13 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 				dataSource);
 
 			database = new DataStorage(DatabaseType.SQLite, connectionString);
+			Assert.That(database, Is.Not.Null);
 		}
 
-		private void SetupSchema()
+		/// <summary>
+		/// Setup the database schema.
+		/// </summary>
+		protected virtual void SetupSchema()
 		{
 			string sqlFile = GetTestSqlFile();
 			string sql = File.ReadAllText(sqlFile);

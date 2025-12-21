@@ -10,6 +10,7 @@ namespace DigitalZenWorks.Database.ToolKit
 {
 	using System;
 	using System.Collections.Generic;
+	using System.Collections.ObjectModel;
 	using System.Globalization;
 	using System.IO;
 	using System.Text;
@@ -18,10 +19,29 @@ namespace DigitalZenWorks.Database.ToolKit
 	/// <summary>
 	/// SQL writer helper class.
 	/// </summary>
-	/// <param name="rowColumnValues">The row column values.</param>
-	public class SqlWriter(string[] rowColumnValues)
+	public class SqlWriter
 	{
-		private readonly string[] rowColumnValues = rowColumnValues;
+		private readonly string[] rowColumnValues;
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="SqlWriter"/> class.
+		/// </summary>
+		public SqlWriter()
+		{
+			rowColumnValues = Array.Empty<string>();
+		}
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="SqlWriter"/> class
+		/// using the specified array of row and column values.
+		/// </summary>
+		/// <param name="rowColumnValues">An array of strings containing the
+		/// values to be written for each row and column. Cannot be null.
+		/// </param>
+		public SqlWriter(string[] rowColumnValues)
+		{
+			this.rowColumnValues = rowColumnValues;
+		}
 
 		/// <summary>
 		/// Create Insert Statement.
@@ -424,6 +444,361 @@ namespace DigitalZenWorks.Database.ToolKit
 				defaultValue);
 
 			return dataItem;
+		}
+
+		/// <summary>
+		/// Generates a SQL CREATE TABLE statement for the specified table
+		/// definition.
+		/// </summary>
+		/// <remarks>The generated SQL statement includes all columns in ordinal
+		/// position order, as well as primary key and foreign key constraints
+		/// if specified in the table definition. The output uses double quotes
+		/// for table and column names to ensure compatibility with the ANSI
+		/// standard syntax.</remarks>
+		/// <param name="table">The table structure containing column
+		/// definitions, primary key, and foreign keys to be used in the
+		/// generated SQL statement. Cannot be null.</param>
+		/// <param name="isLast">A value indicating whether this is the last
+		/// table.</param>
+		/// <returns>A string containing the SQL CREATE TABLE statement that
+		/// defines the table, its columns, primary key, and foreign key
+		/// constraints.</returns>
+		public virtual string GetTableCreateStatement(
+			Table table, bool isLast = false)
+		{
+			ArgumentNullException.ThrowIfNull(table);
+
+			Collection<ForeignKey> foreignKeys = table.ForeignKeys;
+
+			string sql = string.Format(
+				CultureInfo.InvariantCulture,
+				"CREATE TABLE \"{0}\"{1}({1}",
+				table.Name,
+				Environment.NewLine);
+
+			SortedList<int, Column> columns = GetOrdinalSortedColumns(table);
+
+			for (int index = 0; index < columns.Count; index++)
+			{
+				Column column = columns.Values[index];
+
+				bool isLastColumn = false;
+
+				if (index == columns.Count - 1 && foreignKeys.Count == 0)
+				{
+					isLastColumn = true;
+				}
+
+				sql += GetColumnSql(column, isLastColumn);
+			}
+
+			// These seem to be in reverse order.
+			for (int index = foreignKeys.Count - 1; index >= 0; index--)
+			{
+				ForeignKey foreignKey = foreignKeys[index];
+
+				bool isLastKey = false;
+
+				if (index == 0)
+				{
+					isLastKey = true;
+				}
+
+				sql += GetForeignKeySql(foreignKey, isLastKey);
+			}
+
+			if (foreignKeys.Count > 0)
+			{
+				sql += Environment.NewLine;
+			}
+
+			sql += ");";
+
+			if (isLast == false)
+			{
+				sql += Environment.NewLine;
+			}
+
+			return sql;
+		}
+
+		/// <summary>
+		/// Generates SQL CREATE TABLE statements for the specified collection
+		/// of tables.
+		/// </summary>
+		/// <param name="tables">A collection of <see cref="Table"/> objects for
+		/// which to generate CREATE TABLE statements. If
+		/// <paramref name="tables"/> is <see langword="null"/>, an empty string
+		/// is returned.</param>
+		/// <returns>A string containing the SQL CREATE TABLE statements for
+		/// each table in the collection, separated by line breaks.
+		/// Returns an empty string if <paramref name="tables"/> is
+		/// <see langword="null"/> or the collection is empty.</returns>
+		public virtual string GetTablesCreateStatements(
+			Collection<Table> tables)
+		{
+			string sqlStatements = string.Empty;
+
+			if (tables != null)
+			{
+				StringBuilder schemaBuilder = new ();
+
+				for (int index = 0; index < tables.Count; index++)
+				{
+					Table table = tables[index];
+
+					bool isLast = false;
+
+					if (index == tables.Count - 1)
+					{
+						isLast = true;
+					}
+
+					string statement = GetTableCreateStatement(table, isLast);
+					schemaBuilder.AppendLine(statement);
+				}
+
+				sqlStatements = schemaBuilder.ToString();
+			}
+
+			return sqlStatements;
+		}
+
+		/// <summary>
+		/// Returns the SQL type declaration string corresponding to the
+		/// specified column's type and length.
+		/// </summary>
+		/// <remarks>The returned string includes the appropriate SQL type and,
+		/// for string columns, the length constraint. This method does not
+		/// validate the column's properties; callers should ensure that the
+		/// column is properly configured before calling.</remarks>
+		/// <param name="column">The column for which to generate the SQL type
+		/// declaration. The column's type and length determine the returned
+		/// string.</param>
+		/// <returns>A string representing the SQL type declaration for the
+		/// column. Returns an empty string if the column type is not
+		/// recognized.</returns>
+		protected static string GetColumnTypeText(Column column)
+		{
+			ArgumentNullException.ThrowIfNull(column);
+
+			string columnType = column.ColumnType switch
+			{
+				ColumnType.AutoNumber => " INTEGER",
+				ColumnType.Currency => " CURRENCY",
+				ColumnType.DateTime => " DATETIME",
+				ColumnType.Memo => " MEMO",
+				ColumnType.Number => " INTEGER",
+				ColumnType.Ole => " OLEOBJECT",
+				ColumnType.String => string.Format(
+					CultureInfo.InvariantCulture,
+					" VARCHAR({0})",
+					column.Length),
+				ColumnType.Text => " TEXT",
+				ColumnType.YesNo => " OLEOBJECT",
+				_ => string.Empty,
+			};
+
+			return columnType;
+		}
+
+		/// <summary>
+		/// Returns a sorted list of columns from the specified table, ordered
+		/// by their ordinal position.
+		/// </summary>
+		/// <remarks>The returned list is sorted in ascending order by column
+		/// position. If the table contains no columns, the returned list will
+		/// be empty.</remarks>
+		/// <param name="table">The table containing the columns to be sorted.
+		/// Cannot be null.</param>
+		/// <returns>A SortedList where each key is the ordinal position of a
+		/// column and each value is the corresponding Column object from the
+		/// table.</returns>
+		protected static SortedList<int, Column> GetOrdinalSortedColumns(
+			Table table)
+		{
+			ArgumentNullException.ThrowIfNull(table);
+
+			// Sort Columns into ordinal positions
+			SortedList<int, Column> columns = [];
+
+			foreach (KeyValuePair<string, Column> entry in table.Columns)
+			{
+				Column column = entry.Value;
+				columns.Add(column.Position, column);
+			}
+
+			return columns;
+		}
+
+		/// <summary>
+		/// Generates the SQL definition string for the specified column,
+		/// including its name, type, constraints, and default value.
+		/// </summary>
+		/// <remarks>The generated SQL includes the column name, type, and
+		/// applicable constraints such as UNIQUE, NOT NULL, IDENTITY, and
+		/// DEFAULT. The output is intended for use in table creation scripts
+		/// and ends with a comma and newline.</remarks>
+		/// <param name="column">The column for which to generate the SQL
+		/// definition. Cannot be null.</param>
+		/// <param name="isLast">Indicates whether this column is the last
+		/// in the list. If <see langword="false"/>, a comma is appended to the
+		/// SQL statement.</param>
+		/// <returns>A string containing the SQL definition for the column,
+		/// formatted for inclusion in a CREATE TABLE statement.</returns>
+		protected virtual string GetColumnSql(Column column, bool isLast)
+		{
+			ArgumentNullException.ThrowIfNull(column);
+
+			string sql = "\t\"" + column.Name + "\"";
+
+			string columnType = GetColumnTypeText(column);
+			sql += columnType;
+
+			if (column.Unique)
+			{
+				sql += " UNIQUE";
+			}
+
+			if (column.ColumnType == ColumnType.AutoNumber)
+			{
+				sql += " IDENTITY";
+			}
+
+			if (column.Primary == true)
+			{
+				sql += " PRIMARY KEY AUTOINCREMENT";
+			}
+			else if (column.Nullable == false)
+			{
+				sql += " NOT NULL";
+			}
+
+			if (!string.IsNullOrWhiteSpace(column.DefaultValue))
+			{
+				sql += " DEFAULT " + column.DefaultValue;
+			}
+
+			if (isLast == false)
+			{
+				sql += ",";
+			}
+
+			sql += Environment.NewLine;
+
+			return sql;
+		}
+
+		/// <summary>
+		/// Generates the SQL definition string for the specified column,
+		/// including its name, type, constraints, and default value.
+		/// </summary>
+		/// <remarks>The generated SQL includes the column name, type, and
+		/// applicable constraints such as UNIQUE, NOT NULL, IDENTITY, and
+		/// DEFAULT. The output is intended for use in table creation scripts
+		/// and ends with a comma and newline.</remarks>
+		/// <param name="column">The column for which to generate the SQL
+		/// definition. Cannot be null.</param>
+		/// <returns>A string containing the SQL definition for the column,
+		/// formatted for inclusion in a CREATE TABLE statement.</returns>
+		protected virtual string GetCreateColumnSql(Column column)
+		{
+			ArgumentNullException.ThrowIfNull(column);
+
+			string sql = "\t\"" + column.Name + "\"";
+
+			string columnType = GetColumnTypeText(column);
+			sql += columnType;
+
+			if (column.Unique)
+			{
+				sql += " UNIQUE";
+			}
+
+			if (!column.Nullable)
+			{
+				sql += " NOT NULL";
+			}
+
+			if (column.ColumnType == ColumnType.AutoNumber)
+			{
+				sql += " IDENTITY";
+			}
+
+			if (!string.IsNullOrWhiteSpace(column.DefaultValue))
+			{
+				sql += " DEFAULT " + column.DefaultValue;
+			}
+
+			sql += "," + Environment.NewLine;
+
+			return sql;
+		}
+
+		/// <summary>
+		/// Generates the SQL statement for a foreign key constraint based on
+		/// the specified foreign key definition.
+		/// </summary>
+		/// <remarks>The generated SQL includes ON DELETE CASCADE and ON UPDATE
+		/// CASCADE clauses if the corresponding options are set in the foreign
+		/// key definition. The output is formatted for inclusion in a CREATE
+		/// TABLE statement.</remarks>
+		/// <param name="foreignKey">The foreign key definition containing the
+		/// constraint name, parent column, child table, child column, and
+		/// cascade options. Cannot be null.</param>
+		/// <param name="isLast">Indicates whether this constraint is the last
+		/// in the list. If <see langword="false"/>, a comma is appended to the
+		/// SQL statement.</param>
+		/// <returns>A string containing the SQL statement for the foreign key
+		/// constraint, including cascade options if specified.</returns>
+		protected virtual string GetForeignKeySql(
+			ForeignKey foreignKey, bool isLast)
+		{
+			ArgumentNullException.ThrowIfNull(foreignKey);
+
+			const string constraint = "CONSTRAINT";
+			const string key = "FOREIGN KEY";
+			const string references = "REFERENCES";
+
+			const string statement =
+				"\t{0} \"{1}\" {2}(\"{3}\") {4} \"{5}\"(\"{6}\")";
+
+			string sql = string.Format(
+				CultureInfo.InvariantCulture,
+				statement,
+				constraint,
+				foreignKey.Name,
+				key,
+				foreignKey.ParentColumn,
+				references,
+				foreignKey.ChildTable,
+				foreignKey.ChildColumn);
+
+			if (foreignKey.OnDeleteAction == ConstraintAction.Cascade)
+			{
+				sql += " ON DELETE CASCADE";
+			}
+			else if (foreignKey.OnDeleteAction == ConstraintAction.SetNull)
+			{
+				sql += " ON DELETE SET NULL";
+			}
+
+			if (foreignKey.OnUpdateAction == ConstraintAction.Cascade)
+			{
+				sql += " ON UPDATE CASCADE";
+			}
+			else if (foreignKey.OnUpdateAction == ConstraintAction.SetNull)
+			{
+				sql += " ON UPDATE SET NULL";
+			}
+
+			if (isLast == false)
+			{
+				sql += ",";
+				sql += Environment.NewLine;
+			}
+
+			return sql;
 		}
 	}
 }

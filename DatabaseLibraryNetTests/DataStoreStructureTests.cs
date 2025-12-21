@@ -1,38 +1,33 @@
-﻿// <copyright file="OleDbTests.cs" company="James John McGuire">
+﻿// <copyright file="DataStoreStructureTests.cs" company="James John McGuire">
 // Copyright © 2006 - 2025 James John McGuire. All Rights Reserved.
 // </copyright>
 
 namespace DigitalZenWorks.Database.ToolKit.Tests
 {
-	using System;
 	using System.Collections.Generic;
 	using System.Collections.ObjectModel;
 	using System.Data;
+	using System.Data.SQLite;
 	using System.IO;
 	using System.Linq;
-	using System.Runtime.Versioning;
 	using NUnit.Framework;
 
 	/// <summary>
-	/// Ole db tests class.
+	/// DataStoreStructure tests class.
 	/// </summary>
-	[SupportedOSPlatform("windows")]
 	[TestFixture]
-	internal sealed class OleDbTests : BaseTestsSupport
+	internal sealed class DataStoreStructureTests : BaseTestsSupport
 	{
-		private string databaseFile;
-		private string sqlSchemaFile;
-
 		/// <summary>
 		/// Export schema test.
 		/// </summary>
 		[Test]
 		public void ExportSchema()
 		{
-			string schemaFile = databaseFile + ".sql";
+			string schemaFile = DataSource + ".sql";
 
 			bool result =
-				DataDefinitionOleDb.ExportSchema(databaseFile, schemaFile);
+				DataDefinition.ExportSchema(DataSource, schemaFile);
 
 			Assert.That(result, Is.True);
 
@@ -51,44 +46,51 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 		{
 			string tableName = "Sections";
 
-			using OleDbSchema oleDbSchema = new (databaseFile);
+			using DataStoreStructure schema =
+				new (DatabaseType.SQLite, DataSource);
 
 			DataTable constraints =
-				oleDbSchema.GetConstraints(tableName);
+				schema.GetConstraints(tableName);
 
 			int count = constraints.Rows.Count;
 
 			Assert.That(count, Is.EqualTo(3));
 
-			bool exists = constraints.Columns.Contains("CONSTRAINT_NAME");
+			bool exists = constraints.Columns.Contains("ConstraintName");
 			Assert.That(exists, Is.True);
 
-			exists = constraints.Columns.Contains("TABLE_NAME");
+			exists = constraints.Columns.Contains("TableName");
 			Assert.That(exists, Is.True);
 
-			exists = constraints.Columns.Contains("COLUMN_NAME");
+			exists = constraints.Columns.Contains("ColumnName");
 			Assert.That(exists, Is.True);
 
 			IEnumerable<DataRow> dataRows = constraints.Rows.Cast<DataRow>();
 			IEnumerable<string> constraintNameStrings =
-				dataRows.Select(row => row["CONSTRAINT_NAME"]?.ToString());
+				dataRows.Select(row => row["ConstraintName"]?.ToString());
 			IEnumerable<string> nonEmptyConstraintNames =
-				constraintNameStrings.Where(name => !string.IsNullOrEmpty(name));
+				constraintNameStrings.Where(
+					name => !string.IsNullOrEmpty(name));
 			List<string> constraintNames = [.. nonEmptyConstraintNames];
 
-			Assert.That(constraintNames, Contains.Item("PrimaryKey"));
+			// SQLite names foreign key constraints as FK_<table>_<n>_<m>
+			Assert.That(constraintNames, Contains.Item("FK_Sections_0_0"));
+			Assert.That(constraintNames, Contains.Item("FK_Sections_1_0"));
 
-			Assert.That(constraintNames, Contains.Item("SectionsCategories"));
-			Assert.That(constraintNames, Contains.Item("SectionsMakers"));
+#if NOT_SQLITE
+			bool hasPrimaryKeyLikeConstraint = constraintNames.Any(
+				name => name.StartsWith("Index_", StringComparison.Ordinal));
+			Assert.That(hasPrimaryKeyLikeConstraint, Is.True);
 
 			bool hasCategoriesConstraint =
 				constraintNames.Any(name => name.Contains(
 					"Categories", StringComparison.Ordinal));
 			Assert.That(hasCategoriesConstraint, Is.True);
+#endif
 
 			foreach (DataRow row in constraints.Rows)
 			{
-				tableName = row["TABLE_NAME"]?.ToString();
+				tableName = row["TableName"]?.ToString();
 				Assert.That(tableName, Is.EqualTo("Sections"));
 			}
 		}
@@ -99,24 +101,25 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 		[Test]
 		public void GetRelationships()
 		{
-			const string dependentTableName = "Addresses";
+			const string dependentTableName = "Sections";
 
-			using OleDbSchema oleDbSchema = new (databaseFile);
+			using DataStoreStructure schema =
+				new (DatabaseType.SQLite, DataSource);
 
 			Collection<Relationship> relationships =
-				oleDbSchema.GetRelationships(dependentTableName, null);
+				schema.GetRelationships(dependentTableName, null);
 
 			int count = relationships.Count;
 
-			Assert.That(count, Is.EqualTo(1));
+			Assert.That(count, Is.EqualTo(2));
 
 			Relationship relationship = relationships[0];
 
 			string name = relationship.ParentTable;
-			Assert.That(name, Is.EqualTo("Contacts"));
+			Assert.That(name, Is.EqualTo("Sections"));
 
 			name = relationship.ChildTable;
-			Assert.That(name, Is.EqualTo("Addresses"));
+			Assert.That(name, Is.EqualTo("Makers"));
 		}
 
 		/// <summary>
@@ -125,8 +128,10 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 		[Test]
 		public void GetSchema()
 		{
-			Collection<Table> tables =
-				DataDefinitionOleDb.GetSchema(databaseFile);
+			using DataStoreStructure schema =
+				new (DatabaseType.SQLite, DataSource);
+
+			Collection<Table> tables = schema.GetSchema();
 
 			int count = tables.Count;
 			Assert.That(count, Is.EqualTo(7));
@@ -149,11 +154,11 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 			count = tableItem.ForeignKeys.Count;
 			Assert.That(count, Is.Zero);
 
-			tableItem = tables[2];
-			Assert.That(tableItem.Name, Is.EqualTo("Contacts"));
+			tableItem = tables[6];
+			Assert.That(tableItem.Name, Is.EqualTo("Products"));
 
 			count = tableItem.ForeignKeys.Count;
-			Assert.That(count, Is.EqualTo(1));
+			Assert.That(count, Is.EqualTo(3));
 		}
 
 		/// <summary>
@@ -164,9 +169,10 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 		{
 			const string tableName = "Addresses";
 
-			using OleDbSchema oleDbSchema = new (databaseFile);
+			using DataStoreStructure schema =
+				new (DatabaseType.SQLite, DataSource);
 
-			DataTable table = oleDbSchema.GetTableColumns(tableName);
+			DataTable table = schema.GetTableColumns(tableName);
 
 			Assert.That(table, Is.Not.Null);
 
@@ -182,17 +188,12 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 		{
 			string sqlFile = GetTestSqlFile();
 
-			string fileName = Path.GetTempFileName();
+			string newDataSource = GetTestDatabasePath();
 
-			// A 0 byte sized file is created.  Need to remove it.
-			File.Delete(fileName);
-			databaseFile = Path.ChangeExtension(fileName, "accdb");
+			SQLiteConnection.CreateFile(newDataSource);
 
 			bool result =
-				OleDbHelper.CreateAccessDatabaseFile(databaseFile);
-			Assert.That(result, Is.True);
-
-			result = DataDefinitionOleDb.ImportSchema(sqlFile, databaseFile);
+				DataDefinition.ImportSchema(sqlFile, newDataSource);
 
 			Assert.That(result, Is.True);
 		}
@@ -203,8 +204,7 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 		[Test]
 		public void OrderTables()
 		{
-			Collection<Table> tables =
-				DataDefinitionOleDb.GetSchema(databaseFile);
+			Collection<Table> tables = DataDefinition.GetSchema(DataSource);
 
 			Collection<Table> orderedList = DataDefinition.OrderTables(tables);
 
@@ -235,58 +235,6 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 			table = orderedList[6];
 			tableName = table.Name;
 			Assert.That(tableName, Is.EqualTo("Products"));
-		}
-
-		/// <summary>
-		/// Gets the database.
-		/// </summary>
-		protected override void GetDatabase()
-		{
-			string fileName = Path.GetTempFileName();
-
-			// A 0 byte sized file is created.  Need to remove it.
-			File.Delete(fileName);
-			databaseFile = Path.ChangeExtension(fileName, "accdb");
-
-			bool result =
-				OleDbHelper.CreateAccessDatabaseFile(databaseFile);
-			Assert.That(result, Is.True);
-
-			bool exists = File.Exists(databaseFile);
-			Assert.That(exists, Is.True);
-		}
-
-		/// <summary>
-		/// Retrieves the file path to the embedded SQL test file used for unit
-		/// testing.
-		/// </summary>
-		/// <remarks>This method is intended for use in test scenarios where
-		/// access to the embedded SQL script is required. The returned file
-		/// path can be used to read or execute the test SQL statements.
-		/// </remarks>
-		/// <returns>A string containing the file path to the embedded SQL test
-		/// file. The path will be valid if the resource exists; otherwise, it
-		/// may be empty or invalid.</returns>
-		protected override string GetTestSqlFile()
-		{
-			const string resource = "DigitalZenWorks.Database.ToolKit.Tests." +
-				"Products.Access.Test.sql";
-
-			string filePath = GetEmbeddedResourceFile(resource, "sql");
-
-			return filePath;
-		}
-
-		/// <summary>
-		/// Setup the database schema.
-		/// </summary>
-		protected override void SetupSchema()
-		{
-			sqlSchemaFile = GetTestSqlFile();
-
-			bool result =
-				DataDefinitionOleDb.ImportSchema(sqlSchemaFile, databaseFile);
-			Assert.That(result, Is.True);
 		}
 	}
 }

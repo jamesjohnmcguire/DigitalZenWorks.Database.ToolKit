@@ -6,13 +6,10 @@
 
 namespace DigitalZenWorks.Database.ToolKit
 {
-	using System;
 	using System.Collections.Generic;
 	using System.Collections.ObjectModel;
 	using System.Data;
-	using System.Globalization;
-	using System.Reflection;
-	using System.Resources;
+	using System.Text;
 	using global::Common.Logging;
 
 	/// <summary>
@@ -25,16 +22,6 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// </summary>
 		private static readonly ILog Log = LogManager.GetLogger(
 			System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
-
-		private static readonly ResourceManager StringTable = new(
-			"DigitalZenWorks.Database.ToolKit.Resources",
-			Assembly.GetExecutingAssembly());
-
-		private readonly Dictionary<string, Column> columns = [];
-		private readonly Collection<ForeignKey> foreignKeys = [];
-
-		private string name = string.Empty;
-		private string primaryKey = string.Empty;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="Table"/> class.
@@ -54,50 +41,36 @@ namespace DigitalZenWorks.Database.ToolKit
 		}
 
 		/// <summary>
-		/// Gets represents the columns.
+		/// Gets the columns.
 		/// </summary>
 		/// <value>
-		/// Represents the columns.
+		/// The columns.
 		/// </value>
-		public Dictionary<string, Column> Columns
-		{
-			get { return columns; }
-		}
+		public Dictionary<string, Column> Columns { get; } = [];
 
 		/// <summary>
-		/// Gets represents the foreign keys.
+		/// Gets the foreign keys.
 		/// </summary>
 		/// <value>
-		/// Represents the foreign keys.
+		/// The foreign keys.
 		/// </value>
-		public Collection<ForeignKey> ForeignKeys
-		{
-			get { return foreignKeys; }
-		}
+		public Collection<ForeignKey> ForeignKeys { get; } = [];
 
 		/// <summary>
-		/// Gets or sets represents a table name.
+		/// Gets or sets the table name.
 		/// </summary>
 		/// <value>
-		/// Represents a table name.
+		/// The table name.
 		/// </value>
-		public string Name
-		{
-			get { return name; }
-			set { name = value; }
-		}
+		public string Name { get; set; } = string.Empty;
 
 		/// <summary>
-		/// Gets or sets represents the primary key.
+		/// Gets or sets the primary key.
 		/// </summary>
 		/// <value>
-		/// Represents the primary key.
+		/// The primary key.
 		/// </value>
-		public string PrimaryKey
-		{
-			get { return primaryKey; }
-			set { primaryKey = value; }
-		}
+		public string PrimaryKey { get; set; }
 
 		/// <summary>
 		/// Writes out the table information.
@@ -110,40 +83,70 @@ namespace DigitalZenWorks.Database.ToolKit
 
 			if (table != null)
 			{
-				Log.Info(
-					CultureInfo.InvariantCulture,
-					m => m(StringTable.GetString(
-						"TABLE",
-						CultureInfo.InvariantCulture) + table.TableName));
-				output = StringTable.GetString(
-					"TABLE",
-					CultureInfo.InvariantCulture) +
-					table.TableName + Environment.NewLine;
+				Dictionary<string, Column> columns = [];
 
-				foreach (DataColumn column in table.Columns)
+				foreach (DataColumn dataColumn in table.Columns)
 				{
-					Log.Info(CultureInfo.InvariantCulture, m => m(
-						StringTable.GetString(
-							"TABDASH",
-							CultureInfo.InvariantCulture) +
-							column.ColumnName));
-					output += StringTable.GetString(
-						"TABDASH",
-						CultureInfo.InvariantCulture) +
-						column.ColumnName + Environment.NewLine;
+					Column column = new();
+					column.Name = dataColumn.ColumnName;
+
+					foreach (DataColumn primaryKeyColumn in table.PrimaryKey)
+					{
+						if (dataColumn.ColumnName ==
+							primaryKeyColumn.ColumnName)
+						{
+							column.Primary = true;
+						}
+					}
+
+					columns.Add(dataColumn.ColumnName, column);
 				}
 
-				Log.Info(CultureInfo.InvariantCulture, m => m(
-					StringTable.GetString(
-						"PRIMARYKEY",
-						CultureInfo.InvariantCulture) + table.PrimaryKey));
-				output += StringTable.GetString(
-					"PRIMARYKEY",
-					CultureInfo.InvariantCulture) +
-					table.PrimaryKey + Environment.NewLine;
+				output = Dump(table.TableName, columns);
 			}
 
 			return output;
+		}
+
+		/// <summary>
+		/// Writes out the table information.
+		/// </summary>
+		/// <param name="tableName">The name of the table.</param>
+		/// <param name="columns">The columns of the table.</param>
+		/// <returns>A text of table information.</returns>
+		public static string Dump(
+			string tableName, Dictionary<string, Column> columns)
+		{
+			StringBuilder output = new();
+			string message = $"{Strings.Table}{tableName}";
+			output.AppendLine(message);
+			Log.Info(message);
+
+			string primaryKey = string.Empty;
+
+			if (columns != null)
+			{
+				foreach (KeyValuePair<string, Column> column in columns)
+				{
+					Column columnValue = column.Value;
+
+					message = $"{Strings.TabDash}{columnValue.Name}";
+					output.AppendLine(message);
+					Log.Info(message);
+
+					if (columnValue.Primary == true)
+					{
+						primaryKey = columnValue.Name;
+					}
+				}
+			}
+
+			message = $"{Strings.PrimaryKey}{primaryKey}";
+			output.AppendLine(message);
+			Log.Info(message);
+
+			string result = output.ToString();
+			return result;
 		}
 
 		/// <summary>
@@ -161,57 +164,10 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// <summary>
 		/// Writes out the table information.
 		/// </summary>
-		/// <returns>DataTable.</returns>
+		/// <returns>A text of table information.</returns>
 		public string Dump()
 		{
-			string output = StringTable.GetString(
-				"TABLE",
-				CultureInfo.InvariantCulture) + Name + Environment.NewLine;
-			Log.Info(CultureInfo.InvariantCulture, m => m(output));
-
-			foreach (KeyValuePair<string, Column> column in Columns)
-			{
-				Log.Info(
-					CultureInfo.InvariantCulture,
-					m => m(StringTable.GetString(
-						"TABDASH",
-						CultureInfo.InvariantCulture) +
-						((Column)column.Value).Name));
-				output += StringTable.GetString(
-					"TABDASH",
-					CultureInfo.InvariantCulture) +
-					((Column)column.Value).Name + Environment.NewLine;
-			}
-
-			Log.Info(
-				CultureInfo.InvariantCulture,
-				m => m(StringTable.GetString(
-					"PRIMARYKEY",
-					CultureInfo.InvariantCulture) + PrimaryKey));
-			output += StringTable.GetString(
-				"PRIMARYKEY",
-				CultureInfo.InvariantCulture) + PrimaryKey +
-				Environment.NewLine;
-
-			foreach (ForeignKey foreignKey in ForeignKeys)
-			{
-				string format = string.Format(
-					CultureInfo.InvariantCulture,
-					"{0} {1} {2}",
-					foreignKey.Name,
-					foreignKey.ColumnName,
-					foreignKey.ParentTable);
-
-				Log.Info(
-					CultureInfo.InvariantCulture,
-					m => m(StringTable.GetString(
-						"FOREIGNKEY",
-						CultureInfo.InvariantCulture) + format));
-				output += StringTable.GetString(
-					"FOREIGNKEY",
-					CultureInfo.InvariantCulture) + format +
-					Environment.NewLine;
-			}
+			string output = Dump(Name, Columns);
 
 			return output;
 		}

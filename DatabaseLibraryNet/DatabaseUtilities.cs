@@ -8,10 +8,7 @@ namespace DigitalZenWorks.Database.ToolKit
 {
 	using System;
 	using System.Data;
-	using System.Globalization;
 	using System.IO;
-	using System.Reflection;
-	using System.Resources;
 	using System.Security;
 	using DigitalZenWorks.Common.Utilities;
 	using global::Common.Logging;
@@ -24,41 +21,55 @@ namespace DigitalZenWorks.Database.ToolKit
 		private static readonly ILog Log = LogManager.GetLogger(
 			System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-		private static readonly ResourceManager StringTable = new
-			ResourceManager(
-			"DigitalZenWorks.Database.ToolKit.Resources",
-			Assembly.GetExecutingAssembly());
-
-		/// Method <c>CreateAccessDatabaseFile.</c>
 		/// <summary>
-		/// Creates an empty MDB (MS Jet / Access database) file.
+		/// Export database to similarly named csv file.
 		/// </summary>
-		/// <param name="filePath">The file path of the database.</param>
+		/// <param name="database">The database file to use.</param>
+		/// <param name="csvPath">The csv file to export to.</param>
 		/// <returns>A values indicating success or not.</returns>
-		public static bool CreateAccessDatabaseFile(string filePath)
+		public static bool ExportDatabaseToCsv(
+			DataStorage database, string csvPath)
 		{
-			return FileUtils.CreateFileFromEmbeddedResource(
-				"DigitalZenWorks.Database.ToolKit.template.accdb",
-				filePath);
+			bool returnCode = false;
+
+			ArgumentNullException.ThrowIfNull(database);
+
+			// Get all the table names
+			DataTable tableNames = database.SchemaTable;
+
+			if (tableNames != null)
+			{
+				// for each table, select all the data
+				foreach (DataRow table in tableNames.Rows)
+				{
+					ExportDataRowToCsv(database, table, csvPath);
+				}
+			}
+
+			returnCode = true;
+
+			return returnCode;
 		}
 
 		/// <summary>
 		/// Export the data table to csv file.
 		/// </summary>
 		/// <param name="table">The table to export.</param>
-		/// <param name="file">The file to export to.</param>
+		/// <param name="csvfile">The file to export to.</param>
 		/// <returns>Indicates whether the action was successful.</returns>
 		public static bool ExportDataTableToCsv(
-			DataTable table, TextWriter file)
+			DataTable table, string csvfile)
 		{
 			bool returnCode = false;
 
-			Log.Info(CultureInfo.InvariantCulture, m => m(
-				GeneralUtilities.CallingMethod() + ": " +
-				StringTable.GetString("BEGIN", CultureInfo.InvariantCulture)));
+			string message =
+				GeneralUtilities.CallingMethod() + ": " + Strings.Begin;
+			Log.Info(message);
 
-			if (table != null && file != null)
+			if (table != null)
 			{
+				using StreamWriter file = new(csvfile, false);
+
 				// First write the headers.
 				int columnCount = table.Columns.Count;
 
@@ -103,92 +114,57 @@ namespace DigitalZenWorks.Database.ToolKit
 		{
 			bool returnCode = false;
 
-			DatabaseType databaseType;
-			string connectionString;
-			string extension = Path.GetExtension(databaseFile);
+			DatabaseType databaseType =
+				DataDefinition.GetDatabaseType(databaseFile);
+			string connectionString =
+				DataStorage.GetConnectionString(databaseType, databaseFile);
 
-			if (extension.Equals(".mdb", StringComparison.OrdinalIgnoreCase) ||
-				extension.Equals(".accdb", StringComparison.OrdinalIgnoreCase))
+			using DataStorage database = new(databaseType, connectionString);
+
+			returnCode = ExportDatabaseToCsv(database, csvPath);
+
+			database.Shutdown();
+
+			return returnCode;
+		}
+
+		private static bool ExportDataRowToCsv(
+			DataStorage database, DataRow row, string csvPath)
+		{
+			bool returnCode = false;
+
+			try
 			{
-				string provider = "Microsoft.ACE.OLEDB.12.0";
-				connectionString = string.Format(
-					CultureInfo.InvariantCulture,
-					"provider={0}; Data Source={1}",
-					provider,
-					databaseFile);
+				object objectName = row["TABLE_NAME"];
+				string tableName = objectName.ToString();
 
-				databaseType = DatabaseType.OleDb;
+				// export the table
+				string sqlQuery = "SELECT * FROM " + tableName;
+				DataTable tableData = database.GetDataTable(sqlQuery);
+
+				string csvFile = csvPath + tableName + ".csv";
+
+				ExportDataTableToCsv(tableData, csvFile);
 			}
-			else if (extension.Equals(
-					".db", StringComparison.OrdinalIgnoreCase) ||
-				extension.Equals(
-					".sqlite", StringComparison.OrdinalIgnoreCase))
+			catch (Exception exception) when
+				(exception is ArgumentException ||
+				exception is ArgumentNullException ||
+				exception is DirectoryNotFoundException ||
+				exception is IOException ||
+				exception is PathTooLongException ||
+				exception is SecurityException ||
+				exception is UnauthorizedAccessException)
 			{
-				string connectionBase = "Data Source={0};Version=3;" +
-					"DateTimeFormat=InvariantCulture";
-
-				connectionString = string.Format(
-					CultureInfo.InvariantCulture,
-					connectionBase,
-					databaseFile);
-
-				databaseType = DatabaseType.SQLite;
+				Log.Error(exception.ToString());
 			}
-			else
+			catch (Exception exception)
 			{
-				throw new NotImplementedException();
+				Log.Error(exception.ToString());
+
+				throw;
 			}
 
-			// Open the database
-			using (DataStorage database =
-				new DataStorage(databaseType, connectionString))
-			{
-				// Get all the table names
-				DataTable tableNames = database.SchemaTable;
-
-				if (tableNames != null)
-				{
-					// for each table, select all the data
-					foreach (DataRow table in tableNames.Rows)
-					{
-						try
-						{
-							var objectName = table["TABLE_NAME"];
-							string tableName = objectName.ToString();
-
-							// export the table
-							string sqlQuery = "SELECT * FROM " + tableName;
-							DataTable tableData =
-								database.GetDataTable(sqlQuery);
-
-							string csvFile = csvPath + tableName + ".csv";
-
-							// Create the CSV file.
-							using StreamWriter file = new(csvFile, false);
-							ExportDataTableToCsv(tableData, file);
-						}
-						catch (Exception exception) when
-							(exception is ArgumentException ||
-							exception is ArgumentNullException ||
-							exception is DirectoryNotFoundException ||
-							exception is IOException ||
-							exception is PathTooLongException ||
-							exception is SecurityException ||
-							exception is UnauthorizedAccessException)
-						{
-							Log.Error(exception.ToString());
-						}
-						catch (Exception exception)
-						{
-							Log.Error(exception.ToString());
-
-							throw;
-						}
-					}
-				}
-
-				database.Shutdown();
-			}
+			returnCode = true;
 
 			return returnCode;
 		}

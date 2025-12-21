@@ -50,20 +50,7 @@ namespace DigitalZenWorks.Database.ToolKit
 			"please use DataObjectsBase(DatabaseType, string) instead.")]
 		public DataObjectsBase(string dataSource)
 		{
-			if (!File.Exists(dataSource))
-			{
-				dataSource = Environment.GetFolderPath(
-					Environment.SpecialFolder.ApplicationData) +
-					"\\" + dataSource;
-			}
-
-			string connectionString = string.Format(
-				CultureInfo.InvariantCulture,
-				"provider={0}; Data Source={1}",
-				"Microsoft.ACE.OLEDB.12.0",
-				dataSource);
-
-			Database = new DataStorage(DatabaseType.OleDb, connectionString);
+			throw new NotImplementedException();
 		}
 
 		/// <summary>
@@ -90,31 +77,16 @@ namespace DigitalZenWorks.Database.ToolKit
 
 			switch (databaseType)
 			{
-				case DatabaseType.OleDb:
-					connectionString = string.Format(
-						CultureInfo.InvariantCulture,
-						"provider={0}; Data Source={1}",
-						"Microsoft.ACE.OLEDB.12.0",
-						databaseFilePath);
-					break;
 				case DatabaseType.SQLite:
-					string connectionBase = "Data Source={0};Version=3;" +
+					const string connectionBase = "Data Source={0};Version=3;" +
 						"DateTimeFormat=InvariantCulture";
 					connectionString = string.Format(
 						CultureInfo.InvariantCulture,
 						connectionBase,
 						databaseFilePath);
 					break;
-				case DatabaseType.Unknown:
-					break;
-				case DatabaseType.SqlServer:
-					break;
-				case DatabaseType.Oracle:
-					break;
-				case DatabaseType.MySql:
-					break;
 				default:
-					break;
+					throw new NotImplementedException();
 			}
 
 			Database = new DataStorage(databaseType, connectionString);
@@ -176,11 +148,10 @@ namespace DigitalZenWorks.Database.ToolKit
 		public string DatabaseFilePath { get; }
 
 		/// <summary>
-		/// Gets the core database object.
+		/// Gets or sets the core database object.
 		/// </summary>
 		/// <value>Represents the core database object.</value>
-		[CLSCompliantAttribute(false)]
-		public DataStorage Database { get; private set; }
+		public DataStorage Database { get; protected set; }
 
 		/// <summary>
 		/// Gets the database type.
@@ -218,7 +189,7 @@ namespace DigitalZenWorks.Database.ToolKit
 
 			string sql = string.Format(
 				CultureInfo.InvariantCulture,
-				@"DELETE FROM {0} WHERE {1} ='{2}'",
+				"DELETE FROM {0} WHERE {1} ='{2}'",
 				tableName,
 				idColumn,
 				id);
@@ -238,7 +209,7 @@ namespace DigitalZenWorks.Database.ToolKit
 			DataTable tableList;
 			string sql = string.Format(
 				CultureInfo.InvariantCulture,
-				@"SELECT * FROM {0} ORDER BY id",
+				"SELECT * FROM {0} ORDER BY id",
 				table);
 
 			tableList = Database.GetDataTable(sql);
@@ -258,7 +229,7 @@ namespace DigitalZenWorks.Database.ToolKit
 
 			string sql = string.Format(
 				CultureInfo.InvariantCulture,
-				@"SELECT * FROM {0} WHERE {1}",
+				"SELECT * FROM {0} WHERE {1}",
 				table,
 				where);
 
@@ -339,11 +310,8 @@ namespace DigitalZenWorks.Database.ToolKit
 		{
 			if (disposing)
 			{
-				if (Database != null)
-				{
-					Database.Close();
-					Database = null;
-				}
+				Database?.Close();
+				Database = null;
 			}
 		}
 	}
