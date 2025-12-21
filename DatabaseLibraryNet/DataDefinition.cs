@@ -52,8 +52,7 @@ namespace DigitalZenWorks.Database.ToolKit
 					catch (Exception exception) when
 						(exception is ArgumentNullException ||
 						exception is OutOfMemoryException ||
-						exception is DbException ||
-						exception is System.Data.OleDb.OleDbException)
+						exception is DbException)
 					{
 						string message = Strings.Exception + exception;
 						Log.Error(message);

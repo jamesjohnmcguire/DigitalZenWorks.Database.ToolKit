@@ -12,7 +12,6 @@ namespace DigitalZenWorks.Database.ToolKit
 	using System.Configuration;
 	using System.Data;
 	using System.Data.Common;
-	using System.Data.OleDb;
 	using System.Data.SQLite;
 	using System.Globalization;
 	using System.Reflection;
@@ -979,18 +978,13 @@ namespace DigitalZenWorks.Database.ToolKit
 					{
 						switch (databaseType)
 						{
-							case DatabaseType.OleDb:
-								AddParameters((OleDbCommand)command, values);
-								break;
 							case DatabaseType.MySql:
 							case DatabaseType.SQLite:
 							case DatabaseType.SqlServer:
 								AddParameters(command, values);
 								break;
-							case DatabaseType.Unknown:
-								break;
 							case DatabaseType.Oracle:
-								break;
+							case DatabaseType.Unknown:
 							default:
 								break;
 						}

@@ -121,11 +121,9 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// type and data source.</returns>
 		public static string GetConnectionString(string dataSource)
 		{
-			string connectionString = string.Format(
-						CultureInfo.InvariantCulture,
-						"provider={0}; Data Source={1}",
-						"Microsoft.ACE.OLEDB.12.0",
-						dataSource);
+			string connectionString =
+				OleDbHelper.BuildConnectionString(dataSource);
+
 			return connectionString;
 		}
 

@@ -77,13 +77,6 @@ namespace DigitalZenWorks.Database.ToolKit
 
 			switch (databaseType)
 			{
-				case DatabaseType.OleDb:
-					connectionString = string.Format(
-						CultureInfo.InvariantCulture,
-						"provider={0}; Data Source={1}",
-						"Microsoft.ACE.OLEDB.12.0",
-						databaseFilePath);
-					break;
 				case DatabaseType.SQLite:
 					const string connectionBase = "Data Source={0};Version=3;" +
 						"DateTimeFormat=InvariantCulture";
@@ -92,16 +85,8 @@ namespace DigitalZenWorks.Database.ToolKit
 						connectionBase,
 						databaseFilePath);
 					break;
-				case DatabaseType.Unknown:
-					break;
-				case DatabaseType.SqlServer:
-					break;
-				case DatabaseType.Oracle:
-					break;
-				case DatabaseType.MySql:
-					break;
 				default:
-					break;
+					throw new NotImplementedException();
 			}
 
 			Database = new DataStorage(databaseType, connectionString);
