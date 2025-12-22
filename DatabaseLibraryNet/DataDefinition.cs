@@ -36,7 +36,15 @@ namespace DigitalZenWorks.Database.ToolKit
 		{
 			bool result = false;
 
+#if NET6_0_OR_GREATER
 			ArgumentNullException.ThrowIfNull(database);
+#else
+			if (database == null)
+			{
+				string name = nameof(database);
+				throw new ArgumentNullException(name);
+			}
+#endif
 
 			if (queries != null)
 			{

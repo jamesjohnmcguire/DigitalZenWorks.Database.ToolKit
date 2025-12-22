@@ -149,7 +149,15 @@ namespace DigitalZenWorks.Database.ToolKit
 		public static IReadOnlyList<string> GetSqlQueryStatements(
 			string queriesText)
 		{
+#if NET6_0_OR_GREATER
 			ArgumentNullException.ThrowIfNull(queriesText);
+#else
+			if (queriesText == null)
+			{
+				string name = nameof(queriesText);
+				throw new ArgumentNullException(name);
+			}
+#endif
 
 			char[] separator = [';'];
 			string[] splitQueries = queriesText.Split(
@@ -176,7 +184,15 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// "TABLE_NAME" column of the provided <see cref="DataRow"/>.</returns>
 		public static string GetTableName(DataRow row)
 		{
+#if NET6_0_OR_GREATER
 			ArgumentNullException.ThrowIfNull(row);
+#else
+			if (row == null)
+			{
+				string name = nameof(row);
+				throw new ArgumentNullException(name);
+			}
+#endif
 
 			object nameRaw = row["TABLE_NAME"];
 			string tableName = nameRaw.ToString();
@@ -590,7 +606,15 @@ namespace DigitalZenWorks.Database.ToolKit
 		{
 			int length = 0;
 
+#if NET6_0_OR_GREATER
 			ArgumentNullException.ThrowIfNull(row);
+#else
+			if (row == null)
+			{
+				string name = nameof(row);
+				throw new ArgumentNullException(name);
+			}
+#endif
 
 			bool test = row.IsNull("CHARACTER_MAXIMUM_LENGTH");
 
@@ -655,7 +679,15 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// table and column names, and cascade rules.</returns>
 		protected virtual Relationship GetRelationship(DataRow foreignKey)
 		{
+#if NET6_0_OR_GREATER
 			ArgumentNullException.ThrowIfNull(foreignKey);
+#else
+			if (foreignKey == null)
+			{
+				string name = nameof(foreignKey);
+				throw new ArgumentNullException(name);
+			}
+#endif
 
 			Relationship relationship = new ();
 
@@ -791,7 +823,15 @@ namespace DigitalZenWorks.Database.ToolKit
 		{
 			bool isPrimaryKey = false;
 
+#if NET6_0_OR_GREATER
 			ArgumentNullException.ThrowIfNull(column);
+#else
+			if (column == null)
+			{
+				string name = nameof(column);
+				throw new ArgumentNullException(name);
+			}
+#endif
 
 			if (column.Table.Columns.Contains("PRIMARY_KEY"))
 			{
@@ -1149,8 +1189,18 @@ namespace DigitalZenWorks.Database.ToolKit
 #pragma warning disable CA2100
 			command.CommandText = query;
 #pragma warning restore CA2100
-			using var adapter =
+#if NET5_0_OR_GREATER || NETCOREAPP3_0_OR_GREATER || NETFRAMEWORK
+			using DbDataAdapter adapter =
 				DbProviderFactories.GetFactory(connection).CreateDataAdapter();
+#else
+			// DbProviderFactories not available in netstandard2.0
+			// Create adapter directly from connection's command
+			string name = connection.GetType().Namespace + ".DataAdapter, " +
+				connection.GetType().Assembly.FullName;
+			using DbDataAdapter adapter =
+				(DbDataAdapter)Activator.CreateInstance(Type.GetType(name),
+				command);
+#endif
 			adapter.SelectCommand = command;
 
 			DataTable constraints = new ();

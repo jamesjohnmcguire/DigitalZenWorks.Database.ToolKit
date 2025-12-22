@@ -36,7 +36,15 @@ namespace DigitalZenWorks.Database.ToolKit
 		public override string GetTableCreateStatement(
 			Table table, bool isLast = false)
 		{
+#if NET6_0_OR_GREATER
 			ArgumentNullException.ThrowIfNull(table);
+#else
+			if (table == null)
+			{
+				string name = nameof(table);
+				throw new ArgumentNullException(name);
+			}
+#endif
 
 			Collection<ForeignKey> foreignKeys = table.ForeignKeys;
 
@@ -115,7 +123,15 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// formatted for inclusion in a CREATE TABLE statement.</returns>
 		protected override string GetColumnSql(Column column, bool isLast)
 		{
+#if NET6_0_OR_GREATER
 			ArgumentNullException.ThrowIfNull(column);
+#else
+			if (column == null)
+			{
+				string name = nameof(column);
+				throw new ArgumentNullException(name);
+			}
+#endif
 
 			string sql = "\t[" + column.Name + "]";
 
@@ -167,7 +183,15 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// formatted for inclusion in a CREATE TABLE statement.</returns>
 		protected override string GetCreateColumnSql(Column column)
 		{
+#if NET6_0_OR_GREATER
 			ArgumentNullException.ThrowIfNull(column);
+#else
+			if (column == null)
+			{
+				string name = nameof(column);
+				throw new ArgumentNullException(name);
+			}
+#endif
 
 			string sql = "\t[" + column.Name + "]";
 
@@ -218,7 +242,15 @@ namespace DigitalZenWorks.Database.ToolKit
 		protected override string GetForeignKeySql(
 			ForeignKey foreignKey, bool isLast)
 		{
+#if NET6_0_OR_GREATER
 			ArgumentNullException.ThrowIfNull(foreignKey);
+#else
+			if (foreignKey == null)
+			{
+				string name = nameof(foreignKey);
+				throw new ArgumentNullException(name);
+			}
+#endif
 
 			const string constraint = "CONSTRAINT";
 			const string key = "FOREIGN KEY";

@@ -336,7 +336,15 @@ namespace DigitalZenWorks.Database.ToolKit
 		{
 			bool isPrimaryKey = false;
 
+#if NET6_0_OR_GREATER
 			ArgumentNullException.ThrowIfNull(column);
+#else
+			if (column == null)
+			{
+				string name = nameof(column);
+				throw new ArgumentNullException(name);
+			}
+#endif
 
 			if (column.Table.Columns.Contains("COLUMN_NAME"))
 			{
