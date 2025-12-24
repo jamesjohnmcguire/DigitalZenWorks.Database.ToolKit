@@ -120,6 +120,7 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// <summary>
 		/// Gets the database command object.
 		/// </summary>
+		/// <value>The database command object.</value>
 		public virtual DbCommand Command
 		{
 			get
@@ -158,6 +159,7 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// <summary>
 		/// Gets or sets the connection text.
 		/// </summary>
+		/// <value>The connection text.</value>
 		public virtual string ConnectionText
 		{
 			get { return connectionText; }
@@ -167,6 +169,7 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// <summary>
 		/// Gets or sets the data adapter object.
 		/// </summary>
+		/// <value>The data adapter object.</value>
 		public virtual DbDataAdapter DataAdapter
 		{
 			get
