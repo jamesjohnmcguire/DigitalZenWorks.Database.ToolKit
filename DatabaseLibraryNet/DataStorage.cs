@@ -918,17 +918,12 @@ namespace DigitalZenWorks.Database.ToolKit
 						SQLiteParameter parameter =
 							new(DbType.String, keyPairValue);
 						parameter.ParameterName = keyPairName;
-						result = parameters.Add(parameter);
+						parameters.Add(parameter);
 					}
 					else
 					{
-						result = parameters.Add(keyPairValue);
+						parameters.Add(keyPairValue);
 					}
-				}
-
-				if (result == 0)
-				{
-					Log.Warn("DbParameterCollection.Add returns 0");
 				}
 			}
 
