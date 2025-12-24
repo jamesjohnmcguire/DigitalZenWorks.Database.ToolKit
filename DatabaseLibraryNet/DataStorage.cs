@@ -908,12 +908,16 @@ namespace DigitalZenWorks.Database.ToolKit
 				}
 				else
 				{
+					// DbParameter is abstract, so we have to create one of the
+					// specific types below.
+					string keyPairName = valuePair.Key;
 					object keyPairValue = valuePair.Value;
 
 					if (databaseType == DatabaseType.SQLite)
 					{
 						SQLiteParameter parameter =
 							new(DbType.String, keyPairValue);
+						parameter.ParameterName = keyPairName;
 						result = parameters.Add(parameter);
 					}
 					else
