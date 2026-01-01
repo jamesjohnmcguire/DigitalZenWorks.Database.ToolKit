@@ -1,5 +1,5 @@
 ﻿// <copyright file="DataStoreStructureTests.cs" company="James John McGuire">
-// Copyright © 2006 - 2025 James John McGuire. All Rights Reserved.
+// Copyright © 2006 - 2026 James John McGuire. All Rights Reserved.
 // </copyright>
 
 namespace DigitalZenWorks.Database.ToolKit.Tests
