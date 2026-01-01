@@ -8,7 +8,7 @@
 		<Authors>James John McGuire</Authors>
 		<CLSCompliant>true</CLSCompliant>
 		<Company>Digital Zen Works</Company>
-		<Copyright>Copyright © 2006 - 2025</Copyright>
+		<Copyright>Copyright © 2006 - 2026</Copyright>
 		<Description>This client library provides common database functionality.</Description>
 		<EnableNETAnalyzers>true</EnableNETAnalyzers>
 		<EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>

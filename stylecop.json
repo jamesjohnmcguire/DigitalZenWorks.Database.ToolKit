@@ -4,7 +4,7 @@
 	{
 		"documentationRules": {
 			"companyName": "James John McGuire",
-			"copyrightText": "Copyright © 2006 - 2025 {companyName}. All Rights Reserved.",
+			"copyrightText": "Copyright © 2006 - 2026 {companyName}. All Rights Reserved.",
 			"fileNamingConvention": "metadata",
 			"headerDecoration": "///////////////////////////////////////////////////////////////////////////",
 			"xmlHeader": true
@@ -22,3 +22,4 @@
 		}
 	}
 }
+
