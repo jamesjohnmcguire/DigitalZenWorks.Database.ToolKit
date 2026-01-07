@@ -1,4 +1,4 @@
-﻿// <copyright file="DataStoreStructureTests.cs" company="James John McGuire">
+// <copyright file="DataStoreStructureTests.cs" company="James John McGuire">
 // Copyright © 2006 - 2026 James John McGuire. All Rights Reserved.
 // </copyright>
 
