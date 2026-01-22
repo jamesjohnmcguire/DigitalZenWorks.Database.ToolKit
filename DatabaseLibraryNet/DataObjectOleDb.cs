@@ -6,6 +6,7 @@
 
 namespace DigitalZenWorks.Database.ToolKit
 {
+	using System.Globalization;
 	using System.Runtime.Versioning;
 
 	/// <summary>
@@ -43,3 +44,4 @@ namespace DigitalZenWorks.Database.ToolKit
 		}
 	}
 }
+
