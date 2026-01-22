@@ -4,11 +4,11 @@
 // </copyright>
 /////////////////////////////////////////////////////////////////////////////
 
-using System.Globalization;
-using System.Runtime.Versioning;
-
 namespace DigitalZenWorks.Database.ToolKit
 {
+	using System.Globalization;
+	using System.Runtime.Versioning;
+
 	/// <summary>
 	/// OleDb base class for database collection classes.
 	/// </summary>
@@ -44,3 +44,4 @@ namespace DigitalZenWorks.Database.ToolKit
 		}
 	}
 }
+
