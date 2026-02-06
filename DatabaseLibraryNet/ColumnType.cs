@@ -4,342 +4,342 @@
 // </copyright>
 /////////////////////////////////////////////////////////////////////////////
 
-namespace DigitalZenWorks.Database.ToolKit
-{
+namespace DigitalZenWorks.Database.ToolKit;
+
 #pragma warning disable CA1720
 
+/// <summary>
+/// Generic column types
+/// Represents an enumeration of column types.
+/// </summary>
+public enum ColumnType
+{
 	/// <summary>
-	/// Generic column types
-	/// Represents an enumeration of column types.
+	/// Represents an unspecified or unrecognized value.
 	/// </summary>
-	public enum ColumnType
-	{
-		/// <summary>
-		/// Represents an unspecified or unrecognized value.
-		/// </summary>
-		Unknown,
+	Unknown,
 
-		/// <summary>
-		/// MS Access
-		/// Auto increment type.
-		/// </summary>
-		AutoNumber,
+	/// <summary>
+	/// MS Access
+	/// Auto increment type.
+	/// </summary>
+	AutoNumber,
 
-		/// <summary>
-		/// MySQL, SQLServer.
-		/// </summary>
-		BigInt,
+	/// <summary>
+	/// MySQL, SQLServer.
+	/// </summary>
+	BigInt,
 
-		/// <summary>
-		/// SQLServer.
-		/// </summary>
-		Binary,
+	/// <summary>
+	/// SQLServer.
+	/// </summary>
+	Binary,
 
-		/// <summary>
-		/// SQLServer.
-		/// </summary>
-		Bit,
+	/// <summary>
+	/// SQLServer.
+	/// </summary>
+	Bit,
 
-		/// <summary>
-		/// MySQL.
-		/// </summary>
-		Blob,
+	/// <summary>
+	/// MySQL.
+	/// </summary>
+	Blob,
 
-		/// <summary>
-		/// MS Access (Yes/No), MySQL, SQLServer.
-		/// </summary>
-		Boolean,
+	/// <summary>
+	/// MS Access (Yes/No), MySQL, SQLServer.
+	/// </summary>
+	Boolean,
 
-		/// <summary>
-		/// MS Access.
-		/// </summary>
-		Byte,
+	/// <summary>
+	/// MS Access.
+	/// </summary>
+	Byte,
 
-		/// <summary>
-		/// MS Access, MySQL, SQLServer.
-		/// </summary>
-		Char,
+	/// <summary>
+	/// MS Access, MySQL, SQLServer.
+	/// </summary>
+	Char,
 
-		/// <summary>
-		/// Currency type
-		/// MySQL, SQLServer.
-		/// </summary>
-		Currency,
+	/// <summary>
+	/// Currency type
+	/// MySQL, SQLServer.
+	/// </summary>
+	Currency,
 
-		/// <summary>
-		/// SQLServer.
-		/// </summary>
-		Cursor,
+	/// <summary>
+	/// SQLServer.
+	/// </summary>
+	Cursor,
 
-		/// <summary>
-		/// MySQL, SQLServer.
-		/// </summary>
-		Date,
+	/// <summary>
+	/// MySQL, SQLServer.
+	/// </summary>
+	Date,
 
-		/// <summary>
-		/// DateTime type
-		/// MySQL, SQLServer, MS ACCESS (as Date/Time).
-		/// </summary>
-		DateTime,
+	/// <summary>
+	/// DateTime type
+	/// MySQL, SQLServer, MS ACCESS (as Date/Time).
+	/// </summary>
+	DateTime,
 
-		/// <summary>
-		/// SQLServer.
-		/// </summary>
-		DateTime2,
+	/// <summary>
+	/// SQLServer.
+	/// </summary>
+	DateTime2,
 
-		/// <summary>
-		/// SQLServer.
-		/// </summary>
-		DateTimeOffset,
+	/// <summary>
+	/// SQLServer.
+	/// </summary>
+	DateTimeOffset,
 
-		/// <summary>
-		/// MySQL, SQLServer.
-		/// </summary>
-		Decimal,
+	/// <summary>
+	/// MySQL, SQLServer.
+	/// </summary>
+	Decimal,
 
-		/// <summary>
-		/// MS Access, MySQL.
-		/// </summary>
-		Double,
+	/// <summary>
+	/// MS Access, MySQL.
+	/// </summary>
+	Double,
 
-		/// <summary>
-		/// MS Access.
-		/// </summary>
-		Hyperlink,
+	/// <summary>
+	/// MS Access.
+	/// </summary>
+	Hyperlink,
 
-		/// <summary>
-		/// MySQL.
-		/// </summary>
-		Enum,
+	/// <summary>
+	/// MySQL.
+	/// </summary>
+	Enum,
 
-		/// <summary>
-		/// MySQL, SQLServer.
-		/// </summary>
-		Float,
+	/// <summary>
+	/// MySQL, SQLServer.
+	/// </summary>
+	Float,
 
-		/// <summary>
-		/// MS Access.
-		/// </summary>
-		Identity,
+	/// <summary>
+	/// MS Access.
+	/// </summary>
+	Identity,
 
-		/// <summary>
-		/// SQLServer.
-		/// </summary>
-		Image,
+	/// <summary>
+	/// SQLServer.
+	/// </summary>
+	Image,
 
-		/// <summary>
-		/// MySQL, SQLServer.
-		/// </summary>
-		Int,
+	/// <summary>
+	/// MySQL, SQLServer.
+	/// </summary>
+	Int,
 
-		/// <summary>
-		/// MS Access.
-		/// </summary>
-		Integer,
+	/// <summary>
+	/// MS Access.
+	/// </summary>
+	Integer,
 
-		/// <summary>
-		/// Other.
-		/// </summary>
-		JavaObject,
+	/// <summary>
+	/// Other.
+	/// </summary>
+	JavaObject,
 
-		/// <summary>
-		/// MS Access.
-		/// </summary>
-		Long,
+	/// <summary>
+	/// MS Access.
+	/// </summary>
+	Long,
 
-		/// <summary>
-		/// MySQL.
-		/// </summary>
-		LongBlob,
+	/// <summary>
+	/// MySQL.
+	/// </summary>
+	LongBlob,
 
-		/// <summary>
-		/// MySQL.
-		/// </summary>
-		LongText,
+	/// <summary>
+	/// MySQL.
+	/// </summary>
+	LongText,
 
-		/// <summary>
-		/// MySQL.
-		/// </summary>
-		LongVarBinary,
+	/// <summary>
+	/// MySQL.
+	/// </summary>
+	LongVarBinary,
 
-		/// <summary>
-		/// MySQL.
-		/// </summary>
-		LongVarChar,
+	/// <summary>
+	/// MySQL.
+	/// </summary>
+	LongVarChar,
 
-		/// <summary>
-		/// MS Access.
-		/// </summary>
-		LookupWizard,
+	/// <summary>
+	/// MS Access.
+	/// </summary>
+	LookupWizard,
 
-		/// <summary>
-		/// MySQL.
-		/// </summary>
-		MediumBlob,
+	/// <summary>
+	/// MySQL.
+	/// </summary>
+	MediumBlob,
 
-		/// <summary>
-		/// MySQL.
-		/// </summary>
-		MediumInt,
+	/// <summary>
+	/// MySQL.
+	/// </summary>
+	MediumInt,
 
-		/// <summary>
-		/// MySQL.
-		/// </summary>
-		MediumText,
+	/// <summary>
+	/// MySQL.
+	/// </summary>
+	MediumText,
 
-		/// <summary>
-		/// Memo (large text) type
-		/// MS Access.
-		/// </summary>
-		Memo,
+	/// <summary>
+	/// Memo (large text) type
+	/// MS Access.
+	/// </summary>
+	Memo,
 
-		/// <summary>
-		/// SQLServer.
-		/// </summary>
-		Money,
+	/// <summary>
+	/// SQLServer.
+	/// </summary>
+	Money,
 
-		/// <summary>
-		/// SQLServer.
-		/// </summary>
-		NChar,
+	/// <summary>
+	/// SQLServer.
+	/// </summary>
+	NChar,
 
-		/// <summary>
-		/// SQLServer.
-		/// </summary>
-		NText,
+	/// <summary>
+	/// SQLServer.
+	/// </summary>
+	NText,
 
-		/// <summary>
-		/// Number (integer) type
-		/// SQLServer.
-		/// </summary>
-		Number,
+	/// <summary>
+	/// Number (integer) type
+	/// SQLServer.
+	/// </summary>
+	Number,
 
-		/// <summary>
-		/// SQLServer.
-		/// </summary>
-		Numeric,
+	/// <summary>
+	/// SQLServer.
+	/// </summary>
+	Numeric,
 
-		/// <summary>
-		/// SQLServer.
-		/// </summary>
-		NVarChar,
+	/// <summary>
+	/// SQLServer.
+	/// </summary>
+	NVarChar,
 
-		/// <summary>
-		/// MS Access.
-		/// </summary>
-		OleObject,
+	/// <summary>
+	/// MS Access.
+	/// </summary>
+	OleObject,
 
-		/// <summary>
-		/// Ole object type
-		/// MS Access.
-		/// </summary>
-		Ole,
+	/// <summary>
+	/// Ole object type
+	/// MS Access.
+	/// </summary>
+	Ole,
 
-		/// <summary>
-		/// Other column type.
-		/// </summary>
-		Other,
+	/// <summary>
+	/// Other column type.
+	/// </summary>
+	Other,
 
-		/// <summary>
-		/// SQLServer.
-		/// </summary>
-		Real,
+	/// <summary>
+	/// SQLServer.
+	/// </summary>
+	Real,
 
-		/// <summary>
-		/// MySQL.
-		/// </summary>
-		Set,
+	/// <summary>
+	/// MySQL.
+	/// </summary>
+	Set,
 
-		/// <summary>
-		/// MS Access.
-		/// </summary>
-		Single,
+	/// <summary>
+	/// MS Access.
+	/// </summary>
+	Single,
 
-		/// <summary>
-		/// SQLServer.
-		/// </summary>
-		SmallDateTime,
+	/// <summary>
+	/// SQLServer.
+	/// </summary>
+	SmallDateTime,
 
-		/// <summary>
-		/// MySQL, SQLServer.
-		/// </summary>
-		SmallInt,
+	/// <summary>
+	/// MySQL, SQLServer.
+	/// </summary>
+	SmallInt,
 
-		/// <summary>
-		/// SQLServer.
-		/// </summary>
-		SmallMoney,
+	/// <summary>
+	/// SQLServer.
+	/// </summary>
+	SmallMoney,
 
-		/// <summary>
-		/// SQLServer.
-		/// </summary>
-		SqlVariant,
+	/// <summary>
+	/// SQLServer.
+	/// </summary>
+	SqlVariant,
 
-		/// <summary>
-		/// MS Access
-		/// String type.
-		/// </summary>
-		String,
+	/// <summary>
+	/// MS Access
+	/// String type.
+	/// </summary>
+	String,
 
-		/// <summary>
-		/// MS Access.
-		/// </summary>
-		Table,
+	/// <summary>
+	/// MS Access.
+	/// </summary>
+	Table,
 
-		/// <summary>
-		/// MS Access, MySQL, SQLServer.
-		/// </summary>
-		Text,
+	/// <summary>
+	/// MS Access, MySQL, SQLServer.
+	/// </summary>
+	Text,
 
-		/// <summary>
-		/// MySQL, SQLServer.
-		/// </summary>
-		Time,
+	/// <summary>
+	/// MySQL, SQLServer.
+	/// </summary>
+	Time,
 
-		/// <summary>
-		/// MySQL, SQLServer.
-		/// </summary>
-		Timestamp,
+	/// <summary>
+	/// MySQL, SQLServer.
+	/// </summary>
+	Timestamp,
 
-		/// <summary>
-		/// MySQL, SQLServer.
-		/// </summary>
-		TinyInt,
+	/// <summary>
+	/// MySQL, SQLServer.
+	/// </summary>
+	TinyInt,
 
-		/// <summary>
-		/// MySQL.
-		/// </summary>
-		TinyText,
+	/// <summary>
+	/// MySQL.
+	/// </summary>
+	TinyText,
 
-		/// <summary>
-		/// SQLServer.
-		/// </summary>
-		UniqueIdentifier,
+	/// <summary>
+	/// SQLServer.
+	/// </summary>
+	UniqueIdentifier,
 
-		/// <summary>
-		/// SQLServer.
-		/// </summary>
-		VarBinary,
+	/// <summary>
+	/// SQLServer.
+	/// </summary>
+	VarBinary,
 
-		/// <summary>
-		/// MySQL, SQLServer.
-		/// </summary>
-		VarChar,
+	/// <summary>
+	/// MySQL, SQLServer.
+	/// </summary>
+	VarChar,
 
-		/// <summary>
-		/// SQLServer.
-		/// </summary>
-		Xml,
+	/// <summary>
+	/// SQLServer.
+	/// </summary>
+	Xml,
 
-		/// <summary>
-		/// MySQL.
-		/// </summary>
-		Year,
+	/// <summary>
+	/// MySQL.
+	/// </summary>
+	Year,
 
-		/// <summary>
-		/// Boolean.
-		/// </summary>
-		YesNo
-	}
-#pragma warning restore CA1720
+	/// <summary>
+	/// Boolean.
+	/// </summary>
+	YesNo
 }
+#pragma warning restore CA1720
+
