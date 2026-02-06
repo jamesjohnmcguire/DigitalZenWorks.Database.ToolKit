@@ -466,7 +466,14 @@ namespace DigitalZenWorks.Database.ToolKit
 		public virtual string GetTableCreateStatement(
 			Table table, bool isLast = false)
 		{
+#if NET6_0_OR_GREATER
 			ArgumentNullException.ThrowIfNull(table);
+#else
+			if (table == null)
+			{
+				throw new ArgumentNullException(nameof(table));
+			}
+#endif
 
 			Collection<ForeignKey> foreignKeys = table.ForeignKeys;
 
@@ -580,7 +587,14 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// recognized.</returns>
 		protected static string GetColumnTypeText(Column column)
 		{
+#if NET6_0_OR_GREATER
 			ArgumentNullException.ThrowIfNull(column);
+#else
+			if (column == null)
+			{
+				throw new ArgumentNullException(nameof(column));
+			}
+#endif
 
 			string columnType = column.ColumnType switch
 			{
@@ -617,7 +631,14 @@ namespace DigitalZenWorks.Database.ToolKit
 		protected static SortedList<int, Column> GetOrdinalSortedColumns(
 			Table table)
 		{
+#if NET6_0_OR_GREATER
 			ArgumentNullException.ThrowIfNull(table);
+#else
+			if (table == null)
+			{
+				throw new ArgumentNullException(nameof(table));
+			}
+#endif
 
 			// Sort Columns into ordinal positions
 			SortedList<int, Column> columns = [];
@@ -648,7 +669,14 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// formatted for inclusion in a CREATE TABLE statement.</returns>
 		protected virtual string GetColumnSql(Column column, bool isLast)
 		{
+#if NET6_0_OR_GREATER
 			ArgumentNullException.ThrowIfNull(column);
+#else
+			if (column == null)
+			{
+				throw new ArgumentNullException(nameof(column));
+			}
+#endif
 
 			string sql = "\t\"" + column.Name + "\"";
 
@@ -703,7 +731,14 @@ namespace DigitalZenWorks.Database.ToolKit
 		/// formatted for inclusion in a CREATE TABLE statement.</returns>
 		protected virtual string GetCreateColumnSql(Column column)
 		{
+#if NET6_0_OR_GREATER
 			ArgumentNullException.ThrowIfNull(column);
+#else
+			if (column == null)
+			{
+				throw new ArgumentNullException(nameof(column));
+			}
+#endif
 
 			string sql = "\t\"" + column.Name + "\"";
 
@@ -754,7 +789,14 @@ namespace DigitalZenWorks.Database.ToolKit
 		protected virtual string GetForeignKeySql(
 			ForeignKey foreignKey, bool isLast)
 		{
+#if NET6_0_OR_GREATER
 			ArgumentNullException.ThrowIfNull(foreignKey);
+#else
+			if (foreignKey == null)
+			{
+				throw new ArgumentNullException(nameof(foreignKey));
+			}
+#endif
 
 			const string constraint = "CONSTRAINT";
 			const string key = "FOREIGN KEY";
@@ -802,4 +844,3 @@ namespace DigitalZenWorks.Database.ToolKit
 		}
 	}
 }
-

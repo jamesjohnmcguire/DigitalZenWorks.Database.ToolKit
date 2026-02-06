@@ -77,7 +77,14 @@ namespace DigitalZenWorks.Database.ToolKit
 		public static OleDbParameterCollection AddParameters(
 			OleDbCommand command, IDictionary<string, object> values)
 		{
+#if NET6_0_OR_GREATER
 			ArgumentNullException.ThrowIfNull(command);
+#else
+			if (command == null)
+			{
+				throw new ArgumentNullException(nameof(command));
+			}
+#endif
 
 			OleDbParameterCollection parameters = command.Parameters;
 
