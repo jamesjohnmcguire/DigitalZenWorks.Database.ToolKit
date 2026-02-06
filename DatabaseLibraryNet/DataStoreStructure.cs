@@ -12,6 +12,7 @@ namespace DigitalZenWorks.Database.ToolKit
 	using System.Data;
 	using System.Data.Common;
 	using System.Linq;
+	using System.Reflection;
 	using global::Common.Logging;
 
 	/// Class <c>DataStoreStructure.</c>
@@ -891,6 +892,36 @@ namespace DigitalZenWorks.Database.ToolKit
 			return tableDictionary;
 		}
 
+		private static DbDataAdapter CreateDataAdapterForConnection(
+			DbConnection connection)
+		{
+			Type connectionType = connection.GetType();
+			string connectionTypeName = connectionType.FullName;
+
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP2_0_OR_GREATER
+			string adapterTypeName = connectionTypeName.Replace(
+				"Connection",
+				"DataAdapter",
+				StringComparison.InvariantCultureIgnoreCase);
+#else
+			string adapterTypeName = connectionTypeName.Replace(
+				"Connection",
+				"DataAdapter");
+#endif
+
+			Assembly assembly = connectionType.Assembly;
+			Type adapterType = assembly.GetType(adapterTypeName);
+
+			if (adapterType == null)
+			{
+				string message =
+					$"Could not find adapter type for {connectionTypeName}";
+				throw new NotSupportedException(message);
+			}
+
+			return (DbDataAdapter)Activator.CreateInstance(adapterType);
+		}
+
 		private static DataTable GetBaseConstraints()
 		{
 			DataTable table = new();
@@ -1189,17 +1220,12 @@ namespace DigitalZenWorks.Database.ToolKit
 #pragma warning disable CA2100
 			command.CommandText = query;
 #pragma warning restore CA2100
-#if NET5_0_OR_GREATER || NETCOREAPP3_0_OR_GREATER || NETFRAMEWORK
+
+#if NETSTANDARD2_1_OR_GREATER || NET5_0_OR_GREATER
 			using DbDataAdapter adapter =
-				DbProviderFactories.GetFactory(connection).CreateDataAdapter();
 #else
-			// DbProviderFactories not available in netstandard2.0
-			// Create adapter directly from connection's command
-			string name = connection.GetType().Namespace + ".DataAdapter, " +
-				connection.GetType().Assembly.FullName;
-			using DbDataAdapter adapter =
-				(DbDataAdapter)Activator.CreateInstance(Type.GetType(name),
-				command);
+			DbDataAdapter adapter = CreateDataAdapterForConnection(connection);
+			using DbDataAdapter adapterDisposable = adapter;
 #endif
 			adapter.SelectCommand = command;
 
