@@ -65,4 +65,3 @@ namespace DigitalZenWorks.Database.ToolKit
 			"This column has been set to the 'Other' type: ";
 	}
 }
-
