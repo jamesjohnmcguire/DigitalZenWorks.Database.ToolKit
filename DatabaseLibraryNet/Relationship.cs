@@ -64,4 +64,3 @@ namespace DigitalZenWorks.Database.ToolKit
 		public ConstraintAction OnDeleteAction { get; set; }
 	}
 }
-
