@@ -23,6 +23,7 @@
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<PackageTags>Digital Zen Works;Database</PackageTags>
 		<SignAssembly>true</SignAssembly>
+		<SuppressTfmSupportBuildWarnings>true</SuppressTfmSupportBuildWarnings>
 		<Version>1.2.55</Version>
 	</PropertyGroup>
 
