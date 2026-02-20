@@ -914,6 +914,8 @@ public class DataStorage : IDataStorage
 				{
 					SQLiteParameter parameter =
 						new(DbType.String, keyPairValue);
+					parameter.ParameterName = valuePair.Key;
+
 					result = parameters.Add(parameter);
 				}
 				else
