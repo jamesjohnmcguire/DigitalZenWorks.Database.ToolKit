@@ -608,9 +608,9 @@ public class DataStoreStructure : IDisposable
 #if NET6_0_OR_GREATER
 		ArgumentNullException.ThrowIfNull(row);
 #else
-		if (column == null)
+		if (row == null)
 		{
-			string name = nameof(column);
+			string name = nameof(row);
 			throw new ArgumentNullException(name);
 		}
 #endif

@@ -35,18 +35,11 @@ public static class DatabaseUtilities
 #if NET6_0_OR_GREATER
 		ArgumentNullException.ThrowIfNull(database);
 #else
-<<<<<<< HEAD
-			if (database == null)
-			{
-				string name = nameof(database);
-				throw new ArgumentNullException(name);
-			}
-=======
 		if (database == null)
 		{
-			throw new ArgumentNullException(nameof(database));
+			string name = nameof(database);
+			throw new ArgumentNullException(name);
 		}
->>>>>>> 64ecfcf (Use Modern Style Namespace Declaration)
 #endif
 
 		// Get all the table names
