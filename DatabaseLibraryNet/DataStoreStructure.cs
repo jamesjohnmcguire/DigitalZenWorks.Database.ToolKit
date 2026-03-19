@@ -610,7 +610,8 @@ public class DataStoreStructure : IDisposable
 #else
 		if (row == null)
 		{
-			throw new ArgumentNullException(nameof(row));
+			string name = nameof(row);
+			throw new ArgumentNullException(name);
 		}
 #endif
 
@@ -1217,8 +1218,8 @@ public class DataStoreStructure : IDisposable
 #pragma warning restore CA2100
 
 #if NETSTANDARD2_1_OR_GREATER || NET5_0_OR_GREATER
-		using var adapter =
-		DbProviderFactories.GetFactory(connection).CreateDataAdapter();
+		using DbDataAdapter adapter =
+			DbProviderFactories.GetFactory(connection).CreateDataAdapter();
 #else
 		DbDataAdapter adapter = CreateDataAdapterForConnection(connection);
 		using DbDataAdapter adapterDisposable = adapter;

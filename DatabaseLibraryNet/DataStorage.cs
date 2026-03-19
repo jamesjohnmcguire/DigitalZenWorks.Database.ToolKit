@@ -85,41 +85,10 @@ public class DataStorage : IDataStorage
 		this.databaseType = databaseType;
 		connectionText = connectionString;
 	}
-
-	/// <summary>
-	/// Gets get the table schema information for the associated database.
-	/// </summary>
-	/// <value>
-	/// Get the table schema information for the associated database.
-	/// </value>
-	public virtual DataTable SchemaTable
-	{
-		get
-		{
-			DataTable tables = null;
-
-			bool returnCode = Initialize();
-
-			if (returnCode == true)
-			{
-				tables = GetTables();
-			}
-
-			return tables;
-		}
-	}
-
-	/// <summary>
-	/// Gets or sets or set the time out value.
-	/// </summary>
-	/// <value>
-	/// The time out value.
-	/// </value>
-	public int TimeOut { get; set; } = 30;
-
 	/// <summary>
 	/// Gets the database command object.
 	/// </summary>
+	/// <value>The database command object.</value>
 	public virtual DbCommand Command
 	{
 		get
@@ -193,6 +162,37 @@ public class DataStorage : IDataStorage
 
 		set => dataAdapter = value;
 	}
+
+	/// <summary>
+	/// Gets get the table schema information for the associated database.
+	/// </summary>
+	/// <value>
+	/// Get the table schema information for the associated database.
+	/// </value>
+	public virtual DataTable SchemaTable
+	{
+		get
+		{
+			DataTable tables = null;
+
+			bool returnCode = Initialize();
+
+			if (returnCode == true)
+			{
+				tables = GetTables();
+			}
+
+			return tables;
+		}
+	}
+
+	/// <summary>
+	/// Gets or sets or set the time out value.
+	/// </summary>
+	/// <value>
+	/// The time out value.
+	/// </value>
+	public int TimeOut { get; set; } = 30;
 
 	/// <summary>
 	/// Generates a database connection string for the specified database
@@ -908,25 +908,22 @@ public class DataStorage : IDataStorage
 			}
 			else
 			{
+				// DbParameter is abstract, so we have to create one of the
+				// specific types below.
+				string keyPairName = valuePair.Key;
 				object keyPairValue = valuePair.Value;
 
 				if (databaseType == DatabaseType.SQLite)
 				{
 					SQLiteParameter parameter =
 						new(DbType.String, keyPairValue);
-					parameter.ParameterName = valuePair.Key;
-
-					result = parameters.Add(parameter);
+					parameter.ParameterName = keyPairName;
+					parameters.Add(parameter);
 				}
 				else
 				{
-					result = parameters.Add(keyPairValue);
+					parameters.Add(keyPairValue);
 				}
-			}
-
-			if (result == 0)
-			{
-				Log.Warn("DbParameterCollection.Add returns 0");
 			}
 		}
 

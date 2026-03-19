@@ -471,7 +471,8 @@ public class SqlWriter
 #else
 		if (table == null)
 		{
-			throw new ArgumentNullException(nameof(table));
+			string name = nameof(table);
+			throw new ArgumentNullException(name);
 		}
 #endif
 
@@ -592,7 +593,8 @@ public class SqlWriter
 #else
 		if (column == null)
 		{
-			throw new ArgumentNullException(nameof(column));
+			string name = nameof(column);
+			throw new ArgumentNullException(name);
 		}
 #endif
 
@@ -636,7 +638,8 @@ public class SqlWriter
 #else
 		if (table == null)
 		{
-			throw new ArgumentNullException(nameof(table));
+			string name = nameof(table);
+			throw new ArgumentNullException(name);
 		}
 #endif
 
@@ -674,7 +677,8 @@ public class SqlWriter
 #else
 		if (column == null)
 		{
-			throw new ArgumentNullException(nameof(column));
+			string name = nameof(column);
+			throw new ArgumentNullException(name);
 		}
 #endif
 
@@ -736,7 +740,8 @@ public class SqlWriter
 #else
 		if (column == null)
 		{
-			throw new ArgumentNullException(nameof(column));
+			string name = nameof(column);
+			throw new ArgumentNullException(name);
 		}
 #endif
 
@@ -794,7 +799,8 @@ public class SqlWriter
 #else
 		if (foreignKey == null)
 		{
-			throw new ArgumentNullException(nameof(foreignKey));
+			string name = nameof(foreignKey);
+			throw new ArgumentNullException(name);
 		}
 #endif
 

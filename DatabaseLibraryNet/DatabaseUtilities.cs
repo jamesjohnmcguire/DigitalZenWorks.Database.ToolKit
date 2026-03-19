@@ -37,7 +37,8 @@ public static class DatabaseUtilities
 #else
 		if (database == null)
 		{
-			throw new ArgumentNullException(nameof(database));
+			string name = nameof(database);
+			throw new ArgumentNullException(name);
 		}
 #endif
 
