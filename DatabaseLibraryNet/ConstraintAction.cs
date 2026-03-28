@@ -1,6 +1,6 @@
 /////////////////////////////////////////////////////////////////////////////
-// <copyright file="ConstraintAction.cs" company="James John McGuire">
-// Copyright © 2006 - 2026 James John McGuire.
+// <copyright file="ConstraintAction.cs" company="Digital Zen Works">
+// Copyright © 2006 - 2026 Digital Zen Works.
 // </copyright>
 /////////////////////////////////////////////////////////////////////////////
 

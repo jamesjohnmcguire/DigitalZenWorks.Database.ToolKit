@@ -1,6 +1,6 @@
 /////////////////////////////////////////////////////////////////////////////
-// <copyright file="SqlWriterOleDb.cs" company="James John McGuire">
-// Copyright © 2006 - 2026 James John McGuire.
+// <copyright file="SqlWriterOleDb.cs" company="Digital Zen Works">
+// Copyright © 2006 - 2026 Digital Zen Works.
 // </copyright>
 /////////////////////////////////////////////////////////////////////////////
 

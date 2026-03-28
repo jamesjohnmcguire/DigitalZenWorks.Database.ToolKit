@@ -1,5 +1,5 @@
-// <copyright file="OleDbTests.cs" company="James John McGuire">
-// Copyright © 2006 - 2026 James John McGuire.
+// <copyright file="OleDbTests.cs" company="Digital Zen Works">
+// Copyright © 2006 - 2026 Digital Zen Works.
 // </copyright>
 
 namespace DigitalZenWorks.Database.ToolKit.Tests

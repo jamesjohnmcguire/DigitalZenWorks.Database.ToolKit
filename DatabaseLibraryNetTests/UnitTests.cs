@@ -1,5 +1,5 @@
-// <copyright file="UnitTests.cs" company="James John McGuire">
-// Copyright © 2006 - 2026 James John McGuire.
+// <copyright file="UnitTests.cs" company="Digital Zen Works">
+// Copyright © 2006 - 2026 Digital Zen Works.
 // </copyright>
 
 namespace DigitalZenWorks.Database.ToolKit.Tests

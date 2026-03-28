@@ -1,6 +1,6 @@
 /////////////////////////////////////////////////////////////////////////////
-// <copyright file="DatabaseType.cs" company="James John McGuire">
-// Copyright © 2006 - 2026 James John McGuire.
+// <copyright file="DatabaseType.cs" company="Digital Zen Works">
+// Copyright © 2006 - 2026 Digital Zen Works.
 // </copyright>
 /////////////////////////////////////////////////////////////////////////////
 
