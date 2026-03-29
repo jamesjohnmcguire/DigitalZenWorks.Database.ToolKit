@@ -97,7 +97,7 @@ public static class DataDefinition
 			Collection<Table> tables = GetSchema(databaseFile);
 			tables = OrderTables(tables);
 
-			SqlWriter sqlWriter = new ();
+			SqlWriter sqlWriter = new();
 			string schemaText = sqlWriter.GetTablesCreateStatements(tables);
 
 			File.WriteAllText(schemaFile, schemaText);
@@ -449,7 +449,7 @@ public static class DataDefinition
 	{
 		DatabaseType databaseType = GetDatabaseType(databaseFile);
 
-		using DataStoreStructure schema = new (databaseType, databaseFile);
+		using DataStoreStructure schema = new(databaseType, databaseFile);
 		Collection<Table> tables = schema.GetSchema();
 
 		return tables;

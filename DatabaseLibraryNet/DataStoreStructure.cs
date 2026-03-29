@@ -53,7 +53,7 @@ public class DataStoreStructure : IDisposable
 		string connectionString =
 			DataStorage.GetConnectionString(databaseType, databaseFile);
 
-		database = new (databaseType, connectionString);
+		database = new(databaseType, connectionString);
 		database.Open();
 
 		connection = database.Connection;
@@ -306,7 +306,7 @@ public class DataStoreStructure : IDisposable
 
 		if (row != null)
 		{
-			column = new ();
+			column = new();
 
 			column.Name = row["COLUMN_NAME"].ToString();
 			string dataType = row["DATA_TYPE"].ToString();
@@ -476,7 +476,7 @@ public class DataStoreStructure : IDisposable
 	/// table and its columns.</returns>
 	public virtual Table GetTable(string tableName)
 	{
-		Table table = new (tableName);
+		Table table = new(tableName);
 
 		Log.Info("Getting Columns for " + tableName);
 		DataTable dataColumns = GetTableColumns(tableName);
@@ -568,7 +568,7 @@ public class DataStoreStructure : IDisposable
 		Dictionary<string, Table>.ValueCollection values =
 			tableDictionary.Values;
 		List<Table> newList = [.. values];
-		Collection<Table> tables = new (newList);
+		Collection<Table> tables = new(newList);
 
 		tables = RemoveSystemsTables(tables);
 
@@ -687,7 +687,7 @@ public class DataStoreStructure : IDisposable
 		}
 #endif
 
-		Relationship relationship = new ();
+		Relationship relationship = new();
 
 		// Using standard (or perhaps Sqlite) keys
 		const string constraintNameKey = "CONSTRAINT_NAME";
@@ -1226,7 +1226,7 @@ public class DataStoreStructure : IDisposable
 #endif
 		adapter.SelectCommand = command;
 
-		DataTable constraints = new ();
+		DataTable constraints = new();
 		adapter.Fill(constraints);
 
 		return constraints;

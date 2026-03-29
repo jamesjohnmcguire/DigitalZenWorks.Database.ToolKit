@@ -47,7 +47,7 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 			string tableName = "Sections";
 
 			using DataStoreStructure schema =
-				new (DatabaseType.SQLite, DataSource);
+				new(DatabaseType.SQLite, DataSource);
 
 			DataTable constraints =
 				schema.GetConstraints(tableName);
@@ -104,7 +104,7 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 			const string dependentTableName = "Sections";
 
 			using DataStoreStructure schema =
-				new (DatabaseType.SQLite, DataSource);
+				new(DatabaseType.SQLite, DataSource);
 
 			Collection<Relationship> relationships =
 				schema.GetRelationships(dependentTableName, null);
@@ -129,7 +129,7 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 		public void GetSchema()
 		{
 			using DataStoreStructure schema =
-				new (DatabaseType.SQLite, DataSource);
+				new(DatabaseType.SQLite, DataSource);
 
 			Collection<Table> tables = schema.GetSchema();
 
@@ -170,7 +170,7 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 			const string tableName = "Addresses";
 
 			using DataStoreStructure schema =
-				new (DatabaseType.SQLite, DataSource);
+				new(DatabaseType.SQLite, DataSource);
 
 			DataTable table = schema.GetTableColumns(tableName);
 

@@ -130,7 +130,7 @@ public class OleDbSchema : DataStoreStructure
 	{
 		primaryKeyNames = GetPrimaryKeyNames(tableName);
 
-		Table table = new (tableName);
+		Table table = new(tableName);
 
 		Log.Info("Getting Columns for " + tableName);
 		DataTable dataColumns = GetTableColumns(tableName);
@@ -264,7 +264,7 @@ public class OleDbSchema : DataStoreStructure
 	/// table and column names, and cascade rules.</returns>
 	protected override Relationship GetRelationship(DataRow foreignKey)
 	{
-		Relationship relationship = new ();
+		Relationship relationship = new();
 
 		// Note: OleDb seems to have reversed referencing.
 		const string constraintNameKey = "FK_NAME";

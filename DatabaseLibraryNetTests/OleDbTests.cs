@@ -51,7 +51,7 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 		{
 			string tableName = "Sections";
 
-			using OleDbSchema oleDbSchema = new (databaseFile);
+			using OleDbSchema oleDbSchema = new(databaseFile);
 
 			DataTable constraints =
 				oleDbSchema.GetConstraints(tableName);
@@ -101,7 +101,7 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 		{
 			const string dependentTableName = "Addresses";
 
-			using OleDbSchema oleDbSchema = new (databaseFile);
+			using OleDbSchema oleDbSchema = new(databaseFile);
 
 			Collection<Relationship> relationships =
 				oleDbSchema.GetRelationships(dependentTableName, null);
@@ -164,7 +164,7 @@ namespace DigitalZenWorks.Database.ToolKit.Tests
 		{
 			const string tableName = "Addresses";
 
-			using OleDbSchema oleDbSchema = new (databaseFile);
+			using OleDbSchema oleDbSchema = new(databaseFile);
 
 			DataTable table = oleDbSchema.GetTableColumns(tableName);
 

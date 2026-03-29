@@ -549,7 +549,7 @@ public class SqlWriter
 
 		if (tables != null)
 		{
-			StringBuilder schemaBuilder = new ();
+			StringBuilder schemaBuilder = new();
 
 			for (int index = 0; index < tables.Count; index++)
 			{
