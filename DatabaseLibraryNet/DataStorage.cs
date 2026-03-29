@@ -85,6 +85,7 @@ public class DataStorage : IDataStorage
 		this.databaseType = databaseType;
 		connectionText = connectionString;
 	}
+
 	/// <summary>
 	/// Gets the database command object.
 	/// </summary>
