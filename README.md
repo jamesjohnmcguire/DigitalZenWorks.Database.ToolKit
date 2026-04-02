@@ -4,7 +4,7 @@ A .NET library with a set of database utility classes.
 ## Change Log
 ### 1.3.62
 
-Includes updated packages that fix vulnerabilities in transient packages
+Includes updated packages that resolve vulnerabilities in transient packages
 Added limited dapper support
 Increased SqLite support
 Enhanced nullable support
