@@ -297,6 +297,11 @@ public class SqlWriterOleDb : SqlWriter
 		return sql;
 	}
 
+	/// <summary>
+	/// Builds the primary-key constraint clauses for the supplied columns.
+	/// </summary>
+	/// <param name="columns">The ordered columns to inspect.</param>
+	/// <returns>The SQL primary-key constraint text.</returns>
 	private static string GetPrimaryKeysSql(SortedList<int, Column> columns)
 	{
 		string sql = string.Empty;

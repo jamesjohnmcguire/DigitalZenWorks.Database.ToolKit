@@ -888,6 +888,14 @@ public class DataStoreStructure : IDisposable
 		return tableDictionary;
 	}
 
+	/// <summary>
+	/// Creates the data adapter type that corresponds to the connection type.
+	/// </summary>
+	/// <param name="connection">The connection whose provider assembly is
+	/// inspected.</param>
+	/// <returns>The provider-specific data adapter.</returns>
+	/// <exception cref="NotSupportedException">Thrown when a matching adapter
+	/// type cannot be found.</exception>
 	private static DbDataAdapter CreateDataAdapterForConnection(
 		DbConnection connection)
 	{
@@ -918,6 +926,11 @@ public class DataStoreStructure : IDisposable
 		return (DbDataAdapter)Activator.CreateInstance(adapterType);
 	}
 
+	/// <summary>
+	/// Creates the standard constraint table used by provider-specific
+	/// constraint loaders.
+	/// </summary>
+	/// <returns>An empty constraint table with normalized columns.</returns>
 	private static DataTable GetBaseConstraints()
 	{
 		DataTable table = new();
@@ -934,6 +947,11 @@ public class DataStoreStructure : IDisposable
 		return table;
 	}
 
+	/// <summary>
+	/// Builds the MySQL query used to retrieve table constraints.
+	/// </summary>
+	/// <param name="tableName">The table whose constraints are requested.</param>
+	/// <returns>The MySQL constraint query.</returns>
 	private static string GetConstraintQueryMySql(string tableName)
 	{
 		const string fields = "CONSTRAINT_TYPE, CONSTRAINT_NAME, " +
@@ -955,6 +973,11 @@ public class DataStoreStructure : IDisposable
 		return query;
 	}
 
+	/// <summary>
+	/// Builds the Oracle query used to retrieve table constraints.
+	/// </summary>
+	/// <param name="tableName">The table whose constraints are requested.</param>
+	/// <returns>The Oracle constraint query.</returns>
 	private static string GetConstraintQueryOracle(string tableName)
 	{
 		const string fields = @"SELECT constraints.CONSTRAINT_TYPE,
@@ -985,6 +1008,11 @@ public class DataStoreStructure : IDisposable
 		return query;
 	}
 
+	/// <summary>
+	/// Builds the PostgreSQL query used to retrieve table constraints.
+	/// </summary>
+	/// <param name="tableName">The table whose constraints are requested.</param>
+	/// <returns>The PostgreSQL constraint query.</returns>
 	private static string GetConstraintQueryPostgresSql(string tableName)
 	{
 		const string fields = @"SELECT tableConstraints.constraint_type,
@@ -1020,6 +1048,11 @@ public class DataStoreStructure : IDisposable
 		return query;
 	}
 
+	/// <summary>
+	/// Builds the SQLite pragma used to retrieve table foreign keys.
+	/// </summary>
+	/// <param name="tableName">The table whose constraints are requested.</param>
+	/// <returns>The SQLite constraint query.</returns>
 	private static string GetConstraintQuerySqlite(string tableName)
 	{
 		string query = $"PRAGMA foreign_key_list('{tableName}')";
@@ -1027,6 +1060,11 @@ public class DataStoreStructure : IDisposable
 		return query;
 	}
 
+	/// <summary>
+	/// Builds the SQL Server query used to retrieve table constraints.
+	/// </summary>
+	/// <param name="tableName">The table whose constraints are requested.</param>
+	/// <returns>The SQL Server constraint query.</returns>
 	private static string GetConstraintQuerySqlServer(string tableName)
 	{
 		const string fields = @"SELECT tableConstraints.CONSTRAINT_TYPE,
@@ -1060,6 +1098,17 @@ public class DataStoreStructure : IDisposable
 		return query;
 	}
 
+	/// <summary>
+	/// Adds table dependencies to the ordered collection using depth-first
+	/// traversal.
+	/// </summary>
+	/// <param name="key">The table key currently being processed.</param>
+	/// <param name="tableDependencies">The dependency map keyed by table
+	/// name.</param>
+	/// <param name="orderedDependencies">The ordered dependency result.</param>
+	/// <param name="visited">The set of table keys already processed.</param>
+	/// <param name="visiting">The set of table keys in the active traversal
+	/// path.</param>
 	private static void GetDependenciesRecursive(
 		string key,
 		Dictionary<string, Collection<string>> tableDependencies,
@@ -1091,6 +1140,13 @@ public class DataStoreStructure : IDisposable
 		}
 	}
 
+	/// <summary>
+	/// Creates a normalized primary-key constraint row from provider index
+	/// schema data.
+	/// </summary>
+	/// <param name="table">The destination constraint table.</param>
+	/// <param name="row">The provider index schema row.</param>
+	/// <returns>The populated constraint row.</returns>
 	private static DataRow GetIndexConstaintsRow(
 		DataTable table, DataRow row)
 	{
@@ -1104,6 +1160,11 @@ public class DataStoreStructure : IDisposable
 		return newRow;
 	}
 
+	/// <summary>
+	/// Removes provider system tables from the table collection.
+	/// </summary>
+	/// <param name="tables">The table collection to filter.</param>
+	/// <returns>The filtered table collection.</returns>
 	private static Collection<Table> RemoveSystemsTables(
 		Collection<Table> tables)
 	{
@@ -1123,6 +1184,12 @@ public class DataStoreStructure : IDisposable
 		return tables;
 	}
 
+	/// <summary>
+	/// Adds foreign-key constraints reported by the provider schema API.
+	/// </summary>
+	/// <param name="tableName">The table whose foreign keys are read.</param>
+	/// <param name="table">The normalized constraint table to update.</param>
+	/// <returns>The updated constraint table.</returns>
 	private DataTable AddForeignKeyConstraints(
 		string tableName, DataTable table)
 	{
@@ -1158,6 +1225,12 @@ public class DataStoreStructure : IDisposable
 		return table;
 	}
 
+	/// <summary>
+	/// Adds primary-key constraints reported by the provider index schema.
+	/// </summary>
+	/// <param name="tableName">The table whose indexes are read.</param>
+	/// <param name="table">The normalized constraint table to update.</param>
+	/// <returns>The updated constraint table.</returns>
 	private DataTable AddIndexConstraints(
 		string tableName, DataTable table)
 	{
@@ -1196,6 +1269,10 @@ public class DataStoreStructure : IDisposable
 		return table;
 	}
 
+	/// <summary>
+	/// Gets the provider-specific column name for foreign-key source columns.
+	/// </summary>
+	/// <returns>The schema column name for the source column.</returns>
 	private string GetColumnName()
 	{
 		string columnName = "COLUMN_NAME";
@@ -1208,6 +1285,11 @@ public class DataStoreStructure : IDisposable
 		return columnName;
 	}
 
+	/// <summary>
+	/// Executes the provider-specific constraint query and returns the results.
+	/// </summary>
+	/// <param name="tableName">The table whose constraints are requested.</param>
+	/// <returns>The provider constraint result table.</returns>
 	private DataTable GetConstraintsByProvider(string tableName)
 	{
 		string query = GetConstraintQueryByProvider(tableName);
@@ -1232,6 +1314,13 @@ public class DataStoreStructure : IDisposable
 		return constraints;
 	}
 
+	/// <summary>
+	/// Selects the constraint query for the current database provider.
+	/// </summary>
+	/// <param name="tableName">The table whose constraints are requested.</param>
+	/// <returns>The provider-specific constraint query.</returns>
+	/// <exception cref="NotSupportedException">Thrown when the provider is not
+	/// supported for constraint queries.</exception>
 	private string GetConstraintQueryByProvider(string tableName)
 	{
 		string query = databaseType switch
@@ -1251,6 +1340,13 @@ public class DataStoreStructure : IDisposable
 		return query;
 	}
 
+	/// <summary>
+	/// Creates a normalized foreign-key constraint row from provider schema
+	/// data.
+	/// </summary>
+	/// <param name="table">The destination constraint table.</param>
+	/// <param name="row">The provider foreign-key schema row.</param>
+	/// <returns>The populated constraint row.</returns>
 	private DataRow GetForeignKeyConstaintsRow(
 		DataTable table, DataRow row)
 	{
@@ -1270,6 +1366,10 @@ public class DataStoreStructure : IDisposable
 		return newRow;
 	}
 
+	/// <summary>
+	/// Gets the provider-specific column name for referenced columns.
+	/// </summary>
+	/// <returns>The schema column name for the referenced column.</returns>
 	private string GetReferencedColumnName()
 	{
 		string columnName = "REFERENCED_COLUMN_NAME";
@@ -1282,6 +1382,10 @@ public class DataStoreStructure : IDisposable
 		return columnName;
 	}
 
+	/// <summary>
+	/// Gets the provider-specific column name for referenced tables.
+	/// </summary>
+	/// <returns>The schema column name for the referenced table.</returns>
 	private string GetReferencedTableName()
 	{
 		string columnName = "REFERENCED_TABLE_NAME";
@@ -1294,6 +1398,12 @@ public class DataStoreStructure : IDisposable
 		return columnName;
 	}
 
+	/// <summary>
+	/// Opens the connection, reads a schema table, and closes the connection.
+	/// </summary>
+	/// <param name="tableName">The schema collection name.</param>
+	/// <param name="restrictions">The schema restrictions to apply.</param>
+	/// <returns>The requested schema table.</returns>
 	private DataTable GetSchema(string tableName, string[] restrictions)
 	{
 		if (connection.State != ConnectionState.Open)

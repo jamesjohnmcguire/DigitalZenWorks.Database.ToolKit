@@ -163,6 +163,13 @@ public class DatabaseConnection : IDisposable
 		}
 	}
 
+	/// <summary>
+	/// Creates and stores the provider-specific database connection.
+	/// </summary>
+	/// <param name="databaseType">The database provider type to create.</param>
+	/// <param name="connectionString">The provider connection string.</param>
+	/// <returns>The created connection, or null when the provider is not
+	/// supported.</returns>
 	private IDbConnection? GetConnection(
 		DatabaseType databaseType, string connectionString)
 	{

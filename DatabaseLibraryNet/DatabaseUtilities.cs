@@ -136,6 +136,14 @@ public static class DatabaseUtilities
 		return returnCode;
 	}
 
+	/// <summary>
+	/// Exports the table identified by a schema row to a CSV file.
+	/// </summary>
+	/// <param name="database">The database that supplies the table data.</param>
+	/// <param name="row">The schema row containing the table name.</param>
+	/// <param name="csvPath">The destination folder or path prefix for the
+	/// CSV file.</param>
+	/// <returns>A value indicating whether the export process completed.</returns>
 	private static bool ExportDataRowToCsv(
 		DataStorage database, DataRow row, string csvPath)
 	{
@@ -177,6 +185,13 @@ public static class DatabaseUtilities
 		return returnCode;
 	}
 
+	/// <summary>
+	/// Writes one column value from a data row to the CSV output stream.
+	/// </summary>
+	/// <param name="row">The data row containing the value to write.</param>
+	/// <param name="file">The text writer receiving the CSV content.</param>
+	/// <param name="columnCount">The total number of columns in the row.</param>
+	/// <param name="index">The zero-based column index to write.</param>
 	private static void WriteColumnToCsvFile(
 		DataRow row, TextWriter file, int columnCount, int index)
 	{

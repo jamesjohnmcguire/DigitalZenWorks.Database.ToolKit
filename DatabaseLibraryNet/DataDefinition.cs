@@ -629,6 +629,15 @@ public static class DataDefinition
 		return queries;
 	}
 
+	/// <summary>
+	/// Compares a column description with a known database column type marker.
+	/// </summary>
+	/// <param name="column">The source column description to inspect.</param>
+	/// <param name="nameCheck">The text marker that identifies the type.</param>
+	/// <param name="columnType">The column type to return when matched.</param>
+	/// <param name="columnTypeOut">The detected column type.</param>
+	/// <returns>true when the description contains or equals the marker;
+	/// otherwise, false.</returns>
 	private static bool CompareColumnType(
 		string column,
 		string nameCheck,
@@ -655,6 +664,13 @@ public static class DataDefinition
 		return found;
 	}
 
+	/// <summary>
+	/// Opens the database file and executes each non-query statement.
+	/// </summary>
+	/// <param name="databaseFile">The database file to update.</param>
+	/// <param name="queries">The SQL statements to execute.</param>
+	/// <returns>true when the statements are executed successfully;
+	/// otherwise, false.</returns>
 	private static bool ExecuteNonQueries(
 		string databaseFile, IReadOnlyList<string> queries)
 	{
@@ -676,6 +692,17 @@ public static class DataDefinition
 		return result;
 	}
 
+	/// <summary>
+	/// Adds table dependencies to the ordered collection using depth-first
+	/// traversal.
+	/// </summary>
+	/// <param name="key">The table key currently being processed.</param>
+	/// <param name="tableDependencies">The dependency map keyed by table
+	/// name.</param>
+	/// <param name="orderedDependencies">The ordered dependency result.</param>
+	/// <param name="visited">The set of table keys already processed.</param>
+	/// <param name="visiting">The set of table keys in the active traversal
+	/// path.</param>
 	private static void GetDependenciesRecursive(
 		string key,
 		Dictionary<string, Collection<string>> tableDependencies,

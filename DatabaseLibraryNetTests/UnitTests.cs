@@ -241,6 +241,12 @@ internal sealed class UnitTests : BaseTestsSupport
 		Assert.That(File.Exists(DataSource), Is.True);
 	}
 
+	/// <summary>
+	/// Verifies whether a row with the supplied identifier exists in the test
+	/// table.
+	/// </summary>
+	/// <param name="existingRowId">The row identifier to query.</param>
+	/// <param name="shouldExist">The expected existence state.</param>
 	private void VerifyRowExists(int existingRowId, bool shouldExist)
 	{
 		string sql = "Select * from TestTable where Id=" + existingRowId;

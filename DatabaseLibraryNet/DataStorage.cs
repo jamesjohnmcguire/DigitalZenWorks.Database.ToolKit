@@ -835,6 +835,13 @@ public class DataStorage : IDataStorage
 		return tables;
 	}
 
+	/// <summary>
+	/// Maps a data row to a new item instance by matching columns to
+	/// properties.
+	/// </summary>
+	/// <typeparam name="TItem">The item type to create.</typeparam>
+	/// <param name="dataRow">The data row containing the source values.</param>
+	/// <returns>A populated item instance.</returns>
 	private static TItem GetItem<TItem>(DataRow dataRow)
 	{
 		Type localType = typeof(TItem);
@@ -887,6 +894,12 @@ public class DataStorage : IDataStorage
 		return instance;
 	}
 
+	/// <summary>
+	/// Converts a database column name to the singular Pascal-case property
+	/// name used by value objects.
+	/// </summary>
+	/// <param name="columnName">The database column name.</param>
+	/// <returns>The Pascal-case property name.</returns>
 	private static string GetSingularPascalName(string columnName)
 	{
 		string result = TextCase.ConvertToPascalCaseFromKnr(columnName);
@@ -894,6 +907,12 @@ public class DataStorage : IDataStorage
 		return result;
 	}
 
+	/// <summary>
+	/// Adds command parameters from a name/value dictionary.
+	/// </summary>
+	/// <param name="command">The command that receives the parameters.</param>
+	/// <param name="values">The parameter names and values to add.</param>
+	/// <returns>The updated parameter collection.</returns>
 	private DbParameterCollection AddParameters(
 		DbCommand command, IDictionary<string, object> values)
 	{
@@ -961,6 +980,13 @@ public class DataStorage : IDataStorage
 		return result;
 	}
 
+	/// <summary>
+	/// Creates a configured command for the current connection and optional
+	/// parameters.
+	/// </summary>
+	/// <param name="sql">The SQL command text.</param>
+	/// <param name="values">The optional command parameter values.</param>
+	/// <returns>The configured database command.</returns>
 	private DbCommand GetCommandObject(
 		string sql, IDictionary<string, object> values)
 	{

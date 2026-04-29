@@ -360,6 +360,11 @@ public class OleDbSchema : DataStoreStructure
 		return isPrimaryKey;
 	}
 
+	/// <summary>
+	/// Reads and caches the primary-key column names for a table.
+	/// </summary>
+	/// <param name="tableName">The table whose primary keys are requested.</param>
+	/// <returns>The set of primary-key column names.</returns>
 	private HashSet<string> GetPrimaryKeyNames(string tableName)
 	{
 		DataTable primaryKeys = GetPrimaryKeys(tableName);
@@ -376,6 +381,13 @@ public class OleDbSchema : DataStoreStructure
 		return primaryKeyNames;
 	}
 
+	/// <summary>
+	/// Opens the OleDb connection, reads a schema table, and closes the
+	/// connection.
+	/// </summary>
+	/// <param name="guid">The OleDb schema collection identifier.</param>
+	/// <param name="restrictions">The schema restrictions to apply.</param>
+	/// <returns>The requested schema table.</returns>
 	private DataTable GetSchema(Guid guid, object[] restrictions)
 	{
 		if (oleDbConnection.State != ConnectionState.Open)
