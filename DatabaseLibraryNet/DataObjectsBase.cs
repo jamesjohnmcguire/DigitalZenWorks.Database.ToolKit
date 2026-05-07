@@ -307,6 +307,14 @@ public class DataObjectsBase : IDisposable
 	}
 
 	/// <summary>
+	/// Closes the database connection.
+	/// </summary>
+	public void Close()
+	{
+		Database?.Close();
+	}
+
+	/// <summary>
 	/// Dispose.
 	/// </summary>
 	/// <param name="disposing">Indicates whether it is
