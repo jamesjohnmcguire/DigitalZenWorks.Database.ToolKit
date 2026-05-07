@@ -987,7 +987,7 @@ public class DataStorage : IDataStorage
 	/// <param name="sql">The SQL command text.</param>
 	/// <param name="values">The optional command parameter values.</param>
 	/// <returns>The configured database command.</returns>
-	private DbCommand GetCommandObject(
+	protected virtual DbCommand GetCommandObject(
 		string sql, IDictionary<string, object> values)
 	{
 		DbCommand command = null;

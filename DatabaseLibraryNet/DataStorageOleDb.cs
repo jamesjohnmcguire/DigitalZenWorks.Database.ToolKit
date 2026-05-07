@@ -155,6 +155,43 @@ public class DataStorageOleDb(string connectionString)
 	}
 
 	/// <summary>
+	/// Creates a configured command for the current connection and optional
+	/// parameters.
+	/// </summary>
+	/// <param name="sql">The SQL command text.</param>
+	/// <param name="values">The optional command parameter values.</param>
+	/// <returns>The configured database command.</returns>
+	protected override DbCommand GetCommandObject(
+		string sql, IDictionary<string, object> values)
+	{
+		DbCommand command = null;
+
+		try
+		{
+			command = base.GetCommandObject(sql, values);
+
+			if (values != null)
+			{
+				AddParameters((OleDbCommand)command, values);
+			}
+		}
+		catch (Exception exception)
+		{
+			RollbackTransaction();
+
+			string message = Strings.Exception + exception;
+			Log.Error(message);
+
+			message = Strings.Command + sql;
+			Log.Error(message);
+
+			throw;
+		}
+
+		return command;
+	}
+
+	/// <summary>
 	/// Gets the database connection object.
 	/// </summary>
 	/// <param name="databaseType">The database type.</param>
