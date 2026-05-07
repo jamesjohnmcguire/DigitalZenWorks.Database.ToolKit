@@ -31,11 +31,8 @@ public class DataObjectOleDb : DataObjectsBase
 	/// Initializes a new instance of the <see cref="DataObjectOleDb"/>
 	/// class.
 	/// </summary>
-	/// <param name="databaseType">The database type.</param>
 	/// <param name="databaseFilePath">The database file path.</param>
-	public DataObjectOleDb(
-		DatabaseType databaseType, string databaseFilePath)
-		: base(databaseType, databaseFilePath)
+	public DataObjectOleDb(string databaseFilePath)
 	{
 		string connectionString =
 			OleDbHelper.BuildConnectionString(databaseFilePath);

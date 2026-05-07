@@ -20,6 +20,14 @@ public class DataObjectsBase : IDisposable
 	/// Initializes a new instance of the <see cref="DataObjectsBase"/>
 	/// class.
 	/// </summary>
+	public DataObjectsBase()
+	{
+	}
+
+	/// <summary>
+	/// Initializes a new instance of the <see cref="DataObjectsBase"/>
+	/// class.
+	/// </summary>
 	/// <param name="database">The DataStorage object to use.</param>
 	public DataObjectsBase(DataStorage database)
 	{
