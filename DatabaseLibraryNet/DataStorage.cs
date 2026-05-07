@@ -792,6 +792,64 @@ public class DataStorage : IDataStorage
 	}
 
 	/// <summary>
+	/// Creates a configured command for the current connection and optional
+	/// parameters.
+	/// </summary>
+	/// <param name="sql">The SQL command text.</param>
+	/// <param name="values">The optional command parameter values.</param>
+	/// <returns>The configured database command.</returns>
+	protected virtual DbCommand GetCommandObject(
+		string sql, IDictionary<string, object> values)
+	{
+		DbCommand command = null;
+
+		try
+		{
+			bool returnCode = Initialize();
+
+			if (returnCode == true)
+			{
+				command = Command;
+
+				if (values != null)
+				{
+					switch (databaseType)
+					{
+						case DatabaseType.MySql:
+						case DatabaseType.SQLite:
+						case DatabaseType.SqlServer:
+							AddParameters(command, values);
+							break;
+						case DatabaseType.Oracle:
+						case DatabaseType.Unknown:
+						default:
+							break;
+					}
+				}
+
+				command.Transaction = databaseTransaction;
+				command.Connection = Connection;
+				command.CommandText = sql;
+				command.CommandTimeout = TimeOut;
+			}
+		}
+		catch (Exception exception)
+		{
+			RollbackTransaction();
+
+			string message = Strings.Exception + exception;
+			Log.Error(message);
+
+			message = Strings.Command + sql;
+			Log.Error(message);
+
+			throw;
+		}
+
+		return command;
+	}
+
+	/// <summary>
 	/// Gets the database connection object.
 	/// </summary>
 	/// <param name="databaseType">The database type.</param>
@@ -978,64 +1036,6 @@ public class DataStorage : IDataStorage
 		}
 
 		return result;
-	}
-
-	/// <summary>
-	/// Creates a configured command for the current connection and optional
-	/// parameters.
-	/// </summary>
-	/// <param name="sql">The SQL command text.</param>
-	/// <param name="values">The optional command parameter values.</param>
-	/// <returns>The configured database command.</returns>
-	protected virtual DbCommand GetCommandObject(
-		string sql, IDictionary<string, object> values)
-	{
-		DbCommand command = null;
-
-		try
-		{
-			bool returnCode = Initialize();
-
-			if (returnCode == true)
-			{
-				command = Command;
-
-				if (values != null)
-				{
-					switch (databaseType)
-					{
-						case DatabaseType.MySql:
-						case DatabaseType.SQLite:
-						case DatabaseType.SqlServer:
-							AddParameters(command, values);
-							break;
-						case DatabaseType.Oracle:
-						case DatabaseType.Unknown:
-						default:
-							break;
-					}
-				}
-
-				command.Transaction = databaseTransaction;
-				command.Connection = Connection;
-				command.CommandText = sql;
-				command.CommandTimeout = TimeOut;
-			}
-		}
-		catch (Exception exception)
-		{
-			RollbackTransaction();
-
-			string message = Strings.Exception + exception;
-			Log.Error(message);
-
-			message = Strings.Command + sql;
-			Log.Error(message);
-
-			throw;
-		}
-
-		return command;
 	}
 
 	/// <summary>
