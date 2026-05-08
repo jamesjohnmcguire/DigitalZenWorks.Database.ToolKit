@@ -1059,10 +1059,21 @@ public class DataStorage : IDataStorage
 
 			Connection ??= GetConnectionObject(databaseType, connectionText);
 
-			if ((Connection != null) &&
-				(Connection.State != ConnectionState.Open))
+			if (Connection != null)
 			{
-				Connection.Open();
+				switch (Connection.State)
+				{
+					case ConnectionState.Closed:
+						Connection.Open();
+						break;
+					case ConnectionState.Broken:
+						Connection.Close();
+						Connection.Open();
+						break;
+					default:
+						// Open, Connecting, Executing, Fetching — do nothing
+						break;
+				}
 			}
 
 			returnValue = true;
