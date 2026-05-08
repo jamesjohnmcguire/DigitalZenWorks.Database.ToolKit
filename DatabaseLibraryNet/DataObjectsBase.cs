@@ -16,6 +16,8 @@ using System.IO;
 /// </summary>
 public class DataObjectsBase : IDisposable
 {
+	private bool disposed;
+
 	/// <summary>
 	/// Initializes a new instance of the <see cref="DataObjectsBase"/>
 	/// class.
@@ -173,6 +175,11 @@ public class DataObjectsBase : IDisposable
 	protected string TableName { get; set; }
 
 	/// <summary>
+	/// Closes the database connection.
+	/// </summary>
+	public void Close() => Dispose();
+
+	/// <summary>
 	/// Dispose.
 	/// </summary>
 	public void Dispose()
@@ -307,24 +314,18 @@ public class DataObjectsBase : IDisposable
 	}
 
 	/// <summary>
-	/// Closes the database connection.
-	/// </summary>
-	public void Close()
-	{
-		Database?.Close();
-	}
-
-	/// <summary>
 	/// Dispose.
 	/// </summary>
 	/// <param name="disposing">Indicates whether it is
 	/// currently disposing.</param>
 	protected virtual void Dispose(bool disposing)
 	{
-		if (disposing)
+		if (disposing == true && disposed == false)
 		{
 			Database?.Close();
 			Database = null;
+
+			disposed = true;
 		}
 	}
 }
