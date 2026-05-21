@@ -11,7 +11,6 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
 using System.Data.OleDb;
-using System.Globalization;
 using System.Runtime.Versioning;
 using global::Common.Logging;
 
