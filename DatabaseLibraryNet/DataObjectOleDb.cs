@@ -5,6 +5,7 @@
 /////////////////////////////////////////////////////////////////////////////
 
 namespace DigitalZenWorks.Database.ToolKit;
+
 using System.Runtime.Versioning;
 
 /// <summary>
