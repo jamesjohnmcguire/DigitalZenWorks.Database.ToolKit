@@ -1,4 +1,4 @@
-﻿[*.cs]
+[*.cs]
 
 # Require space after 'new' keyword
 csharp_space_after_keywords_in_control_flow_statements = true
