@@ -48,6 +48,11 @@ public static class DataDefinitionOleDb
 			SqlWriterOleDb sqlWriter = new();
 			string schemaText = sqlWriter.GetTablesCreateStatements(tables);
 
+			if (string.IsNullOrWhiteSpace(schemaText))
+			{
+				Log.Warn("No schema text generated.");
+			}
+
 			File.WriteAllText(schemaFile, schemaText);
 
 			successCode = true;
