@@ -87,8 +87,7 @@ public static class DataDefinition
 	/// <returns>A values indicating success or not.</returns>
 	/// <param name="databaseFile">The database file to use.</param>
 	/// <param name="schemaFile">The schema file to export to.</param>
-	public static bool ExportSchema(
-		string databaseFile, string schemaFile)
+	public static bool ExportSchema(string databaseFile, string schemaFile)
 	{
 		bool successCode = false;
 
