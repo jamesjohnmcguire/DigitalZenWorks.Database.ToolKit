@@ -44,6 +44,11 @@ public class SqlWriter
 	}
 
 	/// <summary>
+	/// Gets the default line ending string used in SQL statements.
+	/// </summary>
+	public virtual string DefaultLineEnding => "\n";
+
+	/// <summary>
 	/// Create Insert Statement.
 	/// </summary>
 	/// <param name="tableName">The table name.</param>
@@ -480,9 +485,9 @@ public class SqlWriter
 
 		string sql = string.Format(
 			CultureInfo.InvariantCulture,
-			"CREATE TABLE \"{0}\"{1}({1}",
-			table.Name,
-			Environment.NewLine);
+			"CREATE TABLE \"{0}\"",
+			table.Name);
+		sql += DefaultLineEnding + "(" + DefaultLineEnding;
 
 		SortedList<int, Column> columns = GetOrdinalSortedColumns(table);
 
@@ -517,14 +522,14 @@ public class SqlWriter
 
 		if (foreignKeys.Count > 0)
 		{
-			sql += Environment.NewLine;
+			sql += DefaultLineEnding;
 		}
 
 		sql += ");";
 
 		if (isLast == false)
 		{
-			sql += Environment.NewLine;
+			sql += DefaultLineEnding;
 		}
 
 		return sql;
@@ -542,8 +547,7 @@ public class SqlWriter
 	/// each table in the collection, separated by line breaks.
 	/// Returns an empty string if <paramref name="tables"/> is
 	/// <see langword="null"/> or the collection is empty.</returns>
-	public virtual string GetTablesCreateStatements(
-		Collection<Table> tables)
+	public virtual string GetTablesCreateStatements(Collection<Table> tables)
 	{
 		string sqlStatements = string.Empty;
 
@@ -563,7 +567,8 @@ public class SqlWriter
 				}
 
 				string statement = GetTableCreateStatement(table, isLast);
-				schemaBuilder.AppendLine(statement);
+				statement += DefaultLineEnding;
+				schemaBuilder.Append(statement);
 			}
 
 			sqlStatements = schemaBuilder.ToString();
@@ -716,7 +721,7 @@ public class SqlWriter
 			sql += ",";
 		}
 
-		sql += Environment.NewLine;
+		sql += DefaultLineEnding;
 
 		return sql;
 	}
@@ -770,7 +775,7 @@ public class SqlWriter
 			sql += " DEFAULT " + column.DefaultValue;
 		}
 
-		sql += "," + Environment.NewLine;
+		sql += "," + DefaultLineEnding;
 
 		return sql;
 	}
@@ -843,7 +848,7 @@ public class SqlWriter
 		if (isLast == false)
 		{
 			sql += ",";
-			sql += Environment.NewLine;
+			sql += DefaultLineEnding;
 		}
 
 		return sql;
