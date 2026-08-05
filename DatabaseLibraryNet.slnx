@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="DatabaseLibraryNet/DigitalZenWorks.Database.ToolKit.csproj" />
+  <Project Path="DatabaseLibraryNetTests/DigitalZenWorks.Database.ToolKit.Tests.csproj" />
+</Solution>
