@@ -11,11 +11,17 @@ trim_trailing_whitespace = true
 [*.{bat, cmd}]
 end_of_line = crlf
 
+[*.Access.Test.sql]
+end_of_line = crlf
+
+[*.Sqlite.Test.sql]
+end_of_line = lf
+
 [*.{cs, csproj, props, resx}]
 end_of_line = lf
 
 [*.cs]
-# Renove require space after 'new' keyword
+# Remove require space after 'new' keyword
 dotnet_diagnostic.SA1000.severity = warning
 csharp_space_after_keywords_in_control_flow_statements = true
 csharp_space_between_method_call_empty_parameter_list_parentheses = false
