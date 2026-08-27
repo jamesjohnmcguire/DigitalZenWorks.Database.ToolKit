@@ -43,7 +43,7 @@
 		<PackageReference Include="DigitalZenWorks.Common.Utilities" Version="1.5.78" />
 		<PackageReference Include="Microsoft.Data.SqlClient" Version="7.0.2" />
 		<PackageReference Include="MySql.Data" Version="26.7.0" />
-		<PackageReference Include="Roslynator.Analyzers" Version="4.16.1">
+		<PackageReference Include="Roslynator.Analyzers" Version="5.0.0">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
