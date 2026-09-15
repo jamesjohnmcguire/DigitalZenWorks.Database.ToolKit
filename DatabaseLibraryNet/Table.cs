@@ -65,14 +65,6 @@ public class Table
 	public string Name { get; set; } = string.Empty;
 
 	/// <summary>
-	/// Gets or sets the primary key.
-	/// </summary>
-	/// <value>
-	/// The primary key.
-	/// </value>
-	public string PrimaryKey { get; set; }
-
-	/// <summary>
 	/// Writes out the table information.
 	/// </summary>
 	/// <param name="table">The name of the table.</param>
