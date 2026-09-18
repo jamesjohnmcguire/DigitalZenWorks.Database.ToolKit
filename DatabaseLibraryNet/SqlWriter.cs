@@ -738,6 +738,8 @@ public class SqlWriter
 	/// definition. Cannot be null.</param>
 	/// <returns>A string containing the SQL definition for the column,
 	/// formatted for inclusion in a CREATE TABLE statement.</returns>
+	[Obsolete("GetCreateColumnSql is no longer used and will be removed " +
+	"in a future major version. Use GetColumnSql instead.")]
 	protected virtual string GetCreateColumnSql(Column column)
 	{
 #if NET6_0_OR_GREATER
