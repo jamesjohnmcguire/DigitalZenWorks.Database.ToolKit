@@ -60,7 +60,7 @@ public static class OleDbHelper
 	public static bool CreateAccessDatabaseFile(string filePath)
 	{
 		return FileUtils.CreateFileFromEmbeddedResource(
-			"DigitalZenWorks.Database.ToolKit.template.accdb",
+			"DigitalZenWorks.Database.ToolKit.Template.accdb",
 			filePath);
 	}
 
