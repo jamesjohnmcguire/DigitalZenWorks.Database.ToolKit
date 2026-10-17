@@ -646,16 +646,55 @@ public class DataStoreStructure : IDisposable
 	protected virtual ColumnType GetColumnType(
 		string dataType, int flags, int length)
 	{
-		ColumnType columnType = dataType switch
-		{
-			// Guessing date vs. datetime based on name
-			"date" => ColumnType.DateTime,
-			"integer" => ColumnType.Number,
-			"string" => ColumnType.String,
-			"text" => ColumnType.Text,
+		ColumnType columnType = ColumnType.Unknown;
 
-			_ => ColumnType.Unknown,
-		};
+		if (dataType != null)
+		{
+			string normalizedType = dataType.Trim();
+			normalizedType = normalizedType.ToLowerInvariant();
+
+			// Metadata may contain a declaration such as NUMERIC(12,2).
+			int parameterIndex = normalizedType.IndexOf('(');
+
+			if (parameterIndex >= 0)
+			{
+				normalizedType = normalizedType.Substring(0, parameterIndex);
+				normalizedType = normalizedType.TrimEnd();
+			}
+
+			columnType = normalizedType switch
+			{
+				"smallint" or
+				"integer" or
+				"int" or
+				"bigint" => ColumnType.Number,
+
+				"numeric" or
+				"decimal" or
+				"dec" or
+				"real" or
+				"float" or
+				"double precision" => ColumnType.Numeric,
+
+				"char" or
+				"character" or
+				"varchar" or
+				"character varying" or
+				"nchar" or
+				"nvarchar" or
+				"string" => ColumnType.String,
+
+				"text" => ColumnType.Text,
+				"blob" => ColumnType.Blob,
+
+				// Broad mapping until the model distinguishes temporal types.
+				"date" or
+				"datetime" or
+				"timestamp" => ColumnType.DateTime,
+
+				_ => ColumnType.Unknown,
+			};
+		}
 
 		return columnType;
 	}
