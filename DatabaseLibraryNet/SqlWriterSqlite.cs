@@ -33,8 +33,8 @@ public class SqlWriterSqlite : SqlWriter
 	/// <item><description><see cref="ColumnType.Currency"/>,
 	/// <see cref="ColumnType.Money"/>, <see cref="ColumnType.SmallMoney"/>,
 	/// <see cref="ColumnType.Decimal"/>, and <see cref="ColumnType.Numeric"/>
-	/// map to NUMERIC rather than REAL, to avoid floating point rounding
-	/// on fixed-point/money values.</description></item>
+	/// use DECIMAL or NUMERIC declarations to preserve their intent,
+	/// without guaranteeing exact decimal storage in SQLite.</description></item>
 	/// <item><description><see cref="ColumnType.AutoNumber"/> and
 	/// <see cref="ColumnType.Identity"/> map to INTEGER; combined with the
 	/// base class's existing "PRIMARY KEY AUTOINCREMENT" clause (added
@@ -121,16 +121,11 @@ public class SqlWriterSqlite : SqlWriter
 			ColumnType.Single => " REAL",
 			ColumnType.Real => " REAL",
 
-			// Numeric affinity - fixed point/money types, kept off REAL
-			// to avoid floating point rounding on precise values.
+			// Preserve exact-numeric type names; both have NUMERIC affinity.
 			ColumnType.Decimal => " DECIMAL",
 			ColumnType.Numeric => " NUMERIC",
 
-			// Numeric affinity - currency/money types, kept off REAL to avoid
-			// floating point rounding on precise values. Decimal is the closest
-			// SQLite type affinity to the Access Currency type and keeps the
-			// values accurately stored as fixed-point rather than floating
-			// point.
+			// DECIMAL expresses monetary intent. SQLite may still store REAL.
 			ColumnType.Currency => " DECIMAL",
 			ColumnType.Money => " DECIMAL",
 			ColumnType.SmallMoney => " DECIMAL",

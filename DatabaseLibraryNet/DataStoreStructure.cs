@@ -669,12 +669,14 @@ public class DataStoreStructure : IDisposable
 				"int" or
 				"bigint" => ColumnType.Number,
 
-				"numeric" or
-				"decimal" or
-				"dec" or
-				"real" or
-				"float" or
-				"double precision" => ColumnType.Numeric,
+				"numeric" => ColumnType.Numeric,
+				"decimal" or "dec" => ColumnType.Decimal,
+				"real" => ColumnType.Real,
+				"float" => ColumnType.Float,
+				"double" or "double precision" => ColumnType.Double,
+				"currency" => ColumnType.Currency,
+				"money" => ColumnType.Money,
+				"smallmoney" => ColumnType.SmallMoney,
 
 				"char" or
 				"character" or

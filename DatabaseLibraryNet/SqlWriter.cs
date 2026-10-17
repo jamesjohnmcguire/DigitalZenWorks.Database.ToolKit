@@ -740,7 +740,8 @@ public class SqlWriter
 				CultureInfo.InvariantCulture, " VARBINARY({0})", column.Length),
 			ColumnType.Blob or ColumnType.LongVarBinary or
 				ColumnType.Ole or ColumnType.OleObject => " BLOB",
-			ColumnType.Currency => " DECIMAL(19,4)",
+			ColumnType.Currency or ColumnType.Money => " DECIMAL(19,4)",
+			ColumnType.SmallMoney => " DECIMAL(10,4)",
 			_ => string.Empty,
 		};
 

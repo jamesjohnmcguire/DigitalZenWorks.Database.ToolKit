@@ -61,7 +61,7 @@ CREATE TABLE "Orders"
 (
 	"id" INTEGER PRIMARY KEY AUTOINCREMENT,
 	"productId" INTEGER,
-	"price" NUMERIC NOT NULL,
+	"price" DECIMAL NOT NULL,
 	"orderDate" TEXT NOT NULL,
 	"isShipped" INTEGER DEFAULT 0,
 	"photo" BLOB,

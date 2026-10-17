@@ -150,30 +150,18 @@ internal sealed class SqlWriterSqliteTests
 	}
 
 	/// <summary>
-	/// What: Currency columns are declared as NUMERIC or DECIMAL, not
-	/// REAL.
-	/// How: generates DDL for the Orders table's "price" column and
-	/// checks the declaration text.
-	/// Why: mapping Currency to REAL (a plausible naive choice, since
-	/// Currency is numeric) introduces floating point rounding error on
-	/// monetary values that was not present in the source data. NUMERIC
-	/// and DECIMAL both avoid this - SQLite assigns NUMERIC type affinity
-	/// to either - so both are accepted as correct; only a REAL-affinity
-	/// declaration is rejected.
-	/// Alignment: instruction.md's instruction to "choose the most
-	/// structured type available... focusing on the meaning and function
-	/// of the item" is about Currency's function (an exact monetary
-	/// value), not about one specific spelling of that choice.
+	/// Currency permits DECIMAL (preferred) or NUMERIC. SQLite still
+	/// applies NUMERIC affinity and does not guarantee exact arithmetic.
 	/// </summary>
 	[Test]
-	public void CurrencyColumnAvoidsFloatingPointAffinity()
+	public void CurrencyColumnAllowsDecimalOrNumeric()
 	{
 		Table table = SchemaFixtures.GetOrdersTable();
 		string sql = writer.GetTableCreateStatement(table);
 
 		Assert.That(
 			sql,
-			Does.Contain("\"price\" NUMERIC").Or.Contain("\"price\" DECIMAL"));
+			Does.Contain("\"price\" DECIMAL").Or.Contain("\"price\" NUMERIC"));
 		Assert.That(sql, Does.Not.Contain("\"price\" REAL"));
 	}
 

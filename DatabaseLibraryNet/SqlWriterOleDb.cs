@@ -193,7 +193,8 @@ public class SqlWriterOleDb : SqlWriter
 
 		return column.ColumnType switch
 		{
-			ColumnType.Currency => " CURRENCY",
+			ColumnType.Currency or ColumnType.Money or
+				ColumnType.SmallMoney => " CURRENCY",
 			ColumnType.Date or ColumnType.DateTime or
 				ColumnType.Time or ColumnType.Timestamp => " DATETIME",
 			ColumnType.Memo or ColumnType.Hyperlink => " MEMO",

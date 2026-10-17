@@ -38,6 +38,8 @@ internal sealed class SqlWriterTypeTests
 	[TestCase(ColumnType.DateTime, "TIMESTAMP", "DATETIME")]
 	[TestCase(ColumnType.Timestamp, "TIMESTAMP", "DATETIME")]
 	[TestCase(ColumnType.Currency, "DECIMAL(19,4)", "CURRENCY")]
+	[TestCase(ColumnType.Money, "DECIMAL(19,4)", "CURRENCY")]
+	[TestCase(ColumnType.SmallMoney, "DECIMAL(10,4)", "CURRENCY")]
 	[TestCase(ColumnType.Memo, "TEXT", "MEMO")]
 	[TestCase(ColumnType.Ole, "BLOB", "OLEOBJECT")]
 	[TestCase(ColumnType.OleObject, "BLOB", "OLEOBJECT")]

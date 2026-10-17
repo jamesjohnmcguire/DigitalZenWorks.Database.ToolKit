@@ -19,6 +19,21 @@ using NUnit.Framework;
 internal sealed class DataStoreStructureTests : BaseTestsSupport
 {
 	/// <summary>
+	/// Schema reading preserves the decimal declaration of monetary data.
+	/// </summary>
+	[Test]
+	public void PriceRetainsDecimalType()
+	{
+		using DataStoreStructure schema =
+			new(DatabaseType.SQLite, DataSource);
+		Table table = schema.GetTable("Orders");
+
+		Assert.That(
+			table.Columns["price"].ColumnType,
+			Is.EqualTo(ColumnType.Decimal));
+	}
+
+	/// <summary>
 	/// Export schema test.
 	/// </summary>
 	[Test]
