@@ -708,18 +708,39 @@ public class SqlWriter
 
 		string columnType = column.ColumnType switch
 		{
-			ColumnType.AutoNumber => " INTEGER",
-			ColumnType.Currency => " CURRENCY",
-			ColumnType.DateTime => " DATETIME",
-			ColumnType.Memo => " MEMO",
-			ColumnType.Number => " INTEGER",
-			ColumnType.Ole => " OLEOBJECT",
-			ColumnType.String => string.Format(
-				CultureInfo.InvariantCulture,
-				" VARCHAR({0})",
-				column.Length),
-			ColumnType.Text => " TEXT",
-			ColumnType.YesNo => " OLEOBJECT",
+			ColumnType.AutoNumber or ColumnType.Identity or
+				ColumnType.Number or ColumnType.Int or
+				ColumnType.Integer or ColumnType.Long => " INTEGER",
+			ColumnType.BigInt => " BIGINT",
+			ColumnType.SmallInt => " SMALLINT",
+			ColumnType.Byte or ColumnType.TinyInt => " SMALLINT",
+			ColumnType.Decimal => " DECIMAL",
+			ColumnType.Numeric => " NUMERIC",
+			ColumnType.Float => " FLOAT",
+			ColumnType.Real or ColumnType.Single => " REAL",
+			ColumnType.Double => " DOUBLE PRECISION",
+			ColumnType.Boolean or ColumnType.YesNo => " BOOLEAN",
+			ColumnType.Bit => " BIT",
+			ColumnType.Date => " DATE",
+			ColumnType.DateTime or ColumnType.Timestamp => " TIMESTAMP",
+			ColumnType.Time => " TIME",
+			ColumnType.Char => string.Format(
+				CultureInfo.InvariantCulture, " CHAR({0})", column.Length),
+			ColumnType.NChar => string.Format(
+				CultureInfo.InvariantCulture, " NCHAR({0})", column.Length),
+			ColumnType.String or ColumnType.VarChar => string.Format(
+				CultureInfo.InvariantCulture, " VARCHAR({0})", column.Length),
+			ColumnType.NVarChar => string.Format(
+				CultureInfo.InvariantCulture, " NVARCHAR({0})", column.Length),
+			ColumnType.Text or ColumnType.Memo or
+				ColumnType.LongText or ColumnType.LongVarChar => " TEXT",
+			ColumnType.Binary => string.Format(
+				CultureInfo.InvariantCulture, " BINARY({0})", column.Length),
+			ColumnType.VarBinary => string.Format(
+				CultureInfo.InvariantCulture, " VARBINARY({0})", column.Length),
+			ColumnType.Blob or ColumnType.LongVarBinary or
+				ColumnType.Ole or ColumnType.OleObject => " BLOB",
+			ColumnType.Currency => " DECIMAL(19,4)",
 			_ => string.Empty,
 		};
 

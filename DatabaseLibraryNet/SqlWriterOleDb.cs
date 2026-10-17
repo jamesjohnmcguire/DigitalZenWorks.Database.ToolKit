@@ -175,6 +175,38 @@ public class SqlWriterOleDb : SqlWriter
 	}
 
 	/// <summary>
+	/// Returns the Access SQL type declaration for the specified column.
+	/// Common types are handled by the base writer.
+	/// </summary>
+	/// <param name="column">The column to describe. Cannot be null.</param>
+	/// <returns>The SQL type declaration, including a leading space.</returns>
+	protected override string GetColumnTypeText(Column column)
+	{
+#if NET6_0_OR_GREATER
+		ArgumentNullException.ThrowIfNull(column);
+#else
+		if (column == null)
+		{
+			throw new ArgumentNullException(nameof(column));
+		}
+#endif
+
+		return column.ColumnType switch
+		{
+			ColumnType.Currency => " CURRENCY",
+			ColumnType.Date or ColumnType.DateTime or
+				ColumnType.Time or ColumnType.Timestamp => " DATETIME",
+			ColumnType.Memo or ColumnType.Hyperlink => " MEMO",
+			ColumnType.Ole or ColumnType.OleObject => " OLEOBJECT",
+			ColumnType.Boolean or ColumnType.YesNo => " BIT",
+			ColumnType.Byte or ColumnType.TinyInt => " BYTE",
+			ColumnType.Single or ColumnType.Real => " SINGLE",
+			ColumnType.Double or ColumnType.Float => " DOUBLE",
+			_ => base.GetColumnTypeText(column),
+		};
+	}
+
+	/// <summary>
 	/// Generates the SQL definition string for the specified column,
 	/// including its name, type, constraints, and default value.
 	/// </summary>
