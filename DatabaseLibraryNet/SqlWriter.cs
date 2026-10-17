@@ -578,52 +578,6 @@ public class SqlWriter
 	}
 
 	/// <summary>
-	/// Returns the SQL type declaration string corresponding to the
-	/// specified column's type and length.
-	/// </summary>
-	/// <remarks>The returned string includes the appropriate SQL type and,
-	/// for string columns, the length constraint. This method does not
-	/// validate the column's properties; callers should ensure that the
-	/// column is properly configured before calling.</remarks>
-	/// <param name="column">The column for which to generate the SQL type
-	/// declaration. The column's type and length determine the returned
-	/// string.</param>
-	/// <returns>A string representing the SQL type declaration for the
-	/// column. Returns an empty string if the column type is not
-	/// recognized.</returns>
-	protected static string GetColumnTypeText(Column column)
-	{
-#if NET6_0_OR_GREATER
-		ArgumentNullException.ThrowIfNull(column);
-#else
-		if (column == null)
-		{
-			string name = nameof(column);
-			throw new ArgumentNullException(name);
-		}
-#endif
-
-		string columnType = column.ColumnType switch
-		{
-			ColumnType.AutoNumber => " INTEGER",
-			ColumnType.Currency => " CURRENCY",
-			ColumnType.DateTime => " DATETIME",
-			ColumnType.Memo => " MEMO",
-			ColumnType.Number => " INTEGER",
-			ColumnType.Ole => " OLEOBJECT",
-			ColumnType.String => string.Format(
-				CultureInfo.InvariantCulture,
-				" VARCHAR({0})",
-				column.Length),
-			ColumnType.Text => " TEXT",
-			ColumnType.YesNo => " OLEOBJECT",
-			_ => string.Empty,
-		};
-
-		return columnType;
-	}
-
-	/// <summary>
 	/// Returns a sorted list of columns from the specified table, ordered
 	/// by their ordinal position.
 	/// </summary>
@@ -724,6 +678,52 @@ public class SqlWriter
 		sql += DefaultLineEnding;
 
 		return sql;
+	}
+
+	/// <summary>
+	/// Returns the SQL type declaration string corresponding to the
+	/// specified column's type and length.
+	/// </summary>
+	/// <remarks>The returned string includes the appropriate SQL type and,
+	/// for string columns, the length constraint. This method does not
+	/// validate the column's properties; callers should ensure that the
+	/// column is properly configured before calling.</remarks>
+	/// <param name="column">The column for which to generate the SQL type
+	/// declaration. The column's type and length determine the returned
+	/// string.</param>
+	/// <returns>A string representing the SQL type declaration for the
+	/// column. Returns an empty string if the column type is not
+	/// recognized.</returns>
+	protected virtual string GetColumnTypeText(Column column)
+	{
+#if NET6_0_OR_GREATER
+		ArgumentNullException.ThrowIfNull(column);
+#else
+		if (column == null)
+		{
+			string name = nameof(column);
+			throw new ArgumentNullException(name);
+		}
+#endif
+
+		string columnType = column.ColumnType switch
+		{
+			ColumnType.AutoNumber => " INTEGER",
+			ColumnType.Currency => " CURRENCY",
+			ColumnType.DateTime => " DATETIME",
+			ColumnType.Memo => " MEMO",
+			ColumnType.Number => " INTEGER",
+			ColumnType.Ole => " OLEOBJECT",
+			ColumnType.String => string.Format(
+				CultureInfo.InvariantCulture,
+				" VARCHAR({0})",
+				column.Length),
+			ColumnType.Text => " TEXT",
+			ColumnType.YesNo => " OLEOBJECT",
+			_ => string.Empty,
+		};
+
+		return columnType;
 	}
 
 	/// <summary>
