@@ -63,6 +63,11 @@
 	</ItemGroup-->
 
 	<ItemGroup>
+		<InternalsVisibleTo Include="DigitalZenWorks.Database.ToolKit.Tests" />
+		<InternalsVisibleTo Include="MsAccessJetAceTool.Tests" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<None Include="../LICENSE">
 			<Pack>True</Pack>
 			<PackagePath>\</PackagePath>
