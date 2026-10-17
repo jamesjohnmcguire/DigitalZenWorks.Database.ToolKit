@@ -24,7 +24,7 @@ using DigitalZenWorks.Database.ToolKit;
 /// reference .sql file to match if "Orders" is kept as a permanent part of
 /// the fixture set.
 /// </remarks>
-public static class SchemaFixtures
+internal static class SchemaFixtures
 {
 	/// <summary>
 	/// Builds the "Addresses" table: id (AutoNumber PK), stateId (Number,

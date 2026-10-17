@@ -26,6 +26,9 @@ public static class DataDefinitionOleDb
 	/// <summary>
 	/// Gets or sets the schema-loading operation used by schema export.
 	/// </summary>
+#if NET5_0_OR_GREATER
+	[SupportedOSPlatform("windows")]
+#endif
 	internal static Func<string, Collection<Table>> SchemaLoader { get; set; } =
 		GetSchema;
 

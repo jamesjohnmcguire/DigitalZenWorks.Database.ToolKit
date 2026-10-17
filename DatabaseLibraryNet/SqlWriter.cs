@@ -28,7 +28,7 @@ public class SqlWriter
 	/// </summary>
 	public SqlWriter()
 	{
-		rowColumnValues = Array.Empty<string>();
+		rowColumnValues = [];
 	}
 
 	/// <summary>
@@ -210,7 +210,7 @@ public class SqlWriter
 				dataItem = dataItem.Trim('\'');
 			}
 
-			Regex unescapedApostropheRegex = new(@"(?<!')'(?!')");
+			Regex unescapedApostropheRegex = new("(?<!')'(?!')");
 
 			bool isUnescaped = unescapedApostropheRegex.IsMatch(dataItem);
 
@@ -340,7 +340,7 @@ public class SqlWriter
 
 			if (escapeNonNull == true &&
 				dataItem != null &&
-				!dataItem.Equals("NULL", StringComparison.Ordinal))
+				dataItem.Equals("NULL", StringComparison.Ordinal))
 			{
 				dataItem = EscapeString(dataItem);
 			}

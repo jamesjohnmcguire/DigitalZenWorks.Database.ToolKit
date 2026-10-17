@@ -651,14 +651,17 @@ public class DataStoreStructure : IDisposable
 		if (dataType != null)
 		{
 			string normalizedType = dataType.Trim();
+#pragma warning disable CA1308
 			normalizedType = normalizedType.ToLowerInvariant();
+#pragma warning restore CA1308
 
 			// Metadata may contain a declaration such as NUMERIC(12,2).
-			int parameterIndex = normalizedType.IndexOf('(');
+			int parameterIndex = normalizedType.IndexOf(
+				'(', StringComparison.Ordinal);
 
 			if (parameterIndex >= 0)
 			{
-				normalizedType = normalizedType.Substring(0, parameterIndex);
+				normalizedType = normalizedType[..parameterIndex];
 				normalizedType = normalizedType.TrimEnd();
 			}
 
@@ -927,44 +930,6 @@ public class DataStoreStructure : IDisposable
 		}
 
 		return tableDictionary;
-	}
-
-	/// <summary>
-	/// Creates the data adapter type that corresponds to the connection type.
-	/// </summary>
-	/// <param name="connection">The connection whose provider assembly is
-	/// inspected.</param>
-	/// <returns>The provider-specific data adapter.</returns>
-	/// <exception cref="NotSupportedException">Thrown when a matching adapter
-	/// type cannot be found.</exception>
-	private static DbDataAdapter CreateDataAdapterForConnection(
-		DbConnection connection)
-	{
-		Type connectionType = connection.GetType();
-		string connectionTypeName = connectionType.FullName;
-
-#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP2_0_OR_GREATER
-		string adapterTypeName = connectionTypeName.Replace(
-			"Connection",
-			"DataAdapter",
-			StringComparison.InvariantCultureIgnoreCase);
-#else
-		string adapterTypeName = connectionTypeName.Replace(
-			"Connection",
-			"DataAdapter");
-#endif
-
-		Assembly assembly = connectionType.Assembly;
-		Type adapterType = assembly.GetType(adapterTypeName);
-
-		if (adapterType == null)
-		{
-			string message =
-				$"Could not find adapter type for {connectionTypeName}";
-			throw new NotSupportedException(message);
-		}
-
-		return (DbDataAdapter)Activator.CreateInstance(adapterType);
 	}
 
 	/// <summary>

@@ -161,7 +161,10 @@ public class DataStorage : IDataStorage
 			return dataAdapter;
 		}
 
-		set => dataAdapter = value;
+		set
+		{
+			dataAdapter = value;
+		}
 	}
 
 	/// <summary>
@@ -978,11 +981,9 @@ public class DataStorage : IDataStorage
 
 		foreach (KeyValuePair<string, object> valuePair in values)
 		{
-			int result;
-
 			if (valuePair.Value == null)
 			{
-				result = parameters.Add(DBNull.Value);
+				parameters.Add(DBNull.Value);
 			}
 			else
 			{
