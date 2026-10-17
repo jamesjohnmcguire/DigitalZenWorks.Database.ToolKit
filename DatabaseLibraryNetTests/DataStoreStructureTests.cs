@@ -134,7 +134,7 @@ internal sealed class DataStoreStructureTests : BaseTestsSupport
 		Collection<Table> tables = schema.GetSchema();
 
 		int count = tables.Count;
-		Assert.That(count, Is.EqualTo(7));
+		Assert.That(count, Is.EqualTo(8));
 
 		foreach (Table table in tables)
 		{
@@ -143,6 +143,7 @@ internal sealed class DataStoreStructureTests : BaseTestsSupport
 				"Categories",
 				"Contacts",
 				"Makers",
+				"Orders",
 				"Products",
 				"Sections",
 				"Series"));
