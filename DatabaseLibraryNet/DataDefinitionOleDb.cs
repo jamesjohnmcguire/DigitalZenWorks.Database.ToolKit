@@ -18,9 +18,6 @@ using global::Common.Logging;
 /// Class for OleDb version support on operations on complete data
 /// storage containers.
 /// </summary>
-#if NET5_0_OR_GREATER
-[SupportedOSPlatform("windows")]
-#endif
 public static class DataDefinitionOleDb
 {
 	private static readonly ILog Log = LogManager.GetLogger(
@@ -41,6 +38,9 @@ public static class DataDefinitionOleDb
 	/// <param name="schemaFile">The schema file to export to.</param>
 	/// <param name="toSqlite">If set to <c>true</c> export to SQLite format.
 	/// </param>
+#if NET5_0_OR_GREATER
+	[SupportedOSPlatform("windows")]
+#endif
 	public static bool ExportSchema(
 		string databaseFile, string schemaFile, bool toSqlite = false)
 	{
@@ -93,6 +93,9 @@ public static class DataDefinitionOleDb
 	/// <returns>A collection of <see cref="Table"/> objects representing
 	/// the tables defined in the database. The collection will be empty
 	/// if no tables are found.</returns>
+#if NET5_0_OR_GREATER
+	[SupportedOSPlatform("windows")]
+#endif
 	public static Collection<Table> GetSchema(string databaseFile)
 	{
 		using OleDbSchema oleDbSchema = new(databaseFile);
@@ -107,6 +110,9 @@ public static class DataDefinitionOleDb
 	/// <param name="schemaFile">The schema file.</param>
 	/// <param name="databaseFile">The database file.</param>
 	/// <returns>A values indicating success or not.</returns>
+#if NET5_0_OR_GREATER
+	[SupportedOSPlatform("windows")]
+#endif
 	public static bool ImportSchema(
 		string schemaFile, string databaseFile)
 	{
