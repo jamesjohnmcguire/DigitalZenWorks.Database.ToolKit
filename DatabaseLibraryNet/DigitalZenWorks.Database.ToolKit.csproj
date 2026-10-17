@@ -3,7 +3,7 @@
 	<PropertyGroup>
 		<AnalysisMode>All</AnalysisMode>
 		<AssemblyName>DigitalZenWorks.Database.ToolKit</AssemblyName>
-		<AssemblyOriginatorKeyFile>DatabaseLibraryNet.snk</AssemblyOriginatorKeyFile>
+		<AssemblyOriginatorKeyFile>../DatabaseLibraryNet.snk</AssemblyOriginatorKeyFile>
 		<AssemblyVersion>1.0.0.0</AssemblyVersion>
 		<Authors>James John McGuire</Authors>
 		<CLSCompliant>true</CLSCompliant>
@@ -63,8 +63,8 @@
 	</ItemGroup-->
 
 	<ItemGroup>
-		<InternalsVisibleTo Include="DigitalZenWorks.Database.ToolKit.Tests" />
-		<InternalsVisibleTo Include="MsAccessJetAceTool.Tests" />
+		<InternalsVisibleTo Include="DigitalZenWorks.Database.ToolKit.Tests, PublicKey=00240000048000009400000006020000002400005253413100040000010001008bfa5ac38dbf9688dd39c72ff93347fe6f476d595e424e4442f6e13daa7d77be8d21ee41426db659ceff72a08832276c08651595f2f51e1207c266858f051178d730800470e09fe0ba5d27ff8d6abe8c7358d687ad1e682d68703685a532bc9b0fcf9540937df8dab75030e6f7ee7b23ab9a52fd87577f3293416c023c94fde4" />
+		<InternalsVisibleTo Include="MsAccessJetAceTool.Tests, PublicKey=00240000048000009400000006020000002400005253413100040000010001008bfa5ac38dbf9688dd39c72ff93347fe6f476d595e424e4442f6e13daa7d77be8d21ee41426db659ceff72a08832276c08651595f2f51e1207c266858f051178d730800470e09fe0ba5d27ff8d6abe8c7358d687ad1e682d68703685a532bc9b0fcf9540937df8dab75030e6f7ee7b23ab9a52fd87577f3293416c023c94fde4" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -76,7 +76,7 @@
 			<Pack>True</Pack>
 			<PackagePath>\</PackagePath>
 		</None>
-		<None Include="DatabaseLibraryNet.snk" />
+		<None Include="../DatabaseLibraryNet.snk" />
 		<AdditionalFiles Include="../stylecop.json" />
 		<EmbeddedResource Include="Template.accdb">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>

@@ -2,10 +2,12 @@
 
 	<PropertyGroup>
 		<AnalysisMode>All</AnalysisMode>
+		<AssemblyOriginatorKeyFile>../DatabaseLibraryNet.snk</AssemblyOriginatorKeyFile>
 		<EnableNETAnalyzers>true</EnableNETAnalyzers>
 		<EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 		<IsTestProject>true</IsTestProject>
+		<SignAssembly>true</SignAssembly>
 		<TargetFramework>net10.0</TargetFramework>
 	</PropertyGroup>
 
@@ -41,10 +43,11 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<None Include="../DatabaseLibraryNet.snk" />
+		<AdditionalFiles Include="../stylecop.json" />
 		<EmbeddedResource Include="Products.Test.accdb" />
 		<EmbeddedResource Include="Products.Access.Test.sql" />
 		<EmbeddedResource Include="Products.Sqlite.Test.sql" />
-		<AdditionalFiles Include="../stylecop.json" />
 	</ItemGroup>
 
 </Project>
