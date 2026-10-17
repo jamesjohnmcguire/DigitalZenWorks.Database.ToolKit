@@ -39,8 +39,10 @@ public static class DataDefinitionOleDb
 	/// <returns>A values indicating success or not.</returns>
 	/// <param name="databaseFile">The database file to use.</param>
 	/// <param name="schemaFile">The schema file to export to.</param>
+	/// <param name="toSqlite">If set to <c>true</c> export to SQLite format.
+	/// </param>
 	public static bool ExportSchema(
-		string databaseFile, string schemaFile)
+		string databaseFile, string schemaFile, bool toSqlite = false)
 	{
 		bool successCode = false;
 
@@ -50,7 +52,7 @@ public static class DataDefinitionOleDb
 
 			tables = DataStoreStructure.OrderTables(tables);
 
-			SqlWriterOleDb sqlWriter = new();
+			SqlWriter sqlWriter = GetWriter(toSqlite);
 			string schemaText = sqlWriter.GetTablesCreateStatements(tables);
 
 			if (string.IsNullOrWhiteSpace(schemaText))
@@ -128,5 +130,28 @@ public static class DataDefinitionOleDb
 		}
 
 		return successCode;
+	}
+
+	/// <summary>
+	/// Gets the appropriate SQL writer based on the target database type.
+	/// </summary>
+	/// <param name="toSqlite">Indicates whether the target database is SQLite.
+	/// </param>
+	/// <returns>An instance of <see cref="SqlWriter"/> appropriate for the
+	/// target database type.</returns>
+	internal static SqlWriter GetWriter(bool toSqlite)
+	{
+		SqlWriter writer = null;
+
+		if (toSqlite == true)
+		{
+			writer = new SqlWriterSqlite();
+		}
+		else
+		{
+			writer = new SqlWriterOleDb();
+		}
+
+		return writer;
 	}
 }
