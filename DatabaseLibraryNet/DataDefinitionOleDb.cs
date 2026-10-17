@@ -26,6 +26,12 @@ public static class DataDefinitionOleDb
 	private static readonly ILog Log = LogManager.GetLogger(
 		System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
+	/// <summary>
+	/// Gets or sets the schema-loading operation used by schema export.
+	/// </summary>
+	internal static Func<string, Collection<Table>> SchemaLoader { get; set; } =
+		GetSchema;
+
 	/// Method <c>ExportSchema.</c>
 	/// <summary>
 	/// Export all tables to similarly named csv files.
@@ -40,8 +46,7 @@ public static class DataDefinitionOleDb
 
 		try
 		{
-			using OleDbSchema schema = new(databaseFile);
-			Collection<Table> tables = schema.GetSchema();
+			Collection<Table> tables = SchemaLoader(databaseFile);
 
 			tables = DataStoreStructure.OrderTables(tables);
 
