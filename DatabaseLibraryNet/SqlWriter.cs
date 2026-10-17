@@ -653,7 +653,7 @@ public class SqlWriter
 
 		if (column.ColumnType == ColumnType.AutoNumber)
 		{
-			sql += " IDENTITY";
+			sql += GetIdentityKeywordText(column);
 		}
 
 		if (column.Primary == true)
@@ -769,7 +769,7 @@ public class SqlWriter
 
 		if (column.ColumnType == ColumnType.AutoNumber)
 		{
-			sql += " IDENTITY";
+			sql += GetIdentityKeywordText(column);
 		}
 
 		if (!string.IsNullOrWhiteSpace(column.DefaultValue))
@@ -854,5 +854,24 @@ public class SqlWriter
 		}
 
 		return sql;
+	}
+
+	/// <summary>
+	/// Returns the SQL keyword for an identity column based on the specified.
+	/// </summary>
+	/// <param name="column">The column for which to generate the identity
+	/// keyword. Cannot be null.</param>
+	/// <returns>A string representing the SQL identity keyword for the column.
+	/// </returns>
+	protected virtual string GetIdentityKeywordText(Column column)
+	{
+		string identity = string.Empty;
+
+		if (column != null && column.ColumnType == ColumnType.AutoNumber)
+		{
+			identity = " IDENTITY";
+		}
+
+		return identity;
 	}
 }
