@@ -46,7 +46,6 @@ internal sealed class UnitTests : BaseTestsSupport
 	/// Create table test.
 	/// </summary>
 	[Test]
-	[Order(1)]
 	public void CreateTableTest()
 	{
 		string statement = "CREATE TABLE TestTable " +
@@ -120,6 +119,7 @@ internal sealed class UnitTests : BaseTestsSupport
 	/// Delete Test.
 	/// </summary>
 	[Test]
+	[DependsOnTest(nameof(CreateTableTest))]
 	public void Delete()
 	{
 		string description = "Unit Test - Time: " + DateTime.Now;
@@ -159,6 +159,7 @@ internal sealed class UnitTests : BaseTestsSupport
 	/// Insert Test.
 	/// </summary>
 	[Test]
+	[DependsOnTest(nameof(CreateTableTest))]
 	public void Insert()
 	{
 		string description = "Unit Test - Time: " + DateTime.Now;
@@ -188,6 +189,7 @@ internal sealed class UnitTests : BaseTestsSupport
 	/// Test to see if Unit Testing is working.
 	/// </summary>
 	[Test]
+	[DependsOnTest(nameof(CreateTableTest))]
 	public void SelectTest()
 	{
 		const string query = "SELECT * FROM TestTable";
@@ -202,6 +204,7 @@ internal sealed class UnitTests : BaseTestsSupport
 	/// Update Test.
 	/// </summary>
 	[Test]
+	[DependsOnTest(nameof(CreateTableTest))]
 	public void Update()
 	{
 		string description = "Unit Test - Time: " + DateTime.Now;
@@ -219,6 +222,7 @@ internal sealed class UnitTests : BaseTestsSupport
 	/// Update with Parameters Test.
 	/// </summary>
 	[Test]
+	[DependsOnTest(nameof(CreateTableTest))]
 	public void UpdateWithParameters()
 	{
 		string description = "Unit Test - Time: " + DateTime.Now;
