@@ -1,4 +1,12 @@
 <Solution>
-  <Project Path="DatabaseLibraryNet/DigitalZenWorks.Database.ToolKit.csproj" />
-  <Project Path="DatabaseLibraryNetTests/DigitalZenWorks.Database.ToolKit.Tests.csproj" />
+
+	<Configurations>
+		<Platform Name="Any CPU" />
+		<Platform Name="x64" />
+		<Platform Name="x86" />
+	</Configurations>
+
+	<Project Path="DatabaseLibraryNet/DigitalZenWorks.Database.ToolKit.csproj" />
+	<Project Path="DatabaseLibraryNetTests/DigitalZenWorks.Database.ToolKit.Tests.csproj" />
+
 </Solution>
