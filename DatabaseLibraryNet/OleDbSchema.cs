@@ -117,15 +117,33 @@ public class OleDbSchema : DataStoreStructure
 	/// specified table name.
 	/// </summary>
 	/// <remarks>The returned <see cref="Table"/> includes all columns as
-	/// defined in the data source. If the table does not exist, the
-	/// result may be an empty table definition.</remarks>
+	/// defined in the data source, including AutoNumber metadata. Reading
+	/// this metadata requires querying the table; a nonexistent table
+	/// causes an exception rather than an empty table definition.</remarks>
 	/// <param name="tableName">The name of the table to retrieve. Cannot
 	/// be null or empty.</param>
 	/// <returns>A <see cref="Table"/> object representing the specified
 	/// table and its columns.</returns>
+	/// <exception cref="ArgumentNullException">The table name is null.
+	/// </exception>
+	/// <exception cref="OleDbException">The provider cannot read the table,
+	/// including when the table does not exist.</exception>
+	/// <exception cref="InvalidOperationException">The provider returns no
+	/// column metadata for the table.</exception>
 	public override Table GetTable(string tableName)
 	{
+#if NET6_0_OR_GREATER
+		ArgumentNullException.ThrowIfNull(tableName);
+#else
+		if (tableName == null)
+		{
+			throw new ArgumentNullException(nameof(tableName));
+		}
+#endif
 		primaryKeyNames = GetPrimaryKeyNames(tableName);
+
+		HashSet<string> autoIncrementColumnNames =
+			GetAutoIncrementColumnNames(tableName);
 
 		Table table = new(tableName);
 
@@ -135,6 +153,11 @@ public class OleDbSchema : DataStoreStructure
 		foreach (DataRow dataColumn in dataColumns.Rows)
 		{
 			Column column = FormatColumnFromDataRow(dataColumn);
+
+			if (autoIncrementColumnNames.Contains(column.Name))
+			{
+				column.ColumnType = ColumnType.AutoNumber;
+			}
 
 			table.AddColumn(column);
 		}
@@ -355,6 +378,66 @@ public class OleDbSchema : DataStoreStructure
 		}
 
 		return isPrimaryKey;
+	}
+
+	/// <summary>
+	/// Reads the columns for which the OLE DB provider generates values.
+	/// </summary>
+	/// <param name="tableName">The table whose columns are requested.</param>
+	/// <returns>The names of automatically incremented columns.</returns>
+	private HashSet<string> GetAutoIncrementColumnNames(string tableName)
+	{
+		HashSet<string> columnNames = [];
+
+		try
+		{
+			if (oleDbConnection.State != ConnectionState.Open)
+			{
+				oleDbConnection.Open();
+			}
+
+			using OleDbCommand command = oleDbConnection.CreateCommand();
+			string escapedTableName;
+#if NETSTANDARD2_1_OR_GREATER || NET5_0_OR_GREATER
+			escapedTableName = tableName.Replace(
+				"]", "]]", StringComparison.Ordinal);
+#else
+			escapedTableName = tableName.Replace("]", "]]");
+#endif
+#pragma warning disable CA2100 // The table name is escaped as an identifier.
+			command.CommandText =
+				"SELECT * FROM [" + escapedTableName + "] WHERE 1 = 0";
+#pragma warning restore CA2100
+
+			CommandBehavior behavior =
+				CommandBehavior.SchemaOnly | CommandBehavior.KeyInfo;
+
+			using OleDbDataReader reader = command.ExecuteReader(behavior);
+			DataTable schemaTable = reader.GetSchemaTable();
+
+			if (schemaTable == null)
+			{
+				string message = "The OLE DB provider returned no column " +
+					$"metadata for table '{tableName}'. " +
+					"Verify that the table exists and is accessible.";
+				throw new InvalidOperationException(message);
+			}
+
+			foreach (DataRow row in schemaTable.Rows)
+			{
+				if (row["IsAutoIncrement"] is bool isAutoIncrement &&
+					isAutoIncrement)
+				{
+					columnNames.Add(row["ColumnName"].ToString());
+				}
+			}
+		}
+		finally
+		{
+			oleDbConnection.Close();
+		}
+
+		return columnNames;
 	}
 
 	/// <summary>

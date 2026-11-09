@@ -7,6 +7,9 @@
 namespace DigitalZenWorks.Database.ToolKit;
 
 using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Globalization;
 
 /// <summary>
 /// SQL writer helper for SQLite 3.x class.
@@ -22,6 +25,76 @@ using System;
 /// </remarks>
 public class SqlWriterSqlite : SqlWriter
 {
+	/// <summary>
+	/// Generates a SQLite CREATE TABLE statement for the specified table.
+	/// </summary>
+	/// <param name="table">The source table structure.</param>
+	/// <param name="isLast">Whether this is the last generated table.</param>
+	/// <returns>The executable SQLite CREATE TABLE statement.</returns>
+	public override string GetTableCreateStatement(
+		Table table, bool isLast = false)
+	{
+#if NET6_0_OR_GREATER
+		ArgumentNullException.ThrowIfNull(table);
+#else
+		if (table == null)
+		{
+			string name = nameof(table);
+			throw new ArgumentNullException(name);
+		}
+#endif
+
+		SortedList<int, Column> columns = GetOrdinalSortedColumns(table);
+		List<Column> primaryColumns = [];
+
+		foreach (KeyValuePair<int, Column> entry in columns)
+		{
+			if (entry.Value.Primary)
+			{
+				primaryColumns.Add(entry.Value);
+			}
+		}
+
+		List<string> definitions = [];
+
+		foreach (KeyValuePair<int, Column> entry in columns)
+		{
+			string column =
+				GetSqliteColumnSql(entry.Value, primaryColumns.Count);
+			definitions.Add(column);
+		}
+
+		if (primaryColumns.Count > 1)
+		{
+			string key = GetCompositePrimaryKeySql(primaryColumns);
+			definitions.Add(key);
+		}
+
+		Collection<ForeignKey> foreignKeys = table.ForeignKeys;
+
+		for (int index = foreignKeys.Count - 1; index >= 0; index--)
+		{
+			string foreignKey = GetForeignKeySql(foreignKeys[index], true);
+			definitions.Add(foreignKey);
+		}
+
+		string sql = string.Format(
+			CultureInfo.InvariantCulture,
+			"CREATE TABLE {0}{1}({1}",
+			QuoteIdentifier(table.Name),
+			DefaultLineEnding);
+
+		sql += string.Join("," + DefaultLineEnding, definitions);
+		sql += DefaultLineEnding + ");";
+
+		if (isLast == false)
+		{
+			sql += DefaultLineEnding;
+		}
+
+		return sql;
+	}
+
 	/// <summary>
 	/// Returns the SQLite type affinity string corresponding to the
 	/// specified column's <see cref="ColumnType"/>.
@@ -72,6 +145,7 @@ public class SqlWriterSqlite : SqlWriter
 			ColumnType.MediumText => " TEXT",
 			ColumnType.Memo => " TEXT",
 			ColumnType.NChar => " TEXT",
+			ColumnType.NText => " TEXT",
 			ColumnType.NVarChar => " TEXT",
 			ColumnType.Set => " TEXT",
 			ColumnType.String => " TEXT",
@@ -160,6 +234,44 @@ public class SqlWriterSqlite : SqlWriter
 		return columnType;
 	}
 
+	/// <inheritdoc />
+	protected override string GetForeignKeySql(
+		ForeignKey foreignKey, bool isLast)
+	{
+#if NET6_0_OR_GREATER
+		ArgumentNullException.ThrowIfNull(foreignKey);
+#else
+		if (foreignKey == null)
+		{
+			string name = nameof(foreignKey);
+			throw new ArgumentNullException(name);
+		}
+#endif
+
+		string keyName = QuoteIdentifier(foreignKey.Name);
+		string parentColumn = QuoteIdentifier(foreignKey.ParentColumn);
+		string childTable = QuoteIdentifier(foreignKey.ChildTable);
+		string childColumn = QuoteIdentifier(foreignKey.ChildColumn);
+
+		string sql = string.Format(
+			CultureInfo.InvariantCulture,
+			"\tCONSTRAINT {0} FOREIGN KEY ({1}) REFERENCES {2}({3})",
+			keyName,
+			parentColumn,
+			childTable,
+			childColumn);
+
+		sql += GetContstraintActionText("DELETE", foreignKey.OnDeleteAction);
+		sql += GetContstraintActionText("UPDATE", foreignKey.OnUpdateAction);
+
+		if (isLast == false)
+		{
+			sql += "," + DefaultLineEnding;
+		}
+
+		return sql;
+	}
+
 	/// <summary>
 	/// Returns the SQLite-specific identity keyword text for the specified.
 	/// </summary>
@@ -173,5 +285,132 @@ public class SqlWriterSqlite : SqlWriter
 	protected override string GetIdentityKeywordText(Column column)
 	{
 		return string.Empty;
+	}
+
+	private static string GetCompositePrimaryKeySql(
+		IList<Column> primaryColumns)
+	{
+		List<string> names = [];
+
+		foreach (Column column in primaryColumns)
+		{
+			string identifier = QuoteIdentifier(column.Name);
+			names.Add(identifier);
+		}
+
+		string columns = string.Join(", ", names);
+		string key = "\tPRIMARY KEY (" + columns + ")";
+
+		return key;
+	}
+
+	private static string GetSqliteDefaultValue(string defaultValue)
+	{
+		string value = defaultValue.Trim();
+
+		// A leading '=' if present, which indicates an Access expression.
+		bool isAccessExpression = value.Length > 0 && value[0] == '=';
+
+		if (isAccessExpression)
+		{
+			value = value.Substring(1);
+			value = value.Trim();
+		}
+
+		if (value.Equals("Now()", StringComparison.OrdinalIgnoreCase))
+		{
+			value = "CURRENT_TIMESTAMP";
+		}
+		else if (value.Equals("Date()", StringComparison.OrdinalIgnoreCase) ||
+			value.Equals("Date$()", StringComparison.OrdinalIgnoreCase))
+		{
+			value = "CURRENT_DATE";
+		}
+		else if (value.Equals("Time()", StringComparison.OrdinalIgnoreCase) ||
+			value.Equals("Time$()", StringComparison.OrdinalIgnoreCase))
+		{
+			value = "CURRENT_TIME";
+		}
+		else if (isAccessExpression == true &&
+			!string.IsNullOrWhiteSpace(value))
+		{
+			if (value.Length < 2 || value[0] != '(' ||
+				value[value.Length - 1] != ')')
+			{
+				value = "(" + value + ")";
+			}
+		}
+
+		return value;
+	}
+
+	private static string QuoteIdentifier(string identifier)
+	{
+#if NETSTANDARD2_1_OR_GREATER || NET5_0_OR_GREATER
+		string escaped =
+			identifier.Replace("\"", "\"\"", StringComparison.Ordinal);
+#else
+		string escaped = identifier.Replace("\"", "\"\"");
+#endif
+		escaped = "\"" + escaped + "\"";
+
+		return escaped;
+	}
+
+	private string GetSqliteColumnSql(Column column, int primaryKeyCount)
+	{
+		bool isAutomatic = column.ColumnType == ColumnType.AutoNumber ||
+			column.ColumnType == ColumnType.Identity;
+
+		string columnType = GetColumnTypeText(column);
+
+		if (column.Primary && primaryKeyCount == 1 && isAutomatic == false &&
+			columnType.Equals(" INTEGER", StringComparison.Ordinal))
+		{
+			// Need to use " INT" instead of " INTEGER" because SQLite treats
+			// "INTEGER PRIMARY KEY" specially. It would aliases rowid and
+			// generate values.
+			columnType = " INT";
+		}
+
+		string sql = "\t" + QuoteIdentifier(column.Name);
+		sql += columnType;
+
+		if (column.Unique)
+		{
+			sql += " UNIQUE";
+		}
+
+		if (column.Primary)
+		{
+			if (primaryKeyCount == 1 && isAutomatic)
+			{
+				sql += " PRIMARY KEY AUTOINCREMENT";
+			}
+			else if (primaryKeyCount == 1)
+			{
+				sql += " NOT NULL PRIMARY KEY";
+			}
+			else
+			{
+				sql += " NOT NULL";
+			}
+		}
+		else if (!column.Nullable)
+		{
+			sql += " NOT NULL";
+		}
+
+		if (!string.IsNullOrWhiteSpace(column.DefaultValue))
+		{
+			string defaultValue = GetSqliteDefaultValue(column.DefaultValue);
+
+			if (!string.IsNullOrWhiteSpace(defaultValue))
+			{
+				sql += " DEFAULT " + defaultValue;
+			}
+		}
+
+		return sql;
 	}
 }

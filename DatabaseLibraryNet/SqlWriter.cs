@@ -578,6 +578,27 @@ public class SqlWriter
 	}
 
 	/// <summary>
+	/// Formats a supported foreign key action with leading SQL whitespace.
+	/// </summary>
+	/// <param name="actionItem">The DELETE or UPDATE operation.</param>
+	/// <param name="action">The action to apply.</param>
+	/// <returns>The action clause, or an empty string for the default.</returns>
+	protected static string GetContstraintActionText(
+		string actionItem, ConstraintAction action)
+	{
+		string actionText = " ON " + actionItem;
+
+		actionText = action switch
+		{
+			ConstraintAction.Cascade => actionText + " CASCADE",
+			ConstraintAction.SetNull => actionText + " SET NULL",
+			_ => string.Empty,
+		};
+
+		return actionText;
+	}
+
+	/// <summary>
 	/// Returns a sorted list of columns from the specified table, ordered
 	/// by their ordinal position.
 	/// </summary>

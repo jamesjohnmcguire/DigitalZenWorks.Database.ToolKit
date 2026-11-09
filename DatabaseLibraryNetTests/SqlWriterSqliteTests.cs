@@ -209,6 +209,89 @@ internal sealed class SqlWriterSqliteTests
 	}
 
 	/// <summary>
+	/// SQLite preserves the local column, referenced table and column, and
+	/// both actions when it parses the generated foreign key declaration.
+	/// </summary>
+	/// <param name="action">The action used for updates and deletes.</param>
+	/// <param name="expectedAction">The action reported by SQLite.</param>
+	[TestCase(ConstraintAction.NoAction, "NO ACTION")]
+	[TestCase(ConstraintAction.Cascade, "CASCADE")]
+	[TestCase(ConstraintAction.SetNull, "SET NULL")]
+	public void ForeignKeyMetadataPreservesReferenceAndActions(
+		ConstraintAction action, string expectedAction)
+	{
+		Table table = SchemaFixtures.GetOrdersTable();
+		ForeignKey foreignKey = table.ForeignKeys[0];
+		foreignKey.OnDeleteAction = action;
+		foreignKey.OnUpdateAction = action;
+
+		using SqliteConnection connection = new("Data Source=:memory:");
+		connection.Open();
+
+		using SqliteCommand command = connection.CreateCommand();
+#pragma warning disable CA2100 // SQL is generated from the test fixture.
+		command.CommandText = writer.GetTableCreateStatement(table);
+#pragma warning restore CA2100
+		command.ExecuteNonQuery();
+
+		command.CommandText = "PRAGMA foreign_key_list('Orders')";
+		using SqliteDataReader reader = command.ExecuteReader();
+
+		Assert.That(reader.Read(), Is.True);
+		Assert.That(reader["table"], Is.EqualTo("Products"));
+		Assert.That(reader["from"], Is.EqualTo("productId"));
+		Assert.That(reader["to"], Is.EqualTo("id"));
+		Assert.That(reader["on_delete"], Is.EqualTo(expectedAction));
+		Assert.That(reader["on_update"], Is.EqualTo(expectedAction));
+		Assert.That(reader.Read(), Is.False);
+	}
+
+	/// <summary>
+	/// Generated relationships reject orphan rows and cascade parent changes
+	/// when SQLite foreign key enforcement is enabled.
+	/// </summary>
+	[Test]
+	public void ForeignKeyRejectsOrphansAndCascadesUpdatesAndDeletes()
+	{
+		using SqliteConnection connection = new("Data Source=:memory:");
+		connection.Open();
+
+		using SqliteCommand command = connection.CreateCommand();
+		command.CommandText = "PRAGMA foreign_keys = ON";
+		command.ExecuteNonQuery();
+
+#pragma warning disable CA2100 // SQL is generated from the test fixtures.
+		command.CommandText =
+			writer.GetTableCreateStatement(SchemaFixtures.GetAddressesTable()) +
+			writer.GetTableCreateStatement(SchemaFixtures.GetContactsTable());
+#pragma warning restore CA2100
+		command.ExecuteNonQuery();
+
+		command.CommandText =
+			"INSERT INTO Addresses (id, label) VALUES (1, 'address');" +
+			"INSERT INTO Contacts (id, addressId, label) " +
+			"VALUES (1, 1, 'contact');";
+		command.ExecuteNonQuery();
+
+		command.CommandText =
+			"INSERT INTO Contacts (id, addressId, label) " +
+			"VALUES (2, 999, 'orphan');";
+		SqliteException exception = Assert.Throws<SqliteException>(
+			() => command.ExecuteNonQuery());
+		Assert.That(exception.SqliteExtendedErrorCode, Is.EqualTo(787));
+
+		command.CommandText = "UPDATE Addresses SET id = 2 WHERE id = 1";
+		command.ExecuteNonQuery();
+		command.CommandText = "SELECT addressId FROM Contacts WHERE id = 1";
+		Assert.That(command.ExecuteScalar(), Is.EqualTo(2L));
+
+		command.CommandText = "DELETE FROM Addresses WHERE id = 2";
+		command.ExecuteNonQuery();
+		command.CommandText = "SELECT COUNT(*) FROM Contacts";
+		Assert.That(command.ExecuteScalar(), Is.EqualTo(0L));
+	}
+
+	/// <summary>
 	/// What: Memo columns are declared with TEXT affinity, not BLOB.
 	/// How: generates DDL for the Orders table's "notes" column and
 	/// checks the declaration text.

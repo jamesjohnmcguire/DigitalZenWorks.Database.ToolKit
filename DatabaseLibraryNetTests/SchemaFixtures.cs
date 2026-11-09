@@ -71,6 +71,7 @@ internal static class SchemaFixtures
 
 		table.ForeignKeys.Add(new ForeignKey(
 			"FK_Categories_0_0",
+			"Categories",
 			"parentId",
 			"Categories",
 			"id",
@@ -102,6 +103,7 @@ internal static class SchemaFixtures
 
 		table.ForeignKeys.Add(new ForeignKey(
 			"FK_Contacts_0_0",
+			"Contacts",
 			"addressId",
 			"Addresses",
 			"id",
@@ -160,6 +162,7 @@ internal static class SchemaFixtures
 
 		table.ForeignKeys.Add(new ForeignKey(
 			"FK_Sections_1_0",
+			"Sections",
 			"categoryId",
 			"Categories",
 			"id",
@@ -168,6 +171,7 @@ internal static class SchemaFixtures
 
 		table.ForeignKeys.Add(new ForeignKey(
 			"FK_Sections_0_0",
+			"Sections",
 			"makerId",
 			"Makers",
 			"id",
@@ -201,6 +205,7 @@ internal static class SchemaFixtures
 
 		table.ForeignKeys.Add(new ForeignKey(
 			"FK_Series_0_0",
+			"Series",
 			"makerId",
 			"Makers",
 			"id",
@@ -242,6 +247,7 @@ internal static class SchemaFixtures
 
 		table.ForeignKeys.Add(new ForeignKey(
 			"FK_Products_2_0",
+			"Products",
 			"makerId",
 			"Makers",
 			"id",
@@ -250,6 +256,7 @@ internal static class SchemaFixtures
 
 		table.ForeignKeys.Add(new ForeignKey(
 			"FK_Products_1_0",
+			"Products",
 			"sectionId",
 			"Sections",
 			"id",
@@ -258,6 +265,7 @@ internal static class SchemaFixtures
 
 		table.ForeignKeys.Add(new ForeignKey(
 			"FK_Products_0_0",
+			"Products",
 			"seriesId",
 			"Series",
 			"id",
@@ -307,13 +315,16 @@ internal static class SchemaFixtures
 			new("notes", ColumnType.Memo, 0, false, true, null, 7);
 		table.AddColumn(column);
 
-		table.ForeignKeys.Add(new ForeignKey(
+		ForeignKey foreignKey = new(
 			"FK_Orders_0_0",
+			"Orders",
 			"productId",
 			"Products",
 			"id",
 			ConstraintAction.SetNull,
-			ConstraintAction.Cascade));
+			ConstraintAction.Cascade);
+
+		table.ForeignKeys.Add(foreignKey);
 
 		return table;
 	}
