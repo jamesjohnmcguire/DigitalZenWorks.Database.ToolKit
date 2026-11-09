@@ -656,12 +656,20 @@ public class DataStoreStructure : IDisposable
 #pragma warning restore CA1308
 
 			// Metadata may contain a declaration such as NUMERIC(12,2).
-			int parameterIndex = normalizedType.IndexOf(
-				'(', StringComparison.Ordinal);
+#if NET5_0_OR_GREATER
+			int parameterIndex =
+				normalizedType.IndexOf('(', StringComparison.Ordinal);
+#else
+			int parameterIndex = normalizedType.IndexOf('(');
+#endif
 
 			if (parameterIndex >= 0)
 			{
+#if NET5_0_OR_GREATER
 				normalizedType = normalizedType[..parameterIndex];
+#else
+				normalizedType = normalizedType.Substring(0, parameterIndex);
+#endif
 				normalizedType = normalizedType.TrimEnd();
 			}
 
@@ -930,6 +938,44 @@ public class DataStoreStructure : IDisposable
 		}
 
 		return tableDictionary;
+	}
+
+	/// <summary>
+	/// Creates the data adapter type that corresponds to the connection type.
+	/// </summary>
+	/// <param name="connection">The connection whose provider assembly is
+	/// inspected.</param>
+	/// <returns>The provider-specific data adapter.</returns>
+	/// <exception cref="NotSupportedException">Thrown when a matching adapter
+	/// type cannot be found.</exception>
+	private static DbDataAdapter CreateDataAdapterForConnection(
+		DbConnection connection)
+	{
+		Type connectionType = connection.GetType();
+		string connectionTypeName = connectionType.FullName;
+
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP2_0_OR_GREATER
+		string adapterTypeName = connectionTypeName.Replace(
+			"Connection",
+			"DataAdapter",
+			StringComparison.InvariantCultureIgnoreCase);
+#else
+		string adapterTypeName = connectionTypeName.Replace(
+			"Connection",
+			"DataAdapter");
+#endif
+
+		Assembly assembly = connectionType.Assembly;
+		Type adapterType = assembly.GetType(adapterTypeName);
+
+		if (adapterType == null)
+		{
+			string message =
+				$"Could not find adapter type for {connectionTypeName}";
+			throw new NotSupportedException(message);
+		}
+
+		return (DbDataAdapter)Activator.CreateInstance(adapterType);
 	}
 
 	/// <summary>
