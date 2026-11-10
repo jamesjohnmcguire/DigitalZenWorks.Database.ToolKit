@@ -6,6 +6,7 @@
 
 namespace DigitalZenWorks.Database.ToolKit;
 
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data;
@@ -63,6 +64,15 @@ public class Table
 	/// The table name.
 	/// </value>
 	public string Name { get; set; } = string.Empty;
+
+	/// <summary>
+	/// Gets or sets the legacy primary key name.
+	/// </summary>
+	/// <remarks>This property retains its historical independent storage.
+	/// It does not read or update the Primary flags in Columns.</remarks>
+	[Obsolete("Use Column.Primary on entries in Columns instead. " +
+		"This property will be removed in v2.")]
+	public string PrimaryKey { get; set; }
 
 	/// <summary>
 	/// Writes out the table information.

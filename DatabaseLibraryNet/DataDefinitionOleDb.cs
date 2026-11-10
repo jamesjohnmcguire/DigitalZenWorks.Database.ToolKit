@@ -32,6 +32,20 @@ public static class DataDefinitionOleDb
 	internal static Func<string, Collection<Table>> SchemaLoader { get; set; } =
 		GetSchema;
 
+	/// <summary>
+	/// Exports a schema using the default Access SQL format.
+	/// </summary>
+	/// <param name="databaseFile">The database file to use.</param>
+	/// <param name="schemaFile">The schema file to export to.</param>
+	/// <returns>Whether the schema was exported successfully.</returns>
+#if NET5_0_OR_GREATER
+	[SupportedOSPlatform("windows")]
+#endif
+	public static bool ExportSchema(string databaseFile, string schemaFile)
+	{
+		return ExportSchema(databaseFile, schemaFile, toSqlite: false);
+	}
+
 	/// Method <c>ExportSchema.</c>
 	/// <summary>
 	/// Export all tables to similarly named csv files.

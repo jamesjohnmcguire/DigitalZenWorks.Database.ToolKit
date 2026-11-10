@@ -88,6 +88,10 @@ joining identifiers into a string or creating independent foreign keys.
 
 ## Proposed v2 interface decisions
 
+- Remove the restored obsolete `Table.PrimaryKey` property and
+  `DataObjectOleDb(DatabaseType, string)` constructor after callers migrate.
+  Their current independent storage and base-constructor behavior remain
+  unchanged until that breaking release.
 - Retain only explicit role names; remove historical aliases and the
   obsolete constructor. Review whether the other constructor should be
   replaced by the factory. Never silently reverse legacy property meanings.
