@@ -286,26 +286,26 @@ public class OleDbSchema : DataStoreStructure
 	{
 		Relationship relationship = new();
 
-		// Note: OleDb seems to have reversed referencing.
+		// FK metadata identifies the referencing child; PK identifies its target.
 		const string constraintNameKey = "FK_NAME";
-		const string parentTableNameKey = "FK_TABLE_NAME";
-		const string parentColumnNameKey = "FK_COLUMN_NAME";
-		const string childTableNameKey = "PK_TABLE_NAME";
-		const string childColumnNameKey = "PK_COLUMN_NAME";
+		const string referencingTableNameKey = "FK_TABLE_NAME";
+		const string referencingColumnNameKey = "FK_COLUMN_NAME";
+		const string referencedTableNameKey = "PK_TABLE_NAME";
+		const string referencedColumnNameKey = "PK_COLUMN_NAME";
 		const string updateRuleKey = "UPDATE_RULE";
 		const string deleteRuleKey = "DELETE_RULE";
 
 		if (foreignKey != null)
 		{
 			relationship.Name = foreignKey[constraintNameKey].ToString();
-			relationship.ParentTable =
-				foreignKey[parentTableNameKey].ToString();
-			relationship.ParentTableCol =
-				foreignKey[parentColumnNameKey].ToString();
-			relationship.ChildTable =
-				foreignKey[childTableNameKey].ToString();
-			relationship.ChildTableCol =
-				foreignKey[childColumnNameKey].ToString();
+			relationship.ReferencingTable =
+				foreignKey[referencingTableNameKey].ToString();
+			relationship.ReferencingColumn =
+				foreignKey[referencingColumnNameKey].ToString();
+			relationship.ReferencedTable =
+				foreignKey[referencedTableNameKey].ToString();
+			relationship.ReferencedColumn =
+				foreignKey[referencedColumnNameKey].ToString();
 
 			string onAction = foreignKey[deleteRuleKey].ToString();
 

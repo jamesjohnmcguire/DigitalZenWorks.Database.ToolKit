@@ -7,8 +7,13 @@
 namespace DigitalZenWorks.Database.ToolKit;
 
 /// <summary>
-/// A class to hold foreign key constraints temporarily.
+/// Holds schema relationship metadata from a referencing child table to a
+/// referenced parent table.
 /// </summary>
+/// <remarks>Use the explicit Referencing and Referenced properties. Legacy
+/// Parent and Child properties retain their historical reversed meanings.
+/// This metadata class remains separate from ForeignKey until the planned
+/// review of overlapping functionality.</remarks>
 public class Relationship
 {
 	/// <summary>
@@ -18,25 +23,61 @@ public class Relationship
 	public string Name { get; set; }
 
 	/// <summary>
-	/// Gets or sets parent Table.
+	/// Gets or sets the child table that contains the foreign key.
+	/// </summary>
+	public string ReferencingTable
+	{
+		get { return ParentTable; }
+		set { ParentTable = value; }
+	}
+
+	/// <summary>
+	/// Gets or sets the foreign key column in the referencing child table.
+	/// </summary>
+	public string ReferencingColumn
+	{
+		get { return ParentTableCol; }
+		set { ParentTableCol = value; }
+	}
+
+	/// <summary>
+	/// Gets or sets the parent table targeted by the foreign key.
+	/// </summary>
+	public string ReferencedTable
+	{
+		get { return ChildTable; }
+		set { ChildTable = value; }
+	}
+
+	/// <summary>
+	/// Gets or sets the target key column in the referenced parent table.
+	/// </summary>
+	public string ReferencedColumn
+	{
+		get { return ChildTableCol; }
+		set { ChildTableCol = value; }
+	}
+
+	/// <summary>
+	/// Gets or sets the referencing table using its legacy name.
 	/// </summary>
 	/// <value>The Parent Table.</value>
 	public string ParentTable { get; set; }
 
 	/// <summary>
-	/// Gets or sets parent Table Column.
+	/// Gets or sets the referencing column using its legacy name.
 	/// </summary>
 	/// <value>The Parent Table Column.</value>
 	public string ParentTableCol { get; set; }
 
 	/// <summary>
-	/// Gets or sets child Table.
+	/// Gets or sets the referenced table using its legacy name.
 	/// </summary>
 	/// <value>The Child Table.</value>
 	public string ChildTable { get; set; }
 
 	/// <summary>
-	/// Gets or sets child Table Column.
+	/// Gets or sets the referenced column using its legacy name.
 	/// </summary>
 	/// <value>The Child Table Column.</value>
 	public string ChildTableCol { get; set; }

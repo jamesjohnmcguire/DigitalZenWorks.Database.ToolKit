@@ -135,6 +135,11 @@ internal sealed class DataStoreStructureTests : BaseTestsSupport
 
 		name = relationship.ChildTable;
 		Assert.That(name, Is.EqualTo("Makers"));
+
+		Assert.That(relationship.ReferencingTable, Is.EqualTo("Sections"));
+		Assert.That(relationship.ReferencingColumn, Is.EqualTo("makerId"));
+		Assert.That(relationship.ReferencedTable, Is.EqualTo("Makers"));
+		Assert.That(relationship.ReferencedColumn, Is.EqualTo("id"));
 	}
 
 	/// <summary>
@@ -175,6 +180,15 @@ internal sealed class DataStoreStructureTests : BaseTestsSupport
 
 		count = tableItem.ForeignKeys.Count;
 		Assert.That(count, Is.EqualTo(3));
+
+		foreach (ForeignKey foreignKey in tableItem.ForeignKeys)
+		{
+			Assert.That(foreignKey.ReferencingTable, Is.EqualTo("Products"));
+			Assert.That(foreignKey.ReferencedColumn, Is.EqualTo("id"));
+			Assert.That(
+				foreignKey.ReferencingColumn,
+				Is.AnyOf("makerId", "sectionId", "seriesId"));
+		}
 	}
 
 	/// <summary>

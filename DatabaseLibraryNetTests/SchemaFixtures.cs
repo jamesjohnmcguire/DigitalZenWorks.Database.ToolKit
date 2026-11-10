@@ -69,14 +69,14 @@ internal static class SchemaFixtures
 		column = new("parentId", ColumnType.Number, 0, false, true, null, 3);
 		table.AddColumn(column);
 
-		table.ForeignKeys.Add(new ForeignKey(
-			"FK_Categories_0_0",
-			"Categories",
-			"parentId",
-			"Categories",
-			"id",
-			ConstraintAction.SetNull,
-			ConstraintAction.Cascade));
+		table.ForeignKeys.Add(ForeignKey.Create(
+			name: "FK_Categories_0_0",
+			referencedTable: "Categories",
+			referencedColumn: "id",
+			referencingTable: "Categories",
+			referencingColumn: "parentId",
+			onDeleteAction: ConstraintAction.SetNull,
+			onUpdateAction: ConstraintAction.Cascade));
 
 		return table;
 	}
@@ -101,14 +101,14 @@ internal static class SchemaFixtures
 		column = new("label", ColumnType.Text, 0, false, false, null, 3);
 		table.AddColumn(column);
 
-		table.ForeignKeys.Add(new ForeignKey(
-			"FK_Contacts_0_0",
-			"Contacts",
-			"addressId",
-			"Addresses",
-			"id",
-			ConstraintAction.Cascade,
-			ConstraintAction.Cascade));
+		table.ForeignKeys.Add(ForeignKey.Create(
+			name: "FK_Contacts_0_0",
+			referencedTable: "Addresses",
+			referencedColumn: "id",
+			referencingTable: "Contacts",
+			referencingColumn: "addressId",
+			onDeleteAction: ConstraintAction.Cascade,
+			onUpdateAction: ConstraintAction.Cascade));
 
 		return table;
 	}
@@ -160,23 +160,23 @@ internal static class SchemaFixtures
 			new("label", ColumnType.Text, 0, false, true, null, 4);
 		table.AddColumn(column);
 
-		table.ForeignKeys.Add(new ForeignKey(
-			"FK_Sections_1_0",
-			"Sections",
-			"categoryId",
-			"Categories",
-			"id",
-			ConstraintAction.SetNull,
-			ConstraintAction.Cascade));
+		table.ForeignKeys.Add(ForeignKey.Create(
+			name: "FK_Sections_1_0",
+			referencedTable: "Categories",
+			referencedColumn: "id",
+			referencingTable: "Sections",
+			referencingColumn: "categoryId",
+			onDeleteAction: ConstraintAction.SetNull,
+			onUpdateAction: ConstraintAction.Cascade));
 
-		table.ForeignKeys.Add(new ForeignKey(
-			"FK_Sections_0_0",
-			"Sections",
-			"makerId",
-			"Makers",
-			"id",
-			ConstraintAction.SetNull,
-			ConstraintAction.Cascade));
+		table.ForeignKeys.Add(ForeignKey.Create(
+			name: "FK_Sections_0_0",
+			referencedTable: "Makers",
+			referencedColumn: "id",
+			referencingTable: "Sections",
+			referencingColumn: "makerId",
+			onDeleteAction: ConstraintAction.SetNull,
+			onUpdateAction: ConstraintAction.Cascade));
 
 		return table;
 	}
@@ -203,14 +203,14 @@ internal static class SchemaFixtures
 			new("label", ColumnType.Text, 0, false, false, null, 3);
 		table.AddColumn(column);
 
-		table.ForeignKeys.Add(new ForeignKey(
-			"FK_Series_0_0",
-			"Series",
-			"makerId",
-			"Makers",
-			"id",
-			ConstraintAction.SetNull,
-			ConstraintAction.Cascade));
+		table.ForeignKeys.Add(ForeignKey.Create(
+			name: "FK_Series_0_0",
+			referencedTable: "Makers",
+			referencedColumn: "id",
+			referencingTable: "Series",
+			referencingColumn: "makerId",
+			onDeleteAction: ConstraintAction.SetNull,
+			onUpdateAction: ConstraintAction.Cascade));
 
 		return table;
 	}
@@ -245,32 +245,32 @@ internal static class SchemaFixtures
 			new("label", ColumnType.Text, 0, false, true, null, 5);
 		table.AddColumn(column);
 
-		table.ForeignKeys.Add(new ForeignKey(
-			"FK_Products_2_0",
-			"Products",
-			"makerId",
-			"Makers",
-			"id",
-			ConstraintAction.SetNull,
-			ConstraintAction.Cascade));
+		table.ForeignKeys.Add(ForeignKey.Create(
+			name: "FK_Products_2_0",
+			referencedTable: "Makers",
+			referencedColumn: "id",
+			referencingTable: "Products",
+			referencingColumn: "makerId",
+			onDeleteAction: ConstraintAction.SetNull,
+			onUpdateAction: ConstraintAction.Cascade));
 
-		table.ForeignKeys.Add(new ForeignKey(
-			"FK_Products_1_0",
-			"Products",
-			"sectionId",
-			"Sections",
-			"id",
-			ConstraintAction.SetNull,
-			ConstraintAction.Cascade));
+		table.ForeignKeys.Add(ForeignKey.Create(
+			name: "FK_Products_1_0",
+			referencedTable: "Sections",
+			referencedColumn: "id",
+			referencingTable: "Products",
+			referencingColumn: "sectionId",
+			onDeleteAction: ConstraintAction.SetNull,
+			onUpdateAction: ConstraintAction.Cascade));
 
-		table.ForeignKeys.Add(new ForeignKey(
-			"FK_Products_0_0",
-			"Products",
-			"seriesId",
-			"Series",
-			"id",
-			ConstraintAction.SetNull,
-			ConstraintAction.Cascade));
+		table.ForeignKeys.Add(ForeignKey.Create(
+			name: "FK_Products_0_0",
+			referencedTable: "Series",
+			referencedColumn: "id",
+			referencingTable: "Products",
+			referencingColumn: "seriesId",
+			onDeleteAction: ConstraintAction.SetNull,
+			onUpdateAction: ConstraintAction.Cascade));
 
 		return table;
 	}
@@ -315,14 +315,14 @@ internal static class SchemaFixtures
 			new("notes", ColumnType.Memo, 0, false, true, null, 7);
 		table.AddColumn(column);
 
-		ForeignKey foreignKey = new(
-			"FK_Orders_0_0",
-			"Orders",
-			"productId",
-			"Products",
-			"id",
-			ConstraintAction.SetNull,
-			ConstraintAction.Cascade);
+		ForeignKey foreignKey = ForeignKey.Create(
+			name: "FK_Orders_0_0",
+			referencedTable: "Products",
+			referencedColumn: "id",
+			referencingTable: "Orders",
+			referencingColumn: "productId",
+			onDeleteAction: ConstraintAction.SetNull,
+			onUpdateAction: ConstraintAction.Cascade);
 
 		table.ForeignKeys.Add(foreignKey);
 

@@ -117,6 +117,11 @@ internal sealed class OleDbTests : BaseTestsSupport
 
 		name = relationship.ChildTable;
 		Assert.That(name, Is.EqualTo("Addresses"));
+
+		Assert.That(relationship.ReferencingTable, Is.EqualTo("Contacts"));
+		Assert.That(relationship.ReferencingColumn, Is.EqualTo("addressId"));
+		Assert.That(relationship.ReferencedTable, Is.EqualTo("Addresses"));
+		Assert.That(relationship.ReferencedColumn, Is.EqualTo("id"));
 	}
 
 	/// <summary>
@@ -154,6 +159,12 @@ internal sealed class OleDbTests : BaseTestsSupport
 
 		count = tableItem.ForeignKeys.Count;
 		Assert.That(count, Is.EqualTo(1));
+
+		ForeignKey foreignKey = tableItem.ForeignKeys[0];
+		Assert.That(foreignKey.ReferencingTable, Is.EqualTo("Contacts"));
+		Assert.That(foreignKey.ReferencingColumn, Is.EqualTo("addressId"));
+		Assert.That(foreignKey.ReferencedTable, Is.EqualTo("Addresses"));
+		Assert.That(foreignKey.ReferencedColumn, Is.EqualTo("id"));
 	}
 
 	/// <summary>

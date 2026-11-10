@@ -247,6 +247,30 @@ internal sealed class SqlWriterSqliteTests
 	}
 
 	/// <summary>
+	/// A self reference retains distinct referencing and referenced columns.
+	/// </summary>
+	[Test]
+	public void SelfReferencePreservesColumnDirection()
+	{
+		using SqliteConnection connection = new("Data Source=:memory:");
+		connection.Open();
+		using SqliteCommand command = connection.CreateCommand();
+#pragma warning disable CA2100 // SQL is generated from the test fixture.
+		command.CommandText =
+			writer.GetTableCreateStatement(SchemaFixtures.GetCategoriesTable());
+#pragma warning restore CA2100
+		command.ExecuteNonQuery();
+		command.CommandText = "PRAGMA foreign_key_list('Categories')";
+		using SqliteDataReader reader = command.ExecuteReader();
+
+		Assert.That(reader.Read(), Is.True);
+		Assert.That(reader["table"], Is.EqualTo("Categories"));
+		Assert.That(reader["from"], Is.EqualTo("parentId"));
+		Assert.That(reader["to"], Is.EqualTo("id"));
+		Assert.That(reader.Read(), Is.False);
+	}
+
+	/// <summary>
 	/// Generated relationships reject orphan rows and cascade parent changes
 	/// when SQLite foreign key enforcement is enabled.
 	/// </summary>

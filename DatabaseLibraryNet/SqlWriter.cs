@@ -834,7 +834,7 @@ public class SqlWriter
 	/// key definition. The output is formatted for inclusion in a CREATE
 	/// TABLE statement.</remarks>
 	/// <param name="foreignKey">The foreign key definition containing the
-	/// constraint name, parent column, child table, child column, and
+	/// constraint name, referencing column, referenced table and column, and
 	/// cascade options. Cannot be null.</param>
 	/// <param name="isLast">Indicates whether this constraint is the last
 	/// in the list. If <see langword="false"/>, a comma is appended to the
@@ -867,10 +867,10 @@ public class SqlWriter
 			constraint,
 			foreignKey.Name,
 			key,
-			foreignKey.ParentColumn,
+			foreignKey.ReferencingColumn,
 			references,
-			foreignKey.ChildTable,
-			foreignKey.ChildColumn);
+			foreignKey.ReferencedTable,
+			foreignKey.ReferencedColumn);
 
 		if (foreignKey.OnDeleteAction == ConstraintAction.Cascade)
 		{

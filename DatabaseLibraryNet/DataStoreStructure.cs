@@ -225,7 +225,7 @@ public class DataStoreStructure : IDisposable
 
 				foreach (ForeignKey foreignKeys in table.ForeignKeys)
 				{
-					dependencies.Add(foreignKeys.ChildTable);
+					dependencies.Add(foreignKeys.ReferencedTable);
 				}
 
 				tableDependencies.Add(name, dependencies);
@@ -529,12 +529,14 @@ public class DataStoreStructure : IDisposable
 		}
 		else
 		{
+			// Preserve permissive metadata handling for existing providers.
+			// The public Create factory validates new application definitions.
 			foreignKey = new(
 				relationship.Name,
-				relationship.ParentTable,
-				relationship.ParentTableCol,
-				relationship.ChildTable,
-				relationship.ChildTableCol,
+				relationship.ReferencingTable,
+				relationship.ReferencingColumn,
+				relationship.ReferencedTable,
+				relationship.ReferencedColumn,
 				relationship.OnDeleteAction,
 				relationship.OnUpdateAction);
 		}
@@ -751,13 +753,13 @@ public class DataStoreStructure : IDisposable
 		const string deleteRuleKey = "FKEY_ON_DELETE";
 
 		relationship.Name = foreignKey[constraintNameKey].ToString();
-		relationship.ParentTable =
+		relationship.ReferencingTable =
 			foreignKey[tableNameKey].ToString();
-		relationship.ParentTableCol =
+		relationship.ReferencingColumn =
 			foreignKey[columnNameKey].ToString();
-		relationship.ChildTable =
+		relationship.ReferencedTable =
 			foreignKey[foreignTableNameKey].ToString();
-		relationship.ChildTableCol =
+		relationship.ReferencedColumn =
 			foreignKey[foreignColumnNameKey].ToString();
 
 		string onAction = foreignKey[deleteRuleKey].ToString();
@@ -820,20 +822,20 @@ public class DataStoreStructure : IDisposable
 	}
 
 	/// <summary>
-	/// Retrieves the parent table specified by the relationship and adds
-	/// the corresponding foreign key to its collection.
+	/// Retrieves the referencing child table specified by the relationship
+	/// and adds the corresponding foreign key to its collection.
 	/// </summary>
 	/// <remarks>If the specified relationship or table dictionary is null,
 	/// the method returns null and no changes are made. The foreign key is
-	/// added to the parent table's <c>ForeignKeys</c> collection.
+	/// added to the referencing table's <c>ForeignKeys</c> collection.
 	/// </remarks>
 	/// <param name="tableDictionary">A dictionary containing table names
 	/// as keys and their corresponding <see cref="Table"/> objects as
 	/// values. Must not be null.</param>
 	/// <param name="relationship">The relationship that defines the
-	/// parent table and foreign key to associate. Must not be null.
+	/// referencing table and foreign key to associate. Must not be null.
 	/// </param>
-	/// <returns>The <see cref="Table"/> object representing the parent
+	/// <returns>The <see cref="Table"/> object representing the referencing
 	/// table with the foreign key added, or <see langword="null"/>
 	/// if <paramref name="tableDictionary"/> or
 	/// <paramref name="relationship"/> is null.</returns>
@@ -845,7 +847,7 @@ public class DataStoreStructure : IDisposable
 
 		if (tableDictionary != null && relationship != null)
 		{
-			string name = relationship.ParentTable;
+			string name = relationship.ReferencingTable;
 
 			ForeignKey foreignKey =
 				GetForeignKeyRelationship(relationship);

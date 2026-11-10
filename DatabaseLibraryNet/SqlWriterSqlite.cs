@@ -249,17 +249,18 @@ public class SqlWriterSqlite : SqlWriter
 #endif
 
 		string keyName = QuoteIdentifier(foreignKey.Name);
-		string parentColumn = QuoteIdentifier(foreignKey.ParentColumn);
-		string childTable = QuoteIdentifier(foreignKey.ChildTable);
-		string childColumn = QuoteIdentifier(foreignKey.ChildColumn);
+		string referencingColumn =
+			QuoteIdentifier(foreignKey.ReferencingColumn);
+		string referencedTable = QuoteIdentifier(foreignKey.ReferencedTable);
+		string referencedColumn = QuoteIdentifier(foreignKey.ReferencedColumn);
 
 		string sql = string.Format(
 			CultureInfo.InvariantCulture,
 			"\tCONSTRAINT {0} FOREIGN KEY ({1}) REFERENCES {2}({3})",
 			keyName,
-			parentColumn,
-			childTable,
-			childColumn);
+			referencingColumn,
+			referencedTable,
+			referencedColumn);
 
 		sql += GetContstraintActionText("DELETE", foreignKey.OnDeleteAction);
 		sql += GetContstraintActionText("UPDATE", foreignKey.OnUpdateAction);
