@@ -10,6 +10,9 @@ using System;
 using System.IO;
 using global::Common.Logging;
 
+/// <summary>
+/// Identifies database file formats using file headers and extensions.
+/// </summary>
 public static class DatabaseFileInspector
 {
 	/// <summary>
