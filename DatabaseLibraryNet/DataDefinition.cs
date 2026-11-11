@@ -239,9 +239,9 @@ public static class DataDefinition
 	/// </summary>
 	/// <param name="databaseFile">The database file.</param>
 	/// <returns>The database header bytes.</returns>
-	[Obsolete("GetDatabaseFileHeaderBytes is no longer used and will be " +
-	"removed in a future major version. Use " +
-	"DatabaseFileInspector.GetDatabaseFileHeaderBytes instead.")]
+	[Obsolete("GetDatabaseFileHeaderBytes is deprecated and will be " +
+	"removed in a future major version. For file type detection, use " +
+	"DatabaseFileInspector.GetDatabaseFileType with a file path.")]
 	public static byte[] GetDatabaseFileHeaderBytes(string databaseFile)
 	{
 		byte[] header =
@@ -271,9 +271,9 @@ public static class DataDefinition
 	/// </summary>
 	/// <param name="databaseFile">The database file.</param>
 	/// <returns>The database type.</returns>
-	[Obsolete("GetDatabaseTypeByExtension is no longer used and will be " +
-	"removed in a future major version. Use " +
-	"DatabaseFileInspector.GetDatabaseTypeByExtension instead.")]
+	[Obsolete("GetDatabaseTypeByExtension is deprecated and will be " +
+	"removed in a future major version. For file type detection, use " +
+	"DatabaseFileInspector.GetDatabaseFileType with a file path.")]
 	public static DatabaseType GetDatabaseTypeByExtension(
 		string databaseFile)
 	{
@@ -288,9 +288,9 @@ public static class DataDefinition
 	/// </summary>
 	/// <param name="header">The header bytes.</param>
 	/// <returns>The database type.</returns>
-	[Obsolete("GetDatabaseTypeByFileHeaderBytes is no longer used and will be " +
-	"removed in a future major version. Use " +
-	"DatabaseFileInspector.GetDatabaseTypeByFileHeaderBytes instead.")]
+	[Obsolete("GetDatabaseTypeByFileHeaderBytes is deprecated and will be " +
+	"removed in a future major version. For file type detection, use " +
+	"DatabaseFileInspector.GetDatabaseFileType with a file path.")]
 	public static DatabaseType GetDatabaseTypeByFileHeaderBytes(
 		byte[] header)
 	{

@@ -318,15 +318,43 @@ internal sealed class DatabaseFileInspectorTests
 			method.GetCustomAttribute<ObsoleteAttribute>();
 		Assert.That(obsolete, Is.Not.Null);
 		Assert.That(obsolete.IsError, Is.False);
-		string replacementName = methodName;
-		if (methodName == "GetDatabaseType")
-		{
-			replacementName = "GetDatabaseFileType";
-		}
-
+		Assert.That(
+			obsolete.Message, Does.Contain("removed in a future major version"));
 		Assert.That(
 			obsolete.Message,
-			Does.Contain("DatabaseFileInspector." + replacementName));
+			Does.Contain("DatabaseFileInspector.GetDatabaseFileType"));
+		Assert.That(
+			obsolete.Message,
+			Does.Not.Contain("DatabaseFileInspector." + methodName));
+	}
+
+	/// <summary>
+	/// The inspector exposes file identification as its only public operation.
+	/// </summary>
+	[Test]
+	public void InspectorExposesOnlyFileTypeDetection()
+	{
+		MethodInfo[] methods = typeof(DatabaseFileInspector).GetMethods(
+			BindingFlags.Public | BindingFlags.Static | BindingFlags.DeclaredOnly);
+		Assert.That(methods, Has.Length.EqualTo(1));
+		Assert.That(
+			methods[0].Name,
+			Is.EqualTo(nameof(DatabaseFileInspector.GetDatabaseFileType)));
+	}
+
+	/// <summary>
+	/// Helpers stay internal for compatibility delegates and focused tests.
+	/// </summary>
+	/// <param name="methodName">The internal inspector helper.</param>
+	[TestCase("GetDatabaseFileHeaderBytes")]
+	[TestCase("GetDatabaseTypeByExtension")]
+	[TestCase("GetDatabaseTypeByFileHeaderBytes")]
+	public void InspectorHelpersHaveInternalVisibility(string methodName)
+	{
+		MethodInfo method = typeof(DatabaseFileInspector).GetMethod(
+			methodName, BindingFlags.NonPublic | BindingFlags.Static);
+		Assert.That(method, Is.Not.Null);
+		Assert.That(method.IsAssembly, Is.True);
 	}
 
 	private static void AssertFileType(string path, DatabaseType expected)

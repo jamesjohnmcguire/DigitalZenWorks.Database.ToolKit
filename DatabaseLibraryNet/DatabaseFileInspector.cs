@@ -22,36 +22,6 @@ public static class DatabaseFileInspector
 		System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
 	/// <summary>
-	/// Get database file header bytes.
-	/// </summary>
-	/// <param name="databaseFile">The database file.</param>
-	/// <returns>The database header bytes.</returns>
-	public static byte[] GetDatabaseFileHeaderBytes(string databaseFile)
-	{
-		byte[] header = null;
-
-		try
-		{
-			using FileStream stream = new(
-				databaseFile,
-				FileMode.Open,
-				FileAccess.Read,
-				FileShare.ReadWrite);
-
-			// Read enough bytes to check all signatures
-			header = new byte[32];
-			int bytesRead = stream.Read(header, 0, header.Length);
-		}
-		catch (Exception exception) when
-			(exception is ArgumentNullException)
-		{
-			Log.Error(Strings.Exception + exception);
-		}
-
-		return header;
-	}
-
-	/// <summary>
 	/// Gets the database file type using its header and extension.
 	/// </summary>
 	/// <param name="databaseFile">The database file.</param>
@@ -78,11 +48,41 @@ public static class DatabaseFileInspector
 	}
 
 	/// <summary>
+	/// Get database file header bytes.
+	/// </summary>
+	/// <param name="databaseFile">The database file.</param>
+	/// <returns>The database header bytes.</returns>
+	internal static byte[] GetDatabaseFileHeaderBytes(string databaseFile)
+	{
+		byte[] header = null;
+
+		try
+		{
+			using FileStream stream = new(
+				databaseFile,
+				FileMode.Open,
+				FileAccess.Read,
+				FileShare.ReadWrite);
+
+			// Read enough bytes to check all signatures
+			header = new byte[32];
+			int bytesRead = stream.Read(header, 0, header.Length);
+		}
+		catch (Exception exception) when
+			(exception is ArgumentNullException)
+		{
+			Log.Error(Strings.Exception + exception);
+		}
+
+		return header;
+	}
+
+	/// <summary>
 	/// Get database type by file extension.
 	/// </summary>
 	/// <param name="databaseFile">The database file.</param>
 	/// <returns>The database type.</returns>
-	public static DatabaseType GetDatabaseTypeByExtension(
+	internal static DatabaseType GetDatabaseTypeByExtension(
 		string databaseFile)
 	{
 		string extension = Path.GetExtension(databaseFile);
@@ -107,7 +107,7 @@ public static class DatabaseFileInspector
 	/// </summary>
 	/// <param name="header">The header bytes.</param>
 	/// <returns>The database type.</returns>
-	public static DatabaseType GetDatabaseTypeByFileHeaderBytes(
+	internal static DatabaseType GetDatabaseTypeByFileHeaderBytes(
 		byte[] header)
 	{
 		DatabaseType databaseType = DatabaseType.Unknown;
