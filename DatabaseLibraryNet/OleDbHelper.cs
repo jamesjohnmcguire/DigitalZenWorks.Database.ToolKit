@@ -77,7 +77,7 @@ public static class OleDbHelper
 		bool returnCode = false;
 
 		DatabaseType databaseType =
-			DatabaseFileInspector.GetDatabaseType(databaseFile);
+			DatabaseFileInspector.GetDatabaseFileType(databaseFile);
 		string connectionString =
 			DataStorage.GetConnectionString(databaseType, databaseFile);
 

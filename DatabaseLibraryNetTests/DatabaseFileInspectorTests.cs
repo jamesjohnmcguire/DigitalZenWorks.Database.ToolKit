@@ -318,14 +318,21 @@ internal sealed class DatabaseFileInspectorTests
 			method.GetCustomAttribute<ObsoleteAttribute>();
 		Assert.That(obsolete, Is.Not.Null);
 		Assert.That(obsolete.IsError, Is.False);
+		string replacementName = methodName;
+		if (methodName == "GetDatabaseType")
+		{
+			replacementName = "GetDatabaseFileType";
+		}
+
 		Assert.That(
-			obsolete.Message, Does.Contain("DatabaseFileInspector." + methodName));
+			obsolete.Message,
+			Does.Contain("DatabaseFileInspector." + replacementName));
 	}
 
 	private static void AssertFileType(string path, DatabaseType expected)
 	{
 		Assert.That(
-			DatabaseFileInspector.GetDatabaseType(path), Is.EqualTo(expected));
+			DatabaseFileInspector.GetDatabaseFileType(path), Is.EqualTo(expected));
 #pragma warning disable CS0618 // Verify the retained public entry point.
 		Assert.That(DataDefinition.GetDatabaseType(path), Is.EqualTo(expected));
 #pragma warning restore CS0618

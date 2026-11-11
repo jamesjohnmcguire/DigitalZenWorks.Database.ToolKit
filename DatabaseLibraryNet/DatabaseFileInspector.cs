@@ -52,11 +52,11 @@ public static class DatabaseFileInspector
 	}
 
 	/// <summary>
-	/// Get database type.
+	/// Gets the database file type using its header and extension.
 	/// </summary>
 	/// <param name="databaseFile">The database file.</param>
 	/// <returns>The database type.</returns>
-	public static DatabaseType GetDatabaseType(string databaseFile)
+	public static DatabaseType GetDatabaseFileType(string databaseFile)
 	{
 		DatabaseType databaseType = DatabaseType.Unknown;
 

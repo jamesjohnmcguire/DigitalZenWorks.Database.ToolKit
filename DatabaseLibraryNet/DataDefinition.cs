@@ -257,11 +257,11 @@ public static class DataDefinition
 	/// <returns>The database type.</returns>
 	[Obsolete("GetDatabaseType is no longer used and will be " +
 	"removed in a future major version. Use " +
-	"DatabaseFileInspector.GetDatabaseType instead.")]
+	"DatabaseFileInspector.GetDatabaseFileType instead.")]
 	public static DatabaseType GetDatabaseType(string databaseFile)
 	{
 		DatabaseType databaseType =
-			DatabaseFileInspector.GetDatabaseType(databaseFile);
+			DatabaseFileInspector.GetDatabaseFileType(databaseFile);
 
 		return databaseType;
 	}
@@ -364,7 +364,7 @@ public static class DataDefinition
 	public static Collection<Table> GetSchema(string databaseFile)
 	{
 		DatabaseType databaseType =
-			DatabaseFileInspector.GetDatabaseType(databaseFile);
+			DatabaseFileInspector.GetDatabaseFileType(databaseFile);
 
 		using DataStoreStructure schema = new(databaseType, databaseFile);
 		Collection<Table> tables = schema.GetSchema();
@@ -596,7 +596,7 @@ public static class DataDefinition
 		if (queries != null)
 		{
 			DatabaseType databaseType =
-				DatabaseFileInspector.GetDatabaseType(databaseFile);
+				DatabaseFileInspector.GetDatabaseFileType(databaseFile);
 
 			string connectionString = DataStorage.GetConnectionString(
 				databaseType, databaseFile);
