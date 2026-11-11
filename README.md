@@ -1,6 +1,27 @@
 # DigitalZenWorks.Database.ToolKit
 A .NET library with a set of database utility classes.
 
+## Database file identification
+
+Use the public inspection method to identify an existing database file:
+
+```csharp
+DatabaseType type = DatabaseFileInspector.GetDatabaseFileType("data.accdb");
+```
+
+Recognized file headers take precedence over file extensions. If the header
+is unrecognized, detection falls back to known SQLite, Access, and SQL Server
+extensions. Missing or unidentified files return `DatabaseType.Unknown`.
+Access files return `DatabaseType.OleDb`. Inspection reads the file header;
+it does not open a database connection or validate the complete database.
+
+`GetDatabaseFileType` is the inspector's only public operation. Header reading,
+header interpretation, and extension detection are internal helpers. The four
+existing file-inspection methods on `DataDefinition` remain public, obsolete
+forwarders with their historical behavior. For general file type detection,
+migrate to `DatabaseFileInspector.GetDatabaseFileType` with a file path;
+this operation does not replace specialized byte-array or extension-only use.
+
 ## Foreign key terminology
 
 Use `ReferencedTable` / `ReferencedColumn` for the parent target and
@@ -57,6 +78,10 @@ will need to migrate or suppress the intentional warnings.
 ## Change Log
 ### Unreleased
 
+- Add `DatabaseFileInspector.GetDatabaseFileType` as the public file inspection
+  entry point, retaining obsolete `DataDefinition` methods for compatibility.
+- Delegate Access file identification to the inspector and add regression
+  coverage for detection, validation, compatibility wrappers, and visibility.
 - Add explicit relationship roles and a validated `ForeignKey.Create` factory.
 - Deprecate the shorter `ForeignKey` constructor with a warning; removal is
   planned for v2. Consumers treating obsolete warnings as errors must migrate.
