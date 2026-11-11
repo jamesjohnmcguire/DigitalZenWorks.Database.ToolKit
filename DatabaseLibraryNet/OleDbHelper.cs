@@ -92,39 +92,33 @@ public static class OleDbHelper
 	}
 
 	/// <summary>
-	/// Validates the Access database file.
+	/// Checks whether an existing file is identified as an Access database.
 	/// </summary>
+	/// <remarks>Uses header detection with extension fallback without opening
+	/// a database connection.</remarks>
 	/// <param name="databaseFile">The database file.</param>
-	/// <returns>Indicates whether the file is a valid access database file.
+	/// <returns>True for an Access file; false if the file does not exist.
 	/// </returns>
+	/// <exception cref="ArgumentException">The existing file is not
+	/// identified as an Access database.</exception>
+	/// <exception cref="IOException">The file header cannot be read.
+	/// </exception>
 	public static bool ValidateAccessDatabaseFile(string databaseFile)
 	{
 		bool result = false;
-
-		DatabaseType databaseType;
 
 		bool exists = File.Exists(databaseFile);
 
 		if (exists == true)
 		{
-			byte[] header = DatabaseFileInspector.GetDatabaseFileHeaderBytes(
-				databaseFile);
-			databaseType =
-				DatabaseFileInspector.GetDatabaseTypeByFileHeaderBytes(header);
-
-			// Fallback to extension-based detection
-			if (databaseType == DatabaseType.Unknown)
-			{
-				databaseType = DatabaseFileInspector.GetDatabaseTypeByExtension(
-					databaseFile);
-			}
+			DatabaseType databaseType =
+				DatabaseFileInspector.GetDatabaseFileType(databaseFile);
 
 			if (databaseType != DatabaseType.OleDb)
 			{
 				const string message =
 					"Database type is not supported for OleDb import.";
-				throw new ArgumentException(
-					message, nameof(databaseFile));
+				throw new ArgumentException(message, nameof(databaseFile));
 			}
 			else
 			{
