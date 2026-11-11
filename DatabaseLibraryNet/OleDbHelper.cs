@@ -117,7 +117,7 @@ public static class OleDbHelper
 			if (databaseType != DatabaseType.OleDb)
 			{
 				const string message =
-					"Database type is not supported for OleDb import.";
+					"Expected a Microsoft Access database file.";
 				throw new ArgumentException(message, nameof(databaseFile));
 			}
 			else

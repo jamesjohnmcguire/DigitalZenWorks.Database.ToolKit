@@ -173,7 +173,7 @@ internal sealed class OleDbHelperTests
 		Assert.That(exception.ParamName, Is.EqualTo("databaseFile"));
 		Assert.That(
 			exception.Message,
-			Does.StartWith("Database type is not supported for OleDb import."));
+			Does.StartWith("Expected a Microsoft Access database file."));
 	}
 
 	private static byte[] GetSignature(string format)
