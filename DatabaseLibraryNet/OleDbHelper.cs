@@ -77,7 +77,7 @@ public static class OleDbHelper
 		bool returnCode = false;
 
 		DatabaseType databaseType =
-			DataDefinition.GetDatabaseType(databaseFile);
+			DatabaseFileInspector.GetDatabaseType(databaseFile);
 		string connectionString =
 			DataStorage.GetConnectionString(databaseType, databaseFile);
 
@@ -107,16 +107,16 @@ public static class OleDbHelper
 
 		if (exists == true)
 		{
-			byte[] header
-				= DataDefinition.GetDatabaseFileHeaderBytes(databaseFile);
+			byte[] header = DatabaseFileInspector.GetDatabaseFileHeaderBytes(
+				databaseFile);
 			databaseType =
-				DataDefinition.GetDatabaseTypeByFileHeaderBytes(header);
+				DatabaseFileInspector.GetDatabaseTypeByFileHeaderBytes(header);
 
 			// Fallback to extension-based detection
 			if (databaseType == DatabaseType.Unknown)
 			{
-				databaseType =
-					DataDefinition.GetDatabaseTypeByExtension(databaseFile);
+				databaseType = DatabaseFileInspector.GetDatabaseTypeByExtension(
+					databaseFile);
 			}
 
 			if (databaseType != DatabaseType.OleDb)

@@ -123,7 +123,7 @@ public static class DatabaseUtilities
 		bool returnCode = false;
 
 		DatabaseType databaseType =
-			DataDefinition.GetDatabaseType(databaseFile);
+			DatabaseFileInspector.GetDatabaseType(databaseFile);
 		string connectionString =
 			DataStorage.GetConnectionString(databaseType, databaseFile);
 
