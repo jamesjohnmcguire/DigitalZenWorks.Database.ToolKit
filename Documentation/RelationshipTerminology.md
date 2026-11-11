@@ -111,5 +111,8 @@ joining identifiers into a string or creating independent foreign keys.
   kept separate from structural validation.
 
 These are v2 design notes, not additional APIs promised in the current
-package. Consolidating overlapping models is the next work item after the
-compatible terminology change, before implementing the clean v2 interface.
+package. The compatible implementation consolidation retains `Relationship`
+as provider metadata and `ForeignKey` as the table constraint model, with
+shared decoding and conversion in `DataStoreStructure`. Both public models
+remain available; unifying their interfaces belongs to v2. See the library
+README's implementation responsibilities for current ownership.
