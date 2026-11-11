@@ -85,12 +85,8 @@ public class DataObjectsBase : IDisposable
 		switch (databaseType)
 		{
 			case DatabaseType.SQLite:
-				const string connectionBase = "Data Source={0};Version=3;" +
-					"DateTimeFormat=InvariantCulture";
-				connectionString = string.Format(
-					CultureInfo.InvariantCulture,
-					connectionBase,
-					databaseFilePath);
+				connectionString = DataStorage.GetConnectionString(
+					databaseType, databaseFilePath);
 				break;
 			default:
 				throw new NotImplementedException();

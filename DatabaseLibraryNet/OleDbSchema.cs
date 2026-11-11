@@ -286,56 +286,17 @@ public class OleDbSchema : DataStoreStructure
 	{
 		Relationship relationship = new();
 
-		// FK metadata identifies the referencing child; PK identifies its target.
-		const string constraintNameKey = "FK_NAME";
-		const string referencingTableNameKey = "FK_TABLE_NAME";
-		const string referencingColumnNameKey = "FK_COLUMN_NAME";
-		const string referencedTableNameKey = "PK_TABLE_NAME";
-		const string referencedColumnNameKey = "PK_COLUMN_NAME";
-		const string updateRuleKey = "UPDATE_RULE";
-		const string deleteRuleKey = "DELETE_RULE";
-
 		if (foreignKey != null)
 		{
-			relationship.Name = foreignKey[constraintNameKey].ToString();
-			relationship.ReferencingTable =
-				foreignKey[referencingTableNameKey].ToString();
-			relationship.ReferencingColumn =
-				foreignKey[referencingColumnNameKey].ToString();
-			relationship.ReferencedTable =
-				foreignKey[referencedTableNameKey].ToString();
-			relationship.ReferencedColumn =
-				foreignKey[referencedColumnNameKey].ToString();
-
-			string onAction = foreignKey[deleteRuleKey].ToString();
-
-			if (onAction.Equals("CASCADE", StringComparison.Ordinal))
-			{
-				relationship.OnDeleteAction = ConstraintAction.Cascade;
-			}
-			else if (onAction.Equals("SET NULL", StringComparison.Ordinal))
-			{
-				relationship.OnDeleteAction = ConstraintAction.SetNull;
-			}
-			else
-			{
-				relationship.OnDeleteAction = ConstraintAction.NoAction;
-			}
-
-			onAction = foreignKey[updateRuleKey].ToString();
-
-			if (onAction.Equals("CASCADE", StringComparison.Ordinal))
-			{
-				relationship.OnUpdateAction = ConstraintAction.Cascade;
-			}
-			else if (onAction.Equals("SET NULL", StringComparison.Ordinal))
-			{
-				relationship.OnUpdateAction = ConstraintAction.SetNull;
-			}
-			else
-			{
-				relationship.OnUpdateAction = ConstraintAction.NoAction;
-			}
+			relationship = ReadRelationship(
+				foreignKey,
+				"FK_NAME",
+				"FK_TABLE_NAME",
+				"FK_COLUMN_NAME",
+				"PK_TABLE_NAME",
+				"PK_COLUMN_NAME",
+				"DELETE_RULE",
+				"UPDATE_RULE");
 		}
 
 		return relationship;

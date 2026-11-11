@@ -89,37 +89,8 @@ public static class DataDefinition
 	/// <param name="schemaFile">The schema file to export to.</param>
 	public static bool ExportSchema(string databaseFile, string schemaFile)
 	{
-		bool successCode = false;
-
-		try
-		{
-			Collection<Table> tables = GetSchema(databaseFile);
-			tables = OrderTables(tables);
-
-			SqlWriter sqlWriter = new();
-			string schemaText = sqlWriter.GetTablesCreateStatements(tables);
-
-			File.WriteAllText(schemaFile, schemaText);
-
-			successCode = true;
-		}
-		catch (Exception exception) when
-			(exception is ArgumentNullException ||
-			exception is ArgumentException ||
-			exception is InvalidOperationException)
-		{
-			string message = Strings.Exception + exception;
-			Log.Error(message);
-		}
-		catch (Exception exception)
-		{
-			string message = Strings.Exception + exception;
-			Log.Error(message);
-
-			throw;
-		}
-
-		return successCode;
+		return ExportSchema(
+			databaseFile, schemaFile, GetSchema, new SqlWriter(), Log, false);
 	}
 
 	/// <summary>
@@ -277,14 +248,7 @@ public static class DataDefinition
 
 		if (exists == true)
 		{
-			byte[] header = GetDatabaseFileHeaderBytes(databaseFile);
-			databaseType = GetDatabaseTypeByFileHeaderBytes(header);
-
-			// Fallback to extension-based detection
-			if (databaseType == DatabaseType.Unknown)
-			{
-				databaseType = GetDatabaseTypeByExtension(databaseFile);
-			}
+			databaseType = GetExistingDatabaseType(databaseFile);
 		}
 
 		return databaseType;
@@ -406,32 +370,7 @@ public static class DataDefinition
 	public static Collection<string> GetOrderedDependencies(
 		Dictionary<string, Collection<string>> tableDependencies)
 	{
-		Collection<string> orderedDependencies = [];
-
-		// Tracks previously processed nodes.
-		HashSet<string> visited = [];
-
-		// Tracks nodes in the current recursion stack
-		// (for cycle detection).
-		HashSet<string> visiting = [];
-
-		if (tableDependencies != null)
-		{
-			foreach (string key in tableDependencies.Keys)
-			{
-				if (!visited.Contains(key))
-				{
-					GetDependenciesRecursive(
-						key,
-						tableDependencies,
-						orderedDependencies,
-						visited,
-						visiting);
-				}
-			}
-		}
-
-		return orderedDependencies;
+		return DataStoreStructure.GetOrderedDependencies(tableDependencies);
 	}
 
 	/// <summary>
@@ -629,6 +568,77 @@ public static class DataDefinition
 	}
 
 	/// <summary>
+	/// Loads, orders and writes a schema using the caller's SQL dialect.
+	/// </summary>
+	/// <param name="databaseFile">The source database file.</param>
+	/// <param name="schemaFile">The destination SQL file.</param>
+	/// <param name="schemaLoader">The provider's schema reader.</param>
+	/// <param name="writer">The target SQL dialect.</param>
+	/// <param name="log">The calling facade's logger.</param>
+	/// <param name="warnIfEmpty">Whether to report empty schema output.</param>
+	/// <returns>Whether export succeeded.</returns>
+	internal static bool ExportSchema(
+		string databaseFile,
+		string schemaFile,
+		Func<string, Collection<Table>> schemaLoader,
+		SqlWriter writer,
+		ILog log,
+		bool warnIfEmpty)
+	{
+		bool successCode = false;
+
+		try
+		{
+			Collection<Table> tables = schemaLoader(databaseFile);
+			tables = DataStoreStructure.OrderTables(tables);
+			string schemaText = writer.GetTablesCreateStatements(tables);
+
+			if (warnIfEmpty && string.IsNullOrWhiteSpace(schemaText))
+			{
+				log.Warn("No schema text generated.");
+			}
+
+			File.WriteAllText(schemaFile, schemaText);
+			successCode = true;
+		}
+		catch (Exception exception) when
+			(exception is ArgumentNullException ||
+			exception is ArgumentException ||
+			exception is InvalidOperationException)
+		{
+			string message = Strings.Exception + exception;
+			log.Error(message);
+		}
+		catch (Exception exception)
+		{
+			string message = Strings.Exception + exception;
+			log.Error(message);
+
+			throw;
+		}
+
+		return successCode;
+	}
+
+	/// <summary>
+	/// Detects an existing file by its header, then its extension.
+	/// </summary>
+	/// <param name="databaseFile">The existing database file.</param>
+	/// <returns>The detected database type.</returns>
+	internal static DatabaseType GetExistingDatabaseType(string databaseFile)
+	{
+		byte[] header = GetDatabaseFileHeaderBytes(databaseFile);
+		DatabaseType databaseType = GetDatabaseTypeByFileHeaderBytes(header);
+
+		if (databaseType == DatabaseType.Unknown)
+		{
+			databaseType = GetDatabaseTypeByExtension(databaseFile);
+		}
+
+		return databaseType;
+	}
+
+	/// <summary>
 	/// Compares a column description with a known database column type marker.
 	/// </summary>
 	/// <param name="column">The source column description to inspect.</param>
@@ -689,47 +699,5 @@ public static class DataDefinition
 		}
 
 		return result;
-	}
-
-	/// <summary>
-	/// Adds table dependencies to the ordered collection using depth-first
-	/// traversal.
-	/// </summary>
-	/// <param name="key">The table key currently being processed.</param>
-	/// <param name="tableDependencies">The dependency map keyed by table
-	/// name.</param>
-	/// <param name="orderedDependencies">The ordered dependency result.</param>
-	/// <param name="visited">The set of table keys already processed.</param>
-	/// <param name="visiting">The set of table keys in the active traversal
-	/// path.</param>
-	private static void GetDependenciesRecursive(
-		string key,
-		Dictionary<string, Collection<string>> tableDependencies,
-		Collection<string> orderedDependencies,
-		HashSet<string> visited,
-		HashSet<string> visiting)
-	{
-		if (!visited.Contains(key) && !visiting.Contains(key))
-		{
-			visiting.Add(key);
-
-			if (tableDependencies.TryGetValue(
-				key, out Collection<string> value))
-			{
-				foreach (string dependency in value)
-				{
-					GetDependenciesRecursive(
-						dependency,
-						tableDependencies,
-						orderedDependencies,
-						visited,
-						visiting);
-				}
-			}
-
-			visiting.Remove(key); // Done visiting
-			visited.Add(key);     // Mark as processed
-			orderedDependencies.Add(key); // Add to result (postorder)
-		}
 	}
 }

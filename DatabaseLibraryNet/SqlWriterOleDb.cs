@@ -128,50 +128,7 @@ public class SqlWriterOleDb : SqlWriter
 	/// formatted for inclusion in a CREATE TABLE statement.</returns>
 	protected override string GetColumnSql(Column column, bool isLast)
 	{
-#if NET6_0_OR_GREATER
-		ArgumentNullException.ThrowIfNull(column);
-#else
-		if (column == null)
-		{
-			string name = nameof(column);
-			throw new ArgumentNullException(name);
-		}
-#endif
-
-		string sql = "\t[" + column.Name + "]";
-
-		string columnType = GetColumnTypeText(column);
-		sql += columnType;
-
-		if (column.Unique)
-		{
-			sql += " UNIQUE";
-		}
-
-		if (!column.Nullable)
-		{
-			sql += " NOT NULL";
-		}
-
-		if (column.Primary == true ||
-			column.ColumnType == ColumnType.AutoNumber)
-		{
-			sql += " IDENTITY";
-		}
-
-		if (!string.IsNullOrWhiteSpace(column.DefaultValue))
-		{
-			sql += " DEFAULT " + column.DefaultValue;
-		}
-
-		if (isLast == false)
-		{
-			sql += ",";
-		}
-
-		sql += Environment.NewLine;
-
-		return sql;
+		return BuildColumnSql(column, isLast, false);
 	}
 
 	/// <summary>
@@ -223,44 +180,7 @@ public class SqlWriterOleDb : SqlWriter
 	"in a future major version. Use GetColumnSql instead.")]
 	protected override string GetCreateColumnSql(Column column)
 	{
-#if NET6_0_OR_GREATER
-		ArgumentNullException.ThrowIfNull(column);
-#else
-		if (column == null)
-		{
-			string name = nameof(column);
-			throw new ArgumentNullException(name);
-		}
-#endif
-
-		string sql = "\t[" + column.Name + "]";
-
-		string columnType = GetColumnTypeText(column);
-		sql += columnType;
-
-		if (column.Unique)
-		{
-			sql += " UNIQUE";
-		}
-
-		if (!column.Nullable)
-		{
-			sql += " NOT NULL";
-		}
-
-		if (column.ColumnType == ColumnType.AutoNumber)
-		{
-			sql += " IDENTITY";
-		}
-
-		if (!string.IsNullOrWhiteSpace(column.DefaultValue))
-		{
-			sql += " DEFAULT " + column.DefaultValue;
-		}
-
-		sql += "," + Environment.NewLine;
-
-		return sql;
+		return BuildColumnSql(column, false, true);
 	}
 
 	/// <summary>
@@ -310,23 +230,8 @@ public class SqlWriterOleDb : SqlWriter
 			foreignKey.ReferencedTable,
 			foreignKey.ReferencedColumn);
 
-		if (foreignKey.OnDeleteAction == ConstraintAction.Cascade)
-		{
-			sql += " ON DELETE CASCADE";
-		}
-		else if (foreignKey.OnDeleteAction == ConstraintAction.SetNull)
-		{
-			sql += " ON DELETE SET NULL";
-		}
-
-		if (foreignKey.OnUpdateAction == ConstraintAction.Cascade)
-		{
-			sql += " ON UPDATE CASCADE";
-		}
-		else if (foreignKey.OnUpdateAction == ConstraintAction.SetNull)
-		{
-			sql += " ON UPDATE SET NULL";
-		}
+		sql += GetContstraintActionText("DELETE", foreignKey.OnDeleteAction);
+		sql += GetContstraintActionText("UPDATE", foreignKey.OnUpdateAction);
 
 		if (isLast == false)
 		{
@@ -369,6 +274,62 @@ public class SqlWriterOleDb : SqlWriter
 					column.Name);
 			}
 		}
+
+		return sql;
+	}
+
+	/// <summary>
+	/// Builds a column definition while retaining the legacy constraint rules.
+	/// </summary>
+	/// <param name="column">The column definition.</param>
+	/// <param name="isLast">Whether to omit the trailing comma.</param>
+	/// <param name="legacy">Whether to use the obsolete method's rules.</param>
+	/// <returns>The formatted column definition.</returns>
+	private string BuildColumnSql(
+		Column column, bool isLast, bool legacy)
+	{
+#if NET6_0_OR_GREATER
+		ArgumentNullException.ThrowIfNull(column);
+#else
+		if (column == null)
+		{
+			string name = nameof(column);
+			throw new ArgumentNullException(name);
+		}
+#endif
+
+		string sql = "\t[" + column.Name + "]";
+
+		string columnType = GetColumnTypeText(column);
+		sql += columnType;
+
+		if (column.Unique)
+		{
+			sql += " UNIQUE";
+		}
+
+		if (!column.Nullable)
+		{
+			sql += " NOT NULL";
+		}
+
+		if ((legacy == false && column.Primary == true) ||
+			column.ColumnType == ColumnType.AutoNumber)
+		{
+			sql += " IDENTITY";
+		}
+
+		if (!string.IsNullOrWhiteSpace(column.DefaultValue))
+		{
+			sql += " DEFAULT " + column.DefaultValue;
+		}
+
+		if (isLast == false)
+		{
+			sql += ",";
+		}
+
+		sql += Environment.NewLine;
 
 		return sql;
 	}

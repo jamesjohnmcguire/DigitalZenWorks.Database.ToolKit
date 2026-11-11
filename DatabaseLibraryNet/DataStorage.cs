@@ -762,6 +762,39 @@ public class DataStorage : IDataStorage
 	}
 
 	/// <summary>
+	/// Creates an unopened connection for the supported generic providers.
+	/// </summary>
+	/// <param name="databaseType">The database provider.</param>
+	/// <param name="connectionText">The connection string.</param>
+	/// <returns>The connection, or null for an unsupported provider.</returns>
+	internal static DbConnection CreateConnection(
+		DatabaseType databaseType, string connectionText)
+	{
+		DbConnection connection = null;
+
+		switch (databaseType)
+		{
+			case DatabaseType.MySql:
+				MySqlConnection mySqlConnection = new(connectionText);
+				connection = mySqlConnection;
+				break;
+			case DatabaseType.SQLite:
+				SQLiteConnection sqliteConnection = new(connectionText);
+				connection = sqliteConnection;
+				break;
+			case DatabaseType.SqlServer:
+				connection = new SqlConnection(connectionText);
+				break;
+			case DatabaseType.Oracle:
+			case DatabaseType.Unknown:
+			default:
+				break;
+		}
+
+		return connection;
+	}
+
+	/// <summary>
 	/// Dispose.
 	/// </summary>
 	/// <param name="disposing">Indicates whether it is
@@ -861,28 +894,7 @@ public class DataStorage : IDataStorage
 	protected virtual DbConnection GetConnectionObject(
 		DatabaseType databaseType, string connectionText)
 	{
-		DbConnection connection = null;
-
-		switch (databaseType)
-		{
-			case DatabaseType.MySql:
-				MySqlConnection mySqlConnection = new(connectionText);
-				connection = mySqlConnection;
-				break;
-			case DatabaseType.SQLite:
-				SQLiteConnection sqliteConnection = new(connectionText);
-				connection = sqliteConnection;
-				break;
-			case DatabaseType.SqlServer:
-				connection = new SqlConnection(connectionText);
-				break;
-			case DatabaseType.Oracle:
-			case DatabaseType.Unknown:
-			default:
-				break;
-		}
-
-		return connection;
+		return CreateConnection(databaseType, connectionText);
 	}
 
 	/// <summary>

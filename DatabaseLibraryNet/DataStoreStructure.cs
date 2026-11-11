@@ -506,6 +506,55 @@ public class DataStoreStructure : IDisposable
 	}
 
 	/// <summary>
+	/// Reads a relationship using the provider's metadata field names.
+	/// </summary>
+	/// <param name="foreignKey">The relationship metadata row.</param>
+	/// <param name="nameKey">The constraint name field.</param>
+	/// <param name="referencingTableKey">The referencing table field.</param>
+	/// <param name="referencingColumnKey">The referencing column field.</param>
+	/// <param name="referencedTableKey">The referenced table field.</param>
+	/// <param name="referencedColumnKey">The referenced column field.</param>
+	/// <param name="deleteRuleKey">The delete action field.</param>
+	/// <param name="updateRuleKey">The update action field.</param>
+	/// <returns>The relationship described by the row.</returns>
+	internal static Relationship ReadRelationship(
+		DataRow foreignKey,
+		string nameKey,
+		string referencingTableKey,
+		string referencingColumnKey,
+		string referencedTableKey,
+		string referencedColumnKey,
+		string deleteRuleKey,
+		string updateRuleKey)
+	{
+#if NET6_0_OR_GREATER
+		ArgumentNullException.ThrowIfNull(foreignKey);
+#else
+		if (foreignKey == null)
+		{
+			throw new ArgumentNullException(nameof(foreignKey));
+		}
+#endif
+
+		Relationship relationship = new();
+		relationship.Name = foreignKey[nameKey].ToString();
+		relationship.ReferencingTable =
+			foreignKey[referencingTableKey].ToString();
+		relationship.ReferencingColumn =
+			foreignKey[referencingColumnKey].ToString();
+		relationship.ReferencedTable =
+			foreignKey[referencedTableKey].ToString();
+		relationship.ReferencedColumn =
+			foreignKey[referencedColumnKey].ToString();
+		relationship.OnDeleteAction =
+			GetConstraintAction(foreignKey[deleteRuleKey].ToString());
+		relationship.OnUpdateAction =
+			GetConstraintAction(foreignKey[updateRuleKey].ToString());
+
+		return relationship;
+	}
+
+	/// <summary>
 	/// Creates a <see cref="ForeignKey"/> instance that represents the
 	/// foreign key relationship defined by the specified
 	/// <see cref="Relationship"/> object.
@@ -675,6 +724,8 @@ public class DataStoreStructure : IDisposable
 				normalizedType = normalizedType.TrimEnd();
 			}
 
+			// Preserve metadata grouping and exact-name matching. Only shared
+			// declarations use the general declaration parser.
 			columnType = normalizedType switch
 			{
 				"smallint" or
@@ -682,14 +733,11 @@ public class DataStoreStructure : IDisposable
 				"int" or
 				"bigint" => ColumnType.Number,
 
-				"numeric" => ColumnType.Numeric,
-				"decimal" or "dec" => ColumnType.Decimal,
-				"real" => ColumnType.Real,
-				"float" => ColumnType.Float,
-				"double" or "double precision" => ColumnType.Double,
-				"currency" => ColumnType.Currency,
-				"money" => ColumnType.Money,
-				"smallmoney" => ColumnType.SmallMoney,
+				"dec" => DataDefinition.GetColumnType("decimal"),
+				"numeric" or "decimal" or "real" or "float" or
+				"double" or "double precision" or "currency" or
+				"money" or "smallmoney" or "text" or "blob" =>
+					DataDefinition.GetColumnType(normalizedType),
 
 				"char" or
 				"character" or
@@ -698,9 +746,6 @@ public class DataStoreStructure : IDisposable
 				"nchar" or
 				"nvarchar" or
 				"string" => ColumnType.String,
-
-				"text" => ColumnType.Text,
-				"blob" => ColumnType.Blob,
 
 				// Broad mapping until the model distinguishes temporal types.
 				"date" or
@@ -732,67 +777,15 @@ public class DataStoreStructure : IDisposable
 	/// table and column names, and cascade rules.</returns>
 	protected virtual Relationship GetRelationship(DataRow foreignKey)
 	{
-#if NET6_0_OR_GREATER
-		ArgumentNullException.ThrowIfNull(foreignKey);
-#else
-		if (foreignKey == null)
-		{
-			throw new ArgumentNullException(nameof(foreignKey));
-		}
-#endif
-
-		Relationship relationship = new();
-
-		// Using standard (or perhaps Sqlite) keys
-		const string constraintNameKey = "CONSTRAINT_NAME";
-		const string tableNameKey = "TABLE_NAME";
-		const string columnNameKey = "FKEY_FROM_COLUMN";
-		const string foreignTableNameKey = "FKEY_TO_TABLE";
-		const string foreignColumnNameKey = "FKEY_TO_COLUMN";
-		const string updateRuleKey = "FKEY_ON_UPDATE";
-		const string deleteRuleKey = "FKEY_ON_DELETE";
-
-		relationship.Name = foreignKey[constraintNameKey].ToString();
-		relationship.ReferencingTable =
-			foreignKey[tableNameKey].ToString();
-		relationship.ReferencingColumn =
-			foreignKey[columnNameKey].ToString();
-		relationship.ReferencedTable =
-			foreignKey[foreignTableNameKey].ToString();
-		relationship.ReferencedColumn =
-			foreignKey[foreignColumnNameKey].ToString();
-
-		string onAction = foreignKey[deleteRuleKey].ToString();
-
-		if (onAction.Equals("CASCADE", StringComparison.Ordinal))
-		{
-			relationship.OnDeleteAction = ConstraintAction.Cascade;
-		}
-		else if (onAction.Equals("SET NULL", StringComparison.Ordinal))
-		{
-			relationship.OnDeleteAction = ConstraintAction.SetNull;
-		}
-		else
-		{
-			relationship.OnDeleteAction = ConstraintAction.NoAction;
-		}
-
-		onAction = foreignKey[updateRuleKey].ToString();
-
-		if (onAction.Equals("CASCADE", StringComparison.Ordinal))
-		{
-			relationship.OnUpdateAction = ConstraintAction.Cascade;
-		}
-		else if (onAction.Equals("SET NULL", StringComparison.Ordinal))
-		{
-			relationship.OnUpdateAction = ConstraintAction.SetNull;
-		}
-		else
-		{
-			relationship.OnUpdateAction = ConstraintAction.NoAction;
-		}
-
-		return relationship;
+		return ReadRelationship(
+			foreignKey,
+			"CONSTRAINT_NAME",
+			"TABLE_NAME",
+			"FKEY_FROM_COLUMN",
+			"FKEY_TO_TABLE",
+			"FKEY_TO_COLUMN",
+			"FKEY_ON_DELETE",
+			"FKEY_ON_UPDATE");
 	}
 
 	/// <summary>
@@ -999,6 +992,27 @@ public class DataStoreStructure : IDisposable
 		table.Columns.Add("ReferencedColumn", stringType);
 
 		return table;
+	}
+
+	/// <summary>
+	/// Converts the case-sensitive provider action text to a model action.
+	/// </summary>
+	/// <param name="action">The provider action text.</param>
+	/// <returns>The action, or NoAction for an unrecognized value.</returns>
+	private static ConstraintAction GetConstraintAction(string action)
+	{
+		ConstraintAction result = ConstraintAction.NoAction;
+
+		if (action.Equals("CASCADE", StringComparison.Ordinal))
+		{
+			result = ConstraintAction.Cascade;
+		}
+		else if (action.Equals("SET NULL", StringComparison.Ordinal))
+		{
+			result = ConstraintAction.SetNull;
+		}
+
+		return result;
 	}
 
 	/// <summary>

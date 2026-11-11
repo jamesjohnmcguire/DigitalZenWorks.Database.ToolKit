@@ -107,17 +107,7 @@ public static class OleDbHelper
 
 		if (exists == true)
 		{
-			byte[] header
-				= DataDefinition.GetDatabaseFileHeaderBytes(databaseFile);
-			databaseType =
-				DataDefinition.GetDatabaseTypeByFileHeaderBytes(header);
-
-			// Fallback to extension-based detection
-			if (databaseType == DatabaseType.Unknown)
-			{
-				databaseType =
-					DataDefinition.GetDatabaseTypeByExtension(databaseFile);
-			}
+			databaseType = DataDefinition.GetExistingDatabaseType(databaseFile);
 
 			if (databaseType != DatabaseType.OleDb)
 			{

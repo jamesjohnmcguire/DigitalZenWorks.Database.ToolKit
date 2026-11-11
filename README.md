@@ -27,8 +27,26 @@ properties remain writable aliases with their historical meanings; they
 have not been silently reversed. Validation is confined to the new factory.
 
 See [migration and v2 preparation](https://github.com/jamesjohnmcguire/DigitalZenWorks.Database.ToolKit/blob/main/Documentation/RelationshipTerminology.md)
-for the alias mapping, compatibility details, composite-key design, and the
-planned follow-up review of duplicate or overlapping functionality.
+for the alias mapping, compatibility details, and composite-key design.
+
+## Implementation responsibilities
+
+- `DataStorage` owns generic provider connection creation and connection
+  strings. `DatabaseConnection` keeps its Dapper operations and delegates
+  connection creation to `DataStorage`.
+- `DataDefinition` owns shared declaration parsing, file-type detection,
+  and schema export. Provider facades select their schema reader and writer.
+- `DataStoreStructure` owns dependency ordering and relationship metadata
+  decoding. `OleDbSchema` supplies provider field names and Access metadata.
+- `SqlWriter` owns common SQL actions; each dialect owns its syntax and
+  constraint rules. Current and obsolete column methods share private
+  implementations while retaining their different output and override hooks.
+
+Public facades and protected extension points remain available. Metadata
+type grouping differs from declaration substring matching; those historical
+rules remain distinct. `Relationship` remains the metadata model and
+`ForeignKey` the table constraint model, with conversion in `DataStoreStructure`.
+Unifying their public interfaces requires the planned v2 work.
 
 ## Release API compatibility
 
@@ -57,6 +75,8 @@ will need to migrate or suppress the intentional warnings.
 ## Change Log
 ### Unreleased
 
+- Consolidate shared implementations without changing public signatures,
+  provider behavior, or legacy SQL output; add compatibility regression tests.
 - Add explicit relationship roles and a validated `ForeignKey.Create` factory.
 - Deprecate the shorter `ForeignKey` constructor with a warning; removal is
   planned for v2. Consumers treating obsolete warnings as errors must migrate.

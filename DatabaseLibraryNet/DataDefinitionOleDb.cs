@@ -9,7 +9,6 @@ namespace DigitalZenWorks.Database.ToolKit;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.IO;
 using System.Runtime.Versioning;
 using global::Common.Logging;
 
@@ -61,43 +60,8 @@ public static class DataDefinitionOleDb
 	public static bool ExportSchema(
 		string databaseFile, string schemaFile, bool toSqlite = false)
 	{
-		bool successCode = false;
-
-		try
-		{
-			Collection<Table> tables = SchemaLoader(databaseFile);
-
-			tables = DataStoreStructure.OrderTables(tables);
-
-			SqlWriter sqlWriter = GetWriter(toSqlite);
-			string schemaText = sqlWriter.GetTablesCreateStatements(tables);
-
-			if (string.IsNullOrWhiteSpace(schemaText))
-			{
-				Log.Warn("No schema text generated.");
-			}
-
-			File.WriteAllText(schemaFile, schemaText);
-
-			successCode = true;
-		}
-		catch (Exception exception) when
-			(exception is ArgumentNullException ||
-			exception is ArgumentException ||
-			exception is InvalidOperationException)
-		{
-			string message = Strings.Exception + exception;
-			Log.Error(message);
-		}
-		catch (Exception exception)
-		{
-			string message = Strings.Exception + exception;
-			Log.Error(message);
-
-			throw;
-		}
-
-		return successCode;
+		return DataDefinition.ExportSchema(
+			databaseFile, schemaFile, SchemaLoader, GetWriter(toSqlite), Log, true);
 	}
 
 	/// <summary>

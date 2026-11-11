@@ -11,17 +11,13 @@ namespace DigitalZenWorks.Database.ToolKit;
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.SQLite;
 using Dapper;
-using Microsoft.Data.SqlClient;
-using MySql.Data.MySqlClient;
 
 /// <summary>
 /// The database connection class.
 /// </summary>
 public class DatabaseConnection : IDisposable
 {
-	private readonly string connectionString;
 	private IDbConnection? connection;
 
 	/// <summary>
@@ -45,8 +41,8 @@ public class DatabaseConnection : IDisposable
 	public DatabaseConnection(
 		DatabaseType databaseType, string connectionString)
 	{
-		this.connectionString = connectionString;
-		connection = GetConnection(databaseType, connectionString);
+		connection = DataStorage.CreateConnection(
+			databaseType, connectionString);
 	}
 
 	/// <summary>
@@ -161,37 +157,5 @@ public class DatabaseConnection : IDisposable
 			connection?.Dispose();
 			connection = null;
 		}
-	}
-
-	/// <summary>
-	/// Creates and stores the provider-specific database connection.
-	/// </summary>
-	/// <param name="databaseType">The database provider type to create.</param>
-	/// <param name="connectionString">The provider connection string.</param>
-	/// <returns>The created connection, or null when the provider is not
-	/// supported.</returns>
-	private IDbConnection? GetConnection(
-		DatabaseType databaseType, string connectionString)
-	{
-		switch (databaseType)
-		{
-			case DatabaseType.MySql:
-				MySqlConnection mySqlConnection = new(connectionString);
-				connection = mySqlConnection;
-				break;
-			case DatabaseType.SQLite:
-				SQLiteConnection sqliteConnection = new(connectionString);
-				connection = sqliteConnection;
-				break;
-			case DatabaseType.SqlServer:
-				connection = new SqlConnection(connectionString);
-				break;
-			case DatabaseType.Oracle:
-			case DatabaseType.Unknown:
-			default:
-				break;
-		}
-
-		return connection;
 	}
 }

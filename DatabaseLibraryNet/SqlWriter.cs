@@ -652,53 +652,7 @@ public class SqlWriter
 	/// formatted for inclusion in a CREATE TABLE statement.</returns>
 	protected virtual string GetColumnSql(Column column, bool isLast)
 	{
-#if NET6_0_OR_GREATER
-		ArgumentNullException.ThrowIfNull(column);
-#else
-		if (column == null)
-		{
-			string name = nameof(column);
-			throw new ArgumentNullException(name);
-		}
-#endif
-
-		string sql = "\t\"" + column.Name + "\"";
-
-		string columnType = GetColumnTypeText(column);
-		sql += columnType;
-
-		if (column.Unique)
-		{
-			sql += " UNIQUE";
-		}
-
-		if (column.ColumnType == ColumnType.AutoNumber)
-		{
-			sql += GetIdentityKeywordText(column);
-		}
-
-		if (column.Primary == true)
-		{
-			sql += " PRIMARY KEY AUTOINCREMENT";
-		}
-		else if (column.Nullable == false)
-		{
-			sql += " NOT NULL";
-		}
-
-		if (!string.IsNullOrWhiteSpace(column.DefaultValue))
-		{
-			sql += " DEFAULT " + column.DefaultValue;
-		}
-
-		if (isLast == false)
-		{
-			sql += ",";
-		}
-
-		sql += DefaultLineEnding;
-
-		return sql;
+		return BuildColumnSql(column, isLast, false);
 	}
 
 	/// <summary>
@@ -785,44 +739,7 @@ public class SqlWriter
 	"in a future major version. Use GetColumnSql instead.")]
 	protected virtual string GetCreateColumnSql(Column column)
 	{
-#if NET6_0_OR_GREATER
-		ArgumentNullException.ThrowIfNull(column);
-#else
-		if (column == null)
-		{
-			string name = nameof(column);
-			throw new ArgumentNullException(name);
-		}
-#endif
-
-		string sql = "\t\"" + column.Name + "\"";
-
-		string columnType = GetColumnTypeText(column);
-		sql += columnType;
-
-		if (column.Unique)
-		{
-			sql += " UNIQUE";
-		}
-
-		if (!column.Nullable)
-		{
-			sql += " NOT NULL";
-		}
-
-		if (column.ColumnType == ColumnType.AutoNumber)
-		{
-			sql += GetIdentityKeywordText(column);
-		}
-
-		if (!string.IsNullOrWhiteSpace(column.DefaultValue))
-		{
-			sql += " DEFAULT " + column.DefaultValue;
-		}
-
-		sql += "," + DefaultLineEnding;
-
-		return sql;
+		return BuildColumnSql(column, false, true);
 	}
 
 	/// <summary>
@@ -872,23 +789,8 @@ public class SqlWriter
 			foreignKey.ReferencedTable,
 			foreignKey.ReferencedColumn);
 
-		if (foreignKey.OnDeleteAction == ConstraintAction.Cascade)
-		{
-			sql += " ON DELETE CASCADE";
-		}
-		else if (foreignKey.OnDeleteAction == ConstraintAction.SetNull)
-		{
-			sql += " ON DELETE SET NULL";
-		}
-
-		if (foreignKey.OnUpdateAction == ConstraintAction.Cascade)
-		{
-			sql += " ON UPDATE CASCADE";
-		}
-		else if (foreignKey.OnUpdateAction == ConstraintAction.SetNull)
-		{
-			sql += " ON UPDATE SET NULL";
-		}
+		sql += GetContstraintActionText("DELETE", foreignKey.OnDeleteAction);
+		sql += GetContstraintActionText("UPDATE", foreignKey.OnUpdateAction);
 
 		if (isLast == false)
 		{
@@ -916,5 +818,81 @@ public class SqlWriter
 		}
 
 		return identity;
+	}
+
+	/// <summary>
+	/// Builds a column definition while retaining the legacy constraint rules.
+	/// </summary>
+	/// <param name="column">The column definition.</param>
+	/// <param name="isLast">Whether to omit the trailing comma.</param>
+	/// <param name="legacy">Whether to use the obsolete method's rules.</param>
+	/// <returns>The formatted column definition.</returns>
+	private string BuildColumnSql(
+		Column column, bool isLast, bool legacy)
+	{
+#if NET6_0_OR_GREATER
+		ArgumentNullException.ThrowIfNull(column);
+#else
+		if (column == null)
+		{
+			string name = nameof(column);
+			throw new ArgumentNullException(name);
+		}
+#endif
+
+		string sql = "\t\"" + column.Name + "\"";
+
+		string columnType = GetColumnTypeText(column);
+		sql += columnType;
+
+		if (column.Unique)
+		{
+			sql += " UNIQUE";
+		}
+
+		if (legacy)
+		{
+			// The obsolete method places nullability before identity and
+			// does not emit a primary key.
+			if (!column.Nullable)
+			{
+				sql += " NOT NULL";
+			}
+
+			if (column.ColumnType == ColumnType.AutoNumber)
+			{
+				sql += GetIdentityKeywordText(column);
+			}
+		}
+		else
+		{
+			if (column.ColumnType == ColumnType.AutoNumber)
+			{
+				sql += GetIdentityKeywordText(column);
+			}
+
+			if (column.Primary == true)
+			{
+				sql += " PRIMARY KEY AUTOINCREMENT";
+			}
+			else if (column.Nullable == false)
+			{
+				sql += " NOT NULL";
+			}
+		}
+
+		if (!string.IsNullOrWhiteSpace(column.DefaultValue))
+		{
+			sql += " DEFAULT " + column.DefaultValue;
+		}
+
+		if (isLast == false)
+		{
+			sql += ",";
+		}
+
+		sql += DefaultLineEnding;
+
+		return sql;
 	}
 }
