@@ -53,8 +53,7 @@ public class DataObjectsBase : IDisposable
 	/// class.
 	/// </summary>
 	/// <param name="dataSource">The data source to use.</param>
-	[Obsolete("DataObjectsBase(string) is deprecated, " +
-		"please use DataObjectsBase(DatabaseType, string) instead.")]
+	[Obsolete("Use DataObjectsBase(DatabaseType, string) instead.")]
 	public DataObjectsBase(string dataSource)
 	{
 		throw new NotImplementedException();
@@ -105,9 +104,7 @@ public class DataObjectsBase : IDisposable
 	/// </summary>
 	/// <param name="tableName">The table name to use.</param>
 	/// <param name="dataSource">The data source to use.</param>
-	[Obsolete("DataObjectsBase(string, string) is deprecated, " +
-		"please use DataObjectsBase(DatabaseType, string, string) " +
-		"instead.")]
+	[Obsolete("Use DataObjectsBase(DatabaseType, string, string) instead.")]
 	public DataObjectsBase(string tableName, string dataSource)
 		: this(dataSource)
 	{

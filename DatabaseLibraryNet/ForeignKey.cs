@@ -31,8 +31,7 @@ public class ForeignKey
 	/// <param name="parentTableColumn">The parent table column.</param>
 	/// <param name="onDeleteAction">The on delete action.</param>
 	/// <param name="onUpdateAction">The on update action.</param>
-	[Obsolete("Use ForeignKey.Create with explicit referencing and " +
-		"referenced names. This constructor will be removed in v2.")]
+	[Obsolete("Use ForeignKey.Create instead.")]
 	public ForeignKey(
 		string name,
 		string columnName,

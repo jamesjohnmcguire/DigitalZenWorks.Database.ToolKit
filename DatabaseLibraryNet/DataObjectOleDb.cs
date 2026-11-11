@@ -49,8 +49,7 @@ public class DataObjectOleDb : DataObjectsBase
 	/// <remarks>The base constructor retains its existing database-type
 	/// restrictions. Use the path-only overload for new OLE DB callers.
 	/// </remarks>
-	[Obsolete("Use DataObjectOleDb(string databaseFilePath) instead. " +
-		"This constructor will be removed in v2.")]
+	[Obsolete("Use DataObjectOleDb(string databaseFilePath) instead.")]
 	public DataObjectOleDb(
 		DatabaseType databaseType, string databaseFilePath)
 		: base(databaseType, databaseFilePath)

@@ -24,8 +24,13 @@ public static class DatabaseFileInspector
 	/// <summary>
 	/// Gets the database file type using its header and extension.
 	/// </summary>
+	/// <remarks>Recognized headers take precedence over file extensions.
+	/// Unrecognized headers fall back to known extensions. Inspection does
+	/// not open a database connection or validate the complete database.
+	/// </remarks>
 	/// <param name="databaseFile">The database file.</param>
-	/// <returns>The database type.</returns>
+	/// <returns>The detected type, or <see cref="DatabaseType.Unknown"/>
+	/// if the file does not exist or its type cannot be identified.</returns>
 	public static DatabaseType GetDatabaseFileType(string databaseFile)
 	{
 		DatabaseType databaseType = DatabaseType.Unknown;

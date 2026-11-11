@@ -319,8 +319,6 @@ internal sealed class DatabaseFileInspectorTests
 		Assert.That(obsolete, Is.Not.Null);
 		Assert.That(obsolete.IsError, Is.False);
 		Assert.That(
-			obsolete.Message, Does.Contain("removed in a future major version"));
-		Assert.That(
 			obsolete.Message,
 			Does.Contain("DatabaseFileInspector.GetDatabaseFileType"));
 		Assert.That(

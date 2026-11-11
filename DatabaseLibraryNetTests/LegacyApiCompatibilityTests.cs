@@ -47,7 +47,6 @@ internal sealed class LegacyApiCompatibilityTests
 		Assert.That(obsolete, Is.Not.Null);
 		Assert.That(obsolete.IsError, Is.False);
 		Assert.That(obsolete.Message, Does.Contain("Column.Primary"));
-		Assert.That(obsolete.Message, Does.Contain("v2"));
 	}
 
 	/// <summary>
@@ -85,7 +84,6 @@ internal sealed class LegacyApiCompatibilityTests
 		Assert.That(obsolete, Is.Not.Null);
 		Assert.That(obsolete.IsError, Is.False);
 		Assert.That(obsolete.Message, Does.Contain("DataObjectOleDb(string"));
-		Assert.That(obsolete.Message, Does.Contain("v2"));
 	}
 
 	/// <summary>

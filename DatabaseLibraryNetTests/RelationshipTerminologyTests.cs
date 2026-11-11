@@ -163,7 +163,7 @@ internal sealed class RelationshipTerminologyTests
 
 	/// <summary>
 	/// The shorter constructor remains callable with unchanged assignments
-	/// and warns consumers about removal in v2.
+	/// and provides migration guidance.
 	/// </summary>
 	[Test]
 	public void ShortConstructorIsObsoleteWithoutChangingAssignments()
@@ -199,7 +199,6 @@ internal sealed class RelationshipTerminologyTests
 		Assert.That(attribute, Is.Not.Null);
 		Assert.That(attribute.IsError, Is.False);
 		Assert.That(attribute.Message, Does.Contain("ForeignKey.Create"));
-		Assert.That(attribute.Message, Does.Contain("v2"));
 	}
 
 	/// <summary>

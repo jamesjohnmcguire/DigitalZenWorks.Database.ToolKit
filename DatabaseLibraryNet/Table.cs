@@ -70,8 +70,7 @@ public class Table
 	/// </summary>
 	/// <remarks>This property retains its historical independent storage.
 	/// It does not read or update the Primary flags in Columns.</remarks>
-	[Obsolete("Use Column.Primary on entries in Columns instead. " +
-		"This property will be removed in v2.")]
+	[Obsolete("Use Column.Primary in Columns instead.")]
 	public string PrimaryKey { get; set; }
 
 	/// <summary>
