@@ -140,7 +140,7 @@ public class ForeignKey
 	/// Gets or sets the referenced column using its legacy name.
 	/// </summary>
 	/// <value>
-	/// Column Name.
+	/// The child table column name.
 	/// </value>
 	public string ChildColumn { get; set; }
 
@@ -148,7 +148,7 @@ public class ForeignKey
 	/// Gets or sets the referenced table using its legacy name.
 	/// </summary>
 	/// <value>
-	/// Column Name.
+	/// The child table name.
 	/// </value>
 	public string ChildTable { get; set; }
 
@@ -156,7 +156,7 @@ public class ForeignKey
 	/// Gets or sets the legacy alias for ChildColumn (the referenced column).
 	/// </summary>
 	/// <value>
-	/// Column Name.
+	/// The column name.
 	/// </value>
 	public string ColumnName
 	{
@@ -168,7 +168,7 @@ public class ForeignKey
 	/// Gets or sets foreign Key Name.
 	/// </summary>
 	/// <value>
-	/// Foreign Key Name.
+	/// The foreign key name.
 	/// </value>
 	public string Name { get; set; }
 
@@ -176,7 +176,7 @@ public class ForeignKey
 	/// Gets or sets the referencing column using its legacy name.
 	/// </summary>
 	/// <value>
-	/// Parent Table Column.
+	/// The parent table column name.
 	/// </value>
 	public string ParentColumn { get; set; }
 
@@ -184,7 +184,7 @@ public class ForeignKey
 	/// Gets or sets the referencing table using its legacy name.
 	/// </summary>
 	/// <value>
-	/// Parent Table.
+	/// The parent table name.
 	/// </value>
 	public string ParentTable { get; set; }
 
@@ -192,7 +192,7 @@ public class ForeignKey
 	/// Gets or sets the legacy alias for the referencing column.
 	/// </summary>
 	/// <value>
-	/// Parent Table Column.
+	/// The parent table column name.
 	/// </value>
 	public string ParentTableColumn
 	{
