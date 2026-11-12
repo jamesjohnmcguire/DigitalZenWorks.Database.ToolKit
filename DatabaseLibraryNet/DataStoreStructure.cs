@@ -380,6 +380,31 @@ public class DataStoreStructure : IDisposable
 	}
 
 	/// <summary>
+	/// Reads foreign keys for a table and appends them to a collection.
+	/// </summary>
+	/// <param name="tableName">The table whose metadata is read.</param>
+	/// <param name="foreignKeys">The collection to append to, or null to
+	/// create a new collection.</param>
+	/// <returns>The collection containing the decoded foreign keys.</returns>
+	public Collection<ForeignKey> GetForeignKeys(
+		string tableName, Collection<ForeignKey> foreignKeys)
+	{
+		foreignKeys ??= [];
+
+		DataTable metadata = GetForeignKeys(tableName);
+		foreach (DataRow row in metadata.Rows)
+		{
+			ForeignKey foreignKey = GetForeignKey(row);
+			if (foreignKey != null)
+			{
+				foreignKeys.Add(foreignKey);
+			}
+		}
+
+		return foreignKeys;
+	}
+
+	/// <summary>
 	/// Gets the constraints from the given table.
 	/// </summary>
 	/// <param name="tableName">The name of the table.</param>
@@ -444,7 +469,7 @@ public class DataStoreStructure : IDisposable
 	public virtual Collection<Table> GetSchema()
 	{
 		Dictionary<string, Table> tableDictionary = [];
-		Collection<Relationship> relationships = [];
+		Collection<ForeignKey> foreignKeys = [];
 
 		foreach (DataRow row in TableNames.Rows)
 		{
@@ -452,11 +477,11 @@ public class DataStoreStructure : IDisposable
 			Table table = GetTable(row);
 			tableDictionary.Add(tableName, table);
 
-			relationships = GetRelationships(tableName, relationships);
+			foreignKeys = GetForeignKeys(tableName, foreignKeys);
 		}
 
 		tableDictionary =
-			SetTablesRelationships(tableDictionary, relationships);
+			SetTablesRelationships(tableDictionary, foreignKeys);
 
 		Collection<Table> tables = GetTables(tableDictionary);
 
@@ -715,6 +740,56 @@ public class DataStoreStructure : IDisposable
 	}
 
 	/// <summary>
+	/// Creates a foreign key directly from provider metadata.
+	/// </summary>
+	/// <param name="row">The foreign key metadata row.</param>
+	/// <returns>The decoded foreign key.</returns>
+	/// <exception cref="ArgumentNullException">The row is null.</exception>
+	protected virtual ForeignKey GetForeignKey(DataRow row)
+	{
+#if NET6_0_OR_GREATER
+		ArgumentNullException.ThrowIfNull(row);
+#else
+		if (row == null)
+		{
+			throw new ArgumentNullException(nameof(row));
+		}
+#endif
+
+		// Provider metadata may contain unnamed or incomplete constraints.
+		ForeignKey key = new(
+			row["CONSTRAINT_NAME"].ToString(),
+			row["TABLE_NAME"].ToString(),
+			row["FKEY_FROM_COLUMN"].ToString(),
+			row["FKEY_TO_TABLE"].ToString(),
+			row["FKEY_TO_COLUMN"].ToString(),
+			ConstraintAction.NoAction,
+			ConstraintAction.NoAction);
+
+		string onAction = row["FKEY_ON_DELETE"].ToString();
+		if (onAction.Equals("CASCADE", StringComparison.Ordinal))
+		{
+			key.OnDeleteAction = ConstraintAction.Cascade;
+		}
+		else if (onAction.Equals("SET NULL", StringComparison.Ordinal))
+		{
+			key.OnDeleteAction = ConstraintAction.SetNull;
+		}
+
+		onAction = row["FKEY_ON_UPDATE"].ToString();
+		if (onAction.Equals("CASCADE", StringComparison.Ordinal))
+		{
+			key.OnUpdateAction = ConstraintAction.Cascade;
+		}
+		else if (onAction.Equals("SET NULL", StringComparison.Ordinal))
+		{
+			key.OnUpdateAction = ConstraintAction.SetNull;
+		}
+
+		return key;
+	}
+
+	/// <summary>
 	/// Creates a <see cref="Relationship"/> object representing the foreign
 	/// key relationship described by the specified data row.
 	/// </summary>
@@ -839,6 +914,8 @@ public class DataStoreStructure : IDisposable
 	/// table with the foreign key added, or <see langword="null"/>
 	/// if <paramref name="tableDictionary"/> or
 	/// <paramref name="relationship"/> is null.</returns>
+	[Obsolete("Use SetTablesRelationships with " +
+		"Collection<ForeignKey> instead.")]
 	protected virtual Table GetTableWithRelationships(
 		Dictionary<string, Table> tableDictionary,
 		Relationship relationship)
@@ -916,6 +993,7 @@ public class DataStoreStructure : IDisposable
 	/// collection.</returns>
 	/// <exception cref="ArgumentNullException">Thrown if
 	/// <paramref name="tableDictionary"/> is null.</exception>
+	[Obsolete("Use the Collection<ForeignKey> overload instead.")]
 	protected Dictionary<string, Table> SetTablesRelationships(
 		Dictionary<string, Table> tableDictionary,
 		Collection<Relationship> relationships)
@@ -936,6 +1014,42 @@ public class DataStoreStructure : IDisposable
 				// Will modify tableDictionary in place.
 				GetTableWithRelationships(
 					tableDictionary, relationship);
+			}
+		}
+
+		return tableDictionary;
+	}
+
+	/// <summary>
+	/// Adds foreign keys to their referencing tables in the dictionary.
+	/// </summary>
+	/// <param name="tableDictionary">The tables keyed by name.</param>
+	/// <param name="foreignKeys">The foreign keys to add. If null, no keys
+	/// are added. Null entries are ignored.</param>
+	/// <returns>The original dictionary, modified in place.</returns>
+	/// <exception cref="ArgumentNullException">Thrown if
+	/// <paramref name="tableDictionary"/> is null.</exception>
+	protected Dictionary<string, Table> SetTablesRelationships(
+		Dictionary<string, Table> tableDictionary,
+		Collection<ForeignKey> foreignKeys)
+	{
+		if (tableDictionary == null)
+		{
+			throw new ArgumentNullException(
+				nameof(tableDictionary),
+				"Table dictionary cannot be null");
+		}
+
+		if (foreignKeys != null)
+		{
+			foreach (ForeignKey foreignKey in foreignKeys)
+			{
+				if (foreignKey != null)
+				{
+					string name = foreignKey.ReferencingTable;
+					Table table = tableDictionary[name];
+					table.ForeignKeys.Add(foreignKey);
+				}
 			}
 		}
 

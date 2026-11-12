@@ -267,6 +267,56 @@ public class OleDbSchema : DataStoreStructure
 	}
 
 	/// <summary>
+	/// Creates a foreign key directly from provider metadata.
+	/// </summary>
+	/// <param name="row">The foreign key metadata row.</param>
+	/// <returns>The decoded foreign key.</returns>
+	/// <exception cref="ArgumentNullException">The row is null.</exception>
+	protected override ForeignKey GetForeignKey(DataRow row)
+	{
+#if NET6_0_OR_GREATER
+		ArgumentNullException.ThrowIfNull(row);
+#else
+		if (row == null)
+		{
+			throw new ArgumentNullException(nameof(row));
+		}
+#endif
+
+		// Provider metadata may contain unnamed or incomplete constraints.
+		ForeignKey key = new(
+			row["FK_NAME"].ToString(),
+			row["FK_TABLE_NAME"].ToString(),
+			row["FK_COLUMN_NAME"].ToString(),
+			row["PK_TABLE_NAME"].ToString(),
+			row["PK_COLUMN_NAME"].ToString(),
+			ConstraintAction.NoAction,
+			ConstraintAction.NoAction);
+
+		string onAction = row["DELETE_RULE"].ToString();
+		if (onAction.Equals("CASCADE", StringComparison.Ordinal))
+		{
+			key.OnDeleteAction = ConstraintAction.Cascade;
+		}
+		else if (onAction.Equals("SET NULL", StringComparison.Ordinal))
+		{
+			key.OnDeleteAction = ConstraintAction.SetNull;
+		}
+
+		onAction = row["UPDATE_RULE"].ToString();
+		if (onAction.Equals("CASCADE", StringComparison.Ordinal))
+		{
+			key.OnUpdateAction = ConstraintAction.Cascade;
+		}
+		else if (onAction.Equals("SET NULL", StringComparison.Ordinal))
+		{
+			key.OnUpdateAction = ConstraintAction.SetNull;
+		}
+
+		return key;
+	}
+
+	/// <summary>
 	/// Creates a <see cref="Relationship"/> object representing the foreign
 	/// key relationship described by the specified data row.
 	/// </summary>

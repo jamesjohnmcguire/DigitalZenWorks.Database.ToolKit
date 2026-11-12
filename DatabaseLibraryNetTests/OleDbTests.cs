@@ -94,6 +94,54 @@ internal sealed class OleDbTests : BaseTestsSupport
 	}
 
 	/// <summary>
+	/// Direct foreign-key decoding preserves legacy Access metadata.
+	/// </summary>
+	[Test]
+	public void GetSchemaPreservesLegacyRelationshipMetadata()
+	{
+		using OleDbSchema schema = new(databaseFile);
+		Collection<Table> tables = schema.GetSchema();
+#pragma warning disable CS0618 // Compare with the retained metadata API.
+		Collection<Relationship> relationships = [];
+		foreach (Table table in tables)
+		{
+			relationships = schema.GetRelationships(table.Name, relationships);
+		}
+
+		foreach (Table table in tables)
+		{
+			List<Relationship> expected = relationships.Where(
+				item => item.ReferencingTable == table.Name).ToList();
+			Assert.That(table.ForeignKeys.Count, Is.EqualTo(expected.Count));
+			for (int index = 0; index < expected.Count; index++)
+			{
+				Relationship relationship = expected[index];
+				ForeignKey key = table.ForeignKeys[index];
+				Assert.That(key.Name, Is.EqualTo(relationship.Name));
+				Assert.That(
+					key.ReferencingTable,
+					Is.EqualTo(relationship.ReferencingTable));
+				Assert.That(
+					key.ReferencingColumn,
+					Is.EqualTo(relationship.ReferencingColumn));
+				Assert.That(
+					key.ReferencedTable,
+					Is.EqualTo(relationship.ReferencedTable));
+				Assert.That(
+					key.ReferencedColumn,
+					Is.EqualTo(relationship.ReferencedColumn));
+				Assert.That(
+					key.OnDeleteAction,
+					Is.EqualTo(relationship.OnDeleteAction));
+				Assert.That(
+					key.OnUpdateAction,
+					Is.EqualTo(relationship.OnUpdateAction));
+			}
+		}
+#pragma warning restore CS0618
+	}
+
+	/// <summary>
 	/// Get relationships test.
 	/// </summary>
 	[Test]
