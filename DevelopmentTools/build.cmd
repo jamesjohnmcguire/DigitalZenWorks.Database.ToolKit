@@ -1,35 +1,42 @@
-REM %1 - Type of build
-REM %2 - Version (such as 1.0.0.5)
-REM %3 - API key
+@ECHO OFF
+SETLOCAL
+SET "buildExitCode=0"
 
 CD %~dp0
 CD ..\DatabaseLibraryNet
 
+IF /I "%~1"=="publish" GOTO publish
+
 :default
 dotnet build --configuration Release -p:PlatformTarget=AnyCPU -p:Prefer32Bit=false
 
-IF "%1"=="publish" GOTO publish
-GOTO end
+GOTO :EOF
 
 :publish
-if "%~2"=="" GOTO error1
-if "%~3"=="" GOTO error2
+WHERE gh >NUL 2>&1
+SET "buildExitCode=%ERRORLEVEL%"
+IF NOT "%buildExitCode%"=="0" SET "message=GitHub CLI is required. Install gh and run gh auth login."
+IF NOT "%buildExitCode%"=="0" GOTO error
 
-::msbuild -property:Configuration=Release -restore -target:rebuild;pack DigitalZenWorks.Database.ToolKit.csproj
-dotnet pack --configuration Release --output nupkg -p:IncludeSource=true -p:IncludeSymbols=true
+:: Get Project Version
+SET "projectVersion="
+FOR /F "delims=" %%V IN (
+    'dotnet msbuild -nologo -getProperty:Version'
+) DO SET "projectVersion=%%V"
 
-CD nupkg
+IF NOT DEFINED projectVersion SET "message=Unable to read the project version."
+IF NOT DEFINED projectVersion GOTO error
 
-nuget push DigitalZenWorks.Database.ToolKit.%2.nupkg %3 -Source https://api.nuget.org/v3/index.json
+ECHO Requesting publication of version %projectVersion% from main.
+gh workflow run dotnet.yml --ref main -F publish=true -f version="%projectVersion%" --repo jamesjohnmcguire/DigitalZenWorks.Database.ToolKit
 
-CD ..
-GOTO end
+SET "buildExitCode=%ERRORLEVEL%"
+IF NOT "%buildExitCode%"=="0" SET "message=Problem Running: gh workflow run dotnet.yml"
+IF NOT "%buildExitCode%"=="0" GOTO error
 
-:error1
-ECHO No version tag specified
-GOTO end
+ECHO Workflow requested. GitHub will build, test, and publish the package.
+ECHO Use gh run watch from the Utilities repository to follow its progress.
+GOTO :EOF
 
-:error2
-ECHO No API key specified
-
-:end
+:error
+ECHO %message%
