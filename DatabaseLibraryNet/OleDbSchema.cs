@@ -316,6 +316,17 @@ public class OleDbSchema : DataStoreStructure
 		return key;
 	}
 
+	/// <inheritdoc/>
+	protected override DataTable GetForeignKeyMetadataOwnedByTable(
+		string referencingTableName)
+	{
+		// Restriction six is FK_TABLE_NAME; restriction three is PK_TABLE_NAME.
+		object[] restrictions =
+			[null, null, null, null, null, referencingTableName];
+
+		return GetSchema(OleDbSchemaGuid.Foreign_Keys, restrictions);
+	}
+
 	/// <summary>
 	/// Creates a <see cref="Relationship"/> object representing the foreign
 	/// key relationship described by the specified data row.

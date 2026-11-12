@@ -405,6 +405,51 @@ public class DataStoreStructure : IDisposable
 	}
 
 	/// <summary>
+	/// Gets foreign keys owned by the specified referencing table.
+	/// </summary>
+	/// <param name="referencingTableName">The table that owns the foreign
+	/// key constraints, rather than the table they reference.</param>
+	/// <returns>A new collection of the table's foreign keys, or an empty
+	/// collection when the table owns no foreign keys.</returns>
+	/// <exception cref="ArgumentNullException">The table name is null.
+	/// </exception>
+	/// <exception cref="ArgumentException">The table name is empty or
+	/// consists only of whitespace.</exception>
+	public Collection<ForeignKey> GetForeignKeysOwnedByTable(
+		string referencingTableName)
+	{
+#if NET6_0_OR_GREATER
+		ArgumentNullException.ThrowIfNull(referencingTableName);
+#else
+		if (referencingTableName == null)
+		{
+			throw new ArgumentNullException(nameof(referencingTableName));
+		}
+#endif
+
+		if (string.IsNullOrWhiteSpace(referencingTableName))
+		{
+			throw new ArgumentException(
+				"Referencing table name cannot be empty or whitespace.",
+				nameof(referencingTableName));
+		}
+
+		Collection<ForeignKey> foreignKeys = [];
+		using DataTable metadata =
+			GetForeignKeyMetadataOwnedByTable(referencingTableName);
+		foreach (DataRow row in metadata.Rows)
+		{
+			ForeignKey foreignKey = GetForeignKey(row);
+			if (foreignKey != null)
+			{
+				foreignKeys.Add(foreignKey);
+			}
+		}
+
+		return foreignKeys;
+	}
+
+	/// <summary>
 	/// Gets the constraints from the given table.
 	/// </summary>
 	/// <param name="tableName">The name of the table.</param>
@@ -787,6 +832,18 @@ public class DataStoreStructure : IDisposable
 		}
 
 		return key;
+	}
+
+	/// <summary>
+	/// Reads metadata for constraints owned by the referencing table.
+	/// </summary>
+	/// <param name="referencingTableName">The table that owns the keys.
+	/// </param>
+	/// <returns>The provider's metadata for the owned foreign keys.</returns>
+	protected virtual DataTable GetForeignKeyMetadataOwnedByTable(
+		string referencingTableName)
+	{
+		return GetForeignKeys(referencingTableName);
 	}
 
 	/// <summary>

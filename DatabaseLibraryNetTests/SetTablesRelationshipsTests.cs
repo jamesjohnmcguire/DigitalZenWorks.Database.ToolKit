@@ -363,6 +363,39 @@ internal sealed class SetTablesRelationshipsTests
 	}
 
 	/// <summary>
+	/// Invalid names cannot accidentally query all tables through a provider.
+	/// </summary>
+	/// <param name="tableName">The invalid table name.</param>
+	[TestCase(null)]
+	[TestCase("")]
+	[TestCase(" \t")]
+	public void OwnedForeignKeysRejectMissingTableName(string tableName)
+	{
+		using SchemaProbe schema = new();
+		ArgumentException exception = Assert.Catch<ArgumentException>(
+			() => schema.GetForeignKeysOwnedByTable(tableName));
+
+		Assert.That(exception.ParamName, Is.EqualTo("referencingTableName"));
+		Type expectedType = tableName == null
+			? typeof(ArgumentNullException)
+			: typeof(ArgumentException);
+		Assert.That(exception.GetType(), Is.EqualTo(expectedType));
+		Assert.That(schema.DecodingCalls, Is.Zero);
+	}
+
+	/// <summary>
+	/// Null metadata results from a provider decoder are ignored.
+	/// </summary>
+	[Test]
+	public void OwnedForeignKeysIgnoreNullDecodedKey()
+	{
+		using SchemaProbe schema = new() { ReturnNullForeignKey = true };
+
+		Assert.That(schema.GetForeignKeysOwnedByTable("Orders"), Is.Empty);
+		Assert.That(schema.DecodingCalls, Is.EqualTo(1));
+	}
+
+	/// <summary>
 	/// Creates a key whose referenced and referencing names differ.
 	/// </summary>
 	/// <param name="name">The constraint name.</param>

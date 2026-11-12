@@ -111,6 +111,82 @@ internal sealed class DataStoreStructureTests : BaseTestsSupport
 	}
 
 	/// <summary>
+	/// A table with outgoing and incoming references returns only its own keys.
+	/// </summary>
+	[Test]
+	public void OwnedForeignKeysExcludeIncomingReferences()
+	{
+		using DataStoreStructure schema = new(DatabaseType.SQLite, DataSource);
+		Collection<ForeignKey> keys =
+			schema.GetForeignKeysOwnedByTable("Sections");
+
+		string[] expectedTables = ["Categories", "Makers"];
+		string[] expectedColumns = ["categoryId", "makerId"];
+		Assert.That(keys.Count, Is.EqualTo(2));
+		Assert.That(
+			keys.Select(key => key.ReferencedTable),
+			Is.EquivalentTo(expectedTables));
+		Assert.That(
+			keys.Select(key => key.ReferencingColumn),
+			Is.EquivalentTo(expectedColumns));
+		foreach (ForeignKey key in keys)
+		{
+			Assert.That(key.Name, Is.Not.Empty);
+			Assert.That(key.ReferencingTable, Is.EqualTo("Sections"));
+			Assert.That(key.ReferencedColumn, Is.EqualTo("id"));
+			Assert.That(
+				key.OnDeleteAction, Is.EqualTo(ConstraintAction.SetNull));
+			Assert.That(
+				key.OnUpdateAction, Is.EqualTo(ConstraintAction.Cascade));
+		}
+	}
+
+	/// <summary>
+	/// Being referenced by other tables does not imply ownership of a key.
+	/// </summary>
+	[Test]
+	public void OwnedForeignKeysReturnEmptyForReferencedOnlyTable()
+	{
+		using DataStoreStructure schema = new(DatabaseType.SQLite, DataSource);
+
+		Assert.That(schema.GetForeignKeysOwnedByTable("Makers"), Is.Empty);
+	}
+
+	/// <summary>
+	/// A self-reference is owned by the table and is returned exactly once.
+	/// </summary>
+	[Test]
+	public void OwnedForeignKeysIncludeSelfReferenceOnce()
+	{
+		using DataStoreStructure schema = new(DatabaseType.SQLite, DataSource);
+		Collection<ForeignKey> keys =
+			schema.GetForeignKeysOwnedByTable("Categories");
+
+		Assert.That(keys.Count, Is.EqualTo(1));
+		Assert.That(keys[0].ReferencingTable, Is.EqualTo("Categories"));
+		Assert.That(keys[0].ReferencingColumn, Is.EqualTo("parentId"));
+		Assert.That(keys[0].ReferencedTable, Is.EqualTo("Categories"));
+		Assert.That(keys[0].ReferencedColumn, Is.EqualTo("id"));
+	}
+
+	/// <summary>
+	/// Queries return independent collections, without accumulating results.
+	/// </summary>
+	[Test]
+	public void OwnedForeignKeysReturnIndependentCollections()
+	{
+		using DataStoreStructure schema = new(DatabaseType.SQLite, DataSource);
+		Collection<ForeignKey> first =
+			schema.GetForeignKeysOwnedByTable("Sections");
+		Collection<ForeignKey> second =
+			schema.GetForeignKeysOwnedByTable("Sections");
+
+		Assert.That(second, Is.Not.SameAs(first));
+		first.Clear();
+		Assert.That(second.Count, Is.EqualTo(2));
+	}
+
+	/// <summary>
 	/// Get relationships test.
 	/// </summary>
 	[Test]
