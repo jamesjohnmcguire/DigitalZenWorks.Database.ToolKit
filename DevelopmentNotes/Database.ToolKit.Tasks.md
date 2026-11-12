@@ -1,14 +1,14 @@
-Review First Consolidate Attempt
-Decide What Stays in ReadMe
-Version 2	Resolve	DataDefinition / DataStoreStructure
-Version 2	Resolve	DataStorage / DataObjectsBase / DatabaseConnection
+Encapsulate Exception Throwing
 Merge ForeignKey and Relationship
 Refactor into TableSets
-
-Work Off of Task List
+Review First Consolidate Attempt
+Decide What Stays in ReadMe
+Bump Version Numbers
 Publish
 
-Standardize Notes and Tasks Location Between Application and Library
+Version 2	Resolve	DataDefinition / DataStoreStructure
+Version 2	Resolve	DataStorage / DataObjectsBase / DatabaseConnection
+
 Create Bash Build Script
 ForeignKey	Prepare v2 terminology cleanup	Compatible explicit roles and factory are implemented. Plan and composite-key design: SourceCode/Database.ToolKit/Documentation/RelationshipTerminology.md. Remove legacy aliases in v2 without reversing their current meanings.
 ForeignKey	Strengthen ForeignKeys	Centralize null / blank member validation and prevent invalid mutation.   Define the policy for unnamed constraints and null collection entries.
@@ -42,12 +42,11 @@ Move OleDbSchema to DatabaseLibraryNetWin
 Move references to accdb, mdb	Move / Copy template.accdb to MsAccessTool and DatabaseUtilitiesWin
 Deal with ImportSchemaMdb
 Rename OleDbSchema to DataStoreStructureOleDb?
-FK_Contacts
 SqLite	PRAGMA strict_mode = ON;
 Order Properties	ForeignKey?
 Deprec 		public ForeignKey(	string name, string columnName, string parentTable, string parentTableColumn, ConstraintAction onDeleteAction, ConstraintAction onUpdateAction)
 ExportSchema	Using CompareText from Read File Is Problematic for the Following Reasons: 1. The variations of use spaces doesn't make the schema invalid - The compare text has different use of spaces then the exported text.  2. The ordering of constraints may and, thus far, will be different.  May need to use Regex's
 Simplify Process of Relationship to ForeignKey
 GetConstraintsByProvider	Leave as-is, until Enhanced Providers Database Testing
-# Nullable
+Implement #Nullable Project Wise
 Handling large query return sets - need to set up looping over return set
