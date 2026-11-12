@@ -6,14 +6,15 @@
 
 namespace DigitalZenWorks.Database.ToolKit;
 
+using System;
+
 /// <summary>
 /// Holds schema relationship metadata from a referencing child table to a
 /// referenced parent table.
 /// </summary>
-/// <remarks>Use the explicit Referencing and Referenced properties. Legacy
-/// Parent and Child properties retain their historical reversed meanings.
-/// This metadata class remains separate from ForeignKey until the planned
-/// review of overlapping functionality.</remarks>
+/// <remarks>Use ForeignKey for new code. Legacy Parent and Child properties
+/// retain their historical reversed meanings.</remarks>
+[Obsolete("Use ForeignKey instead.")]
 public class Relationship
 {
 	/// <summary>

@@ -300,6 +300,7 @@ public static class DataDefinition
 	/// </summary>
 	/// <param name="relationships">A set of relationships.</param>
 	/// <returns>The foreign key relationships.</returns>
+	[Obsolete("Create ForeignKey objects directly with ForeignKey.Create.")]
 	public static ForeignKey[] GetForeignKeyRelationships(
 		Relationship[] relationships)
 	{
