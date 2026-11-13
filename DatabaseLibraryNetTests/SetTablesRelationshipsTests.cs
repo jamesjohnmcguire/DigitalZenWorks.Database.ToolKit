@@ -14,18 +14,16 @@ using NUnit.Framework;
 #pragma warning disable CS0618 // Exercise the retained relationship API.
 
 /// <summary>
-/// Protects behavior shared by the legacy and foreign-key overloads.
+/// Protects legacy relationship behavior and foreign-key schema loading.
 /// </summary>
 [TestFixture]
 internal sealed class SetTablesRelationshipsTests
 {
 	/// <summary>
-	/// Both paths retain existing keys, append in order, and use the child.
+	/// The legacy path appends keys in order to the referencing table.
 	/// </summary>
-	/// <param name="legacy">Whether to use the relationship overload.</param>
-	[TestCase(true)]
-	[TestCase(false)]
-	public void AddsKeysToReferencingTableAndPreservesMetadata(bool legacy)
+	[Test]
+	public void AddsKeysToReferencingTableAndPreservesMetadata()
 	{
 		using SchemaProbe schema = new();
 		Table child = new("Orders");
@@ -40,7 +38,7 @@ internal sealed class SetTablesRelationshipsTests
 		child.ForeignKeys.Add(existing);
 
 		Dictionary<string, Table> result =
-			schema.Apply(tables, [null, key, key], legacy);
+			schema.ApplyLegacyRelationships(tables, [null, key, key]);
 
 		Assert.That(result, Is.SameAs(tables));
 		Assert.That(result[child.Name], Is.SameAs(child));
@@ -67,14 +65,12 @@ internal sealed class SetTablesRelationshipsTests
 	/// <summary>
 	/// Null dictionaries fail even when the supplied keys are null.
 	/// </summary>
-	/// <param name="legacy">Whether to use the relationship overload.</param>
-	[TestCase(true)]
-	[TestCase(false)]
-	public void NullDictionaryThrowsWithParameterName(bool legacy)
+	[Test]
+	public void NullDictionaryThrowsWithParameterName()
 	{
 		using SchemaProbe schema = new();
 		ArgumentNullException exception = Assert.Throws<ArgumentNullException>(
-			() => schema.Apply(null, null, legacy));
+			() => schema.ApplyLegacyRelationships(null, null));
 		Assert.That(exception.ParamName, Is.EqualTo("tableDictionary"));
 		Assert.That(
 			exception.Message, Does.Contain("Table dictionary cannot be null"));
@@ -83,14 +79,10 @@ internal sealed class SetTablesRelationshipsTests
 	/// <summary>
 	/// Null collections and empty collections leave the original keys intact.
 	/// </summary>
-	/// <param name="legacy">Whether to use the relationship overload.</param>
 	/// <param name="nullCollection">Whether the collection is null.</param>
-	[TestCase(true, true)]
-	[TestCase(true, false)]
-	[TestCase(false, true)]
-	[TestCase(false, false)]
-	public void NoKeysLeavesDictionaryUnchanged(
-		bool legacy, bool nullCollection)
+	[TestCase(true)]
+	[TestCase(false)]
+	public void NoKeysLeavesDictionaryUnchanged(bool nullCollection)
 	{
 		using SchemaProbe schema = new();
 		Table child = new("Orders");
@@ -99,17 +91,16 @@ internal sealed class SetTablesRelationshipsTests
 		Dictionary<string, Table> tables = new() { [child.Name] = child };
 		Collection<ForeignKey> keys = nullCollection ? null : [];
 
-		Assert.That(schema.Apply(tables, keys, legacy), Is.SameAs(tables));
+		Assert.That(
+			schema.ApplyLegacyRelationships(tables, keys), Is.SameAs(tables));
 		Assert.That(child.ForeignKeys, Is.EqualTo(new[] { existing }));
 	}
 
 	/// <summary>
 	/// A missing child fails after earlier valid keys have been applied.
 	/// </summary>
-	/// <param name="legacy">Whether to use the relationship overload.</param>
-	[TestCase(true)]
-	[TestCase(false)]
-	public void MissingReferencingTablePreservesEarlierChanges(bool legacy)
+	[Test]
+	public void MissingReferencingTablePreservesEarlierChanges()
 	{
 		using SchemaProbe schema = new();
 		Table child = new("Orders");
@@ -117,8 +108,9 @@ internal sealed class SetTablesRelationshipsTests
 		ForeignKey missing = CreateKey("Missing");
 		missing.ReferencingTable = "Unknown";
 
-		Assert.Throws<KeyNotFoundException>(() => schema.Apply(
-			tables, [CreateKey("First"), missing, CreateKey("Last")], legacy));
+		Assert.Throws<KeyNotFoundException>(() =>
+			schema.ApplyLegacyRelationships(
+				tables, [CreateKey("First"), missing, CreateKey("Last")]));
 		Assert.That(child.ForeignKeys.Count, Is.EqualTo(1));
 		Assert.That(child.ForeignKeys[0].Name, Is.EqualTo("First"));
 	}
@@ -126,10 +118,8 @@ internal sealed class SetTablesRelationshipsTests
 	/// <summary>
 	/// Existing provider metadata is not subjected to factory validation.
 	/// </summary>
-	/// <param name="legacy">Whether to use the relationship overload.</param>
-	[TestCase(true)]
-	[TestCase(false)]
-	public void IncompleteMetadataRetainsPermissiveBehavior(bool legacy)
+	[Test]
+	public void IncompleteMetadataRetainsPermissiveBehavior()
 	{
 		using SchemaProbe schema = new();
 		Table child = new("Orders");
@@ -143,28 +133,13 @@ internal sealed class SetTablesRelationshipsTests
 			ConstraintAction.NoAction,
 			ConstraintAction.NoAction);
 
-		schema.Apply(tables, [key], legacy);
+		schema.ApplyLegacyRelationships(tables, [key]);
 
 		Assert.That(child.ForeignKeys.Count, Is.EqualTo(1));
 		Assert.That(child.ForeignKeys[0].Name, Is.Null);
 		Assert.That(child.ForeignKeys[0].ReferencingColumn, Is.Null);
 		Assert.That(child.ForeignKeys[0].ReferencedTable, Is.Null);
 		Assert.That(child.ForeignKeys[0].ReferencedColumn, Is.Null);
-	}
-
-	/// <summary>
-	/// The new overload attaches the supplied object without a lossy copy.
-	/// </summary>
-	[Test]
-	public void ForeignKeyOverloadPreservesObjectIdentity()
-	{
-		using SchemaProbe schema = new();
-		Table child = new("Orders");
-		Dictionary<string, Table> tables = new() { [child.Name] = child };
-		ForeignKey key = CreateKey("Original");
-
-		schema.Apply(tables, [key], false);
-		Assert.That(child.ForeignKeys[0], Is.SameAs(key));
 	}
 
 	/// <summary>
@@ -177,7 +152,7 @@ internal sealed class SetTablesRelationshipsTests
 		Table child = new("Orders");
 		Dictionary<string, Table> tables = new() { [child.Name] = child };
 
-		schema.Apply(tables, [null, CreateKey("Key")], true);
+		schema.ApplyLegacyRelationships(tables, [null, CreateKey("Key")]);
 
 		Assert.That(schema.RelationshipCalls, Is.EqualTo(2));
 		Assert.That(child.ForeignKeys.Count, Is.EqualTo(1));
@@ -203,7 +178,7 @@ internal sealed class SetTablesRelationshipsTests
 
 		Assert.That(attribute, Is.Not.Null);
 		Assert.That(attribute.IsError, Is.False);
-		Assert.That(attribute.Message, Does.Contain("Collection<ForeignKey>"));
+		Assert.That(attribute.Message, Does.Contain("Table.ForeignKeys"));
 	}
 
 	/// <summary>
@@ -265,42 +240,7 @@ internal sealed class SetTablesRelationshipsTests
 		Assert.That(method.IsVirtual, Is.True);
 		Assert.That(attribute, Is.Not.Null);
 		Assert.That(attribute.IsError, Is.False);
-		Assert.That(attribute.Message, Does.Contain("Collection<ForeignKey>"));
-	}
-
-	/// <summary>
-	/// The collection overload appends without replacing existing entries.
-	/// </summary>
-	[Test]
-	public void GetForeignKeysAppendsToExistingCollection()
-	{
-		using SchemaProbe schema = new();
-		ForeignKey existing = CreateKey("Existing");
-		Collection<ForeignKey> keys = [existing];
-
-		Assert.That(schema.GetForeignKeys("Orders", keys), Is.SameAs(keys));
-		Assert.That(keys.Count, Is.EqualTo(2));
-		Assert.That(keys[0], Is.SameAs(existing));
-		Assert.That(keys[1].Name, Is.EqualTo("FK_Orders_Products"));
-		Assert.That(schema.GetForeignKeys("Products", keys), Is.SameAs(keys));
-		Assert.That(keys.Count, Is.EqualTo(2));
-	}
-
-	/// <summary>
-	/// A null destination creates a new collection, including for empty data.
-	/// </summary>
-	/// <param name="tableName">The requested table.</param>
-	/// <param name="expectedCount">The expected number of keys.</param>
-	[TestCase("Orders", 1)]
-	[TestCase("Products", 0)]
-	public void GetForeignKeysCreatesCollection(
-		string tableName, int expectedCount)
-	{
-		using SchemaProbe schema = new();
-		Collection<ForeignKey> keys = schema.GetForeignKeys(tableName, null);
-
-		Assert.That(keys, Is.Not.Null);
-		Assert.That(keys.Count, Is.EqualTo(expectedCount));
+		Assert.That(attribute.Message, Does.Contain("Table.ForeignKeys"));
 	}
 
 	/// <summary>
@@ -414,7 +354,7 @@ internal sealed class SetTablesRelationshipsTests
 	}
 
 	/// <summary>
-	/// Exposes protected overloads through a real in-memory database reader.
+	/// Exposes legacy attachment and metadata hooks for regression tests.
 	/// </summary>
 	private sealed class SchemaProbe : DataStoreStructure
 	{
@@ -501,22 +441,15 @@ internal sealed class SetTablesRelationshipsTests
 		}
 
 		/// <summary>
-		/// Applies the same metadata through either overload.
+		/// Applies metadata through the retained relationship overload.
 		/// </summary>
 		/// <param name="tables">The table dictionary.</param>
 		/// <param name="keys">The foreign keys.</param>
-		/// <param name="legacy">Whether to use the legacy overload.</param>
 		/// <returns>The original table dictionary.</returns>
-		public Dictionary<string, Table> Apply(
+		public Dictionary<string, Table> ApplyLegacyRelationships(
 			Dictionary<string, Table> tables,
-			Collection<ForeignKey> keys,
-			bool legacy)
+			Collection<ForeignKey> keys)
 		{
-			if (!legacy)
-			{
-				return SetTablesRelationships(tables, keys);
-			}
-
 			Collection<Relationship> relationships = null;
 			if (keys != null)
 			{
@@ -584,7 +517,7 @@ internal sealed class SetTablesRelationshipsTests
 		}
 
 		/// <inheritdoc/>
-		[Obsolete("Use the Collection<ForeignKey> overload instead.")]
+		[Obsolete("Populate Table.ForeignKeys with ForeignKey objects instead.")]
 		protected override Table GetTableWithRelationships(
 			Dictionary<string, Table> tableDictionary,
 			Relationship relationship)

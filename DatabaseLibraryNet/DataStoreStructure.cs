@@ -380,31 +380,6 @@ public class DataStoreStructure : IDisposable
 	}
 
 	/// <summary>
-	/// Reads foreign keys for a table and appends them to a collection.
-	/// </summary>
-	/// <param name="tableName">The table whose metadata is read.</param>
-	/// <param name="foreignKeys">The collection to append to, or null to
-	/// create a new collection.</param>
-	/// <returns>The collection containing the decoded foreign keys.</returns>
-	public Collection<ForeignKey> GetForeignKeys(
-		string tableName, Collection<ForeignKey> foreignKeys)
-	{
-		foreignKeys ??= [];
-
-		DataTable metadata = GetForeignKeys(tableName);
-		foreach (DataRow row in metadata.Rows)
-		{
-			ForeignKey foreignKey = GetForeignKey(row);
-			if (foreignKey != null)
-			{
-				foreignKeys.Add(foreignKey);
-			}
-		}
-
-		return foreignKeys;
-	}
-
-	/// <summary>
 	/// Gets foreign keys owned by the specified referencing table.
 	/// </summary>
 	/// <param name="referencingTableName">The table that owns the foreign
@@ -980,8 +955,7 @@ public class DataStoreStructure : IDisposable
 	/// table with the foreign key added, or <see langword="null"/>
 	/// if <paramref name="tableDictionary"/> or
 	/// <paramref name="relationship"/> is null.</returns>
-	[Obsolete("Use SetTablesRelationships with " +
-		"Collection<ForeignKey> instead.")]
+	[Obsolete("Populate Table.ForeignKeys with ForeignKey objects instead.")]
 	protected virtual Table GetTableWithRelationships(
 		Dictionary<string, Table> tableDictionary,
 		Relationship relationship)
@@ -1059,7 +1033,7 @@ public class DataStoreStructure : IDisposable
 	/// collection.</returns>
 	/// <exception cref="ArgumentNullException">Thrown if
 	/// <paramref name="tableDictionary"/> is null.</exception>
-	[Obsolete("Use the Collection<ForeignKey> overload instead.")]
+	[Obsolete("Populate Table.ForeignKeys with ForeignKey objects instead.")]
 	protected Dictionary<string, Table> SetTablesRelationships(
 		Dictionary<string, Table> tableDictionary,
 		Collection<Relationship> relationships)
@@ -1080,42 +1054,6 @@ public class DataStoreStructure : IDisposable
 				// Will modify tableDictionary in place.
 				GetTableWithRelationships(
 					tableDictionary, relationship);
-			}
-		}
-
-		return tableDictionary;
-	}
-
-	/// <summary>
-	/// Adds foreign keys to their referencing tables in the dictionary.
-	/// </summary>
-	/// <param name="tableDictionary">The tables keyed by name.</param>
-	/// <param name="foreignKeys">The foreign keys to add. If null, no keys
-	/// are added. Null entries are ignored.</param>
-	/// <returns>The original dictionary, modified in place.</returns>
-	/// <exception cref="ArgumentNullException">Thrown if
-	/// <paramref name="tableDictionary"/> is null.</exception>
-	protected Dictionary<string, Table> SetTablesRelationships(
-		Dictionary<string, Table> tableDictionary,
-		Collection<ForeignKey> foreignKeys)
-	{
-		if (tableDictionary == null)
-		{
-			throw new ArgumentNullException(
-				nameof(tableDictionary),
-				"Table dictionary cannot be null");
-		}
-
-		if (foreignKeys != null)
-		{
-			foreach (ForeignKey foreignKey in foreignKeys)
-			{
-				if (foreignKey != null)
-				{
-					string name = foreignKey.ReferencingTable;
-					Table table = tableDictionary[name];
-					table.ForeignKeys.Add(foreignKey);
-				}
 			}
 		}
 
