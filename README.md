@@ -26,7 +26,8 @@ this operation does not replace specialized byte-array or extension-only use.
 
 Use `ReferencedTable` / `ReferencedColumn` for the parent target and
 `ReferencingTable` / `ReferencingColumn` for the child that holds the key.
-These names are available on both `ForeignKey` and `Relationship`.
+Use `ForeignKey` for new code. The `Relationship` class is obsolete; its
+existing members remain available for compatibility.
 
 For new application definitions, use the validated, parent-first factory:
 
@@ -47,9 +48,29 @@ for removal in v2. The complete constructor remains supported. Legacy
 properties remain writable aliases with their historical meanings; they
 have not been silently reversed. Validation is confined to the new factory.
 
+## Reading foreign keys
+
+On an existing `DataStoreStructure` or `OleDbSchema` instance, query the
+referencing table that owns the constraints:
+
+```csharp
+Collection<ForeignKey> keys = schema.GetForeignKeysOwnedByTable("Orders");
+```
+
+For `Orders.productId -> Products.id`, this returns the key owned by
+`Orders`. Querying `Products` does not return that incoming key. Self
+references are included for their owning table. Each call returns a new
+collection, empty when the table owns no keys; null or blank names throw
+argument exceptions. SQLite and Access use the same ownership direction.
+
+`GetSchema()` populates each `Table.ForeignKeys` directly. The legacy
+`GetRelationships` method and Relationship conversion/attachment helpers
+are obsolete and retained for compatibility. Their provider-specific query
+behavior is unchanged: Access's legacy query returns incoming keys.
+
 See [migration and v2 preparation](https://github.com/jamesjohnmcguire/DigitalZenWorks.Database.ToolKit/blob/main/Documentation/RelationshipTerminology.md)
-for the alias mapping, compatibility details, composite-key design, and the
-planned follow-up review of duplicate or overlapping functionality.
+for legacy API mappings, subclass migration, alias meanings, and the
+composite-key design notes.
 
 ## Release API compatibility
 
@@ -76,7 +97,7 @@ to the default Access export. Consumers treating obsolete warnings as errors
 will need to migrate or suppress the intentional warnings.
 
 ## Change Log
-### Unreleased
+### Unreleased (1.4.0)
 
 - Add `DatabaseFileInspector.GetDatabaseFileType` as the public file inspection
   entry point, retaining obsolete `DataDefinition` methods for compatibility.
@@ -86,6 +107,18 @@ will need to migrate or suppress the intentional warnings.
 - Deprecate the shorter `ForeignKey` constructor with a warning; removal is
   planned for v2. Consumers treating obsolete warnings as errors must migrate.
 - Preserve legacy constructor and property behavior and generated SQL.
+- Deprecate `Relationship` and its query/conversion/attachment APIs while
+  retaining their published signatures and legacy behavior.
+- Add `GetForeignKeysOwnedByTable` with consistent SQLite/Access ownership
+  semantics and fresh `Collection<ForeignKey>` results.
+- Read schema foreign keys directly into `Table.ForeignKeys`. Schema loading
+  no longer invokes `GetRelationship` or `GetTableWithRelationships`
+  overrides; subclasses should migrate to the ForeignKey reader hooks.
+- Share dependency/table ordering through internal `TableSet`, preserving
+  public forwarding APIs and existing ordering behavior.
+- Centralize null checks in internal `ArgumentGuard`; replace redundant
+  custom null messages with framework defaults, retaining exception types
+  and parameter names.
 - Restore the two-argument `ExportSchema` method for compiled consumers.
 - Restore obsolete `Table.PrimaryKey` and the database-type/path
   `DataObjectOleDb` constructor until v2.

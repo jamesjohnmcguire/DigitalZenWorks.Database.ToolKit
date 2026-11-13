@@ -39,23 +39,83 @@ is preserved, not inferred or repaired by aliases. It is obsolete with a
 warning and scheduled for removal in v2. Migrate by supplying all roles to
 the factory; do not mechanically copy its values using the table above.
 
-## Implementation and verification sequence
+## Migrating for 1.4.0
 
-1. Add explicit role aliases and the validated factory. Deprecate only the
-   shorter constructor; retain existing signatures and permissive behavior.
-2. Migrate schema readers, conversions, all writers, dependency ordering,
-   and fixtures to explicit roles. Keep valid generated SQL unchanged.
-3. Verify factory validation, two-way alias synchronization, both legacy
-   constructors, unnamed metadata, reader mappings, writer equivalence,
-   self references, dependency order, and actual constraint enforcement.
-4. Build every package target framework and run the full application and
-   library suite before choosing the release version and publishing.
-5. After this terminology change, review duplicate / overlapping
-   functionality, including the responsibilities of `Relationship` and
-   `ForeignKey`. Keep that consolidation separate from this migration.
-6. Cut the v2 branch from the accepted compatible-change commit. Use the
-   decisions below as preparation; finalize shared model ownership after
-   the overlap review. No package version or branch is changed by this doc.
+`Relationship` is obsolete. Use `ForeignKey` for new definitions and schema
+metadata. Published legacy APIs remain callable with obsolete warnings;
+projects treating those warnings as errors must migrate or deliberately
+suppress them around compatibility code.
+
+| Legacy API | Migration |
+| --- | --- |
+| `Relationship` | `ForeignKey`; use `ForeignKey.Create` for new definitions. |
+| `DataDefinition.GetForeignKeyRelationships` / `DataStoreStructure.GetForeignKeyRelationships` | Create `ForeignKey` objects directly. |
+| `DataStoreStructure.GetRelationships` | Use `GetForeignKeysOwnedByTable` when querying owned keys; see direction caveat below. |
+| `DataStoreStructure.SetForeignKeys` / `SetTablesRelationships` | Populate the owning table's `ForeignKeys` collection directly. Preserve clear/replace or append behavior as needed. |
+| `DataStoreStructure.GetForeignKeyRelationship` | Use `ForeignKey.Create` for validated application definitions. Provider readers should decode directly. |
+| `GetRelationship(DataRow)` overrides | Decode rows in `GetForeignKey(DataRow)`. |
+| `GetTableWithRelationships` overrides | Apply custom attachment behavior explicitly; `GetSchema()` adds decoded keys directly. |
+
+### Query ownership and direction
+
+For `Orders.productId -> Products.id`, `Orders` owns the constraint and
+`Products` is its referenced target. `GetForeignKeysOwnedByTable("Orders")`
+returns this key; querying `Products` does not return it. A self-referencing
+key belongs to its own table. Results cover only the requested owner, with
+no accumulator of keys from earlier table queries.
+
+Each call returns a new `Collection<ForeignKey>`, empty when no keys are
+owned by that table. Null names throw `ArgumentNullException`; empty or
+whitespace names throw `ArgumentException`. The query does not mutate a
+`Table` or an existing collection.
+
+The legacy `GetForeignKeys(string)` raw-metadata method is still supported
+and is not obsolete. Its historical direction remains provider-specific:
+SQLite filters the owning table; Access filters the referenced target and
+returns incoming keys. `GetRelationships` inherits that direction and still
+appends to its supplied collection. Replacing an Access incoming-key query
+with the new ownership query changes its meaning. To inspect incoming keys,
+read the full schema and select keys whose `ReferencedTable` matches the
+target; there is no new dedicated incoming-key query in 1.4.0.
+
+### Subclass migration
+
+`DataStoreStructure.GetSchema()` reads each table, queries its owned keys,
+and appends them directly to that table's `ForeignKeys`. It no longer calls
+`GetRelationships`, `GetRelationship`, `SetTablesRelationships`, or
+`GetTableWithRelationships`. Existing overrides of the legacy virtual
+methods still run when explicitly called through those legacy paths, but
+no longer customize normal schema loading.
+
+Use these protected virtual hooks for provider customization:
+
+- `GetForeignKeyMetadataOwnedByTable(string referencingTableName)` selects
+  raw metadata for the owning table. The base implementation delegates to
+  `GetForeignKeys`; the Access override filters `FK_TABLE_NAME`, leaving
+  the legacy `PK_TABLE_NAME` query unchanged.
+- `GetForeignKey(DataRow row)` decodes one metadata row into a `ForeignKey`.
+  Access supplies its own column mapping. Keep provider decoding permissive
+  where metadata allows unnamed constraints; the application factory's
+  validation is not a replacement for provider decoding.
+
+There is no new attachment hook mirroring `GetTableWithRelationships`.
+Subclasses needing custom attachment can override `GetSchema()` or adjust
+its returned tables explicitly. Avoid populating the same keys twice.
+
+### Implementation responsibilities
+
+`DataDefinition` retains its file/schema utility APIs. `DataStoreStructure`
+coordinates schema reading, and `OleDbSchema` handles Access metadata.
+Internal `TableSet` shares dependency and table ordering behind the existing
+public forwarding methods; it adds no new public API or ordering policy.
+Internal `ArgumentGuard` centralizes framework-specific null checks.
+Exception types and parameter names are preserved; redundant custom null
+messages now use framework defaults. Methods intentionally accepting null
+retain that behavior.
+
+Type parsing, SQL statement parsing, and stricter dependency validation
+remain separate post-release review tasks. This release does not change
+cycle handling or add composite-key support.
 
 ## Composite foreign keys
 
@@ -88,6 +148,8 @@ joining identifiers into a string or creating independent foreign keys.
 
 ## Proposed v2 interface decisions
 
+- Remove obsolete `Relationship` and its legacy query/conversion/attachment
+  APIs after callers migrate to `ForeignKey`.
 - Remove the restored obsolete `Table.PrimaryKey` property and
   `DataObjectOleDb(DatabaseType, string)` constructor after callers migrate.
   Their current independent storage and base-constructor behavior remain
@@ -111,8 +173,6 @@ joining identifiers into a string or creating independent foreign keys.
   kept separate from structural validation.
 
 These are v2 design notes, not additional APIs promised in the current
-package. The compatible implementation consolidation retains `Relationship`
-as provider metadata and `ForeignKey` as the table constraint model, with
-shared decoding and conversion in `DataStoreStructure`. Both public models
-remain available; unifying their interfaces belongs to v2. See the library
-README's implementation responsibilities for current ownership.
+package. The 1.4.0 schema path uses `ForeignKey` directly; `Relationship` and
+its legacy APIs remain available with obsolete warnings for compatibility.
+Removing those APIs belongs to a major release.

@@ -1,38 +1,33 @@
 ## Immediate — before 1.4.0
 
-1. Introduce an internal `TableSet` class (working name) to own shared
-   table-collection functionality currently duplicated in `DataDefinition`
-   and `DataStoreStructure`.
-   - Inventory the overlap and confirm the class boundary before coding.
-     Focus on operations on table collections, such as dependency ordering
-     and collection manipulation, where duplication is confirmed.
-   - Add characterization tests for meaningful differences in ordering,
-     null handling, exceptions, and existing extension points.
-   - Extract one responsibility at a time. Preserve published public and
-     protected APIs through forwarding methods where needed. Keep schema
-     workflows in `DataDefinition` and provider metadata reading in
-     `DataStoreStructure` / `OleDbSchema`. Avoid new dependency cycles.
-   - Keep `TableSet` internal for 1.4.0. Revisit the name if the confirmed
-     responsibility is narrower than a set of tables. Validate each step
-     and keep it suitable for a small, independent commit.
-2. Review the planned exception-throwing encapsulation. Preserve existing
-   exception types, parameter names, and behavior in this minor release.
-3. Decide what stays in the README and update migration guidance and the
-   changelog for the ownership query, deprecated APIs, and the legacy
-   hooks no longer invoked by `GetSchema()`.
-4. Update `DatabaseLibraryNet/DigitalZenWorks.Database.ToolKit.csproj`:
+1. Update `DatabaseLibraryNet/DigitalZenWorks.Database.ToolKit.csproj`:
    set `Version` to `1.4.0` and `FileVersion` to `1.4.0.0`. Keep
    `AssemblyVersion` at `1.0.0.0` and the package compatibility baseline
    at published `1.3.62` through this release.
-5. Run final SQLite and Access tests, export/schema regressions, and
+2. Run final SQLite and Access tests, export/schema regressions, and
    Release package/API compatibility checks across all eight frameworks.
-6. Commit the reviewed release changes and create an annotated Git tag
+3. Optional, if it remains a small change: add PackageClients as a root
+   DevelopmentTools submodule at `SourceCode/PackageClients`. Review its
+   nested dependencies and commit the intended PackageClients changes
+   first. Keep solution integration and a Database.ToolKit package consumer
+   separate. This is not a 1.4.0 release requirement; defer until after the
+   release if preparation or integration would distract from release work.
+4. Commit the reviewed release changes and create an annotated Git tag
    `1.4.0` on the validated release commit, following existing tag naming.
-7. Push the release tag and publish the reviewed 1.4.0 NuGet package and
+5. Push the release tag and publish the reviewed 1.4.0 NuGet package and
    release artifacts.
 
 ## Completed for 1.4.0
 
+- README usage guidance, the existing terminology/migration guide, and
+  the 1.4.0 changelog now cover ownership queries, legacy deprecations,
+  schema extension-point migration, and the internal refactors.
+
+- Internal `TableSet` dependency and table ordering extraction is complete,
+  with characterization tests and published forwarding APIs preserved.
+- Internal `ArgumentGuard`, focused tests, and caller migration are
+  complete. Null-check exception types, parameter names, and intentional
+  null acceptance are preserved; redundant custom null messages removed.
 - Initial review of `overlap-refactor`: current concerns are addressed.
 - Compatible `Relationship` retirement: the ForeignKey path, legacy
   deprecations, regression coverage, and expected-warning cleanup are
@@ -69,7 +64,7 @@
 
 After 1.4.0: consider a further review of `overlap-refactor` if warranted.
 
-Version 2	Resolve	DataDefinition / DataStoreStructure public API redesign; internal TableSet extraction is planned for 1.4.0.
+Version 2	Resolve	DataDefinition / DataStoreStructure public API redesign; internal TableSet ordering extraction is complete for 1.4.0.
 Version 2	Resolve	DataStorage / DataObjectsBase / DatabaseConnection
 
 Create Bash Build Script
