@@ -76,14 +76,7 @@ public class DataStorageOleDb(string connectionString)
 	public static OleDbParameterCollection AddParameters(
 		OleDbCommand command, IDictionary<string, object> values)
 	{
-#if NET6_0_OR_GREATER
-		ArgumentNullException.ThrowIfNull(command);
-#else
-		if (command == null)
-		{
-			throw new ArgumentNullException(nameof(command));
-		}
-#endif
+		ArgumentGuard.ThrowIfNull(command, nameof(command));
 
 		OleDbParameterCollection parameters = command.Parameters;
 

@@ -247,10 +247,7 @@ public class ForeignKey
 
 	private static void ValidateIdentifier(string value, string parameterName)
 	{
-		if (value == null)
-		{
-			throw new ArgumentNullException(parameterName);
-		}
+		ArgumentGuard.ThrowIfNull(value, parameterName);
 
 		if (string.IsNullOrWhiteSpace(value))
 		{

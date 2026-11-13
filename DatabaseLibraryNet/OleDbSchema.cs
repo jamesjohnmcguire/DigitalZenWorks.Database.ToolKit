@@ -132,14 +132,7 @@ public class OleDbSchema : DataStoreStructure
 	/// column metadata for the table.</exception>
 	public override Table GetTable(string tableName)
 	{
-#if NET6_0_OR_GREATER
-		ArgumentNullException.ThrowIfNull(tableName);
-#else
-		if (tableName == null)
-		{
-			throw new ArgumentNullException(nameof(tableName));
-		}
-#endif
+		ArgumentGuard.ThrowIfNull(tableName, nameof(tableName));
 		primaryKeyNames = GetPrimaryKeyNames(tableName);
 
 		HashSet<string> autoIncrementColumnNames =
@@ -274,14 +267,7 @@ public class OleDbSchema : DataStoreStructure
 	/// <exception cref="ArgumentNullException">The row is null.</exception>
 	protected override ForeignKey GetForeignKey(DataRow row)
 	{
-#if NET6_0_OR_GREATER
-		ArgumentNullException.ThrowIfNull(row);
-#else
-		if (row == null)
-		{
-			throw new ArgumentNullException(nameof(row));
-		}
-#endif
+		ArgumentGuard.ThrowIfNull(row, nameof(row));
 
 		// Provider metadata may contain unnamed or incomplete constraints.
 		ForeignKey key = new(
@@ -418,14 +404,7 @@ public class OleDbSchema : DataStoreStructure
 	{
 		bool isPrimaryKey = false;
 
-#if NET6_0_OR_GREATER
-		ArgumentNullException.ThrowIfNull(column);
-#else
-		if (column == null)
-		{
-			throw new ArgumentNullException(nameof(column));
-		}
-#endif
+		ArgumentGuard.ThrowIfNull(column, nameof(column));
 
 		if (column.Table.Columns.Contains("COLUMN_NAME"))
 		{

@@ -129,14 +129,7 @@ public class DataStoreStructure : IDisposable
 	public static IReadOnlyList<string> GetSqlQueryStatements(
 		string queriesText)
 	{
-#if NET6_0_OR_GREATER
-		ArgumentNullException.ThrowIfNull(queriesText);
-#else
-		if (queriesText == null)
-		{
-			throw new ArgumentNullException(nameof(queriesText));
-		}
-#endif
+		ArgumentGuard.ThrowIfNull(queriesText, nameof(queriesText));
 
 		char[] separator = [';'];
 		string[] splitQueries = queriesText.Split(
@@ -163,14 +156,7 @@ public class DataStoreStructure : IDisposable
 	/// "TABLE_NAME" column of the provided <see cref="DataRow"/>.</returns>
 	public static string GetTableName(DataRow row)
 	{
-#if NET6_0_OR_GREATER
-		ArgumentNullException.ThrowIfNull(row);
-#else
-		if (row == null)
-		{
-			throw new ArgumentNullException(nameof(row));
-		}
-#endif
+		ArgumentGuard.ThrowIfNull(row, nameof(row));
 
 		object nameRaw = row["TABLE_NAME"];
 		string tableName = nameRaw.ToString();
@@ -211,12 +197,7 @@ public class DataStoreStructure : IDisposable
 	public static Table SetForeignKeys(
 		Table table, Collection<Relationship> relationships)
 	{
-		if (table == null)
-		{
-			throw new ArgumentNullException(
-				nameof(table),
-				"Table cannot be null");
-		}
+		ArgumentGuard.ThrowIfNull(table, nameof(table));
 
 		if (relationships != null)
 		{
@@ -341,14 +322,8 @@ public class DataStoreStructure : IDisposable
 	public Collection<ForeignKey> GetForeignKeysOwnedByTable(
 		string referencingTableName)
 	{
-#if NET6_0_OR_GREATER
-		ArgumentNullException.ThrowIfNull(referencingTableName);
-#else
-		if (referencingTableName == null)
-		{
-			throw new ArgumentNullException(nameof(referencingTableName));
-		}
-#endif
+		ArgumentGuard.ThrowIfNull(
+			referencingTableName, nameof(referencingTableName));
 
 		if (string.IsNullOrWhiteSpace(referencingTableName))
 		{
@@ -524,25 +499,18 @@ public class DataStoreStructure : IDisposable
 	{
 		ForeignKey foreignKey;
 
-		if (relationship == null)
-		{
-			throw new ArgumentNullException(
-				nameof(relationship),
-				"Relationship cannot be null");
-		}
-		else
-		{
-			// Preserve permissive metadata handling for existing providers.
-			// The public Create factory validates new application definitions.
-			foreignKey = new(
-				relationship.Name,
-				relationship.ReferencingTable,
-				relationship.ReferencingColumn,
-				relationship.ReferencedTable,
-				relationship.ReferencedColumn,
-				relationship.OnDeleteAction,
-				relationship.OnUpdateAction);
-		}
+		ArgumentGuard.ThrowIfNull(relationship, nameof(relationship));
+
+		// Preserve permissive metadata handling for existing providers.
+		// The public Create factory validates new application definitions.
+		foreignKey = new(
+			relationship.Name,
+			relationship.ReferencingTable,
+			relationship.ReferencingColumn,
+			relationship.ReferencedTable,
+			relationship.ReferencedColumn,
+			relationship.OnDeleteAction,
+			relationship.OnUpdateAction);
 
 		return foreignKey;
 	}
@@ -563,12 +531,7 @@ public class DataStoreStructure : IDisposable
 	protected static Collection<Table> GetTables(
 		Dictionary<string, Table> tableDictionary)
 	{
-		if (tableDictionary == null)
-		{
-			throw new ArgumentNullException(
-				nameof(tableDictionary),
-				"Table dictionary cannot be null");
-		}
+		ArgumentGuard.ThrowIfNull(tableDictionary, nameof(tableDictionary));
 
 		Dictionary<string, Table>.ValueCollection values =
 			tableDictionary.Values;
@@ -610,15 +573,7 @@ public class DataStoreStructure : IDisposable
 	{
 		int length = 0;
 
-#if NET6_0_OR_GREATER
-		ArgumentNullException.ThrowIfNull(row);
-#else
-		if (row == null)
-		{
-			string name = nameof(row);
-			throw new ArgumentNullException(name);
-		}
-#endif
+		ArgumentGuard.ThrowIfNull(row, nameof(row));
 
 		bool test = row.IsNull("CHARACTER_MAXIMUM_LENGTH");
 
@@ -725,14 +680,7 @@ public class DataStoreStructure : IDisposable
 	/// <exception cref="ArgumentNullException">The row is null.</exception>
 	protected virtual ForeignKey GetForeignKey(DataRow row)
 	{
-#if NET6_0_OR_GREATER
-		ArgumentNullException.ThrowIfNull(row);
-#else
-		if (row == null)
-		{
-			throw new ArgumentNullException(nameof(row));
-		}
-#endif
+		ArgumentGuard.ThrowIfNull(row, nameof(row));
 
 		// Provider metadata may contain unnamed or incomplete constraints.
 		ForeignKey key = new(
@@ -798,14 +746,7 @@ public class DataStoreStructure : IDisposable
 	[Obsolete("Use GetForeignKey instead.")]
 	protected virtual Relationship GetRelationship(DataRow foreignKey)
 	{
-#if NET6_0_OR_GREATER
-		ArgumentNullException.ThrowIfNull(foreignKey);
-#else
-		if (foreignKey == null)
-		{
-			throw new ArgumentNullException(nameof(foreignKey));
-		}
-#endif
+		ArgumentGuard.ThrowIfNull(foreignKey, nameof(foreignKey));
 
 		Relationship relationship = new();
 
@@ -874,15 +815,10 @@ public class DataStoreStructure : IDisposable
 	{
 		Table table;
 
-		if (row == null)
-		{
-			throw new ArgumentNullException(nameof(row));
-		}
-		else
-		{
-			string tableName = GetTableName(row);
-			table = GetTable(tableName);
-		}
+		ArgumentGuard.ThrowIfNull(row, nameof(row));
+
+		string tableName = GetTableName(row);
+		table = GetTable(tableName);
 
 		return table;
 	}
@@ -942,14 +878,7 @@ public class DataStoreStructure : IDisposable
 	{
 		bool isPrimaryKey = false;
 
-#if NET6_0_OR_GREATER
-		ArgumentNullException.ThrowIfNull(column);
-#else
-		if (column == null)
-		{
-			throw new ArgumentNullException(nameof(column));
-		}
-#endif
+		ArgumentGuard.ThrowIfNull(column, nameof(column));
 
 		if (column.Table.Columns.Contains("PRIMARY_KEY"))
 		{
@@ -988,12 +917,7 @@ public class DataStoreStructure : IDisposable
 		Dictionary<string, Table> tableDictionary,
 		Collection<Relationship> relationships)
 	{
-		if (tableDictionary == null)
-		{
-			throw new ArgumentNullException(
-				nameof(tableDictionary),
-				"Table dictionary cannot be null");
-		}
+		ArgumentGuard.ThrowIfNull(tableDictionary, nameof(tableDictionary));
 
 		if (relationships != null)
 		{

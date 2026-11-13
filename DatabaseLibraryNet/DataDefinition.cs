@@ -36,15 +36,7 @@ public static class DataDefinition
 	{
 		bool result = false;
 
-#if NET6_0_OR_GREATER
-		ArgumentNullException.ThrowIfNull(database);
-#else
-		if (database == null)
-		{
-			string name = nameof(database);
-			throw new ArgumentNullException(name);
-		}
-#endif
+		ArgumentGuard.ThrowIfNull(database, nameof(database));
 
 		if (queries != null)
 		{

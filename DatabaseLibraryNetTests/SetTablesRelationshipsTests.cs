@@ -73,7 +73,8 @@ internal sealed class SetTablesRelationshipsTests
 			() => schema.ApplyLegacyRelationships(null, null));
 		Assert.That(exception.ParamName, Is.EqualTo("tableDictionary"));
 		Assert.That(
-			exception.Message, Does.Contain("Table dictionary cannot be null"));
+			exception.Message,
+			Is.EqualTo(new ArgumentNullException("tableDictionary").Message));
 	}
 
 	/// <summary>

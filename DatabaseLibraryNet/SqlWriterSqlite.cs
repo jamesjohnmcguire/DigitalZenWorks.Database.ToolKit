@@ -34,15 +34,7 @@ public class SqlWriterSqlite : SqlWriter
 	public override string GetTableCreateStatement(
 		Table table, bool isLast = false)
 	{
-#if NET6_0_OR_GREATER
-		ArgumentNullException.ThrowIfNull(table);
-#else
-		if (table == null)
-		{
-			string name = nameof(table);
-			throw new ArgumentNullException(name);
-		}
-#endif
+		ArgumentGuard.ThrowIfNull(table, nameof(table));
 
 		SortedList<int, Column> columns = GetOrdinalSortedColumns(table);
 		List<Column> primaryColumns = [];
@@ -124,15 +116,7 @@ public class SqlWriterSqlite : SqlWriter
 	/// column.</returns>
 	protected override string GetColumnTypeText(Column column)
 	{
-#if NET6_0_OR_GREATER
-		System.ArgumentNullException.ThrowIfNull(column);
-#else
-		if (column == null)
-		{
-			string name = nameof(column);
-			throw new System.ArgumentNullException(name);
-		}
-#endif
+		ArgumentGuard.ThrowIfNull(column, nameof(column));
 
 		string columnType = column.ColumnType switch
 		{
@@ -238,15 +222,7 @@ public class SqlWriterSqlite : SqlWriter
 	protected override string GetForeignKeySql(
 		ForeignKey foreignKey, bool isLast)
 	{
-#if NET6_0_OR_GREATER
-		ArgumentNullException.ThrowIfNull(foreignKey);
-#else
-		if (foreignKey == null)
-		{
-			string name = nameof(foreignKey);
-			throw new ArgumentNullException(name);
-		}
-#endif
+		ArgumentGuard.ThrowIfNull(foreignKey, nameof(foreignKey));
 
 		string keyName = QuoteIdentifier(foreignKey.Name);
 		string referencingColumn =
