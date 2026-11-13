@@ -762,6 +762,28 @@ public class DataStorage : IDataStorage
 	}
 
 	/// <summary>
+	/// Adds command parameters from a name/value dictionary.
+	/// </summary>
+	/// <param name="command">The command that receives the parameters.</param>
+	/// <param name="values">The parameter names and values to add.</param>
+	/// <returns>The updated parameter collection.</returns>
+	internal static DbParameterCollection AddParameters(
+		DbCommand command, IDictionary<string, object> values)
+	{
+		DbParameterCollection parameters = command.Parameters;
+
+		foreach (KeyValuePair<string, object> valuePair in values)
+		{
+			DbParameter parameter = command.CreateParameter();
+			parameter.ParameterName = valuePair.Key;
+			parameter.Value = valuePair.Value ?? DBNull.Value;
+			parameters.Add(parameter);
+		}
+
+		return parameters;
+	}
+
+	/// <summary>
 	/// Dispose.
 	/// </summary>
 	/// <param name="disposing">Indicates whether it is
@@ -966,47 +988,6 @@ public class DataStorage : IDataStorage
 		string result = TextCase.ConvertToPascalCaseFromKnr(columnName);
 
 		return result;
-	}
-
-	/// <summary>
-	/// Adds command parameters from a name/value dictionary.
-	/// </summary>
-	/// <param name="command">The command that receives the parameters.</param>
-	/// <param name="values">The parameter names and values to add.</param>
-	/// <returns>The updated parameter collection.</returns>
-	private DbParameterCollection AddParameters(
-		DbCommand command, IDictionary<string, object> values)
-	{
-		DbParameterCollection parameters = command.Parameters;
-
-		foreach (KeyValuePair<string, object> valuePair in values)
-		{
-			if (valuePair.Value == null)
-			{
-				parameters.Add(DBNull.Value);
-			}
-			else
-			{
-				// DbParameter is abstract, so we have to create one of the
-				// specific types below.
-				string keyPairName = valuePair.Key;
-				object keyPairValue = valuePair.Value;
-
-				if (databaseType == DatabaseType.SQLite)
-				{
-					SQLiteParameter parameter =
-						new(DbType.String, keyPairValue);
-					parameter.ParameterName = keyPairName;
-					parameters.Add(parameter);
-				}
-				else
-				{
-					parameters.Add(keyPairValue);
-				}
-			}
-		}
-
-		return parameters;
 	}
 
 	/// <summary>

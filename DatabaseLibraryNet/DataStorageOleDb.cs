@@ -70,6 +70,11 @@ public class DataStorageOleDb(string connectionString)
 	/// <summary>
 	/// Adds parameters to the command.
 	/// </summary>
+	/// <remarks>OLE DB binds question-mark placeholders by position.
+	/// Values are added in the supplied dictionary's iteration order, which
+	/// must match placeholder order. Names do not control binding order;
+	/// use a dictionary implementation with a guaranteed iteration order.
+	/// </remarks>
 	/// <param name="command">The command to use.</param>
 	/// <param name="values">The list of values.</param>
 	/// <returns>An updated collection of values.</returns>
