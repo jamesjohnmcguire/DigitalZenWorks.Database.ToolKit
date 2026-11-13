@@ -35,7 +35,7 @@ IF NOT "%buildExitCode%"=="0" SET "message=Problem Running: gh workflow run dotn
 IF NOT "%buildExitCode%"=="0" GOTO error
 
 ECHO Workflow requested. GitHub will build, test, and publish the package.
-ECHO Use gh run watch from the Utilities repository to follow its progress.
+ECHO Use gh run watch from the Database.ToolKit repository to follow its progress.
 GOTO :EOF
 
 :error
