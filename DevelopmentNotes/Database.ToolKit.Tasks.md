@@ -1,24 +1,21 @@
 ## Immediate — before 1.4.0
 
-1. Version bump deferred at user request. When requested, update
-   `DatabaseLibraryNet/DigitalZenWorks.Database.ToolKit.csproj`:
-   set `Version` to `1.4.0` and `FileVersion` to `1.4.0.0`. Keep
-   `AssemblyVersion` at `1.0.0.0` and the package compatibility baseline
-   at published `1.3.62` through this release.
-2. Run final SQLite and Access tests, export/schema regressions, and
-   Release package/API compatibility checks across all eight frameworks.
-3. Optional, if it remains a small change: add PackageClients as a root
-   DevelopmentTools submodule at `SourceCode/PackageClients`. Review its
-   nested dependencies and commit the intended PackageClients changes
-   first. Keep solution integration and a Database.ToolKit package consumer
-   separate. This is not a 1.4.0 release requirement; defer until after the
-   release if preparation or integration would distract from release work.
-4. Commit the reviewed release changes and create an annotated Git tag
+1. Commit the reviewed release changes and create an annotated Git tag
    `1.4.0` on the validated release commit, following existing tag naming.
-5. Push the release tag and publish the reviewed 1.4.0 NuGet package and
+2. Push the release tag and publish the reviewed 1.4.0 NuGet package and
    release artifacts.
 
 ## Completed for 1.4.0
+
+- Final candidate checks passed on 2026-11-13 against `24a493b`: all 291
+  tests passed with none skipped, including Access/SQLite and export/schema
+  regressions. Release/package API validation passed across all eight
+  frameworks against published `1.3.62` (18 existing warnings, zero errors).
+  The generated `1.4.0` package contains all eight assemblies with file
+  version `1.4.0.0` and assembly version `1.0.0.0`, plus its README.
+
+- Version bump committed: package `1.4.0`, file version `1.4.0.0`,
+  assembly version `1.0.0.0`; compatibility baseline remains `1.3.62`.
 
 - README and API XML comments document trusted SQL text versus bound data,
   named/positional parameters, raw-fragment APIs, and unparameterized legacy
@@ -94,6 +91,9 @@
   Any stricter validation or new sorting policy is a behavior change.
 
 ## Later / backlog
+
+- PackageClients submodule and consumer integration are deferred at user
+  request; revisit separately after the release.
 
 After 1.4.0: consider a further review of `overlap-refactor` if warranted.
 
