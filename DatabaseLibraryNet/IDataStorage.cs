@@ -42,27 +42,21 @@ public interface IDataStorage : IDisposable
 	public DbConnection Connection { get; }
 
 	/// <summary>
-	/// Converts a data table to a list.
+	/// This opens a connection and begins the transaction.
 	/// </summary>
-	/// <typeparam name="TItem">The type of item.</typeparam>
-	/// <param name="dataTable">The data table to convert.</param>
-	/// <returns>Returns a list of items from the data table.</returns>
-	public Collection<TItem> ConvertDataTable<TItem>(DataTable dataTable);
+	public void BeginTransaction();
+
+	/// <summary>
+	/// Checks to see if the database can return a valid query. Helper
+	/// function for unit tests.
+	/// </summary>
+	/// <returns>true if connection is open, false otherwise.</returns>
+	public bool CanQuery();
 
 	/// <summary>
 	/// Closes the database connection and object.
 	/// </summary>
 	public void Close();
-
-	/// <summary>
-	/// Shut down the database.
-	/// </summary>
-	public void Shutdown();
-
-	/// <summary>
-	/// This opens a connection and begins the transaction.
-	/// </summary>
-	public void BeginTransaction();
 
 	/// <summary>
 	/// This closes the transaction.
@@ -75,16 +69,12 @@ public interface IDataStorage : IDisposable
 	public void CommitTransaction();
 
 	/// <summary>
-	/// This rolls back the transaction.
+	/// Converts a data table to a list.
 	/// </summary>
-	public void RollbackTransaction();
-
-	/// <summary>
-	/// Checks to see if the database can return a valid query. Helper
-	/// function for unit tests.
-	/// </summary>
-	/// <returns>true if connection is open, false otherwise.</returns>
-	public bool CanQuery();
+	/// <typeparam name="TItem">The type of item.</typeparam>
+	/// <param name="dataTable">The data table to convert.</param>
+	/// <returns>Returns a list of items from the data table.</returns>
+	public Collection<TItem> ConvertDataTable<TItem>(DataTable dataTable);
 
 	/// <summary>
 	/// Performs an SQL DELETE command.
@@ -205,6 +195,16 @@ public interface IDataStorage : IDisposable
 	/// </summary>
 	/// <returns>A values indicating success or not.</returns>
 	public bool Open();
+
+	/// <summary>
+	/// This rolls back the transaction.
+	/// </summary>
+	public void RollbackTransaction();
+
+	/// <summary>
+	/// Shut down the database.
+	/// </summary>
+	public void Shutdown();
 
 	/// <summary>
 	/// Performs an Sql UPDATE command.
