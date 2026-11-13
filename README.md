@@ -72,6 +72,51 @@ See [migration and v2 preparation](https://github.com/jamesjohnmcguire/DigitalZe
 for legacy API mappings, subclass migration, alias meanings, and the
 composite-key design notes.
 
+## SQL text and parameter values
+
+SQL text passed to `DataStorage`, `IDataStorage`, or `DatabaseConnection`
+must come from trusted application code. These APIs execute the supplied
+SQL; they do not validate or sanitize its contents. Pass external data as
+parameters instead of concatenating or interpolating it into SQL. Supplying
+parameters does not protect values already embedded in the command text.
+
+For SQLite, SQL Server, or MySQL, use a parameterized `DataStorage` overload
+with names matching the provider's placeholders:
+
+```csharp
+Dictionary<string, object> values = new()
+{
+    { "@name", suppliedName },
+};
+DataRow row = database.GetDataRow(
+    "SELECT id FROM Customers WHERE name = @name", values);
+```
+
+Values retain their CLR types for provider inference; null becomes SQL NULL
+through `DBNull.Value`. Parameterized overloads are available on
+`ExecuteNonQuery`, `GetDataRow`, `GetDataTable`, `GetDataSet`, `Insert`, and
+`Update`. Methods such as `ExecuteReader(string)` and `GetDataField(string)`
+have no parameter overload; use a suitable parameterized operation when
+external values are involved. Dapper-backed methods taking a parameter
+object bind values separately; `DatabaseConnection.Query<T>(string)` does
+not expose such a parameter argument.
+
+Access/OLE DB uses `?` placeholders and binds values by position. Supply a
+dictionary with a guaranteed iteration order matching the placeholders;
+parameter names do not determine binding order. Do not sort parameters by
+name or rely on the iteration order of an arbitrary `IDictionary`.
+
+Table/column identifiers and WHERE/ORDER BY/LIMIT fragments are SQL syntax,
+not parameter values. Keep fragments under application control; map any
+external identifier choice to an allowlist and quote it for the provider.
+`DataObjectsBase.GetBy` accepts raw fragments. Its legacy `GetByName` and
+`GetIdByName` helpers embed names directly into SQL and do not bind them;
+use a parameterized query for external names or names containing quotes.
+
+CA2100 remains enabled at the raw command assignment pending further
+review. The binding tests verify literal-value handling; they cannot
+establish the safety of SQL constructed by every library consumer.
+
 ## Release API compatibility
 
 Release builds validate the package against published version `1.3.62` on
@@ -119,6 +164,11 @@ will need to migrate or suppress the intentional warnings.
 - Centralize null checks in internal `ArgumentGuard`; replace redundant
   custom null messages with framework defaults, retaining exception types
   and parameter names.
+- Fix command parameter construction for SQLite, SQL Server, and MySQL,
+  preserving names and CLR values and mapping null to `DBNull.Value`.
+- Add parameter-binding regressions, including SQLite literal-value queries
+  and Access positional execution, and document the raw-SQL trust boundary.
+  CA2100 remains unsuppressed.
 - Restore the two-argument `ExportSchema` method for compiled consumers.
 - Restore obsolete `Table.PrimaryKey` and the database-type/path
   `DataObjectOleDb` constructor until v2.

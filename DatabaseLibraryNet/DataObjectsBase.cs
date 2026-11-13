@@ -14,6 +14,10 @@ using System.IO;
 /// <summary>
 /// Base class for database collection classes.
 /// </summary>
+/// <remarks>Legacy query helpers accept trusted SQL identifiers and fragments.
+/// They do not validate, quote, or parameterize these inputs. For external
+/// data values, use parameterized operations on the associated DataStorage.
+/// </remarks>
 public class DataObjectsBase : IDisposable
 {
 	private bool disposed;
@@ -188,8 +192,9 @@ public class DataObjectsBase : IDisposable
 	/// <summary>
 	/// Deletes the record identified by Id.
 	/// </summary>
-	/// <param name="tableName">The name of the table.</param>
-	/// <param name="idColumn">The name of the primay key column.</param>
+	/// <param name="tableName">A trusted SQL table identifier.</param>
+	/// <param name="idColumn">A trusted SQL primary-key column identifier.
+	/// </param>
 	/// <param name="id">The id of item.</param>
 	/// <returns>A value indicating success or not.</returns>
 	public bool Delete(string tableName, string idColumn, int id)
@@ -211,7 +216,7 @@ public class DataObjectsBase : IDisposable
 	/// <summary>
 	/// Returns a DataTable of the table.
 	/// </summary>
-	/// <param name="table">The name of the table.</param>
+	/// <param name="table">A trusted SQL table identifier.</param>
 	/// <returns>A DataTable object.</returns>
 	public DataTable GetAllDataTable(string table)
 	{
@@ -229,8 +234,9 @@ public class DataObjectsBase : IDisposable
 	/// <summary>
 	/// Represents the record identified by the where clause.
 	/// </summary>
-	/// <param name="table">The name of the table.</param>
-	/// <param name="where">The where clause to use.</param>
+	/// <param name="table">A trusted SQL table identifier.</param>
+	/// <param name="where">A trusted SQL fragment without the WHERE keyword.
+	/// This is SQL syntax, not a bound value.</param>
 	/// <returns>A DataRow object.</returns>
 	public DataRow GetBy(string table, string where)
 	{
@@ -250,10 +256,11 @@ public class DataObjectsBase : IDisposable
 	/// <summary>
 	/// Represents the Category record identified by the where clause.
 	/// </summary>
-	/// <param name="tableName">The table name.</param>
-	/// <param name="where">The where clause.</param>
-	/// <param name="orderBy">The order by clause.</param>
-	/// <param name="limit">The limit clause.</param>
+	/// <param name="tableName">A trusted SQL table identifier.</param>
+	/// <param name="where">A trusted SQL fragment without the WHERE keyword.
+	/// This is SQL syntax, not a bound value.</param>
+	/// <param name="orderBy">A trusted SQL fragment without ORDER BY.</param>
+	/// <param name="limit">A trusted SQL fragment without LIMIT.</param>
 	/// <returns>A DataTable Object.</returns>
 	public DataTable GetBy(
 		string tableName, string where, string orderBy, string limit)
@@ -279,8 +286,10 @@ public class DataObjectsBase : IDisposable
 	/// <summary>
 	/// Gets the id of the record identified by the where clause.
 	/// </summary>
-	/// <param name="table">The name of the table.</param>
-	/// <param name="name">The name of item to get.</param>
+	/// <param name="table">A trusted SQL table identifier.</param>
+	/// <param name="name">The name embedded directly into a SQL literal.
+	/// This value is not escaped or parameterized. Use a parameterized query
+	/// for external input or names containing quotes.</param>
 	/// <returns>A DataRow object.</returns>
 	public virtual DataRow GetByName(string table, string name)
 	{
@@ -290,8 +299,10 @@ public class DataObjectsBase : IDisposable
 	/// <summary>
 	/// Gets the id of the record identified by the where clause.
 	/// </summary>
-	/// <param name="table">The name of the table.</param>
-	/// <param name="name">The name of item to get.</param>
+	/// <param name="table">A trusted SQL table identifier.</param>
+	/// <param name="name">The name embedded directly into a SQL literal.
+	/// This value is not escaped or parameterized. Use a parameterized query
+	/// for external input or names containing quotes.</param>
 	/// <returns>The id of the record.</returns>
 	public virtual int GetIdByName(string table, string name)
 	{

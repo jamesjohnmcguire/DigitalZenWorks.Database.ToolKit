@@ -155,8 +155,9 @@ public class DataStorageOleDb(string connectionString)
 	/// Creates a configured command for the current connection and optional
 	/// parameters.
 	/// </summary>
-	/// <param name="sql">The SQL command text.</param>
-	/// <param name="values">The optional command parameter values.</param>
+	/// <param name="sql">Trusted SQL command text.</param>
+	/// <param name="values">Data values in placeholder order; SQL text is
+	/// not validated or sanitized.</param>
 	/// <returns>The configured database command.</returns>
 	protected override DbCommand GetCommandObject(
 		string sql, IDictionary<string, object> values)

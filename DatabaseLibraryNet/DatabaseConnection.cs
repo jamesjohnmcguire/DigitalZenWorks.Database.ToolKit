@@ -19,6 +19,10 @@ using MySql.Data.MySqlClient;
 /// <summary>
 /// The database connection class.
 /// </summary>
+/// <remarks>SQL command text must be trusted application code. Pass external
+/// data separately through parameterized overloads; these APIs do not validate
+/// or sanitize SQL. Parameters bind values, not identifiers or SQL fragments.
+/// </remarks>
 public class DatabaseConnection : IDisposable
 {
 	private readonly string connectionString;
@@ -72,8 +76,8 @@ public class DatabaseConnection : IDisposable
 	/// <summary>
 	/// Execute a SQL statement.
 	/// </summary>
-	/// <param name="statement">The SQL statement to execute.</param>
-	/// <param name="item">The item.</param>
+	/// <param name="statement">Trusted SQL command text.</param>
+	/// <param name="item">The parameter object holding data values.</param>
 	/// <returns>A result indicator.</returns>
 	public int Execute(string statement, object? item)
 	{
@@ -85,8 +89,9 @@ public class DatabaseConnection : IDisposable
 	/// <summary>
 	/// Execute a SQL statement.
 	/// </summary>
-	/// <param name="statement">The SQL statement to execute.</param>
-	/// <param name="parameter">The parameter.</param>
+	/// <param name="statement">Trusted SQL command text.</param>
+	/// <param name="parameter">The parameter object holding data values.
+	/// </param>
 	/// <param name="transaction">The database transaction.</param>
 	/// <returns>A result indicator.</returns>
 	public int Execute(
@@ -102,8 +107,10 @@ public class DatabaseConnection : IDisposable
 	/// <summary>
 	/// Query SQL statment.
 	/// </summary>
+	/// <remarks>This overload has no parameter argument. Do not embed
+	/// external values in the statement.</remarks>
 	/// <typeparam name="T">The type of object to enumerate.</typeparam>
-	/// <param name="statement">The SQL statement to execute.</param>
+	/// <param name="statement">Trusted SQL command text.</param>
 	/// <returns>A list of items.</returns>
 	public IEnumerable<T> Query<T>(
 		string statement)
@@ -117,8 +124,9 @@ public class DatabaseConnection : IDisposable
 	/// Query for single or default from SQL statment.
 	/// </summary>
 	/// <typeparam name="T">The type of object to enumerate.</typeparam>
-	/// <param name="statement">The SQL statement to execute.</param>
-	/// <param name="parameter">The parameter.</param>
+	/// <param name="statement">Trusted SQL command text.</param>
+	/// <param name="parameter">The parameter object holding data values.
+	/// </param>
 	/// <returns>A list of items.</returns>
 	public T? QuerySingleOrDefault<T>(
 		string statement,
@@ -134,8 +142,9 @@ public class DatabaseConnection : IDisposable
 	/// Query for single from SQL statment.
 	/// </summary>
 	/// <typeparam name="T">The type of object to enumerate.</typeparam>
-	/// <param name="statement">The SQL statement to execute.</param>
-	/// <param name="parameter">The parameter.</param>
+	/// <param name="statement">Trusted SQL command text.</param>
+	/// <param name="parameter">The parameter object holding data values.
+	/// </param>
 	/// <param name="transaction">The database transaction.</param>
 	/// <returns>An item.</returns>
 	public T QuerySingle<T>(

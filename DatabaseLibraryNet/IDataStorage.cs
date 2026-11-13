@@ -15,6 +15,10 @@ using System.Data.Common;
 /// <summary>
 /// Database collection interface.
 /// </summary>
+/// <remarks>SQL command text must be trusted application code. Pass external
+/// data separately through parameterized overloads; these APIs do not validate
+/// or sanitize SQL. Parameters bind values, not identifiers or SQL fragments.
+/// </remarks>
 public interface IDataStorage : IDisposable
 {
 	/// <summary>
@@ -79,22 +83,23 @@ public interface IDataStorage : IDisposable
 	/// <summary>
 	/// Performs an SQL DELETE command.
 	/// </summary>
-	/// <param name="sql">The sql statement to execute.</param>
+	/// <param name="sql">Trusted SQL command text.</param>
 	/// <returns>Success / Failure.</returns>
 	public bool Delete(string sql);
 
 	/// <summary>
 	/// Prepares and executes a Non-Query DB Command.
 	/// </summary>
-	/// <param name="sql">The sql statement to execute.</param>
+	/// <param name="sql">Trusted SQL command text.</param>
 	/// <returns>A value indicating success or not.</returns>
 	public bool ExecuteNonQuery(string sql);
 
 	/// <summary>
 	/// Prepares and executes a Non-Query DB Command.
 	/// </summary>
-	/// <param name="sql">The sql statement to execute.</param>
-	/// <param name="values">The values to use in the query.</param>
+	/// <param name="sql">Trusted SQL command text.</param>
+	/// <param name="values">Parameter names and data values, separate from SQL.
+	/// </param>
 	/// <returns>A value indicating success or not.</returns>
 	public bool ExecuteNonQuery(string sql, IDictionary<string, object> values);
 
@@ -102,60 +107,64 @@ public interface IDataStorage : IDisposable
 	/// Execture a data reader.
 	/// </summary>
 	/// <remarks>Caller is responsible for disposing returned
-	/// object.</remarks>
-	/// <param name="statement">the SQL statement to execute.</param>
+	/// object. This overload has no parameter argument; use a parameterized
+	/// operation when external values are involved.</remarks>
+	/// <param name="statement">Trusted SQL command text.</param>
 	/// <returns>A data reader.</returns>
 	public DbDataReader ExecuteReader(string statement);
 
 	/// <summary>
 	/// Gets a single field from a row of data.
 	/// </summary>
-	/// <param name="sql">The sql statement to execute.</param>
+	/// <param name="sql">Trusted SQL command text.</param>
 	/// <returns>the field object.</returns>
 	public object GetDataField(string sql);
 
 	/// <summary>
 	/// Gets a single row of data.
 	/// </summary>
-	/// <param name="sql">The sql statement to execute.</param>
+	/// <param name="sql">Trusted SQL command text.</param>
 	/// <returns>DataRow.</returns>
 	public DataRow GetDataRow(string sql);
 
 	/// <summary>
 	/// Gets a single row of data.
 	/// </summary>
-	/// <param name="sql">The sql statement to execute.</param>
-	/// <param name="values">The values of fields to get.</param>
+	/// <param name="sql">Trusted SQL command text.</param>
+	/// <param name="values">Parameter names and data values, separate from SQL.
+	/// </param>
 	/// <returns>DataRow, null on failure.</returns>
 	public DataRow GetDataRow(string sql, IDictionary<string, object> values);
 
 	/// <summary>
 	/// Gets a DataSet based on the given query.
 	/// </summary>
-	/// <param name="sql">The sql statement to execute.</param>
+	/// <param name="sql">Trusted SQL command text.</param>
 	/// <returns>DataSet or null on failure.</returns>
 	public DataSet GetDataSet(string sql);
 
 	/// <summary>
 	/// Gets a DataSet based on the given query.
 	/// </summary>
-	/// <param name="sql">The sql statement to execute.</param>
-	/// <param name="values">The values to use in the query.</param>
+	/// <param name="sql">Trusted SQL command text.</param>
+	/// <param name="values">Parameter names and data values, separate from SQL.
+	/// </param>
 	/// <returns>DataSet or null on failure.</returns>
 	public DataSet GetDataSet(string sql, IDictionary<string, object> values);
 
 	/// <summary>
 	/// GetDataTable.
 	/// </summary>
-	/// <param name="sql">The sql statement to execute.</param>
+	/// <param name="sql">Trusted SQL command text.</param>
 	/// <returns>number of records retrieved.</returns>
 	public DataTable GetDataTable(string sql);
 
 	/// <summary>
 	/// GetDataTable.
 	/// </summary>
-	/// <param name="sql">The sql statement to execute.</param>
-	/// <param name="values">The values to use in the query.</param>
+	/// <param name="sql">Trusted SQL command text.</param>
+	/// <param name="values">Parameter names and data values, separate from SQL.
+	/// </param>
 	/// <returns>DataTable or null on failure.</returns>
 	public DataTable GetDataTable(
 		string sql, IDictionary<string, object> values);
@@ -171,15 +180,16 @@ public interface IDataStorage : IDisposable
 	/// <summary>
 	/// Performs an Sql UPDATE command.
 	/// </summary>
-	/// <param name="sql">The sql statement to execute.</param>
+	/// <param name="sql">Trusted SQL command text.</param>
 	/// <returns>object item.</returns>
 	public int Insert(string sql);
 
 	/// <summary>
 	/// Performs an Sql UPDATE command.
 	/// </summary>
-	/// <param name="sql">The sql statement to execute.</param>
-	/// <param name="values">The values to use in the query.</param>
+	/// <param name="sql">Trusted SQL command text.</param>
+	/// <param name="values">Parameter names and data values, separate from SQL.
+	/// </param>
 	/// <returns>object item.</returns>
 	public int Insert(string sql, IDictionary<string, object> values);
 
@@ -209,15 +219,16 @@ public interface IDataStorage : IDisposable
 	/// <summary>
 	/// Performs an Sql UPDATE command.
 	/// </summary>
-	/// <param name="sql">The sql statement to execute.</param>
+	/// <param name="sql">Trusted SQL command text.</param>
 	/// <returns>A value indicating success or not.</returns>
 	public bool Update(string sql);
 
 	/// <summary>
 	/// Performs an SQL UPDATE command.
 	/// </summary>
-	/// <param name="sql">The sql statement to execute.</param>
-	/// <param name="values">The values to use in the query.</param>
+	/// <param name="sql">Trusted SQL command text.</param>
+	/// <param name="values">Parameter names and data values, separate from SQL.
+	/// </param>
 	/// <returns>A value indicating success or not.</returns>
 	public bool Update(string sql, IDictionary<string, object> values);
 }
