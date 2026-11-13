@@ -18,6 +18,48 @@ using NUnit.Framework;
 internal sealed class LegacyApiCompatibilityTests
 {
 	/// <summary>
+	/// Legacy relationship operations remain available with migration advice.
+	/// </summary>
+	/// <param name="declaringType">The class declaring the legacy member.</param>
+	/// <param name="methodName">The legacy method name.</param>
+	/// <param name="replacement">The accessible replacement guidance.</param>
+	[TestCase(
+		typeof(DataStoreStructure),
+		"GetForeignKeyRelationships",
+		"ForeignKey.Create")]
+	[TestCase(
+		typeof(DataStoreStructure),
+		"SetForeignKeys",
+		"Table.ForeignKeys")]
+	[TestCase(
+		typeof(DataStoreStructure),
+		"GetForeignKeyRelationship",
+		"ForeignKey.Create")]
+	[TestCase(
+		typeof(DataStoreStructure),
+		"GetRelationship",
+		"GetForeignKey")]
+	[TestCase(
+		typeof(OleDbSchema),
+		"GetRelationship",
+		"GetForeignKey")]
+	public void RelationshipMethodsRemainAvailableWithMigrationGuidance(
+		Type declaringType, string methodName, string replacement)
+	{
+		BindingFlags flags = BindingFlags.Public | BindingFlags.NonPublic |
+			BindingFlags.Static | BindingFlags.Instance |
+			BindingFlags.DeclaredOnly;
+		MethodInfo method = declaringType.GetMethod(methodName, flags);
+		Assert.That(method, Is.Not.Null);
+		ObsoleteAttribute obsolete =
+			method.GetCustomAttribute<ObsoleteAttribute>();
+
+		Assert.That(obsolete, Is.Not.Null);
+		Assert.That(obsolete.IsError, Is.False);
+		Assert.That(obsolete.Message, Does.Contain(replacement));
+	}
+
+	/// <summary>
 	/// The restored property remains independent storage and does not change
 	/// the column flags used by schema writers.
 	/// </summary>

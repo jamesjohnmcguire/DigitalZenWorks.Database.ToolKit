@@ -509,6 +509,7 @@ internal sealed class SetTablesRelationshipsTests
 		}
 
 		/// <inheritdoc/>
+		[Obsolete("Use GetForeignKey instead.")]
 		protected override Relationship GetRelationship(DataRow foreignKey)
 		{
 			LegacyDecodingCalls++;

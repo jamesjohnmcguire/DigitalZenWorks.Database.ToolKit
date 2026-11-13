@@ -81,6 +81,7 @@ public class DataStoreStructure : IDisposable
 	/// </summary>
 	/// <param name="relationships">A set of relationships.</param>
 	/// <returns>The foreign key relationships.</returns>
+	[Obsolete("Create ForeignKey objects directly with ForeignKey.Create.")]
 	public static ForeignKey[] GetForeignKeyRelationships(
 		Relationship[] relationships)
 	{
@@ -260,6 +261,7 @@ public class DataStoreStructure : IDisposable
 	/// Cannot be null.</param>
 	/// <returns>The table instance with its foreign keys updated to
 	/// reflect the specified relationships.</returns>
+	[Obsolete("Populate Table.ForeignKeys with ForeignKey objects instead.")]
 	public static Table SetForeignKeys(
 		Table table, Collection<Relationship> relationships)
 	{
@@ -570,6 +572,7 @@ public class DataStoreStructure : IDisposable
 	/// <returns>A <see cref="ForeignKey"/> instance initialized with the
 	/// properties of the specified <paramref name="relationship"/>.
 	/// </returns>
+	[Obsolete("For new definitions, use ForeignKey.Create.")]
 	protected static ForeignKey GetForeignKeyRelationship(
 		Relationship relationship)
 	{
@@ -846,6 +849,7 @@ public class DataStoreStructure : IDisposable
 	/// <returns>A <see cref="Relationship"/> instance populated with
 	/// information about the foreign key relationship, including
 	/// table and column names, and cascade rules.</returns>
+	[Obsolete("Use GetForeignKey instead.")]
 	protected virtual Relationship GetRelationship(DataRow foreignKey)
 	{
 #if NET6_0_OR_GREATER

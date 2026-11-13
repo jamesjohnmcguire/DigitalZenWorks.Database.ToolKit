@@ -343,6 +343,7 @@ public class OleDbSchema : DataStoreStructure
 	/// <returns>A <see cref="Relationship"/> instance populated with
 	/// information about the foreign key relationship, including
 	/// table and column names, and cascade rules.</returns>
+	[Obsolete("Use GetForeignKey instead.")]
 	protected override Relationship GetRelationship(DataRow foreignKey)
 	{
 		Relationship relationship = new();
