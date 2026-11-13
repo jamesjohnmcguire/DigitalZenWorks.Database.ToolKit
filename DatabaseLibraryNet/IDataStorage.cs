@@ -47,8 +47,7 @@ public interface IDataStorage : IDisposable
 	/// <typeparam name="TItem">The type of item.</typeparam>
 	/// <param name="dataTable">The data table to convert.</param>
 	/// <returns>Returns a list of items from the data table.</returns>
-	public Collection<TItem> ConvertDataTable<TItem>(
-		DataTable dataTable);
+	public Collection<TItem> ConvertDataTable<TItem>(DataTable dataTable);
 
 	/// <summary>
 	/// Closes the database connection and object.
@@ -107,8 +106,7 @@ public interface IDataStorage : IDisposable
 	/// <param name="sql">The sql statement to execute.</param>
 	/// <param name="values">The values to use in the query.</param>
 	/// <returns>A value indicating success or not.</returns>
-	public bool ExecuteNonQuery(
-		string sql, IDictionary<string, object> values);
+	public bool ExecuteNonQuery(string sql, IDictionary<string, object> values);
 
 	/// <summary>
 	/// Execture a data reader.
@@ -139,8 +137,7 @@ public interface IDataStorage : IDisposable
 	/// <param name="sql">The sql statement to execute.</param>
 	/// <param name="values">The values of fields to get.</param>
 	/// <returns>DataRow, null on failure.</returns>
-	public DataRow GetDataRow(
-		string sql, IDictionary<string, object> values);
+	public DataRow GetDataRow(string sql, IDictionary<string, object> values);
 
 	/// <summary>
 	/// Gets a DataSet based on the given query.
@@ -155,8 +152,7 @@ public interface IDataStorage : IDisposable
 	/// <param name="sql">The sql statement to execute.</param>
 	/// <param name="values">The values to use in the query.</param>
 	/// <returns>DataSet or null on failure.</returns>
-	public DataSet GetDataSet(
-		string sql, IDictionary<string, object> values);
+	public DataSet GetDataSet(string sql, IDictionary<string, object> values);
 
 	/// <summary>
 	/// GetDataTable.
