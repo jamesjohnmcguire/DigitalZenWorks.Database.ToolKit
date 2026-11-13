@@ -47,13 +47,13 @@ public interface IDataStorage : IDisposable
 	/// <typeparam name="TItem">The type of item.</typeparam>
 	/// <param name="dataTable">The data table to convert.</param>
 	/// <returns>Returns a list of items from the data table.</returns>
-	Collection<TItem> ConvertDataTable<TItem>(
+	public Collection<TItem> ConvertDataTable<TItem>(
 		DataTable dataTable);
 
 	/// <summary>
 	/// Closes the database connection and object.
 	/// </summary>
-	void Close();
+	public void Close();
 
 	/// <summary>
 	/// Shut down the database.
