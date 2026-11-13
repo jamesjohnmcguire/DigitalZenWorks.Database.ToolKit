@@ -189,6 +189,7 @@ internal sealed class DataStoreStructureTests : BaseTestsSupport
 	/// <summary>
 	/// Get relationships test.
 	/// </summary>
+#pragma warning disable CS0618 // Verify the legacy relationship query.
 	[Test]
 	public void GetRelationships()
 	{
@@ -217,6 +218,7 @@ internal sealed class DataStoreStructureTests : BaseTestsSupport
 		Assert.That(relationship.ReferencedTable, Is.EqualTo("Makers"));
 		Assert.That(relationship.ReferencedColumn, Is.EqualTo("id"));
 	}
+#pragma warning restore CS0618
 
 	/// <summary>
 	/// Get schema test.

@@ -10,6 +10,8 @@ using System.Collections.ObjectModel;
 using System.Reflection;
 using NUnit.Framework;
 
+#pragma warning disable CS0618 // Intentionally test retained obsolete APIs.
+
 /// <summary>
 /// Verifies explicit relationship roles and the existing public API contract.
 /// </summary>
@@ -168,7 +170,6 @@ internal sealed class RelationshipTerminologyTests
 	[Test]
 	public void ShortConstructorIsObsoleteWithoutChangingAssignments()
 	{
-#pragma warning disable CS0618 // Verify the legacy compatibility contract.
 		ForeignKey key = new(
 			name: "FK_Orders_Products",
 			columnName: "productId",
@@ -176,7 +177,6 @@ internal sealed class RelationshipTerminologyTests
 			parentTableColumn: "id",
 			onDeleteAction: ConstraintAction.SetNull,
 			onUpdateAction: ConstraintAction.Cascade);
-#pragma warning restore CS0618
 
 		Assert.That(key.ChildColumn, Is.EqualTo("productId"));
 		Assert.That(key.ParentTable, Is.EqualTo("Products"));
@@ -275,3 +275,5 @@ internal sealed class RelationshipTerminologyTests
 		Assert.That(ordered[1], Is.SameAs(child));
 	}
 }
+
+#pragma warning restore CS0618
