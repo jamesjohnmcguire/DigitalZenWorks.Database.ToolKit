@@ -483,6 +483,13 @@ public class DataStoreStructure : IDisposable
 	/// <param name="tableName">The table name.</param>
 	/// <param name="relationships">A list of relationships.</param>
 	/// <returns>An updated list of relationships.</returns>
+	/// <remarks>This legacy method appends to the supplied collection.
+	/// Query direction follows the provider: Access returns keys that
+	/// reference the supplied table. GetForeignKeysOwnedByTable returns
+	/// keys owned by the supplied table consistently across providers.
+	/// </remarks>
+	[Obsolete("For foreign keys owned by a table, use " +
+		"GetForeignKeysOwnedByTable instead.")]
 	public Collection<Relationship> GetRelationships(
 		string tableName, Collection<Relationship> relationships)
 	{
