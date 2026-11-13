@@ -41,15 +41,7 @@ public class SqlWriterOleDb : SqlWriter
 	public override string GetTableCreateStatement(
 		Table table, bool isLast = false)
 	{
-#if NET6_0_OR_GREATER
-		ArgumentNullException.ThrowIfNull(table);
-#else
-		if (table == null)
-		{
-			string name = nameof(table);
-			throw new ArgumentNullException(name);
-		}
-#endif
+		ArgumentGuard.ThrowIfNull(table, nameof(table));
 
 		Collection<ForeignKey> foreignKeys = table.ForeignKeys;
 
@@ -128,15 +120,7 @@ public class SqlWriterOleDb : SqlWriter
 	/// formatted for inclusion in a CREATE TABLE statement.</returns>
 	protected override string GetColumnSql(Column column, bool isLast)
 	{
-#if NET6_0_OR_GREATER
-		ArgumentNullException.ThrowIfNull(column);
-#else
-		if (column == null)
-		{
-			string name = nameof(column);
-			throw new ArgumentNullException(name);
-		}
-#endif
+		ArgumentGuard.ThrowIfNull(column, nameof(column));
 
 		string sql = "\t[" + column.Name + "]";
 
@@ -182,14 +166,7 @@ public class SqlWriterOleDb : SqlWriter
 	/// <returns>The SQL type declaration, including a leading space.</returns>
 	protected override string GetColumnTypeText(Column column)
 	{
-#if NET6_0_OR_GREATER
-		ArgumentNullException.ThrowIfNull(column);
-#else
-		if (column == null)
-		{
-			throw new ArgumentNullException(nameof(column));
-		}
-#endif
+		ArgumentGuard.ThrowIfNull(column, nameof(column));
 
 		return column.ColumnType switch
 		{
@@ -222,15 +199,7 @@ public class SqlWriterOleDb : SqlWriter
 	[Obsolete("Use GetColumnSql instead.")]
 	protected override string GetCreateColumnSql(Column column)
 	{
-#if NET6_0_OR_GREATER
-		ArgumentNullException.ThrowIfNull(column);
-#else
-		if (column == null)
-		{
-			string name = nameof(column);
-			throw new ArgumentNullException(name);
-		}
-#endif
+		ArgumentGuard.ThrowIfNull(column, nameof(column));
 
 		string sql = "\t[" + column.Name + "]";
 
@@ -281,15 +250,7 @@ public class SqlWriterOleDb : SqlWriter
 	protected override string GetForeignKeySql(
 		ForeignKey foreignKey, bool isLast)
 	{
-#if NET6_0_OR_GREATER
-		ArgumentNullException.ThrowIfNull(foreignKey);
-#else
-		if (foreignKey == null)
-		{
-			string name = nameof(foreignKey);
-			throw new ArgumentNullException(name);
-		}
-#endif
+		ArgumentGuard.ThrowIfNull(foreignKey, nameof(foreignKey));
 
 		const string constraint = "CONSTRAINT";
 		const string key = "FOREIGN KEY";
