@@ -115,30 +115,8 @@ public class DataStoreStructure : IDisposable
 	public static Collection<string> GetOrderedDependencies(
 		Dictionary<string, Collection<string>> tableDependencies)
 	{
-		Collection<string> orderedDependencies = [];
-
-		// Tracks previously processed nodes.
-		HashSet<string> visited = [];
-
-		// Tracks nodes in the current recursion stack
-		// (for cycle detection).
-		HashSet<string> visiting = [];
-
-		if (tableDependencies != null)
-		{
-			foreach (string key in tableDependencies.Keys)
-			{
-				if (!visited.Contains(key))
-				{
-					GetDependenciesRecursive(
-						key,
-						tableDependencies,
-						orderedDependencies,
-						visited,
-						visiting);
-				}
-			}
-		}
+		Collection<string> orderedDependencies =
+			TableSet.GetOrderedDependencies(tableDependencies);
 
 		return orderedDependencies;
 	}
@@ -1272,48 +1250,6 @@ public class DataStoreStructure : IDisposable
 		string query = $"SELECT {fields} FROM {from} {joins} {where}";
 
 		return query;
-	}
-
-	/// <summary>
-	/// Adds table dependencies to the ordered collection using depth-first
-	/// traversal.
-	/// </summary>
-	/// <param name="key">The table key currently being processed.</param>
-	/// <param name="tableDependencies">The dependency map keyed by table
-	/// name.</param>
-	/// <param name="orderedDependencies">The ordered dependency result.</param>
-	/// <param name="visited">The set of table keys already processed.</param>
-	/// <param name="visiting">The set of table keys in the active traversal
-	/// path.</param>
-	private static void GetDependenciesRecursive(
-		string key,
-		Dictionary<string, Collection<string>> tableDependencies,
-		Collection<string> orderedDependencies,
-		HashSet<string> visited,
-		HashSet<string> visiting)
-	{
-		if (!visited.Contains(key) && !visiting.Contains(key))
-		{
-			visiting.Add(key);
-
-			if (tableDependencies.TryGetValue(
-				key, out Collection<string> value))
-			{
-				foreach (string dependency in value)
-				{
-					GetDependenciesRecursive(
-						dependency,
-						tableDependencies,
-						orderedDependencies,
-						visited,
-						visiting);
-				}
-			}
-
-			visiting.Remove(key); // Done visiting
-			visited.Add(key);     // Mark as processed
-			orderedDependencies.Add(key); // Add to result (postorder)
-		}
 	}
 
 	/// <summary>
