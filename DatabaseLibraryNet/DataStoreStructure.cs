@@ -514,7 +514,6 @@ public class DataStoreStructure : IDisposable
 	public virtual Collection<Table> GetSchema()
 	{
 		Dictionary<string, Table> tableDictionary = [];
-		Collection<ForeignKey> foreignKeys = [];
 
 		foreach (DataRow row in TableNames.Rows)
 		{
@@ -522,11 +521,14 @@ public class DataStoreStructure : IDisposable
 			Table table = GetTable(row);
 			tableDictionary.Add(tableName, table);
 
-			foreignKeys = GetForeignKeys(tableName, foreignKeys);
-		}
+			Collection<ForeignKey> foreignKeys =
+				GetForeignKeysOwnedByTable(tableName);
 
-		tableDictionary =
-			SetTablesRelationships(tableDictionary, foreignKeys);
+			foreach (ForeignKey foreignKey in foreignKeys)
+			{
+				table.ForeignKeys.Add(foreignKey);
+			}
+		}
 
 		Collection<Table> tables = GetTables(tableDictionary);
 

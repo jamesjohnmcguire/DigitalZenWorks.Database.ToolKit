@@ -228,6 +228,7 @@ internal sealed class SetTablesRelationshipsTests
 		Assert.That(tables[1].ForeignKeys, Is.Empty);
 		Assert.That(schema.DecodingCalls, Is.EqualTo(1));
 		Assert.That(schema.LegacyDecodingCalls, Is.Zero);
+		Assert.That(schema.OwnedMetadataCalls, Is.EqualTo(2));
 		Assert.That(schema.RelationshipCalls, Is.Zero);
 		if (nullForeignKey)
 		{
@@ -446,6 +447,11 @@ internal sealed class SetTablesRelationshipsTests
 		/// </summary>
 		public int LegacyDecodingCalls { get; private set; }
 
+		/// <summary>
+		/// Gets the number of table ownership metadata queries.
+		/// </summary>
+		public int OwnedMetadataCalls { get; private set; }
+
 		/// <inheritdoc/>
 		public override DataTable TableNames
 		{
@@ -559,6 +565,14 @@ internal sealed class SetTablesRelationshipsTests
 			}
 
 			return base.GetForeignKey(row);
+		}
+
+		/// <inheritdoc/>
+		protected override DataTable GetForeignKeyMetadataOwnedByTable(
+			string referencingTableName)
+		{
+			OwnedMetadataCalls++;
+			return base.GetForeignKeyMetadataOwnedByTable(referencingTableName);
 		}
 
 		/// <inheritdoc/>
