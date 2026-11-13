@@ -1,6 +1,7 @@
 ## Immediate — before 1.4.0
 
-1. Update `DatabaseLibraryNet/DigitalZenWorks.Database.ToolKit.csproj`:
+1. Version bump deferred at user request. When requested, update
+   `DatabaseLibraryNet/DigitalZenWorks.Database.ToolKit.csproj`:
    set `Version` to `1.4.0` and `FileVersion` to `1.4.0.0`. Keep
    `AssemblyVersion` at `1.0.0.0` and the package compatibility baseline
    at published `1.3.62` through this release.
@@ -19,6 +20,16 @@
 
 ## Completed for 1.4.0
 
+- README and API XML comments document trusted SQL text versus bound data,
+  named/positional parameters, raw-fragment APIs, and unparameterized legacy
+  name helpers. CA2100 remains enabled and unsuppressed.
+
+- Parameter binding uses provider-created parameters, preserving names and
+  CLR values and mapping null to `DBNull.Value`. Eight regression cases
+  cover SQLite execution, SQL Server/MySQL command binding without servers,
+  and Access positional execution. OLE DB iteration order is documented;
+  CA2100 remains unsuppressed pending the broader trust-boundary review.
+
 - README usage guidance, the existing terminology/migration guide, and
   the 1.4.0 changelog now cover ownership queries, legacy deprecations,
   schema extension-point migration, and the internal refactors.
@@ -35,6 +46,28 @@
   removal belongs to a major version.
 
 ## After 1.4.0 — review findings
+
+- Review raw-SQL APIs and internal callers across `DataStorage`,
+  `DataObjectsBase`, and `DatabaseConnection`. Inventory value interpolation,
+  caller-supplied WHERE/ORDER BY/LIMIT fragments, and dynamic identifiers.
+  In particular, `GetByName` and `GetIdByName` embed the name directly into
+  an unescaped SQL literal; add compatible parameterized replacements.
+  Distinguish typed numeric values from arbitrary strings when assessing
+  actual exposure; avoid generic SQL sanitizers or keyword filters.
+- Add missing parameterized query/reader/scalar convenience overloads in
+  small compatible changes. Review interface evolution separately so new
+  members do not break existing `IDataStorage` implementations.
+- Design provider-aware identifier quoting and allowlisted selections for
+  higher-level helpers. Parameters bind data values, not identifiers or SQL
+  fragments. Consider explicit trusted-SQL naming/contracts in a future
+  API revision while retaining compatible raw-SQL entry points.
+- Review an ordered parameter API for Access/OLE DB: `?` placeholders bind
+  by position, while arbitrary `IDictionary` implementations do not promise
+  a portable iteration order. Plan migration rather than silently sorting.
+- Revisit CA2100 after the binding fixes, internal-call review, and trust
+  contract are verified. Consider a local suppression only at the reviewed
+  raw-command assignment, keeping security analysis enabled elsewhere.
+  Review SQL logging for sensitive literals as part of the broader audit.
 
 - Review `GetColumnType` responsibilities before consolidating further.
   `DataDefinition` parses declaration text using substring matching and
