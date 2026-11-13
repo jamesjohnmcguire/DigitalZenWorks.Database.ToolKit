@@ -188,39 +188,7 @@ public class DataStoreStructure : IDisposable
 	public static Collection<Table> OrderTables(
 		Collection<Table> tables)
 	{
-		Collection<Table> orderedTables = [];
-
-		if (tables != null)
-		{
-			Dictionary<string, Collection<string>> tableDependencies = [];
-			Dictionary<string, Table> tablesByName = [];
-
-			foreach (Table table in tables)
-			{
-				string name = table.Name;
-				tablesByName[name] = table;
-
-				Collection<string> dependencies = [];
-
-				foreach (ForeignKey foreignKeys in table.ForeignKeys)
-				{
-					dependencies.Add(foreignKeys.ReferencedTable);
-				}
-
-				tableDependencies.Add(name, dependencies);
-			}
-
-			Collection<string> orderedNames =
-				GetOrderedDependencies(tableDependencies);
-
-			foreach (string tableName in orderedNames)
-			{
-				if (tablesByName.TryGetValue(tableName, out Table table))
-				{
-					orderedTables.Add(table);
-				}
-			}
-		}
+		Collection<Table> orderedTables = TableSet.OrderTables(tables);
 
 		return orderedTables;
 	}

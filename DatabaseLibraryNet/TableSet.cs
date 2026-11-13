@@ -54,6 +54,53 @@ internal static class TableSet
 	}
 
 	/// <summary>
+	/// Orders tables so referenced dependencies precede referencing tables.
+	/// </summary>
+	/// <param name="tables">The tables to order, or null.</param>
+	/// <returns>A new collection containing the original table instances,
+	/// or an empty collection for null input. Referenced tables absent
+	/// from the input are omitted.</returns>
+	/// <remarks>Cycles retain the existing traversal behavior.</remarks>
+	internal static Collection<Table> OrderTables(Collection<Table> tables)
+	{
+		Collection<Table> orderedTables = [];
+
+		if (tables != null)
+		{
+			Dictionary<string, Collection<string>> tableDependencies = [];
+			Dictionary<string, Table> tablesByName = [];
+
+			foreach (Table table in tables)
+			{
+				string name = table.Name;
+				tablesByName[name] = table;
+
+				Collection<string> dependencies = [];
+
+				foreach (ForeignKey foreignKeys in table.ForeignKeys)
+				{
+					dependencies.Add(foreignKeys.ReferencedTable);
+				}
+
+				tableDependencies.Add(name, dependencies);
+			}
+
+			Collection<string> orderedNames =
+				GetOrderedDependencies(tableDependencies);
+
+			foreach (string tableName in orderedNames)
+			{
+				if (tablesByName.TryGetValue(tableName, out Table table))
+				{
+					orderedTables.Add(table);
+				}
+			}
+		}
+
+		return orderedTables;
+	}
+
+	/// <summary>
 	/// Adds table dependencies to the ordered collection using depth-first
 	/// traversal.
 	/// </summary>

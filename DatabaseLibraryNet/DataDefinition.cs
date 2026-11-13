@@ -468,7 +468,7 @@ public static class DataDefinition
 		Collection<Table> tables)
 	{
 		Collection<Table> orderedTables =
-			DataStoreStructure.OrderTables(tables);
+			TableSet.OrderTables(tables);
 
 		return orderedTables;
 	}
@@ -583,5 +583,4 @@ public static class DataDefinition
 
 		return result;
 	}
-
 }
