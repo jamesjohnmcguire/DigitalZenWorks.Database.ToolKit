@@ -1,6 +1,6 @@
 # Relationship terminology and v2 preparation
 
-## Current major version: compatible migration
+## Foreign key roles
 
 The referenced table is the parent target. The referencing table is the
 child containing the foreign key. For `Orders.productId -> Products.id`:
@@ -12,9 +12,9 @@ child containing the foreign key. For `Orders.productId -> Products.id`:
 | `ReferencingTable` | `Orders` | `ParentTable` |
 | `ReferencingColumn` | `productId` | `ParentColumn` / `Relationship.ParentTableCol` |
 
-The new properties are aliases over existing storage. Writes through either
-name are visible through both APIs. `ForeignKey.ColumnName` remains an alias
-for `ChildColumn`; `ParentTableColumn` remains an alias for `ParentColumn`.
+The explicit role properties share existing storage. Writes through either
+name are visible through both APIs. `ForeignKey.ColumnName` aliases
+`ChildColumn`; `ParentTableColumn` aliases `ParentColumn`.
 New public properties may appear in reflection-based serialization; callers
 with fixed serialized contracts should select property names explicitly.
 
@@ -101,21 +101,6 @@ Use these protected virtual hooks for provider customization:
 There is no new attachment hook mirroring `GetTableWithRelationships`.
 Subclasses needing custom attachment can override `GetSchema()` or adjust
 its returned tables explicitly. Avoid populating the same keys twice.
-
-### Implementation responsibilities
-
-`DataDefinition` retains its file/schema utility APIs. `DataStoreStructure`
-coordinates schema reading, and `OleDbSchema` handles Access metadata.
-Internal `TableSet` shares dependency and table ordering behind the existing
-public forwarding methods; it adds no new public API or ordering policy.
-Internal `ArgumentGuard` centralizes framework-specific null checks.
-Exception types and parameter names are preserved; redundant custom null
-messages now use framework defaults. Methods intentionally accepting null
-retain that behavior.
-
-Type parsing, SQL statement parsing, and stricter dependency validation
-remain separate post-release review tasks. This release does not change
-cycle handling or add composite-key support.
 
 ## Composite foreign keys
 

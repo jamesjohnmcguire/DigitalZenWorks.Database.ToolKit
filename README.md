@@ -149,38 +149,30 @@ to the default Access export. Consumers treating obsolete warnings as errors
 will need to migrate or suppress the intentional warnings.
 
 ## Change Log
+
 ### 1.4.0
 
-- Add `DatabaseFileInspector.GetDatabaseFileType` as the public file inspection
-  entry point, retaining obsolete `DataDefinition` methods for compatibility.
-- Delegate Access file identification to the inspector and add regression
-  coverage for detection, validation, compatibility wrappers, and visibility.
-- Add explicit relationship roles and a validated `ForeignKey.Create` factory.
-- Deprecate the shorter `ForeignKey` constructor with a warning; removal is
-  planned for v2. Consumers treating obsolete warnings as errors must migrate.
-- Preserve legacy constructor and property behavior and generated SQL.
-- Deprecate `Relationship` and its query/conversion/attachment APIs while
-  retaining their published signatures and legacy behavior.
+- Add `DatabaseFileInspector.GetDatabaseFileType` as the public file-type
+  inspection entry point; retain obsolete `DataDefinition` forwarders.
+- Add explicit referenced/referencing roles and the validated
+  `ForeignKey.Create` factory, preserving legacy property meanings.
+- Deprecate `Relationship`, its query/conversion/attachment APIs, and the
+  shorter `ForeignKey` constructor. Retain legacy signatures and behavior;
+  projects treating obsolete warnings as errors must migrate or suppress
+  intentional compatibility warnings.
 - Add `GetForeignKeysOwnedByTable` with consistent SQLite/Access ownership
   semantics and fresh `Collection<ForeignKey>` results.
-- Read schema foreign keys directly into `Table.ForeignKeys`. Schema loading
-  no longer invokes `GetRelationship` or `GetTableWithRelationships`
-  overrides; subclasses should migrate to the ForeignKey reader hooks.
-- Share dependency/table ordering through internal `TableSet`, preserving
-  public forwarding APIs and existing ordering behavior.
-- Centralize null checks in internal `ArgumentGuard`; replace redundant
-  custom null messages with framework defaults, retaining exception types
-  and parameter names.
-- Fix command parameter construction for SQLite, SQL Server, and MySQL,
-  preserving names and CLR values and mapping null to `DBNull.Value`.
-- Add parameter-binding regressions, including SQLite literal-value queries
-  and Access positional execution, and document the raw-SQL trust boundary.
-  CA2100 remains unsuppressed.
-- Restore the two-argument `ExportSchema` method for compiled consumers.
-- Restore obsolete `Table.PrimaryKey` and the database-type/path
-  `DataObjectOleDb` constructor until v2.
-- Validate Release packages against published 1.3.62, including public
-  parameter names, with regression tests for the restored APIs.
+- Populate `Table.ForeignKeys` directly during schema loading. Legacy
+  `GetRelationship` and `GetTableWithRelationships` overrides no longer
+  customize that workflow; use the ForeignKey reader hooks instead.
+- Restore the two-argument `ExportSchema` overload and retain obsolete
+  `Table.PrimaryKey` and `DataObjectOleDb(DatabaseType, string)` APIs for
+  compatibility with existing consumers.
+- Fix parameter binding for SQLite, SQL Server, and MySQL, preserving names
+  and CLR values and mapping null to `DBNull.Value`. Document the raw-SQL
+  trust boundary and Access positional parameter requirements.
+- Use framework-default messages for redundant null-argument errors while
+  preserving exception types and parameter names.
 
 ### 1.3.62
 

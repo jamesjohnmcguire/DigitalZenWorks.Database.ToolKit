@@ -1,61 +1,15 @@
-## Immediate — after 1.4.0
+## Next
 
-1. Remove routine older-target warnings in a separate commit: conditionally
-   include the five `System.Runtime.Versioning` imports and make
-   `GetSqlNullValue`'s non-null return explicit. Preserve existing behavior
-   and keep CA2100 enabled and unsuppressed.
-2. Review parameterized replacements for `GetByName` / `GetIdByName` as
-   separate functional work; see the SQL API review findings below.
+- Review parameterized replacements for `GetByName` / `GetIdByName` as
+  separate functional work; see the SQL API review findings below.
 
-## Completed after 1.4.0
+## Review findings
 
-- Advanced the package API compatibility baseline to published `1.4.0`
-  and updated the README guidance. Release packaging/API validation passed
-  across all eight frameworks. Package, file, and assembly versions are
-  unchanged; routine warnings and CA2100 remain visible for later review.
-
-## Completed for 1.4.0
-
-- Release changes are committed, Git tag `1.4.0` is present, and the
-  1.4.0 NuGet package is published. Release/publish workflow setup is
-  complete; publication was confirmed by the maintainer.
-
-- Final candidate checks passed on 2026-11-13 against `24a493b`: all 291
-  tests passed with none skipped, including Access/SQLite and export/schema
-  regressions. Release/package API validation passed across all eight
-  frameworks against published `1.3.62` (18 existing warnings, zero errors).
-  The generated `1.4.0` package contains all eight assemblies with file
-  version `1.4.0.0` and assembly version `1.0.0.0`, plus its README.
-
-- Version bump committed: package `1.4.0`, file version `1.4.0.0`,
-  assembly version `1.0.0.0`; compatibility baseline remains `1.3.62`.
-
-- README and API XML comments document trusted SQL text versus bound data,
-  named/positional parameters, raw-fragment APIs, and unparameterized legacy
-  name helpers. CA2100 remains enabled and unsuppressed.
-
-- Parameter binding uses provider-created parameters, preserving names and
-  CLR values and mapping null to `DBNull.Value`. Eight regression cases
-  cover SQLite execution, SQL Server/MySQL command binding without servers,
-  and Access positional execution. OLE DB iteration order is documented;
-  CA2100 remains unsuppressed pending the broader trust-boundary review.
-
-- README usage guidance, the existing terminology/migration guide, and
-  the 1.4.0 changelog now cover ownership queries, legacy deprecations,
-  schema extension-point migration, and the internal refactors.
-
-- Internal `TableSet` dependency and table ordering extraction is complete,
-  with characterization tests and published forwarding APIs preserved.
-- Internal `ArgumentGuard`, focused tests, and caller migration are
-  complete. Null-check exception types, parameter names, and intentional
-  null acceptance are preserved; redundant custom null messages removed.
-- Initial review of `overlap-refactor`: current concerns are addressed.
-- Compatible `Relationship` retirement: the ForeignKey path, legacy
-  deprecations, regression coverage, and expected-warning cleanup are
-  complete. Published legacy APIs remain available for migration;
-  removal belongs to a major version.
-
-## After 1.4.0 — review findings
+- Investigate Release packaging consuming Debug-only restore assets under
+  SDK 11. Reproduce the cause of missing dependency groups and API comparison
+  errors before changing build/workflow configuration. Workaround: restore
+  with `-p:Configuration=Release --force`, then pack with `--no-restore`.
+  Keep package validation enabled.
 
 - Review raw-SQL APIs and internal callers across `DataStorage`,
   `DataObjectsBase`, and `DatabaseConnection`. Inventory value interpolation,
@@ -74,8 +28,8 @@
 - Review an ordered parameter API for Access/OLE DB: `?` placeholders bind
   by position, while arbitrary `IDictionary` implementations do not promise
   a portable iteration order. Plan migration rather than silently sorting.
-- Revisit CA2100 after the binding fixes, internal-call review, and trust
-  contract are verified. Consider a local suppression only at the reviewed
+- Revisit CA2100 after the internal-call review and trust contract are
+  verified. Consider a local suppression only at the reviewed
   raw-command assignment, keeping security analysis enabled elsewhere.
   Review SQL logging for sensitive literals as part of the broader audit.
 
@@ -103,53 +57,42 @@
   are omitted from ordered table objects, and duplicate table names fail.
   Any stricter validation or new sorting policy is a behavior change.
 
-## Later / backlog
+## Backlog
 
-- PackageClients submodule and consumer integration are deferred at user
-  request; revisit separately after the release.
-
-After 1.4.0: consider a further review of `overlap-refactor` if warranted.
-
-Version 2	Resolve	DataDefinition / DataStoreStructure public API redesign; internal TableSet ordering extraction is complete for 1.4.0.
-Version 2	Resolve	DataStorage / DataObjectsBase / DatabaseConnection
-
-Create Bash Build Script
-ForeignKey	Prepare v2 terminology cleanup	Compatible explicit roles and factory are implemented. Plan and composite-key design: SourceCode/Database.ToolKit/Documentation/RelationshipTerminology.md. Remove legacy aliases in v2 without reversing their current meanings.
-ForeignKey	Strengthen ForeignKeys	Centralize null / blank member validation and prevent invalid mutation.   Define the policy for unnamed constraints and null collection entries.
-ForeignKey	Remove the obsolete shorter constructor in v2	The current version retains its original parameter order, names, and assignments and warns callers to use ForeignKey.Create.
-ForeignKey	Add model tests for missing / blank identifiers and mutation, legacy constructor migration, and descriptive validation errors before writing SQL or ordering dependencies.
-ForeignKey	Extend writer / schema-reader integration coverage for self references, composite keys, quoted identifiers, and Access-to-SQLite relationships. Keep type-mapping tests independent of unrelated relationship fixtures.
-Architecture	Review duplicate or overlapping functionality after the terminology work	Evaluate ForeignKey and Relationship responsibilities before finalizing the v2 interface; keep consolidation separate from the compatible terminology migration.
-MsAccessToolKit	/// Get constaints test.
-Database.ToolKit	Add a future task to re-visit adding DatabaseType to SqlWriter.
-Database.ToolKit	Note: OleDbTests.ExportSchema (CRLF vs LF) — not caused by anything you or I touched. This is a genuinely pre-existing bug that's simply invisible in your Linux verifier run, because that whole test class is [SupportedOSPlatform("windows")]-skipped there. It only surfaced now because you ran locally on Windows, where it executes for real. Irrelevant to this task's scope and to the grading pipeline — but worth a mental note for later, separate from this bounty.
-Database.ToolKit	ColumnType.NText isn't explicitly listed but harmless.
-Database.ToolKit	fix tests
-Database.ToolKit	Remove Table.PrimaryKey	looks like a vestige of the original single-PK-per-table design you mentioned
-Database.ToolKit	Generate Access.sql Orders
-DB	/// Execture a data reader.
-DB	/// depdenencies.</param>
-In the 'GetSchema' method, ensure that the 'oleDbSchema.GetPrimaryKeys' does not return an empty DataTable to avoid 'IndexOutOfRangeException' when accessing 'Rows[0]'. Consider adding a check for the row count.		DatabaseLibraryNet/DataDefinition.cs:330
-The list concatenation syntax '[.. relationships, .. newRelationships]' is unconventional in C#. Consider using List.AddRange(newRelationships) to merge the lists for better clarity and compatibility.	DatabaseLibraryNet/DataDefinition.cs:804
-Accessing primaryKeys.Rows[0] without checking if any primary key exists may lead to an exception when a table does not have a defined primary key. Consider adding a check to ensure that primaryKeys contains at least one row before accessing it.
-Database.ToolKit	Replace Windows Specific (OleDb) Code with Cross Platform Support Code focusing on SqLite functionality
-Database.ToolKit	GetSchema Assumes Only One Primary Key, Adjust for Potential Composite Primary Keys
-GetBy	need to return multiple
-Need to omit or set to NULL when foreign key fields when value is 0
-database errors	throw?
-CreateDatabaseFileIfNotExists
-Have OleDbSchema Use New BuildConnectionString Method
-Deprecate DataDefinition.GetOrderedDependencies
-Create DatabaseLibraryNetWin Project
-Move OleDbSchema to DatabaseLibraryNetWin
-Move references to accdb, mdb	Move / Copy template.accdb to MsAccessTool and DatabaseUtilitiesWin
-Deal with ImportSchemaMdb
-Rename OleDbSchema to DataStoreStructureOleDb?
-SqLite	PRAGMA strict_mode = ON;
-Order Properties	ForeignKey?
-Deprec 		public ForeignKey(	string name, string columnName, string parentTable, string parentTableColumn, ConstraintAction onDeleteAction, ConstraintAction onUpdateAction)
-ExportSchema	Using CompareText from Read File Is Problematic for the Following Reasons: 1. The variations of use spaces doesn't make the schema invalid - The compare text has different use of spaces then the exported text.  2. The ordering of constraints may and, thus far, will be different.  May need to use Regex's
-Simplify Process of Relationship to ForeignKey
-GetConstraintsByProvider	Leave as-is, until Enhanced Providers Database Testing
-Implement #Nullable Project Wise
-Handling large query return sets - need to set up looping over return set
+- Revisit PackageClients submodule and consumer integration separately;
+  inclusion is deferred.
+- Add a Bash build script.
+- Review public API boundaries between `DataDefinition`,
+  `DataStoreStructure`, `DataStorage`, `DataObjectsBase`, and
+  `DatabaseConnection`. Revisit `overlap-refactor` where useful.
+- Prepare the v2 terminology and composite-key design in
+  [RelationshipTerminology.md](../Documentation/RelationshipTerminology.md).
+  Remove obsolete Relationship APIs, legacy role aliases, the shorter
+  ForeignKey constructor, `Table.PrimaryKey`, and the obsolete
+  `DataObjectOleDb` constructor after callers migrate.
+- Define ForeignKey mutation and validation policy, including unnamed
+  constraints and null collection entries. Add tests for invalid identifiers,
+  mutation, constructor migration, and errors before SQL generation.
+- Extend writer/schema-reader coverage for self references, quoted
+  identifiers, composite keys, and Access-to-SQLite relationships. Review
+  composite primary-key handling alongside composite foreign keys.
+- Review provider constraint testing, including the MsAccess constraint
+  fixture and `GetConstraintsByProvider` behavior.
+- Review exported-SQL assertions for meaningful schema equivalence rather
+  than whitespace or constraint-order differences. Check Access export
+  line endings and the Orders fixture in the generated Access SQL.
+- Review `ColumnType.NText` mapping and whether `SqlWriter` needs a
+  `DatabaseType` setting.
+- Review SQLite strict-table support and Windows/OLE DB separation.
+  Consider a Windows-specific library, moving Access templates and schema
+  readers, and renaming `OleDbSchema` consistently with other readers.
+- Review `ImportSchemaMdb` and whether to deprecate
+  `DataDefinition.GetOrderedDependencies` in a future API revision.
+- Define multi-row `GetBy` behavior and foreign-key handling when an input
+  value is zero versus SQL NULL.
+- Review database error propagation and a create-if-missing database API.
+- Review whether ForeignKey property ordering needs an explicit contract.
+- Enable nullable analysis consistently across projects and add streaming
+  or batching support for large query results.
+- Correct remaining XML-comment typos, including reader execution and
+  dependency descriptions.
