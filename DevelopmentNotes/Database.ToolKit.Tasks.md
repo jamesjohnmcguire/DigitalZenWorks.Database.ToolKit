@@ -1,11 +1,24 @@
-## Immediate — before 1.4.0
+## Immediate — after 1.4.0
 
-1. Commit the reviewed release changes and create an annotated Git tag
-   `1.4.0` on the validated release commit, following existing tag naming.
-2. Push the release tag and publish the reviewed 1.4.0 NuGet package and
-   release artifacts.
+1. Remove routine older-target warnings in a separate commit: conditionally
+   include the five `System.Runtime.Versioning` imports and make
+   `GetSqlNullValue`'s non-null return explicit. Preserve existing behavior
+   and keep CA2100 enabled and unsuppressed.
+2. Review parameterized replacements for `GetByName` / `GetIdByName` as
+   separate functional work; see the SQL API review findings below.
+
+## Completed after 1.4.0
+
+- Advanced the package API compatibility baseline to published `1.4.0`
+  and updated the README guidance. Release packaging/API validation passed
+  across all eight frameworks. Package, file, and assembly versions are
+  unchanged; routine warnings and CA2100 remain visible for later review.
 
 ## Completed for 1.4.0
+
+- Release changes are committed, Git tag `1.4.0` is present, and the
+  1.4.0 NuGet package is published. Release/publish workflow setup is
+  complete; publication was confirmed by the maintainer.
 
 - Final candidate checks passed on 2026-11-13 against `24a493b`: all 291
   tests passed with none skipped, including Access/SQLite and export/schema

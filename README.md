@@ -126,7 +126,7 @@ establish the safety of SQL constructed by every library consumer.
 
 ## Release API compatibility
 
-Release builds validate the package against published version `1.3.62` on
+Release builds validate the package against published version `1.4.0` on
 all shipped target frameworks, including public parameter names. From this
 library repository root, run:
 
@@ -134,10 +134,10 @@ library repository root, run:
 dotnet build DatabaseLibraryNet/DigitalZenWorks.Database.ToolKit.csproj -c Release
 ```
 
-Keep this baseline through the 1.4.0 release, then advance it to published
-1.4.0 for subsequent releases. The checks allow additive APIs and do not
-replace behavioral tests. Validation-only package downloads provide metadata
-for transitive references; they do not add published package dependencies.
+Published `1.4.0` is the baseline for subsequent releases. The checks allow
+additive APIs and do not replace behavioral tests. Validation-only package
+downloads provide metadata for transitive references; they do not add
+published package dependencies.
 
 `Table.PrimaryKey` and `DataObjectOleDb(DatabaseType, string)` remain available
 with obsolete warnings and are scheduled for removal in v2. The property
