@@ -286,9 +286,11 @@ public class SqlWriter
 	/// empty value.</returns>
 	public static string GetSqlNullValue(string? dataItem)
 	{
-		if (string.IsNullOrWhiteSpace(dataItem))
+		// Older frameworks lack nullable annotations on IsNullOrWhiteSpace.
+		// The explicit null check proves the final return is non-null.
+		if (dataItem == null || string.IsNullOrWhiteSpace(dataItem))
 		{
-			dataItem = "NULL";
+			return "NULL";
 		}
 
 		return dataItem;
