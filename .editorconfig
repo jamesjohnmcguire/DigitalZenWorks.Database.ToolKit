@@ -1,5 +1,6 @@
 [*]
 charset = utf-8
+end_of_line = lf
 guidelines = 80
 guidelines_style = 2px solid lime
 indent_size = 4
@@ -8,16 +9,13 @@ insert_final_newline = true
 max_line_length = 80
 trim_trailing_whitespace = true
 
-[*.{bat, cmd}]
+[*.{bat,cmd}]
 end_of_line = crlf
 
 [*.Access.Test.sql]
 end_of_line = crlf
 
 [*.Sqlite.Test.sql]
-end_of_line = lf
-
-[*.{cs, csproj, props, resx}]
 end_of_line = lf
 
 [*.cs]
