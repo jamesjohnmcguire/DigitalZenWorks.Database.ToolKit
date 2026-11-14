@@ -1,4 +1,11 @@
 # DigitalZenWorks.Database.ToolKit
+
+[![NuGet version][version-badge]][nuget]
+[![NuGet downloads][downloads-badge]][nuget]
+[![Build and tests][build-badge]][workflow]
+[![License: MIT][license-badge]][license]
+[![GitHub issues][issues-badge]][issues]
+
 A .NET library with a set of database utility classes.
 
 ## Database file identification
@@ -142,7 +149,7 @@ to the default Access export. Consumers treating obsolete warnings as errors
 will need to migrate or suppress the intentional warnings.
 
 ## Change Log
-### Unreleased (1.4.0)
+### 1.4.0
 
 - Add `DatabaseFileInspector.GetDatabaseFileType` as the public file inspection
   entry point, retaining obsolete `DataDefinition` methods for compatibility.
@@ -186,3 +193,22 @@ Consolidated and moved OleDb functionality
 Improvements based on code analysis warnings
 Other various bug fixes
 Removed 'All Rights Reserved.'
+
+[version-badge]:
+  https://img.shields.io/nuget/v/DigitalZenWorks.Database.ToolKit.svg
+[downloads-badge]:
+  https://img.shields.io/nuget/dt/DigitalZenWorks.Database.ToolKit.svg
+[license-badge]:
+  https://img.shields.io/badge/license-MIT-blue.svg
+[build-badge]:
+  https://img.shields.io/github/actions/workflow/status/jamesjohnmcguire/DigitalZenWorks.Database.ToolKit/dotnet.yml?branch=main
+[workflow]:
+  https://github.com/jamesjohnmcguire/DigitalZenWorks.Database.ToolKit/actions/workflows/dotnet.yml
+[issues-badge]:
+  https://img.shields.io/github/issues/jamesjohnmcguire/DigitalZenWorks.Database.ToolKit
+[nuget]:
+  https://www.nuget.org/packages/DigitalZenWorks.Database.ToolKit
+[license]:
+  https://github.com/jamesjohnmcguire/DigitalZenWorks.Database.ToolKit/blob/main/LICENSE
+[issues]:
+  https://github.com/jamesjohnmcguire/DigitalZenWorks.Database.ToolKit/issues
