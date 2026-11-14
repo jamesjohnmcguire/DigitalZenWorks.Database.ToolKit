@@ -10,7 +10,6 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.OleDb;
-using System.Runtime.Versioning;
 using global::Common.Logging;
 
 /// Class <c>OleDbSchema.</c>
@@ -18,7 +17,7 @@ using global::Common.Logging;
 /// Represents an OleDbSchema object.
 /// </summary>
 #if NET5_0_OR_GREATER
-[SupportedOSPlatform("windows")]
+[System.Runtime.Versioning.SupportedOSPlatform("windows")]
 #endif
 public class OleDbSchema : DataStoreStructure
 {

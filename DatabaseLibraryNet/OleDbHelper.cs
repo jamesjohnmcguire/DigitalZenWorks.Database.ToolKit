@@ -8,7 +8,6 @@ namespace DigitalZenWorks.Database.ToolKit;
 
 using System;
 using System.IO;
-using System.Runtime.Versioning;
 using DigitalZenWorks.Common.Utilities;
 
 #nullable enable
@@ -17,7 +16,7 @@ using DigitalZenWorks.Common.Utilities;
 /// The OLE DB helper class.
 /// </summary>
 #if NET5_0_OR_GREATER
-[SupportedOSPlatform("windows")]
+[System.Runtime.Versioning.SupportedOSPlatform("windows")]
 #endif
 public static class OleDbHelper
 {

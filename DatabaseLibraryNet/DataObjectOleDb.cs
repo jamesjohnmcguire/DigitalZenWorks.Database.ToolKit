@@ -7,13 +7,12 @@
 namespace DigitalZenWorks.Database.ToolKit;
 
 using System;
-using System.Runtime.Versioning;
 
 /// <summary>
 /// OleDb base class for database collection classes.
 /// </summary>
 #if NET5_0_OR_GREATER
-[SupportedOSPlatform("windows")]
+[System.Runtime.Versioning.SupportedOSPlatform("windows")]
 #endif
 public class DataObjectOleDb : DataObjectsBase
 {

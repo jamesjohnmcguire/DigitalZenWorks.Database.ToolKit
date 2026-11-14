@@ -11,7 +11,6 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
 using System.Data.OleDb;
-using System.Runtime.Versioning;
 using global::Common.Logging;
 
 /// Class <c>DataStorageOleDb.</c>
@@ -25,7 +24,7 @@ using global::Common.Logging;
 /// </remarks>
 /// <param name="connectionString">The connection string.</param>
 #if NET5_0_OR_GREATER
-[SupportedOSPlatform("windows")]
+[System.Runtime.Versioning.SupportedOSPlatform("windows")]
 #endif
 public class DataStorageOleDb(string connectionString)
 	: DataStorage(DatabaseType.OleDb, connectionString)
