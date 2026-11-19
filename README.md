@@ -29,9 +29,14 @@ breaks, and Unicode without normalization. Pass raw text exactly once;
 previously escaped text is treated as data. Apply trimming or vocabulary
 normalization separately before formatting.
 
-This additive API leaves the existing static escaping helpers unchanged.
-Use it for new script generation and migration toward v2. Database execution
-should continue to use parameter binding where available.
+`EscapeString` and both `GetEscapedValue` overloads are obsolete and planned
+for removal in v2. For script generation, pass the original field value to
+`writer.GetTextLiteral(value)` and use its result directly. Remove any
+surrounding quotes or escaping that your code previously added. If you used
+the array overload, pass the selected field rather than the array. Apply any
+trimming or missing-value policy before formatting.
+
+Use parameter binding when executing SQL against a database.
 
 ## Database file identification
 

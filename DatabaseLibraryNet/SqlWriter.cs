@@ -170,76 +170,34 @@ public class SqlWriter
 	}
 
 	/// <summary>
-	/// Escape string.
+	/// Trims text and surrounds it with apostrophes.
 	/// </summary>
 	/// <param name="dataItem">The value to escape.</param>
 	/// <returns>The escaped value.</returns>
+	[Obsolete("Pass raw text to SqlWriter.GetTextLiteral instead.")]
 	public static string? EscapeString(string dataItem)
 	{
-		if (dataItem != null)
-		{
-			dataItem = dataItem.Trim();
-			dataItem = "'" + dataItem + "'";
-		}
-
-		return dataItem;
+		return LegacyEscapeString(dataItem);
 	}
 
 	/// <summary>
-	/// Get escaped value.
+	/// Applies legacy apostrophe handling to an input value.
 	/// </summary>
 	/// <param name="dataItem">The value to escape.</param>
 	/// <returns>The escaped value.</returns>
+	[Obsolete("Pass raw text to SqlWriter.GetTextLiteral instead.")]
 	public static string? GetEscapedValue(string dataItem)
 	{
-		if (dataItem != null)
-		{
-			bool enclosed = false;
-#if NETSTANDARD2_1_OR_GREATER || NET5_0_OR_GREATER
-			bool beginEscape = dataItem.StartsWith('\'');
-			bool endsEscape = dataItem.EndsWith('\'');
-#else
-			bool beginEscape = dataItem.StartsWith("\'");
-			bool endsEscape = dataItem.EndsWith("\'");
-#endif
-
-			if (beginEscape == true && endsEscape == true)
-			{
-				enclosed = true;
-
-				dataItem = dataItem.Trim('\'');
-			}
-
-			Regex unescapedApostropheRegex = new("(?<!')'(?!')");
-
-			bool isUnescaped = unescapedApostropheRegex.IsMatch(dataItem);
-
-			if (isUnescaped == true)
-			{
-#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP2_0_OR_GREATER
-				dataItem = dataItem.Replace(
-					"'", "''", StringComparison.Ordinal);
-#else
-				dataItem = dataItem.Replace(
-					"'", "''");
-#endif
-			}
-
-			if (enclosed == true)
-			{
-				dataItem = '\'' + dataItem + '\'';
-			}
-		}
-
-		return dataItem;
+		return LegacyGetEscapedValue(dataItem);
 	}
 
 	/// <summary>
-	/// Get escaped value.
+	/// Applies legacy apostrophe handling to an input value.
 	/// </summary>
 	/// <param name="columnValues">The column values.</param>
 	/// <param name="column">the column index.</param>
 	/// <returns>The escaped value.</returns>
+	[Obsolete("Pass the raw field to SqlWriter.GetTextLiteral instead.")]
 	public static string? GetEscapedValue(
 		string[] columnValues, int column)
 	{
@@ -248,7 +206,7 @@ public class SqlWriter
 		if (columnValues != null)
 		{
 			dataItem = columnValues[column];
-			dataItem = GetEscapedValue(dataItem);
+			dataItem = LegacyGetEscapedValue(dataItem);
 		}
 
 		return dataItem;
@@ -327,7 +285,7 @@ public class SqlWriter
 				// Replace extra spaces.
 				dataItem = Regex.Replace(dataItem, @"\s+", " ");
 
-				dataItem = GetEscapedValue(dataItem);
+				dataItem = LegacyGetEscapedValue(dataItem);
 			}
 
 			if (defaultNull == true)
@@ -344,7 +302,7 @@ public class SqlWriter
 				dataItem != null &&
 				dataItem.Equals("NULL", StringComparison.Ordinal))
 			{
-				dataItem = EscapeString(dataItem);
+				dataItem = LegacyEscapeString(dataItem);
 			}
 		}
 
@@ -898,5 +856,60 @@ public class SqlWriter
 		}
 
 		return identity;
+	}
+
+	private static string? LegacyEscapeString(string dataItem)
+	{
+		if (dataItem != null)
+		{
+			dataItem = dataItem.Trim();
+			dataItem = "'" + dataItem + "'";
+		}
+
+		return dataItem;
+	}
+
+	private static string? LegacyGetEscapedValue(string dataItem)
+	{
+		if (dataItem != null)
+		{
+			bool enclosed = false;
+#if NETSTANDARD2_1_OR_GREATER || NET5_0_OR_GREATER
+			bool beginEscape = dataItem.StartsWith('\'');
+			bool endsEscape = dataItem.EndsWith('\'');
+#else
+			bool beginEscape = dataItem.StartsWith("\'");
+			bool endsEscape = dataItem.EndsWith("\'");
+#endif
+
+			if (beginEscape == true && endsEscape == true)
+			{
+				enclosed = true;
+
+				dataItem = dataItem.Trim('\'');
+			}
+
+			Regex unescapedApostropheRegex = new("(?<!')'(?!')");
+
+			bool isUnescaped = unescapedApostropheRegex.IsMatch(dataItem);
+
+			if (isUnescaped == true)
+			{
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP2_0_OR_GREATER
+				dataItem = dataItem.Replace(
+					"'", "''", StringComparison.Ordinal);
+#else
+				dataItem = dataItem.Replace(
+					"'", "''");
+#endif
+			}
+
+			if (enclosed == true)
+			{
+				dataItem = '\'' + dataItem + '\'';
+			}
+		}
+
+		return dataItem;
 	}
 }

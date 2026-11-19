@@ -94,4 +94,35 @@ internal sealed class SqlWriterTextLiteralTests
 
 		Assert.That(result, Is.EqualTo((object?)value ?? DBNull.Value));
 	}
+
+	/// <summary>
+	/// The obsolete helpers retain their published quoting behavior.
+	/// </summary>
+	[Test]
+	public void LegacyEscapingPreservesPublishedBehavior()
+	{
+#pragma warning disable CS0618 // Verify the retained escaping APIs.
+		string? quoted = SqlWriter.EscapeString("  O'Brien  ");
+		string? escaped = SqlWriter.GetEscapedValue("a''b");
+		string? escapedColumn = SqlWriter.GetEscapedValue(["a''b'c"], 0);
+#pragma warning restore CS0618
+
+		Assert.That(quoted, Is.EqualTo("'O'Brien'"));
+		Assert.That(escaped, Is.EqualTo("a''b"));
+		Assert.That(escapedColumn, Is.EqualTo("a''''b''c"));
+	}
+
+	/// <summary>
+	/// The row helper still applies its legacy quoting and null rules.
+	/// </summary>
+	[Test]
+	public void LegacyRowValuesPreservePublishedBehavior()
+	{
+		string[] values = ["  O'Brien  ", " "];
+		string? escaped = SqlWriter.GetSqlValue(values, 0);
+		string? missing = SqlWriter.GetSqlValue(values, 1);
+
+		Assert.That(escaped, Is.EqualTo("O''Brien"));
+		Assert.That(missing, Is.EqualTo("'NULL'"));
+	}
 }
