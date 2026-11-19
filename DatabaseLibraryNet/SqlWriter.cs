@@ -399,6 +399,35 @@ public class SqlWriter
 	}
 
 	/// <summary>
+	/// Formats raw text as a complete SQL text literal.
+	/// </summary>
+	/// <param name="value">The raw text, or null for SQL NULL.</param>
+	/// <returns>A quoted text literal, or the unquoted SQL NULL keyword.
+	/// </returns>
+	/// <remarks>
+	/// Uses standard SQL apostrophe doubling and treats backslashes literally.
+	/// Preserves whitespace and Unicode without normalization. Input must be
+	/// raw text, not a previously quoted or escaped SQL literal.
+	/// </remarks>
+	public virtual string GetTextLiteral(string? value)
+	{
+		string escapedValue = "NULL";
+
+		if (value != null)
+		{
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP2_0_OR_GREATER
+			escapedValue = value.Replace("'", "''", StringComparison.Ordinal);
+#else
+			escapedValue = value.Replace("'", "''");
+#endif
+
+			escapedValue = "'" + escapedValue + "'";
+		}
+
+		return escapedValue;
+	}
+
+	/// <summary>
 	/// Get date.
 	/// </summary>
 	/// <param name="column">The column index to check.</param>

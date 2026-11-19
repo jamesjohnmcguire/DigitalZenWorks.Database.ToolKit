@@ -8,6 +8,31 @@
 
 A .NET library with a set of database utility classes.
 
+## SQL text literals
+
+Use `GetTextLiteral` for raw text when generating SQL scripts:
+
+```csharp
+SqlWriter writer = new SqlWriterMySql();
+string literal = writer.GetTextLiteral("O'Brien");
+```
+
+The base writer doubles apostrophes using standard SQL quoting.
+`SqlWriterMySql` delegates escaping to the existing MySql.Data provider.
+Its text literals require MySQL backslash escaping to be enabled
+(`NO_BACKSLASH_ESCAPES` must be absent from the target session's SQL mode).
+Other inherited operations retain the base writer's behavior.
+
+Both writers return unquoted `NULL` for a null reference, `''` for empty
+text, and `'NULL'` for the text `NULL`. They preserve whitespace, line
+breaks, and Unicode without normalization. Pass raw text exactly once;
+previously escaped text is treated as data. Apply trimming or vocabulary
+normalization separately before formatting.
+
+This additive API leaves the existing static escaping helpers unchanged.
+Use it for new script generation and migration toward v2. Database execution
+should continue to use parameter binding where available.
+
 ## Database file identification
 
 Use the public inspection method to identify an existing database file:
