@@ -239,21 +239,15 @@ public class SqlWriter
 	}
 
 	/// <summary>
-	/// Get SQL nuLL value.
+	/// Converts null or whitespace to SQL NULL using legacy rules.
 	/// </summary>
 	/// <param name="dataItem">The data item to check.</param>
 	/// <returns>The SQL value with NULL as replacement for a null or
 	/// empty value.</returns>
+	[Obsolete("Apply missing-value rules before formatting a SQL literal.")]
 	public static string GetSqlNullValue(string? dataItem)
 	{
-		// Older frameworks lack nullable annotations on IsNullOrWhiteSpace.
-		// The explicit null check proves the final return is non-null.
-		if (dataItem == null || string.IsNullOrWhiteSpace(dataItem))
-		{
-			return "NULL";
-		}
-
-		return dataItem;
+		return LegacyGetSqlNullValue(dataItem);
 	}
 
 	/// <summary>
@@ -267,6 +261,7 @@ public class SqlWriter
 	/// default value.</param>
 	/// <param name="defaultValue">The default value.</param>
 	/// <returns>The SQL value.</returns>
+	[Obsolete("Parse the field first, then format it by type for SQL.")]
 	public static string? GetSqlValue(
 		string[] columnValues,
 		int column,
@@ -274,39 +269,8 @@ public class SqlWriter
 		bool defaultNull = true,
 		string? defaultValue = null)
 	{
-		string? dataItem = null;
-
-		if (columnValues != null)
-		{
-			dataItem = columnValues[column];
-
-			if (dataItem != null)
-			{
-				dataItem = dataItem.Trim();
-
-				// Replace extra spaces.
-				dataItem = Regex.Replace(dataItem, @"\s+", " ");
-
-				dataItem = LegacyGetEscapedValue(dataItem);
-			}
-
-			if (defaultNull == true)
-			{
-				dataItem = GetSqlNullValue(dataItem);
-			}
-			else if (string.IsNullOrWhiteSpace(dataItem) &&
-				defaultValue != null)
-			{
-				dataItem = defaultValue;
-			}
-
-			if (escapeNonNull == true &&
-				dataItem != null &&
-				dataItem.Equals("NULL", StringComparison.Ordinal))
-			{
-				dataItem = LegacyEscapeString(dataItem);
-			}
-		}
+		string? dataItem = LegacyGetSqlValue(
+			columnValues, column, escapeNonNull, defaultNull, defaultValue);
 
 		return dataItem;
 	}
@@ -317,6 +281,7 @@ public class SqlWriter
 	/// <param name="checkText">The text to check.</param>
 	/// <returns>A value indicating whether the text is null or
 	/// a SQL NULL value.</returns>
+	[Obsolete("Check for missing values when reading the input field.")]
 	public static bool IsNullOrSqlNull(string checkText)
 	{
 		bool isNullOrWhiteSpaceOrSqlNull = false;
@@ -438,13 +403,14 @@ public class SqlWriter
 	/// default value.</param>
 	/// <param name="defaultValue">The default value.</param>
 	/// <returns>The SQL value.</returns>
+	[Obsolete("Parse the field first, then format it by type for SQL.")]
 	public string? GetSqlValue(
 		int column,
 		bool escapeNonNull = true,
 		bool defaultNull = true,
 		string? defaultValue = null)
 	{
-		string? dataItem = GetSqlValue(
+		string? dataItem = LegacyGetSqlValue(
 			rowColumnValues,
 			column,
 			escapeNonNull,
@@ -921,6 +887,62 @@ public class SqlWriter
 			if (enclosed == true)
 			{
 				dataItem = '\'' + dataItem + '\'';
+			}
+		}
+
+		return dataItem;
+	}
+
+	private static string LegacyGetSqlNullValue(string? dataItem)
+	{
+		// Older frameworks lack nullable annotations on IsNullOrWhiteSpace.
+		// The explicit null check proves the final return is non-null.
+		if (dataItem == null || string.IsNullOrWhiteSpace(dataItem))
+		{
+			return "NULL";
+		}
+
+		return dataItem;
+	}
+
+	private static string? LegacyGetSqlValue(
+		string[] columnValues,
+		int column,
+		bool escapeNonNull,
+		bool defaultNull,
+		string? defaultValue)
+	{
+		string? dataItem = null;
+
+		if (columnValues != null)
+		{
+			dataItem = columnValues[column];
+
+			if (dataItem != null)
+			{
+				dataItem = dataItem.Trim();
+
+				// Replace extra spaces.
+				dataItem = Regex.Replace(dataItem, @"\s+", " ");
+
+				dataItem = LegacyGetEscapedValue(dataItem);
+			}
+
+			if (defaultNull == true)
+			{
+				dataItem = LegacyGetSqlNullValue(dataItem);
+			}
+			else if (string.IsNullOrWhiteSpace(dataItem) &&
+				defaultValue != null)
+			{
+				dataItem = defaultValue;
+			}
+
+			if (escapeNonNull == true &&
+				dataItem != null &&
+				dataItem.Equals("NULL", StringComparison.Ordinal))
+			{
+				dataItem = LegacyEscapeString(dataItem);
 			}
 		}
 

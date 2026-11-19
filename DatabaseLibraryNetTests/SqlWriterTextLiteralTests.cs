@@ -119,10 +119,54 @@ internal sealed class SqlWriterTextLiteralTests
 	public void LegacyRowValuesPreservePublishedBehavior()
 	{
 		string[] values = ["  O'Brien  ", " "];
+#pragma warning disable CS0618 // Verify the retained static row API.
 		string? escaped = SqlWriter.GetSqlValue(values, 0);
 		string? missing = SqlWriter.GetSqlValue(values, 1);
+#pragma warning restore CS0618
 
 		Assert.That(escaped, Is.EqualTo("O''Brien"));
 		Assert.That(missing, Is.EqualTo("'NULL'"));
+	}
+
+	/// <summary>
+	/// The legacy null helpers preserve their distinct missing-value rules.
+	/// </summary>
+	/// <param name="value">The input value.</param>
+	/// <param name="expectedValue">The legacy SQL value.</param>
+	/// <param name="expectedNull">Whether the legacy predicate accepts it.</param>
+	[TestCase(null, "NULL", true)]
+	[TestCase("", "NULL", false)]
+	[TestCase(" \t ", "NULL", false)]
+	[TestCase("NULL", "NULL", true)]
+	[TestCase("null", "null", false)]
+	[TestCase(" NULL ", " NULL ", false)]
+	public void LegacyNullHelpersPreservePublishedBehavior(
+		string? value, string expectedValue, bool expectedNull)
+	{
+#pragma warning disable CS0618 // Verify the retained null APIs.
+		string sqlValue = SqlWriter.GetSqlNullValue(value);
+		bool isNull = SqlWriter.IsNullOrSqlNull(value!);
+#pragma warning restore CS0618
+
+		Assert.That(sqlValue, Is.EqualTo(expectedValue));
+		Assert.That(isNull, Is.EqualTo(expectedNull));
+	}
+
+	/// <summary>
+	/// The instance row helper still supports the legacy default settings.
+	/// </summary>
+	[Test]
+	public void LegacyInstanceRowHelperPreservesDefaults()
+	{
+		SqlWriter writer = new([" \t ", "  a\t  b  "]);
+#pragma warning disable CS0618 // Verify the retained instance row API.
+		string? fallback = writer.GetSqlValue(0, false, false, "fallback");
+		string? sqlNull = writer.GetSqlValue(0, false, true, "fallback");
+		string? cleaned = writer.GetSqlValue(1);
+#pragma warning restore CS0618
+
+		Assert.That(fallback, Is.EqualTo("fallback"));
+		Assert.That(sqlNull, Is.EqualTo("NULL"));
+		Assert.That(cleaned, Is.EqualTo("a b"));
 	}
 }

@@ -42,6 +42,8 @@ pass a nullable `DateTime` to `writer.GetDateLiteral(date)`. It writes a quoted
 For an integer field, parse to a nullable integer first. Format its value with
 `CultureInfo.InvariantCulture` and use SQL `NULL` when the value is missing.
 
+Both `GetSqlValue` overloads, `GetSqlNullValue`, and `IsNullOrSqlNull` are obsolete and planned for removal in v2. Decide what counts as missing and apply any defaults before formatting. Pass nullable text to `GetTextLiteral` and nullable dates to `GetDateLiteral`. For numbers, parse the field to the intended numeric type and format the value using `CultureInfo.InvariantCulture`. Emit unquoted `NULL` only for a missing numeric value. If an input format uses the word `NULL` to mean missing, recognize that token when reading the input so ordinary text can still contain the word.
+
 Use parameter binding when executing SQL against a database.
 
 ## Database file identification
