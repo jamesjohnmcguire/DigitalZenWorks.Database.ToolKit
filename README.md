@@ -36,6 +36,12 @@ surrounding quotes or escaping that your code previously added. If you used
 the array overload, pass the selected field rather than the array. Apply any
 trimming or missing-value policy before formatting.
 
+For dates, parse the field using the source data's format and culture, then
+pass a nullable `DateTime` to `writer.GetDateLiteral(date)`. It writes a quoted
+`yyyy-MM-dd` date without the time of day, or SQL `NULL` for a missing date.
+For an integer field, parse to a nullable integer first. Format its value with
+`CultureInfo.InvariantCulture` and use SQL `NULL` when the value is missing.
+
 Use parameter binding when executing SQL against a database.
 
 ## Database file identification

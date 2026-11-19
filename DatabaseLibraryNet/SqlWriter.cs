@@ -21,6 +21,8 @@ using System.Text.RegularExpressions;
 /// </summary>
 public class SqlWriter
 {
+	private const string DateFormat = "yyyy-MM-dd";
+
 	private readonly string[] rowColumnValues;
 
 	/// <summary>
@@ -164,7 +166,7 @@ public class SqlWriter
 	{
 		DateTime dateTime = DateTime.FromOADate(rawValue);
 		string? date = dateTime.ToString(
-			"yyyy-MM-dd", CultureInfo.InvariantCulture);
+			DateFormat, CultureInfo.InvariantCulture);
 
 		return date;
 	}
@@ -386,32 +388,44 @@ public class SqlWriter
 	}
 
 	/// <summary>
-	/// Get date.
+	/// Formats a calendar date as a quoted ISO date or SQL NULL.
 	/// </summary>
-	/// <param name="column">The column index to check.</param>
-	/// <returns>A text representation of the date.</returns>
+	/// <param name="value">The date, or null for SQL NULL.</param>
+	/// <returns>The SQL date value with the time of day omitted.</returns>
+	public string GetDateLiteral(DateTime? value)
+	{
+		string? dateText =
+			value?.ToString(DateFormat, CultureInfo.InvariantCulture);
+		string literal = GetTextLiteral(dateText);
+
+		return literal;
+	}
+
+	/// <summary>
+	/// Parses an OLE Automation date from the selected field and formats it
+	/// for SQL.
+	/// </summary>
+	/// <param name="column">The column index to read.</param>
+	/// <returns>A quoted date, or SQL NULL for a missing or non-numeric
+	/// field.</returns>
 	public string? GetDate(int column)
 	{
-		string? date = "NULL";
+		string? rawValue = rowColumnValues?[column];
+		DateTime? date = null;
 
-		string? rawValue = GetSqlValue(column, false, false);
-
-		if (string.IsNullOrWhiteSpace(rawValue))
+		if (rawValue != null)
 		{
-			date = GetSqlNullValue(rawValue);
-		}
-		else
-		{
-			bool result = double.TryParse(rawValue, out double outDate);
+			string field = Regex.Replace(rawValue.Trim(), @"\s+", " ");
 
-			if (result == true)
+			if (double.TryParse(field, out double serial))
 			{
-				date = GetOADate(outDate);
-				date = "'" + date + "'";
+				date = DateTime.FromOADate(serial);
 			}
 		}
 
-		return date;
+		string literal = GetDateLiteral(date);
+
+		return literal;
 	}
 
 	/// <summary>
