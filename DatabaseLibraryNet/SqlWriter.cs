@@ -81,12 +81,8 @@ public class SqlWriter
 			}
 		}
 
-		string? insertStatement = string.Format(
-			CultureInfo.InvariantCulture,
-			"INSERT INTO {0} ({1}) VALUES ({2});",
-			tableName,
-			columns,
-			values);
+		string insertStatement =
+			FormatInsertStatement(tableName, columns, values);
 
 		return insertStatement;
 	}
@@ -350,6 +346,70 @@ public class SqlWriter
 		}
 
 		return escapedValue;
+	}
+
+	/// <summary>
+	/// Creates an insert statement from ordered column and SQL value pairs.
+	/// </summary>
+	/// <param name="tableName">
+	/// The table identifier in the form required by the target SQL dialect.
+	/// </param>
+	/// <param name="columnPairs">The ordered column and value pairs.</param>
+	/// <returns>The complete insert statement.</returns>
+	/// <remarks>
+	/// The table, column identifiers, and SQL values are used as supplied.
+	/// </remarks>
+	/// <exception cref="ArgumentNullException">
+	/// The table name or collection is null.
+	/// </exception>
+	/// <exception cref="ArgumentException">
+	/// The table name is blank, or the collection is empty or has a null entry.
+	/// </exception>
+	public virtual string CreateInsertStatement(
+		string tableName, IReadOnlyList<ColumnPair> columnPairs)
+	{
+		ArgumentGuard.ThrowIfNull(tableName, nameof(tableName));
+		ArgumentGuard.ThrowIfNull(columnPairs, nameof(columnPairs));
+
+		if (string.IsNullOrWhiteSpace(tableName))
+		{
+			throw new ArgumentException(
+				"A table name cannot be empty or whitespace.",
+				nameof(tableName));
+		}
+
+		if (columnPairs.Count == 0)
+		{
+			throw new ArgumentException(
+				"An insert requires at least one column.", nameof(columnPairs));
+		}
+
+		StringBuilder columns = new();
+		StringBuilder values = new();
+
+		for (int index = 0; index < columnPairs.Count; index++)
+		{
+			ColumnPair pair = columnPairs[index];
+			if (pair == null)
+			{
+				throw new ArgumentException(
+					"A column pair cannot be null.", nameof(columnPairs));
+			}
+
+			if (index > 0)
+			{
+				columns.Append(", ");
+				values.Append(", ");
+			}
+
+			columns.Append(pair.ColumnName);
+			values.Append(pair.SqlValue);
+		}
+
+		string statement = FormatInsertStatement(
+			tableName, columns.ToString(), values.ToString());
+
+		return statement;
 	}
 
 	/// <summary>
@@ -836,6 +896,19 @@ public class SqlWriter
 		}
 
 		return identity;
+	}
+
+	private static string FormatInsertStatement(
+		string tableName, string columns, string values)
+	{
+		string statement = string.Format(
+			CultureInfo.InvariantCulture,
+			"INSERT INTO {0} ({1}) VALUES ({2});",
+			tableName,
+			columns,
+			values);
+
+		return statement;
 	}
 
 	private static string? LegacyEscapeString(string dataItem)
