@@ -105,7 +105,7 @@ public class SqlWriter
 		if (primaryKeyPairs != null && keyPairs != null)
 		{
 			string pairs = string.Empty;
-			string where = "WHERE ";
+			string where = string.Empty;
 
 			int count = keyPairs.Count;
 
@@ -142,12 +142,7 @@ public class SqlWriter
 				where += pair;
 			}
 
-			statement = string.Format(
-				CultureInfo.InvariantCulture,
-				"UPDATE {0} SET {1} {2};",
-				tableName,
-				pairs,
-				where);
+			statement = FormatUpdateStatement(tableName, pairs, where);
 		}
 
 		return statement;
@@ -408,6 +403,49 @@ public class SqlWriter
 
 		string statement = FormatInsertStatement(
 			tableName, columns.ToString(), values.ToString());
+
+		return statement;
+	}
+
+	/// <summary>
+	/// Creates an update with ordered assignments and primary key conditions.
+	/// </summary>
+	/// <param name="tableName">The prepared table identifier.</param>
+	/// <param name="primaryKeyPairs">The key columns and SQL values.</param>
+	/// <param name="columnPairs">The assignments in column order.</param>
+	/// <returns>The complete update statement.</returns>
+	/// <remarks>
+	/// Uses the supplied identifiers and SQL values verbatim. Key conditions
+	/// use equality and are joined by AND. Supply non-null key values.
+	/// </remarks>
+	/// <exception cref="ArgumentNullException">
+	/// The table name or either collection is null.
+	/// </exception>
+	/// <exception cref="ArgumentException">
+	/// The table name is blank, or a collection is empty or has a null entry.
+	/// </exception>
+	public virtual string CreateUpdateStatement(
+		string tableName,
+		IReadOnlyList<ColumnPair> primaryKeyPairs,
+		IReadOnlyList<ColumnPair> columnPairs)
+	{
+		ArgumentGuard.ThrowIfNull(tableName, nameof(tableName));
+		ArgumentGuard.ThrowIfNull(primaryKeyPairs, nameof(primaryKeyPairs));
+		ArgumentGuard.ThrowIfNull(columnPairs, nameof(columnPairs));
+
+		if (string.IsNullOrWhiteSpace(tableName))
+		{
+			throw new ArgumentException(
+				"A table name cannot be empty or whitespace.",
+				nameof(tableName));
+		}
+
+		string assignments = FormatColumnAssignments(
+			columnPairs, ", ", nameof(columnPairs));
+		string conditions = FormatColumnAssignments(
+			primaryKeyPairs, " AND ", nameof(primaryKeyPairs));
+		string statement =
+			FormatUpdateStatement(tableName, assignments, conditions);
 
 		return statement;
 	}
@@ -907,6 +945,56 @@ public class SqlWriter
 			tableName,
 			columns,
 			values);
+
+		return statement;
+	}
+
+	private static string FormatColumnAssignments(
+		IReadOnlyList<ColumnPair> columnPairs,
+		string separator,
+		string parameterName)
+	{
+		if (columnPairs.Count == 0)
+		{
+			throw new ArgumentException(
+				"At least one column pair is required.", parameterName);
+		}
+
+		StringBuilder builder = new();
+
+		for (int index = 0; index < columnPairs.Count; index++)
+		{
+			ColumnPair pair = columnPairs[index];
+			if (pair == null)
+			{
+				throw new ArgumentException(
+					"A column pair cannot be null.", parameterName);
+			}
+
+			if (index > 0)
+			{
+				builder.Append(separator);
+			}
+
+			builder.Append(pair.ColumnName);
+			builder.Append(" = ");
+			builder.Append(pair.SqlValue);
+		}
+
+		string assignments = builder.ToString();
+
+		return assignments;
+	}
+
+	private static string FormatUpdateStatement(
+		string tableName, string assignments, string conditions)
+	{
+		string statement = string.Format(
+			CultureInfo.InvariantCulture,
+			"UPDATE {0} SET {1} WHERE {2};",
+			tableName,
+			assignments,
+			conditions);
 
 		return statement;
 	}
